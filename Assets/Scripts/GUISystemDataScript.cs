@@ -13,30 +13,36 @@ public class GUISystemDataScript : MonoBehaviour
 	[HideInInspector]
 	public string improvementLevel;
 	[HideInInspector]
-	public string[] allPlanetsInfo = new string[6];	
+	public string[] allPlanetsInfo = new string[6];	//Unique to object
 	[HideInInspector]
-	public string[,] planNameOwnImprov = new string[6,3];
+	public string[,] planNameOwnImprov = new string[6,3]; //Unique to object
 	[HideInInspector]
 	public Rect[] allPlanetsGUI, allButtonsGUI;
 	[HideInInspector]
 	public bool canImprove, foundPlanetData;
+
+	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM;
+	private float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
 	
 	private string text = " ";
 	private GameObject[] systemConnections = new GameObject[4];
+
 	private TurnInfo turnInfoScript;
 	private LineRenderScript lineRenderScript;
 	private CameraFunctions cameraFunctionsScript;
+	private TechTreeScript techTreeScript;
 
 	void Awake()
 	{
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
+		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 
 		LoadFile();		
 		GUIRectBuilder();
 	}
-	
-	void LoadFile()
+
+	private void LoadFile() //This fills the systems array with all the planets in the system, whether they are owned, and their improvement level
 	{
 		using(StreamReader reader =  new StreamReader("SystemTypeData.txt"))
 		{
@@ -67,11 +73,9 @@ public class GUISystemDataScript : MonoBehaviour
 		}
 	}
 	
-	public void FindSystem()
+	public void FindSystem() //This function is used to check if the highlighted system can be colonised, and if it can, to colonise it
 	{		
-		GameObject tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
-
-		lineRenderScript = tempObject.GetComponent<LineRenderScript>();
+		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		
 		systemConnections = lineRenderScript.connections;
 		
@@ -82,7 +86,7 @@ public class GUISystemDataScript : MonoBehaviour
 				break;
 			}
 			
-			for(int j = 0; j < 60; j++)
+			for(int j = 0; j < turnInfoScript.arrayIterator; ++j)
 			{
 				if(turnInfoScript.ownedSystems[j] == null)
 				{
@@ -91,11 +95,11 @@ public class GUISystemDataScript : MonoBehaviour
 				
 				if(systemConnections[i] == turnInfoScript.ownedSystems[j])
 				{					
-					turnInfoScript.ownedSystems[turnInfoScript.arrayIterator] = tempObject;
+					turnInfoScript.ownedSystems[turnInfoScript.arrayIterator] = gameObject;
 					
 					turnInfoScript.arrayIterator++;
 					
-					tempObject.renderer.material = turnInfoScript.ownedMaterial;
+					gameObject.renderer.material = turnInfoScript.ownedMaterial;
 						
 					turnInfoScript.GP -= 1;
 						
@@ -107,40 +111,48 @@ public class GUISystemDataScript : MonoBehaviour
 		}
 	}
 
-	public void FindPlanetData()
-	{
-		for(int i = 0; i < 6; i++)
-		{				
-			for(int n = 0; n < 6; n++)
+	public void SystemSIMCounter() //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
+	{				
+		totalSystemScience = 0.0f;
+		totalSystemIndustry = 0.0f;
+		totalSystemMoney = 0.0f;
+
+		for(int n = 0; n < numPlanets; ++n)
+		{
+			if(planNameOwnImprov[n,0] != null)
 			{
 				string planetType = planNameOwnImprov[n,0];
+
+				improvementNumber = int.Parse (planNameOwnImprov[n,2]);
+
+				CheckImprovement();
 				
-				if(planetType != null)
+				for(int j = 0; j < 12; ++j)
 				{
-					improvementNumber = int.Parse(planNameOwnImprov[n,2]);
-					
-					CheckImprovement();
-					
-					for(int j = 0; j < 12; j++)
+					if(turnInfoScript.planetRIM[j,0] == planetType)
 					{
-						if(planetType == turnInfoScript.planetRIM[j,0])
-						{
-							pScience = (float.Parse (turnInfoScript.planetRIM[j,1])) * (float)turnInfoScript.raceScience * resourceBonus;
-							pIndustry = (float.Parse (turnInfoScript.planetRIM[j,2])) * (float)turnInfoScript.raceIndustry * resourceBonus;
-							pMoney = (float.Parse (turnInfoScript.planetRIM[j,3])) * (float)turnInfoScript.raceMoney * resourceBonus;
-						}
+						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]) * resourceBonus * turnInfoScript.raceScience;
+						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * turnInfoScript.raceIndustry;
+						tempMon = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * turnInfoScript.raceMoney;
 					}
-					
-					if(planetType != null)
-					{
-						allPlanetsInfo[n] = gameObject.name + " " + (n+1) + "\n" + planetType + "\n" + improvementLevel + "\n" + pScience.ToString() + "\n" + pIndustry.ToString() + "\n" + pMoney.ToString();
-					}
+
+					allPlanetsInfo[n] = gameObject.name + " " + (n+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
+						+ tempSci.ToString() + "\n" + tempInd.ToString() + "\n" + tempMon.ToString();
 				}
-			}	
-		}	
+
+				totalSystemScience += (tempSci * techTreeScript.sciencePercentBonus) + techTreeScript.sciencePointBonus;
+				totalSystemIndustry += (tempInd * techTreeScript.industryPercentBonus) + techTreeScript.industryPointBonus;
+				totalSystemMoney += (tempMon * techTreeScript.moneyPercentBonus) + techTreeScript.moneyPointBonus;
+			}
+		}
+		
+		if(turnInfoScript.endTurn == true)
+		{
+			totalSystemSIM += totalSystemScience + totalSystemIndustry + totalSystemMoney;
+		}
 	}
-	
-	void GUIRectBuilder()
+
+	private void GUIRectBuilder()
 	{
 		Rect topLeft = new Rect(Screen.width/2 - 320.0f, Screen.height / 2 - 200.0f, 200.0f, 200.0f); //Top Left
 		
