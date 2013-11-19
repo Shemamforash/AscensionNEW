@@ -14,6 +14,9 @@ public class TurnInfo : MonoBehaviour
 	public GameObject[] systemList = new GameObject[60];
 	[HideInInspector]
 	public GameObject[] ownedSystems = new GameObject[60];
+	[HideInInspector]
+	public Rect[] allPlanetsGUI, allButtonsGUI; 
+	public Rect[,] tierButtonsGUI;
 	public Material ownedMaterial;
 	public Camera mainCamera;
 	public bool endTurn;
@@ -25,6 +28,7 @@ public class TurnInfo : MonoBehaviour
 	private GameObject tempObject;
 	private GUISystemDataScript guiPlanScript;
 	private CameraFunctions cameraFunctionsScript;
+	private TechTreeScript techTreeScript;
 	
 	void Awake()
 	{	
@@ -35,6 +39,10 @@ public class TurnInfo : MonoBehaviour
 		Time.timeScale = 0;
 		
 		LoadPlanetData();
+
+		GUIRectBuilder();
+
+		GUITechTreeRectBuilder();
 	}
 	
 	void Update()
@@ -44,6 +52,7 @@ public class TurnInfo : MonoBehaviour
 			GameObject tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
 			
 			guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
+			techTreeScript = tempObject.GetComponent<TechTreeScript>();
 		}
 
 		CentreCamera();
@@ -97,7 +106,120 @@ public class TurnInfo : MonoBehaviour
 			}			
 		}
 	}
-	
+
+	private void GUIRectBuilder()
+	{
+		Rect topLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 - 225.0f, 200.0f, 100.0f); //Top left
+		
+		Rect buttonTopLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 - 125.0f, 200.0f, 50.0f);
+		
+		Rect topRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 225.0f, 200.0f, 100.0f); //Top right
+		
+		Rect buttonTopRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 125.0f, 200.0f, 50.0f);
+
+		
+		Rect middleLeft = new Rect (Screen.width/2 - 500.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle left
+		
+		Rect buttonMiddleLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 + 50.0f, 200.0f, 50.0f);
+		
+		Rect middleRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle right
+		
+		Rect buttonMiddleRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 + 50.0f, 200.0f, 50.0f);
+
+		
+		Rect bottomLeft = new Rect(Screen.width/2 -500.0f, Screen.height / 2 + 125.0f, 200.0f, 100.0f); //Bottom left
+		
+		Rect buttonBottomLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 + 225.0f, 200.0f, 50.0f);
+		
+		Rect bottomRight = new Rect(Screen.width/2 -250.0f, Screen.height / 2 + 125.0f, 200.0f, 100.0f); //Bottom right
+		
+		Rect buttonBottomRight = new Rect(Screen.width/2 -250.0f, Screen.height / 2 + 225.0f, 200.0f, 50.0f);
+
+		
+		allPlanetsGUI = new Rect[6] {topLeft, topRight, middleLeft, middleRight, bottomLeft, bottomRight};
+		
+		allButtonsGUI = new Rect[6] {buttonTopLeft, buttonTopRight, buttonMiddleLeft, buttonMiddleRight, buttonBottomLeft, buttonBottomRight};	
+	}
+
+	private void GUITechTreeRectBuilder()
+	{
+		Rect top1 = new Rect(Screen.width / 2 + 50.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
+		Rect top2 = new Rect(Screen.width / 2 + 205.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
+		Rect top3 = new Rect(Screen.width / 2 + 360.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
+		Rect top4 = new Rect(Screen.width / 2 + 515.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
+		Rect top5 = new Rect(Screen.width / 2 + 670.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
+		Rect ignore1 =  new Rect(100.0f, 100.0f, 100.0f, 100.0f);
+
+		Rect middleTop1 = new Rect(Screen.width / 2 + 50.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
+		Rect middleTop2 = new Rect(Screen.width / 2 + 205.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
+		Rect middleTop3 = new Rect(Screen.width / 2 + 360.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
+		Rect middleTop4 = new Rect(Screen.width / 2 + 515.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
+		Rect middleTop5 = new Rect(Screen.width / 2 + 670.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
+		Rect ignore2 =  new Rect(100.0f, 100.0f, 100.0f, 100.0f);
+
+		Rect middleBottom1 = new Rect(Screen.width / 2 + 50.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
+		Rect middleBottom2 = new Rect(Screen.width / 2 + 205.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
+		Rect middleBottom3 = new Rect(Screen.width / 2 + 360.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
+		Rect middleBottom4 = new Rect(Screen.width / 2 + 515.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
+		Rect middleBottom5 = new Rect(Screen.width / 2 + 670.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
+		Rect middleBottom6 = new Rect(Screen.width / 2 + 825.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
+
+		Rect bottom1 = new Rect(Screen.width / 2 + 50.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
+		Rect bottom2 = new Rect(Screen.width / 2 + 205.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
+		Rect bottom3 = new Rect(Screen.width / 2 + 360.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
+		Rect bottom4 = new Rect(Screen.width / 2 + 515.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
+		Rect bottom5 = new Rect(Screen.width / 2 + 670.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
+		Rect bottom6 = new Rect(Screen.width / 2 + 825.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
+
+		tierButtonsGUI = new Rect[4,6] {{top1, top2, top3, top4, top5, ignore1},{middleTop1, middleTop2, middleTop3, middleTop4, middleTop5, ignore2},
+			{middleBottom1, middleBottom2, middleBottom3, middleBottom4, middleBottom5, middleBottom6},{bottom1, bottom2, bottom3, bottom4, bottom5, bottom6}};
+	}
+
+	private void PickRace()
+	{
+		if(playerRace == "Human")
+		{
+			raceScience = 1;
+			raceIndustry = 1;
+			raceMoney = 2;
+			raceGP = 3;
+			homePlanet = "Sol";
+		}
+		if(playerRace == "Selkie")
+		{
+			raceScience = 1;
+			raceIndustry = 3;
+			raceMoney = 2;
+			raceGP = 2;
+			homePlanet = "Heracles";
+		}
+		if(playerRace == "Nereid")
+		{
+			raceScience = 6;
+			raceIndustry = 2;
+			raceMoney = 4;
+			raceGP = 1;
+			homePlanet = "Nepthys";
+		}
+
+		for(int i = 0; i < 60; i++)
+		{
+			if(systemList[i].name == homePlanet)
+			{
+				ownedSystems[arrayIterator] = systemList[i];
+				ownedSystems[arrayIterator].renderer.material = ownedMaterial;
+				arrayIterator++;
+				break;
+			}
+		}
+		
+		cameraFunctionsScript.selectedSystem = homePlanet;
+		
+		GP = raceGP;
+		
+		Time.timeScale = 1;
+	}
+
 	void OnGUI()
 	{
 		#region playerrace
@@ -108,58 +230,28 @@ public class TurnInfo : MonoBehaviour
 			if(GUI.Button (new Rect(Screen.width/2 - 130, Screen.height/2, 80, 20), "Humans"))
 			{
 				playerRace = "Human";
-				raceScience = 1;
-				raceIndustry = 1;
-				raceMoney = 2;
-				raceGP = 3;
-				homePlanet = "Sol";
 			}
+
 			if(GUI.Button (new Rect(Screen.width/2 -40, Screen.height/2, 80, 20), "Selkies"))
 			{
 				playerRace = "Selkie";
-				raceScience = 1;
-				raceIndustry = 3;
-				raceMoney = 2;
-				raceGP = 2;
-				homePlanet = "Heracles";
 			}
+
 			if(GUI.Button (new Rect(Screen.width/2 + 50, Screen.height/2, 80, 20), "Nereides"))
 			{
 				playerRace = "Nereid";
-				raceScience = 6;
-				raceIndustry = 2;
-				raceMoney = 4;
-				raceGP = 1;
-				homePlanet = "Nepthys";
-			}
-			
-			for(int i = 0; i < 60; i++)
-			{
-				if(systemList[i].name == homePlanet)
-				{
-					ownedSystems[arrayIterator] = systemList[i];
-					ownedSystems[arrayIterator].renderer.material = ownedMaterial;
-					arrayIterator++;
-					break;
-				}
 			}
 
-			cameraFunctionsScript.selectedSystem = homePlanet;
-
-			GP = raceGP;
-			
-			Time.timeScale = 1;
+			PickRace ();
 		}
 		#endregion
 		
-		#region turninfo
-		Rect bottomRight = new Rect(Screen.width - 80, Screen.height - 30, 70, 20);
-		
+		#region turninfo		
 		string turnNumber = "Turn: " + turn.ToString();
 		
 		GUI.Label (new Rect(Screen.width - 80, Screen.height - 50, 50, 20), turnNumber);
 		
-		if(GUI.Button (bottomRight, "End turn") && playerRace != null)
+		if(GUI.Button (new Rect(Screen.width - 80, Screen.height - 30, 70, 20), "End turn") && playerRace != null)
 		{
 			TurnEnd ();
 		}
@@ -197,8 +289,10 @@ public class TurnInfo : MonoBehaviour
 		}
 		#endregion
 
+		#region planetinfomenu
 		if(cameraFunctionsScript.openMenu == true)
 		{
+			#region planetdata
 			GUI.enabled = true;
 			
 			Rect fullScreenMenu = new Rect(0.5f, 0.5f, Screen.width, Screen.height);
@@ -211,7 +305,7 @@ public class TurnInfo : MonoBehaviour
 				guiPlanScript.foundPlanetData = true;
 			}
 
-			Rect dataSIM = new Rect (Screen.width/2 - 50.0f, Screen.height/2 - 350.0f, 100.0f, 100.0f);
+			Rect dataSIM = new Rect (Screen.width/2 - 500.0f, Screen.height/2 - 350.0f, 100.0f, 100.0f);
 
 			string dataSIMString = "Total SIM: " + guiPlanScript.totalSystemSIM.ToString() + "\n" + "Total Science: " + guiPlanScript.totalSystemScience.ToString() + "\n" 
 				+ "Total Industry: " + guiPlanScript.totalSystemIndustry.ToString() + "\n" + "Total Money: " + guiPlanScript.totalSystemMoney.ToString(); 
@@ -226,23 +320,54 @@ public class TurnInfo : MonoBehaviour
 
 				cost = "Improve Cost: " + guiPlanScript.improvementCost;
 
-				if(GUI.Button(guiPlanScript.allButtonsGUI[i], cost) && guiPlanScript.canImprove == true && industry >= guiPlanScript.improvementCost)
+				if(GUI.Button(allButtonsGUI[i], cost) && guiPlanScript.canImprove == true && industry >= guiPlanScript.improvementCost)
 				{	
-					int q = int.Parse(guiPlanScript.planNameOwnImprov[i,2]);
-
-					q++;
-						
-					guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
-
-					industry -= guiPlanScript.improvementCost;
-					
-					guiPlanScript.SystemSIMCounter();
+					ImproveButtonClick(i);
 				}
 
-				GUI.Label (guiPlanScript.allPlanetsGUI[i], guiPlanScript.allPlanetsInfo[i]);
-			}	
-		}
+				GUI.Label (allPlanetsGUI[i], guiPlanScript.allPlanetsInfo[i]);
+			}
+			#endregion
+			#region techtreedata
 
+			string techBuildButtonText;
+
+			for(int f = 0; f <= techTreeScript.techTier; ++f)
+			{
+				for(int i = 0; i < 6; ++i)
+				{
+					if((techTreeScript.techTreeComplete[f,i,0] == null) || (f == 0 && i == 5) || (f == 1 && i == 5))
+					{
+						break;
+					}
+
+					techBuildButtonText = techTreeScript.techTreeComplete[f,i,0].ToString () + "\n" + techTreeScript.techTreeComplete[f,i,1].ToString();
+
+					if(GUI.Button (tierButtonsGUI[f,i], techBuildButtonText))
+					{
+						techTreeScript.techToBuildPosition = i;
+						techTreeScript.techToBuildTier = f;
+						techTreeScript.ImproveSystem();
+					}
+				}
+			}
+
+			#endregion
+		}
+		#endregion
+	}
+
+	void ImproveButtonClick(int i)
+	{
+		int q = int.Parse(guiPlanScript.planNameOwnImprov[i,2]);
+		
+		q++;
+		
+		guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
+		
+		industry -= guiPlanScript.improvementCost;
+		
+		guiPlanScript.SystemSIMCounter();
 	}
 	
 	void TurnEnd() //This function accumulates all the SIM generated by each system to give an empire SIM value

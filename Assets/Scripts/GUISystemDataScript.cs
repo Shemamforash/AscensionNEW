@@ -17,8 +17,6 @@ public class GUISystemDataScript : MonoBehaviour
 	[HideInInspector]
 	public string[,] planNameOwnImprov = new string[6,3]; //Unique to object
 	[HideInInspector]
-	public Rect[] allPlanetsGUI, allButtonsGUI;
-	[HideInInspector]
 	public bool canImprove, foundPlanetData;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM;
@@ -39,7 +37,6 @@ public class GUISystemDataScript : MonoBehaviour
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 
 		LoadFile();		
-		GUIRectBuilder();
 	}
 
 	private void LoadFile() //This fills the systems array with all the planets in the system, whether they are owned, and their improvement level
@@ -149,40 +146,22 @@ public class GUISystemDataScript : MonoBehaviour
 		if(turnInfoScript.endTurn == true)
 		{
 			totalSystemSIM += totalSystemScience + totalSystemIndustry + totalSystemMoney;
+
+			if(totalSystemSIM >= 1600.0f && totalSystemSIM < 3200)
+			{
+				techTreeScript.techTier = 1;
+			}
+			if(totalSystemSIM >= 3200.0f && totalSystemSIM < 6400)
+			{
+				techTreeScript.techTier = 2;
+			}
+			if(totalSystemSIM >= 6400.0f)
+			{
+				techTreeScript.techTier = 3;
+			}
 		}
 	}
 
-	private void GUIRectBuilder()
-	{
-		Rect topLeft = new Rect(Screen.width/2 - 320.0f, Screen.height / 2 - 200.0f, 200.0f, 200.0f); //Top Left
-		
-		Rect buttonTopLeft = new Rect(Screen.width/2 - 320.0f, Screen.height / 2 - 75.0f, 200.0f, 50.0f);
-		
-		Rect topMiddle = new Rect(Screen.width/2 - 100.0f, Screen.height / 2 - 200.0f, 200.0f, 200.0f); //Top middle
-		
-		Rect buttonTopMiddle = new Rect(Screen.width/2 - 100.0f, Screen.height / 2 - 75.0f, 200.0f, 50.0f);
-		
-		Rect topRight = new Rect (Screen.width/2 + 120.0f, Screen.height / 2 - 200.0f, 200.0f, 200.0f); //Top right
-		
-		Rect buttonTopRight = new Rect(Screen.width/2 + 120.0f, Screen.height / 2 - 75.0f, 200.0f, 50.0f);
-		
-		Rect bottomLeft = new Rect(Screen.width/2 - 320.0f, Screen.height / 2, 200.0f, 200.0f); //Bottom left
-		
-		Rect buttonBottomLeft = new Rect(Screen.width/2 - 320.0f, Screen.height / 2 + 125.0f, 200.0f, 50.0f);
-		
-		Rect bottomMiddle = new Rect(Screen.width/2 -100.0f, Screen.height / 2, 200.0f, 200.0f); //Bottom middle
-		
-		Rect buttonBottomMiddle = new Rect(Screen.width/2 - 100.0f, Screen.height / 2 + 125.0f, 200.0f, 50.0f);
-		
-		Rect bottomRight = new Rect(Screen.width/2 + 120.0f, Screen.height / 2, 200.0f, 200.0f); //Bottom right
-		
-		Rect buttonBottomRight = new Rect(Screen.width/2 + 120.0f, Screen.height / 2 + 125.0f, 200.0f, 50.0f);
-		
-		allPlanetsGUI = new Rect[6] {topLeft, topMiddle, topRight, bottomLeft, bottomMiddle, bottomRight};
-		
-		allButtonsGUI = new Rect[6] {buttonTopLeft, buttonTopMiddle, buttonTopRight, buttonBottomLeft, buttonBottomMiddle, buttonBottomRight};	
-	}
-	
 	public void CheckImprovement()
 	{
 		if(improvementNumber == 0)
