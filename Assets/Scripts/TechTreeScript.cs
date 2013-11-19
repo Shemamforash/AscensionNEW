@@ -17,6 +17,8 @@ public class TechTreeScript : MonoBehaviour
 	public int techTier = 0;
 	private GameObject[] connectedSystems = new GameObject[4];
 
+	private bool activeTech = false, builtThisTurn = false;
+
 	void Start()
 	{
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
@@ -29,9 +31,9 @@ public class TechTreeScript : MonoBehaviour
 	{
 		if(turnInfoScript.industry >= techTreeCost[techToBuildTier, techToBuildPosition])
 		{
-			turnInfoScript.industry -= techTreeCost[techToBuildTier, techToBuildPosition];
+			turnInfoScript.industry -= (int)techTreeCost[techToBuildTier, techToBuildPosition];
 			techTreeComplete[techToBuildTier, techToBuildPosition, 1] = "Built";
-			//TechnologyList();
+			builtThisTurn = true;
 		}
 	}
 
@@ -61,40 +63,56 @@ public class TechTreeScript : MonoBehaviour
 		}
 	}
 
-
-
-	private void TechnologyList()
+	public void ActiveTechnologies()
 	{
-		string techToImprove = ""; //************ edit this asap ************
-
-		if(techToImprove == "Secondary Research")
+		if(techTreeComplete[0,0,1] == "Built" && builtThisTurn == true) //Secondary Research
 		{
-			//+50 science on system improvement
+			turnInfoScript.science += 50;
+			builtThisTurn = false;
 		}
 
-		if(techToImprove == "Synergy")
+		if(techTreeComplete[0,1,1] == "Built" && activeTech == false) //Synergy
 		{
 			for(int i = 0; i < 4; ++i)
 			{
 				connectedSystems[i] = lineRenderScript.connections[i];
 			}
-
+			
 			foreach (GameObject system in connectedSystems)
 			{
 				for(int i = 0; i < 60; ++i)
 				{
+					if(system == null)
+					{
+						break;
+					}
+
 					if(system == turnInfoScript.ownedSystems[i])
 					{
 						industryPercentBonus += 0.05f;
 					}
 				}
 			}
+
+			activeTech = true;
 		}
 
-		if(techToImprove == "Morale")
+		if(techTreeComplete[0,3,1] == "Built")
 		{
-			//foreach hero in system +10 money
-		}
+			foreach(GameObject system in turnInfoScript.ownedSystems)
+			{
+				systemDataScript = system.GetComponent<GUISystemDataScript>();
 
+				for(int i = 0; i < systemDataScript.numPlanets; ++i)
+				{
+					string tempString = systemDataScript.planNameOwnImprov[i,0];
+
+					if(tempString == "Plains" || tempString == "Ocean" || tempString == "Forest")
+					{
+						turnInfoScript.money += 10;
+					}
+				}
+			}
+		}
 	}
 }

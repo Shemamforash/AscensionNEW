@@ -7,7 +7,8 @@ public class TurnInfo : MonoBehaviour
 	[HideInInspector]
 	public int arrayIterator, GP, raceGP;
 	[HideInInspector]
-	public float science, industry, money, raceScience, raceIndustry, raceMoney;
+	public int science, industry, money;
+	public float raceScience, raceIndustry, raceMoney;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,4];
 	[HideInInspector]
@@ -365,7 +366,7 @@ public class TurnInfo : MonoBehaviour
 		
 		guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
 		
-		industry -= guiPlanScript.improvementCost;
+		industry -= (int)guiPlanScript.improvementCost;
 		
 		guiPlanScript.SystemSIMCounter();
 	}
@@ -379,12 +380,14 @@ public class TurnInfo : MonoBehaviour
 			if(system != null)
 			{
 				guiPlanScript = system.GetComponent<GUISystemDataScript>();
+				techTreeScript = system.GetComponent<TechTreeScript>();
 
 				guiPlanScript.SystemSIMCounter();
+				techTreeScript.ActiveTechnologies();
 
-				science += guiPlanScript.totalSystemScience;
-				industry += guiPlanScript.totalSystemIndustry;
-				money += guiPlanScript.totalSystemMoney;
+				science += (int)guiPlanScript.totalSystemScience;
+				industry += (int)guiPlanScript.totalSystemIndustry;
+				money += (int)guiPlanScript.totalSystemMoney;
 			}
 		}
 		
