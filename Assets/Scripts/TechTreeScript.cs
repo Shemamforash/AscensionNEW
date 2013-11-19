@@ -10,17 +10,18 @@ public class TechTreeScript : MonoBehaviour
 	private LineRenderScript lineRenderScript;
 	private TurnInfo turnInfoScript;
 	public bool systemHasImproved = false;
-	protected float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
-	protected int techTier, sciencePointBonus, industryPointBonus, moneyPointBonus;
+	public float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
+	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
+	private int techTier;
 	private GameObject[] connectedSystems = new GameObject[4];
 
-	private void Start()
+	void Start()
 	{
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 	}
 
-	private void Update()
+	void Update()
 	{
 		if(systemHasImproved == true)
 		{
@@ -32,7 +33,7 @@ public class TechTreeScript : MonoBehaviour
 			{
 				if(allImprovementsTiers[techTier, i] == null)
 				{
-					allImprovementsTiers[techTier, i] = clickedImprovementName;
+					//allImprovementsTiers[techTier, i] = clickedImprovementName;
 					break;
 				}
 			}
