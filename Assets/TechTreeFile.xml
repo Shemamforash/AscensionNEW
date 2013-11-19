@@ -1,0 +1,16 @@
+Tier1
+SecondaryResearch = false;
+Synergy = false;
+Morale = false;
+Tier2
+Collaboration = false;
+QuickStarters = false;
+WarProfiteering = false;
+Tier3
+VirginSoils = false;
+Unionisation = false;
+Familiarity = false;
+Tier4
+Renaissance = false;
+Salvage = false;
+Bribery = false;

@@ -1,71 +1,72 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Xml;
+using System.IO;
 
 public class TechTreeScript : MonoBehaviour 
 {
-	private string techToImprove;
+	public int techToBuildTier, techToBuildPosition;
+	public string[,,] techTreeComplete = new string[4,6,2];
+	public float[,] techTreeCost = new float[4,6];
 
-	private string[,] allImprovementsTiers = new string[4,6];
 	private LineRenderScript lineRenderScript;
 	private TurnInfo turnInfoScript;
-	public bool systemHasImproved = false;
+	private GUISystemDataScript systemDataScript;
+	
 	public float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
 	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
-	private int techTier;
+	public int techTier = 0;
 	private GameObject[] connectedSystems = new GameObject[4];
 
 	void Start()
 	{
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
+
+		LoadTechTree();
 	}
 
-	void Update()
+	public void ImproveSystem()
 	{
-		if(systemHasImproved == true)
+		if(turnInfoScript.industry >= techTreeCost[techToBuildTier, techToBuildPosition])
 		{
-			//techToImprove = clickedImprovementName;
-			//techTier = clickedImprovementTier;
+			turnInfoScript.industry -= techTreeCost[techToBuildTier, techToBuildPosition];
+			techTreeComplete[techToBuildTier, techToBuildPosition, 1] = "Built";
+			//TechnologyList();
+		}
+	}
 
-			CheckTier ();
-			for(int i = 0; i < 6; i++)
+	private void LoadTechTree()
+	{
+		string text = " ";
+		
+		using(StreamReader reader =  new StreamReader("HumanTechTree.txt"))
+		{
+			for(int i = 0; i < 4; i++)
 			{
-				if(allImprovementsTiers[techTier, i] == null)
+				for(int j = 0; j < 6; j++)
 				{
-					//allImprovementsTiers[techTier, i] = clickedImprovementName;
-					break;
+					if((i == 0 && j > 4) || (i == 1 && j > 4))
+					{
+						break;
+					}
+
+					text = reader.ReadLine();
+					techTreeComplete[i,j,0] = text;
+					techTreeComplete[i,j,1] = "Not Built";
+
+					text = reader.ReadLine();
+					techTreeCost[i,j] = float.Parse(text);
 				}
-			}
-
+			}			
 		}
 	}
 
-	private void CheckTier()
-	{
-		if(techTier == 0)
-		{
-			TierZero();
-		}
-		
-		if(techTier == 1)
-		{
-			TierOne ();
-		}
-		
-		if(techTier == 2)
-		{
-			TierTwo ();
-		}
-		
-		if(techTier == 3)
-		{
-			TierThree ();
-		}
-	}
 
-	private void TierZero()
+
+	private void TechnologyList()
 	{
+		string techToImprove = ""; //************ edit this asap ************
+
 		if(techToImprove == "Secondary Research")
 		{
 			//+50 science on system improvement
@@ -95,23 +96,5 @@ public class TechTreeScript : MonoBehaviour
 			//foreach hero in system +10 money
 		}
 
-	}
-
-	private void TierOne()
-	{
-		if(techToImprove == "Collaboration")
-		{
-			//foreach faction at peace sciencePercenBonus += +0.1
-		}
-	}
-
-	private void TierTwo()
-	{
-		
-	}
-
-	private void TierThree()
-	{
-		
 	}
 }
