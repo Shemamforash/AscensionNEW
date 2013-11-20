@@ -20,7 +20,7 @@ public class GUISystemDataScript : MonoBehaviour
 	public bool canImprove, foundPlanetData;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM;
-	private float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
+	public float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
 	
 	private string text = " ";
 	private GameObject[] systemConnections = new GameObject[4];
@@ -75,26 +75,31 @@ public class GUISystemDataScript : MonoBehaviour
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		
 		systemConnections = lineRenderScript.connections;
-		
+
 		for(int i = 0; i < 4; i++)
 		{
 			if(systemConnections[i] == null)
 			{
 				break;
 			}
-			
-			for(int j = 0; j < turnInfoScript.arrayIterator; ++j)
+
+			int arrayPosition = 0;
+
+			for(int j = 0; j < 60; ++j)
 			{
 				if(turnInfoScript.ownedSystems[j] == null)
 				{
-					break;
+					continue;
+				}
+
+				if(turnInfoScript.systemList[j] == gameObject)
+				{
+					arrayPosition = j;
 				}
 				
 				if(systemConnections[i] == turnInfoScript.ownedSystems[j])
 				{					
-					turnInfoScript.ownedSystems[turnInfoScript.arrayIterator] = gameObject;
-					
-					turnInfoScript.arrayIterator++;
+					turnInfoScript.ownedSystems[arrayPosition] = gameObject;
 					
 					gameObject.renderer.material = turnInfoScript.ownedMaterial;
 						
@@ -131,6 +136,8 @@ public class GUISystemDataScript : MonoBehaviour
 						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]) * resourceBonus * turnInfoScript.raceScience;
 						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * turnInfoScript.raceIndustry;
 						tempMon = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * turnInfoScript.raceMoney;
+						techTreeScript.planetToCheck = planetType;
+						techTreeScript.CheckPlanets();
 					}
 
 					allPlanetsInfo[n] = gameObject.name + " " + (n+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 

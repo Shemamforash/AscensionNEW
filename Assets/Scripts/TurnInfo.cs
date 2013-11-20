@@ -5,7 +5,7 @@ using System.IO;
 public class TurnInfo : MonoBehaviour 
 {
 	[HideInInspector]
-	public int arrayIterator, GP, raceGP;
+	public int GP, raceGP;
 	[HideInInspector]
 	public int science, industry, money;
 	public float raceScience, raceIndustry, raceMoney;
@@ -21,10 +21,13 @@ public class TurnInfo : MonoBehaviour
 	public Material ownedMaterial;
 	public Camera mainCamera;
 	public bool endTurn;
+	public string homePlanet;
 
+	private bool spendMenu = false;
+	private string resourceToSpend;
 	private int turn = 0;
 	private float timer = 0.0f;
-	private string playerRace, homePlanet, cost;
+	private string playerRace, cost;
 	private bool moveCamera = false;
 	private GameObject tempObject;
 	private GUISystemDataScript guiPlanScript;
@@ -51,9 +54,12 @@ public class TurnInfo : MonoBehaviour
 		if(Input.GetMouseButtonDown(0) && cameraFunctionsScript.selectedSystem != null)
 		{			
 			GameObject tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
-			
-			guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
-			techTreeScript = tempObject.GetComponent<TechTreeScript>();
+
+			if(tempObject.tag == "StarSystem")
+			{
+				guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
+				techTreeScript = tempObject.GetComponent<TechTreeScript>();
+			}
 		}
 
 		CentreCamera();
@@ -207,9 +213,8 @@ public class TurnInfo : MonoBehaviour
 		{
 			if(systemList[i].name == homePlanet)
 			{
-				ownedSystems[arrayIterator] = systemList[i];
-				ownedSystems[arrayIterator].renderer.material = ownedMaterial;
-				arrayIterator++;
+				ownedSystems[i] = systemList[i];
+				ownedSystems[i].renderer.material = ownedMaterial;
 				break;
 			}
 		}
@@ -314,21 +319,53 @@ public class TurnInfo : MonoBehaviour
 			GUI.Label(dataSIM, dataSIMString);
 
 			for(int i = 0; i < guiPlanScript.numPlanets; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
-			{
+			{	
 				guiPlanScript.improvementNumber = int.Parse (guiPlanScript.planNameOwnImprov[i,2]);
 				
 				guiPlanScript.CheckImprovement();
 
-				cost = "Improve Cost: " + guiPlanScript.improvementCost;
+				if(guiPlanScript.canImprove == false)
+				{
+					cost = "Max Improvement";
+				}
 
-				if(GUI.Button(allButtonsGUI[i], cost) && guiPlanScript.canImprove == true && industry >= guiPlanScript.improvementCost)
+				if(guiPlanScript.canImprove == true)
+				{
+					cost = "Improve Cost: " + guiPlanScript.improvementCost;
+				}
+
+				if(GUI.Button(allButtonsGUI[i], cost) && guiPlanScript.canImprove == true )
 				{	
-					ImproveButtonClick(i);
+					spendMenu = true;
+				}
+
+				string indSpend = guiPlanScript.improvementCost + " Industry";
+
+				string monSpend = guiPlanScript.improvementCost * 2 + " Money";
+
+				if(spendMenu == true)
+				{
+					GUI.Box (new Rect(Screen.width/2 - 100.0f, Screen.height/2 - 50.0f, 200.0f, 75.0f), "Resource to Spend:");			
+
+					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 92.5f, 35.0f), indSpend) && industry >= guiPlanScript.improvementCost)
+					{
+						resourceToSpend = "Industry";
+						ImproveButtonClick(i);
+						spendMenu = false;
+					}
+
+					if(GUI.Button (new Rect(Screen.width/2 + 2.5f, Screen.height/2 - 15.0f, 92.5f, 35.0f), monSpend) && money >= guiPlanScript.improvementCost * 2)
+					{
+						resourceToSpend = "Money";
+						ImproveButtonClick(i);
+						spendMenu = false;
+					}
 				}
 
 				GUI.Label (allPlanetsGUI[i], guiPlanScript.allPlanetsInfo[i]);
 			}
 			#endregion
+
 			#region techtreedata
 
 			string techBuildButtonText;
@@ -365,8 +402,16 @@ public class TurnInfo : MonoBehaviour
 		q++;
 		
 		guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
-		
-		industry -= (int)guiPlanScript.improvementCost;
+
+		if(resourceToSpend == "Industry")
+		{
+			industry -= (int)guiPlanScript.improvementCost;
+		}
+
+		if(resourceToSpend == "Money")
+		{
+			money -= (int)(guiPlanScript.improvementCost * 2);
+		}
 		
 		guiPlanScript.SystemSIMCounter();
 	}
