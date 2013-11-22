@@ -5,9 +5,7 @@ using System.IO;
 public class TurnInfo : MonoBehaviour 
 {
 	[HideInInspector]
-	public int GP, raceGP;
-	[HideInInspector]
-	public int science, industry, money;
+	public int GP, raceGP, science, industry, money;
 	public float raceScience, raceIndustry, raceMoney;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,4];
@@ -16,20 +14,21 @@ public class TurnInfo : MonoBehaviour
 	[HideInInspector]
 	public GameObject[] ownedSystems = new GameObject[60];
 	[HideInInspector]
-	public Rect[] allPlanetsGUI, allButtonsGUI; 
-	public Rect[,] tierButtonsGUI;
 	public Material ownedMaterial;
-	public Camera mainCamera;
+	[HideInInspector]
 	public bool endTurn;
+	[HideInInspector]
 	public string homePlanet;
+	public Camera mainCamera;
 
 	private bool spendMenu = false;
-	private string resourceToSpend;
+	private string resourceToSpend, playerRace, cost;
 	private int turn = 0;
-	private float timer = 0.0f;
-	private string playerRace, cost;
-	private bool moveCamera = false;
 	private GameObject tempObject;
+
+	private Rect[] allPlanetsGUI, allButtonsGUI; 
+	private Rect[,] tierButtonsGUI;
+
 	private GUISystemDataScript guiPlanScript;
 	private CameraFunctions cameraFunctionsScript;
 	private TechTreeScript techTreeScript;
@@ -39,8 +38,6 @@ public class TurnInfo : MonoBehaviour
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		
 		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
-		
-		Time.timeScale = 0;
 		
 		LoadPlanetData();
 
@@ -62,40 +59,9 @@ public class TurnInfo : MonoBehaviour
 			}
 		}
 
-		CentreCamera();
+		cameraFunctionsScript.CentreCamera();
 	}
 
-	void CentreCamera()
-	{
-		GameObject planetObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
-
-		if(Input.GetKeyDown("f"))
-		{
-			moveCamera = true;
-
-			timer = Time.time;
-
-			tempObject = planetObject;
-		}
-
-		if(moveCamera == true)
-		{
-			Vector3 homingPlanetPosition = new Vector3(tempObject.transform.position.x, tempObject.transform.position.y, -30.0f);
-			
-			Vector3 currentPosition = mainCamera.transform.position;
-
-			if(mainCamera.transform.position == homingPlanetPosition || Time.time > timer + 1.0f)
-			{
-				homingPlanetPosition = mainCamera.transform.position;
-
-				moveCamera = false;
-
-				timer = 0.0f;
-			}
-
-			mainCamera.transform.position = Vector3.Lerp (currentPosition, homingPlanetPosition, 0.1f);
-		}
-	}
 	
 	void LoadPlanetData()
 	{
@@ -117,29 +83,23 @@ public class TurnInfo : MonoBehaviour
 	private void GUIRectBuilder()
 	{
 		Rect topLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 - 225.0f, 200.0f, 100.0f); //Top left
-		
 		Rect buttonTopLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 - 125.0f, 200.0f, 50.0f);
 		
-		Rect topRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 225.0f, 200.0f, 100.0f); //Top right
-		
+		Rect topRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 225.0f, 200.0f, 100.0f); //Top right		
 		Rect buttonTopRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 125.0f, 200.0f, 50.0f);
 
 		
-		Rect middleLeft = new Rect (Screen.width/2 - 500.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle left
-		
+		Rect middleLeft = new Rect (Screen.width/2 - 500.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle left		
 		Rect buttonMiddleLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 + 50.0f, 200.0f, 50.0f);
 		
-		Rect middleRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle right
-		
+		Rect middleRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle right		
 		Rect buttonMiddleRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 + 50.0f, 200.0f, 50.0f);
 
 		
-		Rect bottomLeft = new Rect(Screen.width/2 -500.0f, Screen.height / 2 + 125.0f, 200.0f, 100.0f); //Bottom left
-		
+		Rect bottomLeft = new Rect(Screen.width/2 -500.0f, Screen.height / 2 + 125.0f, 200.0f, 100.0f); //Bottom left		
 		Rect buttonBottomLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 + 225.0f, 200.0f, 50.0f);
 		
-		Rect bottomRight = new Rect(Screen.width/2 -250.0f, Screen.height / 2 + 125.0f, 200.0f, 100.0f); //Bottom right
-		
+		Rect bottomRight = new Rect(Screen.width/2 -250.0f, Screen.height / 2 + 125.0f, 200.0f, 100.0f); //Bottom right		
 		Rect buttonBottomRight = new Rect(Screen.width/2 -250.0f, Screen.height / 2 + 225.0f, 200.0f, 50.0f);
 
 		
@@ -320,6 +280,10 @@ public class TurnInfo : MonoBehaviour
 
 			for(int i = 0; i < guiPlanScript.numPlanets; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
 			{	
+				string indSpend = " ";
+
+				string monSpend = " ";
+
 				guiPlanScript.improvementNumber = int.Parse (guiPlanScript.planNameOwnImprov[i,2]);
 				
 				guiPlanScript.CheckImprovement();
@@ -337,11 +301,11 @@ public class TurnInfo : MonoBehaviour
 				if(GUI.Button(allButtonsGUI[i], cost) && guiPlanScript.canImprove == true )
 				{	
 					spendMenu = true;
+
+					indSpend = guiPlanScript.improvementCost + " Industry";
+					
+					monSpend = guiPlanScript.improvementCost * 2 + " Money";
 				}
-
-				string indSpend = guiPlanScript.improvementCost + " Industry";
-
-				string monSpend = guiPlanScript.improvementCost * 2 + " Money";
 
 				if(spendMenu == true)
 				{

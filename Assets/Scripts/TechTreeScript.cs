@@ -16,6 +16,7 @@ public class TechTreeScript : MonoBehaviour
 	
 	public float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
 	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
+
 	public int techTier = 0;
 	private GameObject[] connectedSystems = new GameObject[4];
 
@@ -32,7 +33,7 @@ public class TechTreeScript : MonoBehaviour
 		LoadTechTree();
 	}
 
-	public void ImproveSystem()
+	public void ImproveSystem() //Occurs if button of tech is clicked.
 	{
 		if(turnInfoScript.industry >= techTreeCost[techToBuildTier, techToBuildPosition])
 		{
@@ -42,7 +43,7 @@ public class TechTreeScript : MonoBehaviour
 		}
 	}
 
-	private void LoadTechTree()
+	private void LoadTechTree() //Loads tech tree into two arrays (whether tech has been built, and the cost of each tech)
 	{
 		string text = " ";
 		
@@ -140,7 +141,7 @@ public class TechTreeScript : MonoBehaviour
 		}
 	}
 
-	private void HyperNet()
+	private void HyperNet() //Tier 3 tech. Bonus SIM for each connected planet. This functions is good.
 	{
 		sciencePercentBonus -= currentPlanetsWithHyperNet * 0.005f;
 		industryPercentBonus -= currentPlanetsWithHyperNet * 0.005f;
@@ -168,7 +169,7 @@ public class TechTreeScript : MonoBehaviour
 		moneyPercentBonus += currentPlanetsWithHyperNet * 0.005f;
 	}
 
-	public void CheckPlanets()
+	public void CheckPlanets() //This function contains effects caused by tech, but cannot be activated within this script.
 	{
 		if(capitalism == true && planetToCheck == "Plains" || planetToCheck == "Ocean" || planetToCheck == "Forest")
 		{
