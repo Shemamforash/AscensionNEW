@@ -12,19 +12,12 @@ public class CameraFunctions : MonoBehaviour
 	[HideInInspector]
 	public string selectedSystem = "";
 	[HideInInspector]
-	public bool doubleClick = false;
-	[HideInInspector]
-	public bool coloniseMenu = false;
-	[HideInInspector]
-	public bool openMenu = false;
+	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false;
 	
-	private float leftBound = -40;
-	private float rightBound = 40;
-	private float upperBound = 40;
-	private float lowerBound = -40;
+	private float leftBound = -40, rightBound = 40, upperBound = 40, lowerBound = -40;
 	private float timer = 0.0f;
-	[HideInInspector]
-	public float updatedX, updatedY;
+	private float updatedX, updatedY;
+	private GameObject thisObject;
 	
 	void Awake() 
 	{
@@ -46,7 +39,10 @@ public class CameraFunctions : MonoBehaviour
 		
 		if(Input.GetMouseButtonDown(0))
 		{
-			DoubleClick ();
+			if(doubleClick == false)
+			{
+				DoubleClick ();
+			}
 
 			RaycastHit hit = new RaycastHit();
 		
@@ -148,6 +144,42 @@ public class CameraFunctions : MonoBehaviour
 			{
 				cameraMain.position = cameraPositionNew;
 			}
+		}
+	}
+
+	public void CentreCamera()
+	{
+		GameObject planetObject = GameObject.Find (selectedSystem);
+		
+		if(Input.GetKeyDown("f"))
+		{
+			moveCamera = true;
+			
+			timer = Time.time;
+			
+			thisObject = planetObject;
+		}
+		
+		if(moveCamera == true)
+		{
+			Vector3 homingPlanetPosition = new Vector3(thisObject.transform.position.x, thisObject.transform.position.y, -30.0f);
+			
+			Vector3 currentPosition = cameraMain.transform.position;
+			
+			if(cameraMain.transform.position == homingPlanetPosition || Time.time > timer + 1.0f)
+			{
+				homingPlanetPosition = cameraMain.transform.position;
+
+				updatedX = cameraMain.transform.position.x;
+
+				updatedY = cameraMain.transform.position.y;
+				
+				moveCamera = false;
+				
+				timer = 0.0f;
+			}
+			
+			cameraMain.transform.position = Vector3.Lerp (currentPosition, homingPlanetPosition, 0.1f);
 		}
 	}
 	
