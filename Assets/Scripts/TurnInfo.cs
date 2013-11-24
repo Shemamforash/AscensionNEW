@@ -20,36 +20,30 @@ public class TurnInfo : MonoBehaviour
 	[HideInInspector]
 	public string homePlanet;
 	public Camera mainCamera;
-
-	private bool spendMenu = false;
-	private string resourceToSpend, playerRace, cost, indSpend, monSpend;
-	private int turn = 0, thisPlanet = 0;
-	private GameObject tempObject;
-
-	private Rect[] allPlanetsGUI, allButtonsGUI; 
-	private Rect[,] tierButtonsGUI;
-
+	
+	public string playerRace;
+	public int turn = 0;
+	public GameObject tempObject;
+	
 	private GUISystemDataScript guiPlanScript;
 	private CameraFunctions cameraFunctionsScript;
 	private TechTreeScript techTreeScript;
 	private HeroScript heroScript;
+	private MainGUIScript mainGUIScript;
 
 	void Awake()
 	{	
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
+		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
 		
 		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
 		
 		LoadPlanetData();
-
-		GUIRectBuilder();
-
-		GUITechTreeRectBuilder();
 	}
 	
-	void Update()
+	void Update() 
 	{
-		if(Input.GetMouseButtonDown(0) && cameraFunctionsScript.selectedSystem != null)
+		if(Input.GetMouseButtonDown(0) && cameraFunctionsScript.selectedSystem != null) //Assigns scripts to selected system.
 		{			
 			tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
 
@@ -61,11 +55,11 @@ public class TurnInfo : MonoBehaviour
 			}
 		}
 
-		cameraFunctionsScript.CentreCamera();
+		cameraFunctionsScript.CentreCamera(); //Checks if camera needs centreing
 	}
 
 	
-	void LoadPlanetData()
+	void LoadPlanetData() //Loads up planet stats into array
 	{
 		string text = " ";
 		
@@ -82,69 +76,7 @@ public class TurnInfo : MonoBehaviour
 		}
 	}
 
-	private void GUIRectBuilder()
-	{
-		Rect topLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 - 225.0f, 200.0f, 100.0f); //Top left
-		Rect buttonTopLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 - 125.0f, 200.0f, 50.0f);
-		
-		Rect topRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 225.0f, 200.0f, 100.0f); //Top right		
-		Rect buttonTopRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 125.0f, 200.0f, 50.0f);
-
-		
-		Rect middleLeft = new Rect (Screen.width/2 - 500.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle left		
-		Rect buttonMiddleLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 + 50.0f, 200.0f, 50.0f);
-		
-		Rect middleRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle right		
-		Rect buttonMiddleRight = new Rect(Screen.width/2 - 250.0f, Screen.height / 2 + 50.0f, 200.0f, 50.0f);
-
-		
-		Rect bottomLeft = new Rect(Screen.width/2 -500.0f, Screen.height / 2 + 125.0f, 200.0f, 100.0f); //Bottom left		
-		Rect buttonBottomLeft = new Rect(Screen.width/2 - 500.0f, Screen.height / 2 + 225.0f, 200.0f, 50.0f);
-		
-		Rect bottomRight = new Rect(Screen.width/2 -250.0f, Screen.height / 2 + 125.0f, 200.0f, 100.0f); //Bottom right		
-		Rect buttonBottomRight = new Rect(Screen.width/2 -250.0f, Screen.height / 2 + 225.0f, 200.0f, 50.0f);
-
-		
-		allPlanetsGUI = new Rect[6] {topLeft, topRight, middleLeft, middleRight, bottomLeft, bottomRight};
-		
-		allButtonsGUI = new Rect[6] {buttonTopLeft, buttonTopRight, buttonMiddleLeft, buttonMiddleRight, buttonBottomLeft, buttonBottomRight};	
-	}
-
-	private void GUITechTreeRectBuilder()
-	{
-		Rect top1 = new Rect(Screen.width / 2 + 50.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
-		Rect top2 = new Rect(Screen.width / 2 + 205.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
-		Rect top3 = new Rect(Screen.width / 2 + 360.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
-		Rect top4 = new Rect(Screen.width / 2 + 515.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
-		Rect top5 = new Rect(Screen.width / 2 + 670.0f, Screen.height/2 - 225.0f, 150.0f, 100.0f);
-		Rect ignore1 =  new Rect(100.0f, 100.0f, 100.0f, 100.0f);
-
-		Rect middleTop1 = new Rect(Screen.width / 2 + 50.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
-		Rect middleTop2 = new Rect(Screen.width / 2 + 205.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
-		Rect middleTop3 = new Rect(Screen.width / 2 + 360.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
-		Rect middleTop4 = new Rect(Screen.width / 2 + 515.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
-		Rect middleTop5 = new Rect(Screen.width / 2 + 670.0f, Screen.height/2 - 100.0f, 150.0f, 100.0f);
-		Rect ignore2 =  new Rect(100.0f, 100.0f, 100.0f, 100.0f);
-
-		Rect middleBottom1 = new Rect(Screen.width / 2 + 50.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
-		Rect middleBottom2 = new Rect(Screen.width / 2 + 205.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
-		Rect middleBottom3 = new Rect(Screen.width / 2 + 360.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
-		Rect middleBottom4 = new Rect(Screen.width / 2 + 515.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
-		Rect middleBottom5 = new Rect(Screen.width / 2 + 670.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
-		Rect middleBottom6 = new Rect(Screen.width / 2 + 825.0f, Screen.height/2 + 25.0f, 150.0f, 100.0f);
-
-		Rect bottom1 = new Rect(Screen.width / 2 + 50.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
-		Rect bottom2 = new Rect(Screen.width / 2 + 205.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
-		Rect bottom3 = new Rect(Screen.width / 2 + 360.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
-		Rect bottom4 = new Rect(Screen.width / 2 + 515.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
-		Rect bottom5 = new Rect(Screen.width / 2 + 670.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
-		Rect bottom6 = new Rect(Screen.width / 2 + 825.0f, Screen.height/2 + 150.0f, 150.0f, 100.0f);
-
-		tierButtonsGUI = new Rect[4,6] {{top1, top2, top3, top4, top5, ignore1},{middleTop1, middleTop2, middleTop3, middleTop4, middleTop5, ignore2},
-			{middleBottom1, middleBottom2, middleBottom3, middleBottom4, middleBottom5, middleBottom6},{bottom1, bottom2, bottom3, bottom4, bottom5, bottom6}};
-	}
-
-	private void PickRace()
+	public void PickRace() //Start of turn function. Race choice dictates starting planet and inherent bonuses as well as racial technologies.
 	{
 		if(playerRace == "Human")
 		{
@@ -170,11 +102,14 @@ public class TurnInfo : MonoBehaviour
 			raceGP = 1;
 			homePlanet = "Nepthys";
 		}
+	}
 
-		cameraFunctionsScript.selectedSystem = homePlanet;
+	public void StartSystemPlanetColonise()
+	{
+		cameraFunctionsScript.selectedSystem = homePlanet; //Set the selected system
 		guiPlanScript = GameObject.Find (homePlanet).GetComponent<GUISystemDataScript>();
-
-		for(int i = 0; i < 60; i++)
+		
+		for(int i = 0; i < 60; i++) //Find selected system and set it to owned
 		{
 			if(systemList[i].name == homePlanet)
 			{
@@ -183,8 +118,8 @@ public class TurnInfo : MonoBehaviour
 				break;
 			}
 		}
-
-		for(int i = 0; i < guiPlanScript.numPlanets; ++i)
+		
+		for(int i = 0; i < guiPlanScript.numPlanets; ++i) //Colonise ocean planet (earth).
 		{
 			if(guiPlanScript.planNameOwnImprov[i,0] == "Ocean")
 			{
@@ -193,241 +128,30 @@ public class TurnInfo : MonoBehaviour
 			}
 		}
 		
-
 		GP = raceGP;
-		
-		Time.timeScale = 1;
 	}
 
-	void OnGUI()
+	public void ImproveButtonClick(int i)
 	{
-		#region playerrace
-		if(playerRace == null)
-		{
-			GUI.Box (new Rect(Screen.width/2 - 150, Screen.height/2 - 40, 300, 80), "Select Race");
+		int q = int.Parse(guiPlanScript.planNameOwnImprov[i,2]);
 			
-			if(GUI.Button (new Rect(Screen.width/2 - 130, Screen.height/2, 80, 20), "Humans"))
-			{
-				playerRace = "Human";
-			}
-
-			if(GUI.Button (new Rect(Screen.width/2 -40, Screen.height/2, 80, 20), "Selkies"))
-			{
-				playerRace = "Selkie";
-			}
-
-			if(GUI.Button (new Rect(Screen.width/2 + 50, Screen.height/2, 80, 20), "Nereides"))
-			{
-				playerRace = "Nereid";
-			}
-
-			PickRace ();
-		}
-		#endregion
-		
-		#region turninfo		
-		string turnNumber = "Turn: " + turn.ToString();
-		
-		GUI.Label (new Rect(Screen.width - 80, Screen.height - 50, 50, 20), turnNumber);
-		
-		if(GUI.Button (new Rect(Screen.width - 80, Screen.height - 30, 70, 20), "End turn") && playerRace != null)
-		{
-			TurnEnd ();
-		}
-		
-		GUI.Box (new Rect(15, 15, 100, 130), "");
-		
-		GUI.Label (new Rect(20, 20, 60, 20), playerRace);
-		
-		string scienceStr = science.ToString();
-		
-		GUI.Label (new Rect(20, 45, 60, 20), scienceStr);
-		
-		string industryStr = industry.ToString ();
-		
-		GUI.Label (new Rect(20, 70, 60, 20), industryStr);
-		
-		string moneyStr = money.ToString ();
-		
-		GUI.Label (new Rect(20, 95, 60, 20), moneyStr);
-		
-		string GPString = GP.ToString ();
-		
-		GUI.Label (new Rect(20, 120, 60, 20), GPString);
-		#endregion
-		
-		#region colonisebutton
-		Rect coloniseButton = new Rect(10, Screen.height - 40, 75, 30);
-		
-		if(cameraFunctionsScript.coloniseMenu == true)
-		{
-			if(GUI.Button (coloniseButton, "Colonise") && GP > 0)
-			{			
-				guiPlanScript.FindSystem ();
-			}
-		}
-		#endregion
-
-		#region planetinfomenu
-		if(cameraFunctionsScript.openMenu == true)
-		{
-			#region planetdata
-			GUI.enabled = true;
+		q++;
 			
-			Rect fullScreenMenu = new Rect(0.5f, 0.5f, Screen.width, Screen.height);
+		guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
 			
-			GUI.Box (fullScreenMenu, "Planets in System");
-			
-			if(guiPlanScript.foundPlanetData == false)
-			{
-				guiPlanScript.SystemSIMCounter();
-				guiPlanScript.foundPlanetData = true;
-			}
-
-			Rect dataSIM = new Rect (Screen.width/2 - 500.0f, Screen.height/2 - 350.0f, 100.0f, 100.0f);
-
-			string dataSIMString = "Total SIM: " + guiPlanScript.totalSystemSIM.ToString() + "\n" + "Total Science: " + guiPlanScript.totalSystemScience.ToString() + "\n" 
-				+ "Total Industry: " + guiPlanScript.totalSystemIndustry.ToString() + "\n" + "Total Money: " + guiPlanScript.totalSystemMoney.ToString(); 
-
-			GUI.Label(dataSIM, dataSIMString);
-
-			for(int i = 0; i < guiPlanScript.numPlanets; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
-			{	
-				guiPlanScript.improvementNumber = int.Parse (guiPlanScript.planNameOwnImprov[i,2]);
-				
-				guiPlanScript.CheckImprovement();
-
-				if(guiPlanScript.canImprove == false)
-				{
-					cost = "Max Improvement";
-				}
-
-				if(guiPlanScript.canImprove == true)
-				{
-					cost = "Improve Cost: " + guiPlanScript.improvementCost;
-				}
-
-				if(guiPlanScript.planNameOwnImprov[i,1] == "No")
-				{
-					cost = "Colonise: 100";
-				}
-
-				if(GUI.Button(allButtonsGUI[i], cost) && guiPlanScript.canImprove == true )
-				{	
-					spendMenu = true;
-					thisPlanet = i;
-					indSpend = guiPlanScript.improvementCost + " Industry";
-					monSpend = guiPlanScript.improvementCost * 2 + " Money";
-
-					if(guiPlanScript.planNameOwnImprov[i,1] == "No")
-					{
-						indSpend = "100 Industry";
-						monSpend = "Not Applicable";
-					}
-				}
-
-				GUI.Label (allPlanetsGUI[i], guiPlanScript.allPlanetsInfo[i]);
-			}
-
-			if(spendMenu == true && cameraFunctionsScript.openMenu == true)
-			{
-				guiPlanScript.improvementNumber = int.Parse (guiPlanScript.planNameOwnImprov[thisPlanet,2]);
-
-				guiPlanScript.CheckImprovement();
-
-				GUI.Box (new Rect(Screen.width/2 - 100.0f, Screen.height/2 - 50.0f, 200.0f, 75.0f), "Resource to Spend:");	
-				
-				if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 92.5f, 35.0f), indSpend) && industry >= guiPlanScript.improvementCost)
-				{
-					resourceToSpend = "Industry";
-					spendMenu = false;
-
-					if(guiPlanScript.planNameOwnImprov[thisPlanet, 1] == "No")
-					{
-						guiPlanScript.improvementCost = 100.0f;
-						guiPlanScript.planNameOwnImprov[thisPlanet, 1] = "Yes";
-						++planetsColonisedThisTurn;
-					}
-
-					ImproveButtonClick(thisPlanet);
-				}
-				
-				if(GUI.Button (new Rect(Screen.width/2 + 2.5f, Screen.height/2 - 15.0f, 92.5f, 35.0f), monSpend) && money >= (guiPlanScript.improvementCost * 2) && guiPlanScript.planNameOwnImprov[thisPlanet,1] == "Yes")
-				{
-					resourceToSpend = "Money";
-					spendMenu = false;
-					ImproveButtonClick(thisPlanet);
-				}
-
-				if(GUI.Button(new Rect(Screen.width/2 + 77.5f, Screen.height/2 - 45.0f, 18.5f, 18.5f), "x"))
-				{
-					spendMenu = false;
-				}
-			}
-
-			#endregion
-
-			#region techtreedata
-
-			string techBuildButtonText;
-
-			for(int f = 0; f <= techTreeScript.techTier; ++f)
-			{
-				for(int i = 0; i < 6; ++i)
-				{
-					if((techTreeScript.techTreeComplete[f,i,0] == null) || (f == 0 && i == 5) || (f == 1 && i == 5))
-					{
-						break;
-					}
-
-					techBuildButtonText = techTreeScript.techTreeComplete[f,i,0].ToString () + "\n" + techTreeScript.techTreeComplete[f,i,1].ToString();
-
-					if(GUI.Button (tierButtonsGUI[f,i], techBuildButtonText))
-					{
-						techTreeScript.techToBuildPosition = i;
-						techTreeScript.techToBuildTier = f;
-						techTreeScript.ImproveSystem();
-					}
-				}
-			}
-
-			#endregion
-
-			if(GUI.Button (new Rect(Screen.width / 2 - 800.0f, Screen.height/2, 150.0f, 50.0f), "President"))
-			{
-				heroScript.heroesInSystem[1] = "President";
-			}
-		}
-		#endregion
-
-	}
-
-	void ImproveButtonClick(int i)
-	{
-		if(guiPlanScript.improvementCost != 100.0f)
-		{
-			int q = int.Parse(guiPlanScript.planNameOwnImprov[i,2]);
-
-			q++;
-
-			guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
-		}
-
-		if(resourceToSpend == "Industry")
+		if(mainGUIScript.resourceToSpend == "Industry")
 		{
 			industry -= (int)guiPlanScript.improvementCost;
 		}
-
-		if(resourceToSpend == "Money")
+			
+		if(mainGUIScript.resourceToSpend == "Money")
 		{
 			Debug.Log (guiPlanScript.improvementCost * 2);
 			money -= (int)(guiPlanScript.improvementCost * 2);
 		}
-		
-		guiPlanScript.SystemSIMCounter();
 	}
-	
-	void TurnEnd() //This function accumulates all the SIM generated by each system to give an empire SIM value
+
+	public void TurnEnd() //This function accumulates all the SIM generated by each system to give an empire SIM value
 	{			
 		endTurn = true;
 		

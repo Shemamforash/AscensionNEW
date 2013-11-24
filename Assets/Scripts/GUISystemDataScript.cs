@@ -135,7 +135,7 @@ public class GUISystemDataScript : MonoBehaviour
 				{
 					if(turnInfoScript.planetRIM[j,0] == planetType)
 					{
-						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]) * resourceBonus * turnInfoScript.raceScience;
+						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]) * resourceBonus * turnInfoScript.raceScience; //Need to sort out variable types, too much casting
 						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * turnInfoScript.raceIndustry;
 						tempMon = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * turnInfoScript.raceMoney;
 						techTreeScript.planetToCheck = planetType;
@@ -152,7 +152,7 @@ public class GUISystemDataScript : MonoBehaviour
 			}
 		}
 		
-		if(turnInfoScript.endTurn == true)
+		if(turnInfoScript.endTurn == true) //Checks tech tier unlocked
 		{
 			totalSystemSIM += totalSystemScience + totalSystemIndustry + totalSystemMoney;
 
@@ -171,7 +171,7 @@ public class GUISystemDataScript : MonoBehaviour
 		}
 	}
 
-	public void CheckImprovement()
+	public void CheckImprovement() //Contains data on the quality of planets and the bonuses they receive
 	{
 		if(improvementNumber == 0)
 		{

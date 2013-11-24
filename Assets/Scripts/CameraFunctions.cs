@@ -18,26 +18,21 @@ public class CameraFunctions : MonoBehaviour
 	private float timer = 0.0f;
 	private float updatedX, updatedY;
 	private GameObject thisObject;
-	
-	void Awake() 
-	{
-        Application.targetFrameRate = 60;
-    }
-	
+
 	void Update()
 	{
 		ZoomCamera();
 
 		PanCamera();
 		
-		if(Input.GetKeyDown ("escape"))
+		if(Input.GetKeyDown ("escape")) //Used to close all open menus, and to reset doubleclick
 		{
 			coloniseMenu = false;
 			openMenu = false;
 			doubleClick = false;
 		}
 		
-		if(Input.GetMouseButtonDown(0))
+		if(Input.GetMouseButtonDown(0)) //Used to start double click events and to identify systems when clicked on. Throws up error if click on a connector object.
 		{
 			if(doubleClick == false)
 			{
@@ -49,23 +44,23 @@ public class CameraFunctions : MonoBehaviour
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
 				selectedSystem = hit.collider.name;
-				coloniseMenu = true;
+				coloniseMenu = true; //Shows the colonise button on single click
 
 				if(doubleClick == true)
 				{
-					openMenu = true;
+					openMenu = true; //Opens system menu on double click
 				}
 			}
 		}
 	}
 	
-	public void PanCamera()
+	public void PanCamera() //Used to pan camera
 	{		
 		if(Input.GetAxis ("Horizontal") > 0)
 		{
 			updatedX += panSpeed;
 			
-			if(updatedX > rightBound)	
+			if(updatedX > rightBound) //Prevent scrolling over screen edge
 			{
 				updatedX = rightBound;
 			}
@@ -77,7 +72,7 @@ public class CameraFunctions : MonoBehaviour
 		{
 			updatedX -= panSpeed;
 			
-			if(updatedX < leftBound)	
+			if(updatedX < leftBound) //Prevent scrolling over screen edge	
 			{
 				updatedX = leftBound;
 			}
@@ -89,7 +84,7 @@ public class CameraFunctions : MonoBehaviour
 		{
 			updatedY += panSpeed;
 			
-			if(updatedY > upperBound)	
+			if(updatedY > upperBound) //Prevent scrolling over screen edge	
 			{
 				updatedY = upperBound;
 			}
@@ -101,7 +96,7 @@ public class CameraFunctions : MonoBehaviour
 		{
 			updatedY -= panSpeed;
 			
-			if(updatedY < lowerBound)	
+			if(updatedY < lowerBound) //Prevent scrolling over screen edge	
 			{
 				updatedY = lowerBound;
 			}
@@ -110,11 +105,11 @@ public class CameraFunctions : MonoBehaviour
 		}
 	}
 	
-	public void ZoomCamera()
+	public void ZoomCamera() //Changes height of camera
 	{		
 		Vector3 cameraPositionNew = new Vector3(cameraMain.position.x, cameraMain.position.y, zPosition);
 		
-		if(Input.GetAxis ("Mouse ScrollWheel") < 0)
+		if(Input.GetAxis ("Mouse ScrollWheel") < 0) //Zoom in
 		{
 			zPosition -= zoomSpeed/10;
 		
@@ -130,7 +125,7 @@ public class CameraFunctions : MonoBehaviour
 			}
 		}
 
-		if(Input.GetAxis ("Mouse ScrollWheel") > 0)
+		if(Input.GetAxis ("Mouse ScrollWheel") > 0) //Zoom out
 		{
 			zPosition += zoomSpeed/10;
 			
@@ -147,7 +142,7 @@ public class CameraFunctions : MonoBehaviour
 		}
 	}
 
-	public void CentreCamera()
+	public void CentreCamera() //Used to centre the camera over the last selected object, or the home planet if on first turn.
 	{
 		GameObject planetObject = GameObject.Find (selectedSystem);
 		
@@ -162,11 +157,11 @@ public class CameraFunctions : MonoBehaviour
 		
 		if(moveCamera == true)
 		{
-			Vector3 homingPlanetPosition = new Vector3(thisObject.transform.position.x, thisObject.transform.position.y, -30.0f);
+			Vector3 homingPlanetPosition = new Vector3(thisObject.transform.position.x, thisObject.transform.position.y, -30.0f); //Target position
 			
 			Vector3 currentPosition = cameraMain.transform.position;
 			
-			if(cameraMain.transform.position == homingPlanetPosition || Time.time > timer + 1.0f)
+			if(cameraMain.transform.position == homingPlanetPosition || Time.time > timer + 1.0f) //If lerp exceeds timer, camera position will lock to point at object
 			{
 				homingPlanetPosition = cameraMain.transform.position;
 
@@ -174,16 +169,16 @@ public class CameraFunctions : MonoBehaviour
 
 				updatedY = cameraMain.transform.position.y;
 				
-				moveCamera = false;
+				moveCamera = false; //Stop moving camera
 				
-				timer = 0.0f;
+				timer = 0.0f; //Reset timer
 			}
 			
 			cameraMain.transform.position = Vector3.Lerp (currentPosition, homingPlanetPosition, 0.1f);
 		}
 	}
 	
-	void DoubleClick()
+	void DoubleClick() //Function for detecting double click
 	{
 		float delay = 0.2f;
 

@@ -28,7 +28,7 @@ public class TechTreeScript : MonoBehaviour
 
 	void Start()
 	{
-		systemDataScript = gameObject.GetComponent<GUISystemDataScript>();
+		systemDataScript = gameObject.GetComponent<GUISystemDataScript>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScript>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
@@ -38,11 +38,11 @@ public class TechTreeScript : MonoBehaviour
 
 	public void ImproveSystem() //Occurs if button of tech is clicked.
 	{
-		if(turnInfoScript.industry >= techTreeCost[techToBuildTier, techToBuildPosition])
+		if(turnInfoScript.industry >= techTreeCost[techToBuildTier, techToBuildPosition]) //Checks cost of tech and current industry
 		{
 			turnInfoScript.industry -= (int)techTreeCost[techToBuildTier, techToBuildPosition];
 			techTreeComplete[techToBuildTier, techToBuildPosition, 1] = "Built";
-			secondaryResearch = true;
+			secondaryResearch = true; //Activates tech ability
 		}
 	}
 
@@ -72,9 +72,9 @@ public class TechTreeScript : MonoBehaviour
 		}
 	}
 
-	public void ActiveTechnologies()
+	public void ActiveTechnologies() //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
-		sciencePercentBonus = 1.0f;
+		sciencePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
 		industryPercentBonus = 1.0f;
 		moneyPercentBonus = 1.0f;
 
@@ -169,7 +169,7 @@ public class TechTreeScript : MonoBehaviour
 		}
 	}
 
-	private void HyperNet() //Tier 3 tech. Bonus SIM for each connected planet. This functions is good.
+	private void HyperNet() //Tier 3 tech. Bonus SIM for each connected planet. This function is good.
 	{		
 		currentPlanetsWithHyperNet = 0;
 		
