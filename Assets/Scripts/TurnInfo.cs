@@ -5,7 +5,7 @@ using System.IO;
 public class TurnInfo : MonoBehaviour 
 {
 	[HideInInspector]
-	public int GP, raceGP, science, industry, money;
+	public int GP, raceGP, science, industry, money, planetsColonisedThisTurn;
 	public float raceScience, raceIndustry, raceMoney;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,4];
@@ -22,8 +22,8 @@ public class TurnInfo : MonoBehaviour
 	public Camera mainCamera;
 
 	private bool spendMenu = false;
-	private string resourceToSpend, playerRace, cost;
-	private int turn = 0;
+	private string resourceToSpend, playerRace, cost, indSpend, monSpend;
+	private int turn = 0, thisPlanet = 0;
 	private GameObject tempObject;
 
 	private Rect[] allPlanetsGUI, allButtonsGUI; 
@@ -32,7 +32,8 @@ public class TurnInfo : MonoBehaviour
 	private GUISystemDataScript guiPlanScript;
 	private CameraFunctions cameraFunctionsScript;
 	private TechTreeScript techTreeScript;
-	
+	private HeroScript heroScript;
+
 	void Awake()
 	{	
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
@@ -50,12 +51,13 @@ public class TurnInfo : MonoBehaviour
 	{
 		if(Input.GetMouseButtonDown(0) && cameraFunctionsScript.selectedSystem != null)
 		{			
-			GameObject tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
+			tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
 
 			if(tempObject.tag == "StarSystem")
 			{
 				guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
 				techTreeScript = tempObject.GetComponent<TechTreeScript>();
+				heroScript = tempObject.GetComponent<HeroScript>();
 			}
 		}
 
@@ -169,6 +171,9 @@ public class TurnInfo : MonoBehaviour
 			homePlanet = "Nepthys";
 		}
 
+		cameraFunctionsScript.selectedSystem = homePlanet;
+		guiPlanScript = GameObject.Find (homePlanet).GetComponent<GUISystemDataScript>();
+
 		for(int i = 0; i < 60; i++)
 		{
 			if(systemList[i].name == homePlanet)
@@ -178,9 +183,17 @@ public class TurnInfo : MonoBehaviour
 				break;
 			}
 		}
+
+		for(int i = 0; i < guiPlanScript.numPlanets; ++i)
+		{
+			if(guiPlanScript.planNameOwnImprov[i,0] == "Ocean")
+			{
+				guiPlanScript.planNameOwnImprov[i,1] = "Yes";
+				break;
+			}
+		}
 		
-		cameraFunctionsScript.selectedSystem = homePlanet;
-		
+
 		GP = raceGP;
 		
 		Time.timeScale = 1;
@@ -280,10 +293,6 @@ public class TurnInfo : MonoBehaviour
 
 			for(int i = 0; i < guiPlanScript.numPlanets; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
 			{	
-				string indSpend = " ";
-
-				string monSpend = " ";
-
 				guiPlanScript.improvementNumber = int.Parse (guiPlanScript.planNameOwnImprov[i,2]);
 				
 				guiPlanScript.CheckImprovement();
@@ -298,36 +307,64 @@ public class TurnInfo : MonoBehaviour
 					cost = "Improve Cost: " + guiPlanScript.improvementCost;
 				}
 
+				if(guiPlanScript.planNameOwnImprov[i,1] == "No")
+				{
+					cost = "Colonise: 100";
+				}
+
 				if(GUI.Button(allButtonsGUI[i], cost) && guiPlanScript.canImprove == true )
 				{	
 					spendMenu = true;
-
+					thisPlanet = i;
 					indSpend = guiPlanScript.improvementCost + " Industry";
-					
 					monSpend = guiPlanScript.improvementCost * 2 + " Money";
-				}
 
-				if(spendMenu == true)
-				{
-					GUI.Box (new Rect(Screen.width/2 - 100.0f, Screen.height/2 - 50.0f, 200.0f, 75.0f), "Resource to Spend:");			
-
-					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 92.5f, 35.0f), indSpend) && industry >= guiPlanScript.improvementCost)
+					if(guiPlanScript.planNameOwnImprov[i,1] == "No")
 					{
-						resourceToSpend = "Industry";
-						ImproveButtonClick(i);
-						spendMenu = false;
-					}
-
-					if(GUI.Button (new Rect(Screen.width/2 + 2.5f, Screen.height/2 - 15.0f, 92.5f, 35.0f), monSpend) && money >= guiPlanScript.improvementCost * 2)
-					{
-						resourceToSpend = "Money";
-						ImproveButtonClick(i);
-						spendMenu = false;
+						indSpend = "100 Industry";
+						monSpend = "Not Applicable";
 					}
 				}
 
 				GUI.Label (allPlanetsGUI[i], guiPlanScript.allPlanetsInfo[i]);
 			}
+
+			if(spendMenu == true && cameraFunctionsScript.openMenu == true)
+			{
+				guiPlanScript.improvementNumber = int.Parse (guiPlanScript.planNameOwnImprov[thisPlanet,2]);
+
+				guiPlanScript.CheckImprovement();
+
+				GUI.Box (new Rect(Screen.width/2 - 100.0f, Screen.height/2 - 50.0f, 200.0f, 75.0f), "Resource to Spend:");	
+				
+				if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 92.5f, 35.0f), indSpend) && industry >= guiPlanScript.improvementCost)
+				{
+					resourceToSpend = "Industry";
+					spendMenu = false;
+
+					if(guiPlanScript.planNameOwnImprov[thisPlanet, 1] == "No")
+					{
+						guiPlanScript.improvementCost = 100.0f;
+						guiPlanScript.planNameOwnImprov[thisPlanet, 1] = "Yes";
+						++planetsColonisedThisTurn;
+					}
+
+					ImproveButtonClick(thisPlanet);
+				}
+				
+				if(GUI.Button (new Rect(Screen.width/2 + 2.5f, Screen.height/2 - 15.0f, 92.5f, 35.0f), monSpend) && money >= (guiPlanScript.improvementCost * 2) && guiPlanScript.planNameOwnImprov[thisPlanet,1] == "Yes")
+				{
+					resourceToSpend = "Money";
+					spendMenu = false;
+					ImproveButtonClick(thisPlanet);
+				}
+
+				if(GUI.Button(new Rect(Screen.width/2 + 77.5f, Screen.height/2 - 45.0f, 18.5f, 18.5f), "x"))
+				{
+					spendMenu = false;
+				}
+			}
+
 			#endregion
 
 			#region techtreedata
@@ -355,17 +392,26 @@ public class TurnInfo : MonoBehaviour
 			}
 
 			#endregion
+
+			if(GUI.Button (new Rect(Screen.width / 2 - 800.0f, Screen.height/2, 150.0f, 50.0f), "President"))
+			{
+				heroScript.heroesInSystem[1] = "President";
+			}
 		}
 		#endregion
+
 	}
 
 	void ImproveButtonClick(int i)
 	{
-		int q = int.Parse(guiPlanScript.planNameOwnImprov[i,2]);
-		
-		q++;
-		
-		guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
+		if(guiPlanScript.improvementCost != 100.0f)
+		{
+			int q = int.Parse(guiPlanScript.planNameOwnImprov[i,2]);
+
+			q++;
+
+			guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
+		}
 
 		if(resourceToSpend == "Industry")
 		{
@@ -374,6 +420,7 @@ public class TurnInfo : MonoBehaviour
 
 		if(resourceToSpend == "Money")
 		{
+			Debug.Log (guiPlanScript.improvementCost * 2);
 			money -= (int)(guiPlanScript.improvementCost * 2);
 		}
 		
@@ -390,9 +437,12 @@ public class TurnInfo : MonoBehaviour
 			{
 				guiPlanScript = system.GetComponent<GUISystemDataScript>();
 				techTreeScript = system.GetComponent<TechTreeScript>();
+				heroScript = system.GetComponent<HeroScript>();
 
-				guiPlanScript.SystemSIMCounter();
 				techTreeScript.ActiveTechnologies();
+				heroScript.CheckHeroesInSystem();
+				guiPlanScript.SystemSIMCounter();
+
 
 				science += (int)guiPlanScript.totalSystemScience;
 				industry += (int)guiPlanScript.totalSystemIndustry;
@@ -402,6 +452,11 @@ public class TurnInfo : MonoBehaviour
 		
 		GP += raceGP;
 		++turn;
+
 		endTurn = false;
+
+		planetsColonisedThisTurn = 0;
+
+		guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
 	}
 }

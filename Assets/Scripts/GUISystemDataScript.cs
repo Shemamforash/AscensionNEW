@@ -59,7 +59,7 @@ public class GUISystemDataScript : MonoBehaviour
 					
 						planNameOwnImprov[i,0] = text;
 						
-						planNameOwnImprov[i,1] = "no";
+						planNameOwnImprov[i,1] = "No";
 						
 						planNameOwnImprov[i,2] = "0";
 					}
@@ -106,6 +106,8 @@ public class GUISystemDataScript : MonoBehaviour
 					turnInfoScript.GP -= 1;
 						
 					cameraFunctionsScript.coloniseMenu = false;
+
+					planNameOwnImprov[1,1] = "Yes";
 						
 					return;
 				}
@@ -121,7 +123,7 @@ public class GUISystemDataScript : MonoBehaviour
 
 		for(int n = 0; n < numPlanets; ++n)
 		{
-			if(planNameOwnImprov[n,0] != null)
+			if(planNameOwnImprov[n,0] != null && planNameOwnImprov[n,1] == "Yes")
 			{
 				string planetType = planNameOwnImprov[n,0];
 
@@ -141,7 +143,7 @@ public class GUISystemDataScript : MonoBehaviour
 					}
 
 					allPlanetsInfo[n] = gameObject.name + " " + (n+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-						+ tempSci.ToString() + "\n" + tempInd.ToString() + "\n" + tempMon.ToString();
+						+ ((int)(tempSci)).ToString() + "\n" + ((int)(tempInd)).ToString() + "\n" + ((int)(tempMon)).ToString();
 				}
 
 				totalSystemScience += (tempSci * techTreeScript.sciencePercentBonus) + techTreeScript.sciencePointBonus;
