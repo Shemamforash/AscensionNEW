@@ -29,8 +29,6 @@ public class HeroScript : MonoBehaviour
 				break;
 			}
 		}
-
-		Debug.Log (techTreeScript.sciencePercentBonus);
 	}
 
 	private void President()
