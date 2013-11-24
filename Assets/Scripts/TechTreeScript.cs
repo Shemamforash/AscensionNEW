@@ -13,6 +13,7 @@ public class TechTreeScript : MonoBehaviour
 	private TurnInfo turnInfoScript;
 	private GUISystemDataScript systemDataScript;
 	private TechTreeScript techTreeScript;
+	private HeroScript heroScript;
 	
 	public float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
 	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
@@ -22,12 +23,14 @@ public class TechTreeScript : MonoBehaviour
 
 	private int currentPlanetsWithHyperNet = 0;
 
-	private bool synergy = false, capitalism = false, unionisation = false, familiarity = false, secondaryResearch = false;
+	private bool capitalism = false, familiarity = false, secondaryResearch = false;
+	public bool leadership = false;
 
 	void Start()
 	{
 		systemDataScript = gameObject.GetComponent<GUISystemDataScript>();
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
+		heroScript = gameObject.GetComponent<HeroScript>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 
 		LoadTechTree();
@@ -71,17 +74,34 @@ public class TechTreeScript : MonoBehaviour
 
 	public void ActiveTechnologies()
 	{
+		sciencePercentBonus = 1.0f;
+		industryPercentBonus = 1.0f;
+		moneyPercentBonus = 1.0f;
+
 		if(techTreeComplete[0,0,1] == "Built" && secondaryResearch == true) //Secondary Research
 		{
 			turnInfoScript.science += 50;
 			secondaryResearch = false;
 		}
 
-		if(techTreeComplete[0,1,1] == "Built" && synergy == false) //Synergy
+		if(techTreeComplete[0,1,1] == "Built") //Synergy
 		{
 			Synergy();
-			
-			synergy = true;
+		}
+
+		if(techTreeComplete[0,2,1] == "Built") //Morale
+		{
+			foreach(string hero in heroScript.heroesInSystem)
+			{
+				if(hero == null)
+				{
+					break;
+				}
+				else
+				{
+					moneyPointBonus += 10.0f;
+				}
+			}
 		}
 
 		if(techTreeComplete[0,3,1] == "Built" && capitalism == false) //Capitalism
@@ -89,11 +109,19 @@ public class TechTreeScript : MonoBehaviour
 			capitalism = true;
 		}
 
-		if(techTreeComplete[2,1,1] == "Built" && unionisation == false) //Unionisation
+		if(techTreeComplete[0,4,1] == "Built" && leadership == false) //Leadership
+		{
+			leadership = true;
+		}
+
+		if(techTreeComplete[1,1,1] == "Built") //Quick Starters
+		{
+			industryPointBonus += turnInfoScript.planetsColonisedThisTurn * 50.0f;
+		}
+
+		if(techTreeComplete[2,1,1] == "Built") //Unionisation
 		{
 			Unionisation();
-
-			unionisation = true;
 		}
 
 		if(techTreeComplete[2,2,1] == "Built" && familiarity == false) //Familiarity
@@ -142,11 +170,7 @@ public class TechTreeScript : MonoBehaviour
 	}
 
 	private void HyperNet() //Tier 3 tech. Bonus SIM for each connected planet. This functions is good.
-	{
-		sciencePercentBonus -= currentPlanetsWithHyperNet * 0.005f;
-		industryPercentBonus -= currentPlanetsWithHyperNet * 0.005f;
-		moneyPercentBonus -= currentPlanetsWithHyperNet * 0.005f;
-		
+	{		
 		currentPlanetsWithHyperNet = 0;
 		
 		foreach(GameObject system in turnInfoScript.ownedSystems)
