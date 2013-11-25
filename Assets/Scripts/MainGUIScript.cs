@@ -11,6 +11,7 @@ public class MainGUIScript : MonoBehaviour
 	private CameraFunctions cameraFunctionsScript;
 	private HeroScript heroScript;
 	private GUISystemDataScript guiPlanScript;
+	private PlayerTurn playerTurnScript;
 	
 	public bool spendMenu = false, hasColonised = false;
 	public string resourceToSpend;
@@ -21,6 +22,7 @@ public class MainGUIScript : MonoBehaviour
 	{
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
+		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
 
 		turnInfoScript.playerRace = null;
 
@@ -103,30 +105,28 @@ public class MainGUIScript : MonoBehaviour
 	void OnGUI() //Urgh. Unity demands that all GUI related script should come from one OnGUI to prevent excessive numbers of calls to the CPU
 	{
 		#region playerrace
-		if(turnInfoScript.playerRace == null)
+		if(playerTurnScript.playerRace == null)
 		{
 			GUI.Box (new Rect(Screen.width/2 - 150, Screen.height/2 - 40, 300, 80), "Select Race");
 			
 			if(GUI.Button (new Rect(Screen.width/2 - 130, Screen.height/2, 80, 20), "Humans"))
 			{
-				turnInfoScript.playerRace = "Human";
+				playerTurnScript.playerRace = "Human";
 			}
 			
 			if(GUI.Button (new Rect(Screen.width/2 -40, Screen.height/2, 80, 20), "Selkies"))
 			{
-				turnInfoScript.playerRace = "Selkie";
+				playerTurnScript.playerRace = "Selkie";
 			}
 
 			if(GUI.Button (new Rect(Screen.width/2 + 50, Screen.height/2, 80, 20), "Nereides"))
 			{
-				turnInfoScript.playerRace = "Nereid";
+				playerTurnScript.playerRace = "Nereid";
 			}
 
-			if(turnInfoScript.playerRace != null)
+			if(playerTurnScript.playerRace != null)
 			{
-				turnInfoScript.PickRace ();
-
-				turnInfoScript.StartSystemPlanetColonise();
+				playerTurnScript.StartTurn();
 			}
 		}
 		#endregion
