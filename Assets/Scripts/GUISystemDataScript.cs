@@ -107,7 +107,7 @@ public class GUISystemDataScript : MonoBehaviour
 						
 					cameraFunctionsScript.coloniseMenu = false;
 
-					planNameOwnImprov[1,1] = "Yes";
+					planNameOwnImprov[0,1] = "Yes";
 						
 					return;
 				}

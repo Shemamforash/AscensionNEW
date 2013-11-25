@@ -304,6 +304,10 @@ public class MainGUIScript : MonoBehaviour
 			{
 				heroScript.heroesInSystem[1] = "President";
 			}
+			if(heroScript.heroesInSystem[1] == "President")
+			{
+				GUI.Label(new Rect(Screen.width/2 - 750.0f, Screen.height/2 +30.0f,140.0f, 20.0f), "Is Present");
+			}
 		}
 		#endregion
 	}
