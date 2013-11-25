@@ -14,50 +14,28 @@ public class TurnInfo : MonoBehaviour
 	[HideInInspector]
 	public GameObject[] ownedSystems = new GameObject[60];
 	[HideInInspector]
-	public Material ownedMaterial;
-	[HideInInspector]
 	public bool endTurn;
-	[HideInInspector]
-	public string homePlanet;
 	public Camera mainCamera;
+	public Material enemyMaterial;
+	public Material playerMaterial;
+	public Material materialInUse;
 	
-	public string playerRace;
+	public string playerRace, homeSystem;
 	public int turn = 0;
 	public GameObject tempObject;
 	
-	private GUISystemDataScript guiPlanScript;
-	private CameraFunctions cameraFunctionsScript;
-	private TechTreeScript techTreeScript;
-	private HeroScript heroScript;
+	public GUISystemDataScript guiPlanScript;
+	public CameraFunctions cameraFunctionsScript;
+	public TechTreeScript techTreeScript;
+	public HeroScript heroScript;
 	private MainGUIScript mainGUIScript;
 
 	void Awake()
 	{	
-		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
-		
-		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
 		
 		LoadPlanetData();
 	}
-	
-	void Update() 
-	{
-		if(Input.GetMouseButtonDown(0) && cameraFunctionsScript.selectedSystem != null) //Assigns scripts to selected system.
-		{			
-			tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
-
-			if(tempObject.tag == "StarSystem")
-			{
-				guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
-				techTreeScript = tempObject.GetComponent<TechTreeScript>();
-				heroScript = tempObject.GetComponent<HeroScript>();
-			}
-		}
-
-		cameraFunctionsScript.CentreCamera(); //Checks if camera needs centreing
-	}
-
 	
 	void LoadPlanetData() //Loads up planet stats into array
 	{
@@ -84,7 +62,7 @@ public class TurnInfo : MonoBehaviour
 			raceIndustry = 1;
 			raceMoney = 2;
 			raceGP = 3;
-			homePlanet = "Sol";
+			homeSystem = "Sol";
 		}
 		if(playerRace == "Selkie")
 		{
@@ -92,7 +70,7 @@ public class TurnInfo : MonoBehaviour
 			raceIndustry = 3;
 			raceMoney = 2;
 			raceGP = 2;
-			homePlanet = "Heracles";
+			homeSystem = "Heracles";
 		}
 		if(playerRace == "Nereid")
 		{
@@ -100,21 +78,20 @@ public class TurnInfo : MonoBehaviour
 			raceIndustry = 2;
 			raceMoney = 4;
 			raceGP = 1;
-			homePlanet = "Nepthys";
+			homeSystem = "Nepthys";
 		}
 	}
 
-	public void StartSystemPlanetColonise()
+	public void StartSystemPlanetColonise(Material playerMaterial, string homeSystem)
 	{
-		cameraFunctionsScript.selectedSystem = homePlanet; //Set the selected system
-		guiPlanScript = GameObject.Find (homePlanet).GetComponent<GUISystemDataScript>();
+		guiPlanScript = GameObject.Find (homeSystem).GetComponent<GUISystemDataScript>();
 		
 		for(int i = 0; i < 60; i++) //Find selected system and set it to owned
 		{
-			if(systemList[i].name == homePlanet)
+			if(systemList[i].name == homeSystem)
 			{
 				ownedSystems[i] = systemList[i];
-				ownedSystems[i].renderer.material = ownedMaterial;
+				ownedSystems[i].renderer.material = playerMaterial;
 				break;
 			}
 		}

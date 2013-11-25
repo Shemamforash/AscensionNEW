@@ -200,10 +200,10 @@ public class TechTreeScript : MonoBehaviour
 			systemDataScript.tempMon += 10;
 		}
 		
-		if(familiarity == true && planetToCheck == turnInfoScript.homePlanet)
-		{
-			systemDataScript.tempMon += systemDataScript.tempMon * 0.5f;
-		}
+		//if(familiarity == true && planetToCheck == turnInfoScript.homePlanet)
+		//{
+			//systemDataScript.tempMon += systemDataScript.tempMon * 0.5f;
+		//}
 	}
 }
 

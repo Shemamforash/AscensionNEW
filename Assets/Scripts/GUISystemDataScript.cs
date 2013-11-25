@@ -101,7 +101,7 @@ public class GUISystemDataScript : MonoBehaviour
 				{					
 					turnInfoScript.ownedSystems[arrayPosition] = gameObject;
 					
-					gameObject.renderer.material = turnInfoScript.ownedMaterial;
+					gameObject.renderer.material = turnInfoScript.materialInUse;
 						
 					turnInfoScript.GP -= 1;
 						
