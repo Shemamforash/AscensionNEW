@@ -167,7 +167,6 @@ public class TurnInfo : MonoBehaviour
 				heroScript.CheckHeroesInSystem();
 				guiPlanScript.SystemSIMCounter();
 
-
 				science += (int)guiPlanScript.totalSystemScience;
 				industry += (int)guiPlanScript.totalSystemIndustry;
 				money += (int)guiPlanScript.totalSystemMoney;
