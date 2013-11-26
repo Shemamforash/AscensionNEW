@@ -4,11 +4,14 @@ using System.Collections;
 public class PlayerTurn : TurnInfo
 {
 	public string playerHomeSystem;
+	public GameObject tempObject;
+	private MainGUIScript mainGUIScript;
 
 	void Awake()
 	{
 		playerRace = null;
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
+		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
 		materialInUse = playerMaterial;
 		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
 	}
@@ -30,15 +33,38 @@ public class PlayerTurn : TurnInfo
 		cameraFunctionsScript.CentreCamera(); //Checks if camera needs centreing
 	}
 
+	public void ImproveButtonClick(int i)
+	{
+		int q = int.Parse(guiPlanScript.planNameOwnImprov[i,2]);
+		
+		q++;
+		
+		guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
+		
+		if(mainGUIScript.resourceToSpend == "Industry")
+		{
+			industry -= (int)guiPlanScript.improvementCost;
+		}
+		
+		if(mainGUIScript.resourceToSpend == "Money")
+		{
+			Debug.Log (guiPlanScript.improvementCost * 2);
+			money -= (int)(guiPlanScript.improvementCost * 2);
+		}
+	}
+
 	public void StartTurn()
 	{
 		PickRace ();
 
 		playerHomeSystem = homeSystem;
 
-		Debug.Log (playerHomeSystem);
-		
-		StartSystemPlanetColonise(playerMaterial, playerHomeSystem);
+		lineRenderScript = GameObject.Find(playerHomeSystem).GetComponent<LineRenderScript>();
+		lineRenderScript.ownedBy = "Player";
+
+		StartSystemPlanetColonise(playerMaterial, playerHomeSystem, ownedSystems);
+
+		GP = raceGP;
 
 		cameraFunctionsScript.selectedSystem = playerHomeSystem; //Set the selected system
 	}

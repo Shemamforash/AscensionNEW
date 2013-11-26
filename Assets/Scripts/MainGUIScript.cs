@@ -12,6 +12,7 @@ public class MainGUIScript : MonoBehaviour
 	private HeroScript heroScript;
 	private GUISystemDataScript guiPlanScript;
 	private PlayerTurn playerTurnScript;
+	private EnemyAIBasic enemyTurnScript;
 	
 	public bool spendMenu = false, hasColonised = false;
 	public string resourceToSpend;
@@ -23,6 +24,7 @@ public class MainGUIScript : MonoBehaviour
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+		enemyTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyAIBasic>();
 
 		turnInfoScript.playerRace = null;
 
@@ -32,11 +34,11 @@ public class MainGUIScript : MonoBehaviour
 
 	void Update()
 	{
-		if(turnInfoScript.tempObject != null)
+		if(playerTurnScript.tempObject != null)
 		{
-			guiPlanScript = turnInfoScript.tempObject.GetComponent<GUISystemDataScript>();
-			techTreeScript = turnInfoScript.tempObject.GetComponent<TechTreeScript>();
-			heroScript = turnInfoScript.tempObject.GetComponent<HeroScript>();
+			guiPlanScript = playerTurnScript.tempObject.GetComponent<GUISystemDataScript>();
+			techTreeScript = playerTurnScript.tempObject.GetComponent<TechTreeScript>();
+			heroScript = playerTurnScript.tempObject.GetComponent<HeroScript>();
 		}
 	}
 
@@ -136,28 +138,30 @@ public class MainGUIScript : MonoBehaviour
 		
 		GUI.Label (new Rect(Screen.width - 80, Screen.height - 50, 50, 20), turnNumber);
 		
-		if(GUI.Button (new Rect(Screen.width - 80, Screen.height - 30, 70, 20), "End turn") && turnInfoScript.playerRace != null)
+		if(GUI.Button (new Rect(Screen.width - 80, Screen.height - 30, 70, 20), "End turn") && playerTurnScript.playerRace != null)
 		{
-			turnInfoScript.TurnEnd ();
+			turnInfoScript.turn++;
+			playerTurnScript.TurnEnd (playerTurnScript.ownedSystems);
+			enemyTurnScript.Expand();
 		}
 		
 		GUI.Box (new Rect(15, 15, 100, 130), "");
 		
-		GUI.Label (new Rect(20, 20, 60, 20), turnInfoScript.playerRace);
+		GUI.Label (new Rect(20, 20, 60, 20), playerTurnScript.playerRace);
 		
-		string scienceStr = turnInfoScript.science.ToString();
+		string scienceStr = playerTurnScript.science.ToString();
 		
 		GUI.Label (new Rect(20, 45, 60, 20), scienceStr);
 		
-		string industryStr = turnInfoScript.industry.ToString ();
+		string industryStr = playerTurnScript.industry.ToString ();
 		
 		GUI.Label (new Rect(20, 70, 60, 20), industryStr);
 		
-		string moneyStr = turnInfoScript.money.ToString ();
+		string moneyStr = playerTurnScript.money.ToString ();
 		
 		GUI.Label (new Rect(20, 95, 60, 20), moneyStr);
 		
-		string GPString = turnInfoScript.GP.ToString ();
+		string GPString = playerTurnScript.GP.ToString ();
 		
 		GUI.Label (new Rect(20, 120, 60, 20), GPString);
 		#endregion
@@ -167,9 +171,9 @@ public class MainGUIScript : MonoBehaviour
 		
 		if(cameraFunctionsScript.coloniseMenu == true)
 		{
-			if(GUI.Button (coloniseButton, "Colonise") && turnInfoScript.GP > 0)
+			if(GUI.Button (coloniseButton, "Colonise") && playerTurnScript.GP > 0)
 			{			
-				guiPlanScript.FindSystem ();
+				guiPlanScript.FindSystem (playerTurnScript);
 			}
 		}
 		#endregion
@@ -237,29 +241,29 @@ public class MainGUIScript : MonoBehaviour
 
 					guiPlanScript.CheckImprovement();
 
-					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 92.5f, 35.0f), indSpend) && turnInfoScript.industry >= guiPlanScript.improvementCost)
+					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 92.5f, 35.0f), indSpend) && playerTurnScript.industry >= guiPlanScript.improvementCost)
 					{
 						resourceToSpend = "Industry";
 						spendMenu = false;
-						turnInfoScript.ImproveButtonClick(thisPlanet);
+						playerTurnScript.ImproveButtonClick(thisPlanet);
 					}
 
-					if(GUI.Button (new Rect(Screen.width/2 + 2.5f, Screen.height/2 - 15.0f, 92.5f, 35.0f), monSpend) && turnInfoScript.money >= (guiPlanScript.improvementCost * 2))
+					if(GUI.Button (new Rect(Screen.width/2 + 2.5f, Screen.height/2 - 15.0f, 92.5f, 35.0f), monSpend) && playerTurnScript.money >= (guiPlanScript.improvementCost * 2))
 					{
 						resourceToSpend = "Money";
 						spendMenu = false;
-						turnInfoScript.ImproveButtonClick(thisPlanet);
+						playerTurnScript.ImproveButtonClick(thisPlanet);
 					}
 				}
 
 				if(guiPlanScript.planNameOwnImprov[thisPlanet, 1] == "No")
 				{
 					
-					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 190.0f, 35.0f), "1 GP") && turnInfoScript.GP > 0)
+					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 190.0f, 35.0f), "1 GP") && playerTurnScript.GP > 0)
 					{
-						turnInfoScript.GP -= 1;
+						playerTurnScript.GP -= 1;
 						guiPlanScript.planNameOwnImprov[thisPlanet, 1] = "Yes";
-						++turnInfoScript.planetsColonisedThisTurn;
+						++playerTurnScript.planetsColonisedThisTurn;
 						hasColonised = true;
 						spendMenu = false;
 					}
