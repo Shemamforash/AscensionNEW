@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 public class GUISystemDataScript : MonoBehaviour 
@@ -26,6 +27,8 @@ public class GUISystemDataScript : MonoBehaviour
 	private GameObject[] systemConnections = new GameObject[4];
 
 	private TurnInfo turnInfoScript;
+	private PlayerTurn playerTurnScript;
+	private EnemyAIBasic enemyTurnScript;
 	private LineRenderScript lineRenderScript;
 	private CameraFunctions cameraFunctionsScript;
 	private TechTreeScript techTreeScript;
@@ -33,6 +36,8 @@ public class GUISystemDataScript : MonoBehaviour
 	void Awake()
 	{
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
+		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+		enemyTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyAIBasic>();
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 
@@ -70,45 +75,64 @@ public class GUISystemDataScript : MonoBehaviour
 		}
 	}
 	
-	public void FindSystem() //This function is used to check if the highlighted system can be colonised, and if it can, to colonise it
+	public void FindSystem(TurnInfo thisPlayer) //This function is used to check if the highlighted system can be colonised, and if it can, to colonise it
 	{		
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		
 		systemConnections = lineRenderScript.connections;
 
-		for(int i = 0; i < 4; i++)
+		string ownedByString = null;
+
+		if(thisPlayer == playerTurnScript)
 		{
-			if(systemConnections[i] == null)
+			ownedByString  = "Player";
+		}
+
+		if(thisPlayer == enemyTurnScript)
+		{
+			ownedByString  = "Enemy";
+		}
+
+		for(int i = 0; i < 4; i++) //For all connections
+		{
+			if(systemConnections[i] == null) //If a connection is null, stop looking through list as there are no more connected systems
 			{
 				break;
 			}
 
-			int arrayPosition = 0;
-
-			for(int j = 0; j < 60; ++j)
+			if(lineRenderScript.ownedBy != null && lineRenderScript.ownedBy != "")
 			{
-				if(turnInfoScript.ownedSystems[j] == null)
+				break;
+			}
+			
+			int arrayPosition = 0;
+			
+			for(int j = 0; j < 60; ++j) //For all systems
+			{
+				if(thisPlayer.ownedSystems[j] == null) //If there is an unowned system, continue, it is not relevant
 				{
 					continue;
 				}
-
-				if(turnInfoScript.systemList[j] == gameObject)
+				
+				if(thisPlayer.systemList[j] == gameObject) //If the system list matches this system
 				{
-					arrayPosition = j;
+					arrayPosition = j; //Set the array position
 				}
 				
-				if(systemConnections[i] == turnInfoScript.ownedSystems[j])
+				if(systemConnections[i] == thisPlayer.ownedSystems[j]) //If system connected to this system is owned by player allow colonisation
 				{					
-					turnInfoScript.ownedSystems[arrayPosition] = gameObject;
+					thisPlayer.ownedSystems[arrayPosition] = gameObject;
 					
-					gameObject.renderer.material = turnInfoScript.materialInUse;
-						
-					turnInfoScript.GP -= 1;
-						
+					lineRenderScript.ownedBy = ownedByString;
+					
+					gameObject.renderer.material = thisPlayer.materialInUse;
+					
+					thisPlayer.GP -= 1;
+					
 					cameraFunctionsScript.coloniseMenu = false;
-
+					
 					planNameOwnImprov[0,1] = "Yes";
-						
+					
 					return;
 				}
 			}
@@ -135,9 +159,9 @@ public class GUISystemDataScript : MonoBehaviour
 				{
 					if(turnInfoScript.planetRIM[j,0] == planetType)
 					{
-						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]) * resourceBonus * turnInfoScript.raceScience; //Need to sort out variable types, too much casting
-						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * turnInfoScript.raceIndustry;
-						tempMon = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * turnInfoScript.raceMoney;
+						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]) * resourceBonus * playerTurnScript.raceScience; //Need to sort out variable types, too much casting
+						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * playerTurnScript.raceIndustry;
+						tempMon = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * playerTurnScript.raceMoney;
 						techTreeScript.planetToCheck = planetType;
 						techTreeScript.CheckPlanets();
 					}

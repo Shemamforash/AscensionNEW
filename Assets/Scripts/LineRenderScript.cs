@@ -8,11 +8,10 @@ public class LineRenderScript : MonoBehaviour
 	[HideInInspector]
 	public GUISystemDataScript guiPlanScript;
 	[HideInInspector]
-	public MainGUIScript mainGUIScript;
-	[HideInInspector]
 	public GUITextScript guiTextScript;
 	[HideInInspector]
-	public TurnInfo turnInfoScript;
+	public PlayerTurn playerTurnScript;
+	public EnemyAIBasic enemyTurnScript;
 	public GUIText activeGUI;
 	public GameObject[] connections = new GameObject[4];
 	[HideInInspector]
@@ -21,17 +20,23 @@ public class LineRenderScript : MonoBehaviour
 	public Vector3[,] lineRotationsScalePosition = new Vector3[4,3];
 	public GameObject quadA;
 	public GameObject ownedQuad;
+	public GameObject enemyOwnedQuad;
 	[HideInInspector]
 	public int i = 0;
 	[HideInInspector]
 	private GameObject objectB;
 
+	private GameObject[] tempSystemArray = new GameObject[60];
+
+	public string ownedBy = null;
+
 	void Start()
 	{	
-		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
+		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+		enemyTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyAIBasic>();
+
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
-		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
 
 		foreach (GameObject connectedObject in connections)
 		{
@@ -51,12 +56,26 @@ public class LineRenderScript : MonoBehaviour
 	void Update()
 	{
 		if(owned == false)
-		{
-			foreach(GameObject system in turnInfoScript.ownedSystems)
+		{ 
+			GameObject quad = null;
+
+			if(ownedBy == "Player")
+			{
+				tempSystemArray = playerTurnScript.ownedSystems;
+				quad = ownedQuad;
+			}
+
+			if(ownedBy == "Enemy")
+			{
+				tempSystemArray = enemyTurnScript.ownedSystems;
+				quad = enemyOwnedQuad;
+			}
+
+			foreach(GameObject system in tempSystemArray)
 			{
 				if(gameObject == system && system != null)
 				{
-					BuildLine(ownedQuad);
+					BuildLine(quad);
 					owned = true;
 					break;
 				}
