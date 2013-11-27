@@ -109,7 +109,7 @@ public class GUISystemDataScript : MonoBehaviour
 			
 			for(int j = 0; j < 60; ++j) //For all systems
 			{
-				if(thisPlayer.ownedSystems[j] == null) //If there is an unowned system, continue, it is not relevant
+				if(thisPlayer.ownedSystems[j] == null) //If this player owns the system, continue, it is not relevant
 				{
 					continue;
 				}
@@ -118,10 +118,14 @@ public class GUISystemDataScript : MonoBehaviour
 				{
 					arrayPosition = j; //Set the array position
 				}
-				
+
+				Debug.Log (systemConnections[i].name + thisPlayer.ownedSystems[j].name);
+
 				if(systemConnections[i] == thisPlayer.ownedSystems[j]) //If system connected to this system is owned by player allow colonisation
 				{					
 					thisPlayer.ownedSystems[arrayPosition] = gameObject;
+
+					Debug.Log (thisPlayer.ownedSystems[arrayPosition]);
 					
 					lineRenderScript.ownedBy = ownedByString;
 					
@@ -161,7 +165,7 @@ public class GUISystemDataScript : MonoBehaviour
 					{
 						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]) * resourceBonus * playerTurnScript.raceScience; //Need to sort out variable types, too much casting
 						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * playerTurnScript.raceIndustry;
-						tempMon = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * playerTurnScript.raceMoney;
+						tempMon = float.Parse(turnInfoScript.planetRIM[j,3]) * resourceBonus * playerTurnScript.raceMoney;
 						techTreeScript.planetToCheck = planetType;
 						techTreeScript.CheckPlanets();
 					}

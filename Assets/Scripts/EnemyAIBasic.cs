@@ -4,11 +4,15 @@ using System.Collections;
 public class EnemyAIBasic : TurnInfo 
 {
 	public string enemyHomeSystem;
+	private float tempSIM, systemRatio;
+	private GameObject mostValuableSystem;
 	private EnemyAIBasic enemyTurnScript;
 	private LineRenderScript thisLineRenderScript;
+	private TurnInfo turnInfoScript;
 
 	void Awake()
 	{
+		turnInfoScript = gameObject.GetComponent<TurnInfo>();
 		enemyTurnScript = gameObject.GetComponent<EnemyAIBasic>();
 
 		materialInUse = enemyMaterial;
@@ -26,25 +30,84 @@ public class EnemyAIBasic : TurnInfo
 		StartSystemPlanetColonise(enemyMaterial, enemyHomeSystem, ownedSystems);
 	}
 
-	void Update()
+	public void Expand(GameObject activeSystem)
 	{
-		if(endTurn == true)
-		{
-			Expand ();
-		}
-	}
+		lineRenderScript = activeSystem.GetComponent<LineRenderScript>();
 
-	public void Expand()
-	{
+		bool selectPlanet = false;
+
+		int noOfSystemsIteratedThrough = 0;
+
 		foreach(GameObject system in lineRenderScript.connections)
 		{
+			if(system == null)
+			{
+				break;
+			}
+
 			thisLineRenderScript = system.GetComponent<LineRenderScript>();
+
+			if(thisLineRenderScript.ownedBy == "Enemy" || thisLineRenderScript.ownedBy == "Player")
+			{
+				continue;
+			}
 
 			if(thisLineRenderScript.ownedBy == "" && GP > 0)
 			{
-				guiPlanScript = system.GetComponent<GUISystemDataScript>();
+				guiPlanScript = activeSystem.GetComponent<GUISystemDataScript>(); //Wtf is happening here!?
 				guiPlanScript.FindSystem(enemyTurnScript);
+				guiPlanScript = activeSystem.GetComponent<GUISystemDataScript>();
+				++noOfSystemsIteratedThrough;
 			}
+		}
+
+		if(noOfSystemsIteratedThrough == 0)
+		{
+			selectPlanet = true;
+		}
+
+		if(selectPlanet == true)
+		{
+			foreach(GameObject system in lineRenderScript.connections)
+			{
+				if(system != null)
+				{
+					CalculateSIMRatio(system);
+				}
+			}
+
+			Expand (mostValuableSystem);
+		}
+
+		TurnEnd(ownedSystems);
+	}
+
+	void CalculateSIMRatio(GameObject thisSystem)
+	{
+		guiPlanScript = thisSystem.GetComponent<GUISystemDataScript>();
+
+		for(int i = 0; i < guiPlanScript.numPlanets; i++)
+		{
+			for(int f = 0; f < 12; f++)
+			{
+				if(guiPlanScript.planNameOwnImprov[i, 0] == turnInfoScript.planetRIM[f, 0])
+				{
+					float tempSci = float.Parse (turnInfoScript.planetRIM[f,1]);
+					float tempInd = float.Parse (turnInfoScript.planetRIM[f,2]);
+					float tempMon = float.Parse (turnInfoScript.planetRIM[f,3]);
+
+					tempSIM += (tempSci + tempInd + tempMon);
+					break;
+				}
+			}
+		}
+
+		float tempRatio = tempSIM / guiPlanScript.numPlanets;
+
+		if(tempRatio > systemRatio)
+		{
+			systemRatio = tempRatio;
+			mostValuableSystem = thisSystem;
 		}
 	}
 }

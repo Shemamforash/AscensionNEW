@@ -142,7 +142,7 @@ public class MainGUIScript : MonoBehaviour
 		{
 			turnInfoScript.turn++;
 			playerTurnScript.TurnEnd (playerTurnScript.ownedSystems);
-			enemyTurnScript.Expand();
+			enemyTurnScript.Expand(GameObject.Find (enemyTurnScript.enemyHomeSystem));
 		}
 		
 		GUI.Box (new Rect(15, 15, 100, 130), "");
