@@ -6,6 +6,7 @@ public class EnemyAIBasic : TurnInfo
 	public string enemyHomeSystem;
 	private float tempSIM, systemRatio;
 	private GameObject mostValuableSystem;
+	public GameObject lastActiveSystem;
 	private EnemyAIBasic enemyTurnScript;
 	private LineRenderScript thisLineRenderScript;
 	private TurnInfo turnInfoScript;
@@ -21,6 +22,7 @@ public class EnemyAIBasic : TurnInfo
 		PickRace();
 
 		enemyHomeSystem = homeSystem;
+		lastActiveSystem = GameObject.Find(enemyHomeSystem);
 
 		GP = raceGP;
 
@@ -28,62 +30,69 @@ public class EnemyAIBasic : TurnInfo
 		lineRenderScript.ownedBy = "Enemy";
 
 		StartSystemPlanetColonise(enemyMaterial, enemyHomeSystem, ownedSystems);
+
+
 	}
 
-	public void Expand(GameObject activeSystem)
+	public void Expand()
 	{
-		lineRenderScript = activeSystem.GetComponent<LineRenderScript>();
-
-		bool selectPlanet = false;
-
-		int noOfSystemsIteratedThrough = 0;
-
-		foreach(GameObject system in lineRenderScript.connections)
+		while(GP > 0)
 		{
-			if(system == null)
+			mostValuableSystem = null;
+
+			while(mostValuableSystem == null)
 			{
-				break;
+				CheckForSuitableSystem();
 			}
 
-			thisLineRenderScript = system.GetComponent<LineRenderScript>();
+			guiPlanScript = mostValuableSystem.GetComponent<GUISystemDataScript>();
+			guiPlanScript.FindSystem(enemyTurnScript);
+		}
 
-			if(thisLineRenderScript.ownedBy == "Enemy" || thisLineRenderScript.ownedBy == "Player")
+		GP += raceGP;
+	}
+
+	public void CheckForSuitableSystem()
+	{
+		foreach(GameObject system in systemList)
+		{
+			lineRenderScript = system.GetComponent<LineRenderScript>();
+
+			if(lineRenderScript.ownedBy == "Enemy" || lineRenderScript.ownedBy == "Player")
 			{
 				continue;
 			}
 
-			if(thisLineRenderScript.ownedBy == "" && GP > 0)
+			foreach(GameObject connection in lineRenderScript.connections)
 			{
-				guiPlanScript = activeSystem.GetComponent<GUISystemDataScript>(); //Wtf is happening here!?
-				guiPlanScript.FindSystem(enemyTurnScript);
-				guiPlanScript = activeSystem.GetComponent<GUISystemDataScript>();
-				++noOfSystemsIteratedThrough;
-			}
-		}
+				if(connection == null)
+				{
+					continue;
+				}
 
-		if(noOfSystemsIteratedThrough == 0)
-		{
-			selectPlanet = true;
-		}
+				thisLineRenderScript = connection.GetComponent<LineRenderScript>();
 
-		if(selectPlanet == true)
-		{
-			foreach(GameObject system in lineRenderScript.connections)
-			{
-				if(system != null)
+				if(thisLineRenderScript.ownedBy == "Enemy")
 				{
 					CalculateSIMRatio(system);
+					RandomNumber(system);
 				}
 			}
-
-			Expand (mostValuableSystem);
 		}
+	}
 
-		TurnEnd(ownedSystems);
+	private void RandomNumber(GameObject thisSystem)
+	{
+		if(systemRatio < Random.Range (0.00f, 1.00f))
+		{
+			mostValuableSystem = thisSystem;
+		}
 	}
 
 	void CalculateSIMRatio(GameObject thisSystem)
 	{
+		tempSIM = 0.0f;
+
 		guiPlanScript = thisSystem.GetComponent<GUISystemDataScript>();
 
 		for(int i = 0; i < guiPlanScript.numPlanets; i++)
@@ -97,17 +106,15 @@ public class EnemyAIBasic : TurnInfo
 					float tempMon = float.Parse (turnInfoScript.planetRIM[f,3]);
 
 					tempSIM += (tempSci + tempInd + tempMon);
+
 					break;
 				}
 			}
 		}
 
+
 		float tempRatio = tempSIM / guiPlanScript.numPlanets;
 
-		if(tempRatio > systemRatio)
-		{
-			systemRatio = tempRatio;
-			mostValuableSystem = thisSystem;
-		}
+		systemRatio = (1.0f/16.7f) * (tempRatio/2.0f);
 	}
 }
