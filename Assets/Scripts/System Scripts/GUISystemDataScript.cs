@@ -18,7 +18,7 @@ public class GUISystemDataScript : MonoBehaviour
 	[HideInInspector]
 	public string[,] planNameOwnImprov = new string[6,3]; //Unique to object
 	[HideInInspector]
-	public bool canImprove, foundPlanetData;
+	public bool canImprove, foundPlanetData, isOkToColonise;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM;
 	public float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
@@ -83,62 +83,63 @@ public class GUISystemDataScript : MonoBehaviour
 
 		string ownedByString = null;
 
+		int arrayPosition = 0;
+
 		if(thisPlayer == playerTurnScript)
 		{
 			ownedByString  = "Player";
+			PlayerColoniseSystem(systemConnections);
+			lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		}
 
 		if(thisPlayer == enemyTurnScript)
 		{
 			ownedByString  = "Enemy";
+			isOkToColonise = true;
 		}
 
-		for(int i = 0; i < 4; i++) //For all connections
+		if(isOkToColonise == true)
 		{
-			if(systemConnections[i] == null) //If a connection is null, stop looking through list as there are no more connected systems
+			for(int i = 0; i < 60; i ++)
+			{
+				if(thisPlayer.systemList[i] == gameObject)
+				{
+					arrayPosition = i;
+					break;
+				}
+			}
+
+			thisPlayer.ownedSystems[arrayPosition] = gameObject;
+			
+			lineRenderScript.ownedBy = ownedByString;
+			
+			gameObject.renderer.material = thisPlayer.materialInUse;
+			
+			thisPlayer.GP -= 1;
+			
+			cameraFunctionsScript.coloniseMenu = false;
+			
+			planNameOwnImprov[0,1] = "Yes";
+		}
+	}
+
+	void PlayerColoniseSystem(GameObject[] connections)
+	{
+		foreach(GameObject connection in connections)
+		{
+			if(connection == null)
 			{
 				break;
 			}
 
-			if(lineRenderScript.ownedBy != null && lineRenderScript.ownedBy != "")
+			lineRenderScript = connection.GetComponent<LineRenderScript>();
+			if(lineRenderScript.ownedBy == "Player")
 			{
-				break;
+				isOkToColonise = true;
 			}
-			
-			int arrayPosition = 0;
-			
-			for(int j = 0; j < 60; ++j) //For all systems
+			else
 			{
-				if(thisPlayer.ownedSystems[j] == null) //If this player owns the system, continue, it is not relevant
-				{
-					continue;
-				}
-				
-				if(thisPlayer.systemList[j] == gameObject) //If the system list matches this system
-				{
-					arrayPosition = j; //Set the array position
-				}
-
-				Debug.Log (systemConnections[i].name + thisPlayer.ownedSystems[j].name);
-
-				if(systemConnections[i] == thisPlayer.ownedSystems[j]) //If system connected to this system is owned by player allow colonisation
-				{					
-					thisPlayer.ownedSystems[arrayPosition] = gameObject;
-
-					Debug.Log (thisPlayer.ownedSystems[arrayPosition]);
-					
-					lineRenderScript.ownedBy = ownedByString;
-					
-					gameObject.renderer.material = thisPlayer.materialInUse;
-					
-					thisPlayer.GP -= 1;
-					
-					cameraFunctionsScript.coloniseMenu = false;
-					
-					planNameOwnImprov[0,1] = "Yes";
-					
-					return;
-				}
+				continue;
 			}
 		}
 	}
