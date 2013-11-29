@@ -21,13 +21,15 @@ public class TurnInfo : MonoBehaviour
 	public Material materialInUse;
 	
 	public string playerRace, homeSystem;
-	public int turn = 0;
+	public int turn = 0, systemsInPlay = 0;
 	
 	public GUISystemDataScript guiPlanScript;
 	public CameraFunctions cameraFunctionsScript;
 	public TechTreeScript techTreeScript;
 	public HeroScript heroScript;
 	public LineRenderScript lineRenderScript;
+	public EnemyAIBasic enemyTurnScript;
+	public PlayerTurn playerTurnScript;
 
 	void Awake()
 	{			
@@ -88,7 +90,14 @@ public class TurnInfo : MonoBehaviour
 			if(systemList[i].name == homeSystem)
 			{
 				thisSystemArray[i] = systemList[i];
+
 				thisSystemArray[i].renderer.material = playerMaterial;
+
+				enemyTurnScript.systemList[i] = null;
+				playerTurnScript.systemList[i] = null;
+
+				++systemsInPlay;
+
 				break;
 			}
 		}

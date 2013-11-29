@@ -104,6 +104,8 @@ public class GUISystemDataScript : MonoBehaviour
 			{
 				if(thisPlayer.systemList[i] == gameObject)
 				{
+					thisPlayer.systemList[i] = null;
+					playerTurnScript.systemList[i] = null;
 					arrayPosition = i;
 					break;
 				}
@@ -116,6 +118,8 @@ public class GUISystemDataScript : MonoBehaviour
 			gameObject.renderer.material = thisPlayer.materialInUse;
 			
 			thisPlayer.GP -= 1;
+
+			++turnInfoScript.systemsInPlay;
 			
 			cameraFunctionsScript.coloniseMenu = false;
 			
