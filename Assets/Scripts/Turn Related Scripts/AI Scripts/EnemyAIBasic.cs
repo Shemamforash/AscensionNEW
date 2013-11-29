@@ -6,7 +6,6 @@ public class EnemyAIBasic : TurnInfo
 	public string enemyHomeSystem;
 	private float tempSIM, systemRatio;
 	private GameObject mostValuableSystem;
-	public GameObject lastActiveSystem;
 	private EnemyAIBasic enemyTurnScript;
 	private LineRenderScript thisLineRenderScript;
 	private TurnInfo turnInfoScript;
@@ -19,10 +18,10 @@ public class EnemyAIBasic : TurnInfo
 		materialInUse = enemyMaterial;
 		playerRace = "Selkie";
 		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
+
 		PickRace();
 
 		enemyHomeSystem = homeSystem;
-		lastActiveSystem = GameObject.Find(enemyHomeSystem);
 
 		GP = raceGP;
 
@@ -30,19 +29,30 @@ public class EnemyAIBasic : TurnInfo
 		lineRenderScript.ownedBy = "Enemy";
 
 		StartSystemPlanetColonise(enemyMaterial, enemyHomeSystem, ownedSystems);
-
-
 	}
 
 	public void Expand()
 	{
-		while(GP > 0)
+		while(GP > 0 && turnInfoScript.systemsInPlay < 60)
 		{
 			mostValuableSystem = null;
+
+			if(turnInfoScript.systemsInPlay == 55)
+			{
+				foreach(GameObject system in systemList)
+				{
+					if(system == null)
+					{
+						continue;
+					}
+					Debug.Log (system.name);
+				}
+			}
 
 			while(mostValuableSystem == null)
 			{
 				CheckForSuitableSystem();
+
 			}
 
 			guiPlanScript = mostValuableSystem.GetComponent<GUISystemDataScript>();
@@ -56,6 +66,11 @@ public class EnemyAIBasic : TurnInfo
 	{
 		foreach(GameObject system in systemList)
 		{
+			if(system == null)
+			{
+				continue;
+			}
+
 			lineRenderScript = system.GetComponent<LineRenderScript>();
 
 			if(lineRenderScript.ownedBy == "Enemy" || lineRenderScript.ownedBy == "Player")
