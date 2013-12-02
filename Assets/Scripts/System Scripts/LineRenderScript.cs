@@ -12,6 +12,7 @@ public class LineRenderScript : MonoBehaviour
 	[HideInInspector]
 	public PlayerTurn playerTurnScript;
 	public SelkiesAIBasic selkiesTurnScript;
+	public NereidesAIBasic nereidesTurnScript;
 	public GUIText activeGUI;
 	public GameObject[] connections = new GameObject[4];
 	[HideInInspector]
@@ -21,6 +22,7 @@ public class LineRenderScript : MonoBehaviour
 	public GameObject quadA;
 	public GameObject ownedQuad;
 	public GameObject selkiesOwnedQuad;
+	public GameObject nereidesOwnedQuad;
 	[HideInInspector]
 	public int i = 0;
 	[HideInInspector]
@@ -34,6 +36,7 @@ public class LineRenderScript : MonoBehaviour
 	{	
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
 		selkiesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SelkiesAIBasic>();
+		nereidesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<NereidesAIBasic>();
 
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
@@ -69,6 +72,12 @@ public class LineRenderScript : MonoBehaviour
 			{
 				tempSystemArray = selkiesTurnScript.ownedSystems;
 				quad = selkiesOwnedQuad;
+			}
+
+			if(ownedBy == "Nereides")
+			{
+				tempSystemArray = nereidesTurnScript.ownedSystems;
+				quad = nereidesOwnedQuad;
 			}
 
 			foreach(GameObject system in tempSystemArray)

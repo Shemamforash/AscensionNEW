@@ -1,68 +1,57 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyAIBasic : TurnInfo 
+public class AIBasicParent : TurnInfo 
 {
-	public string enemyHomeSystem;
-	private float tempSIM, systemRatio;
+	public string selkiesHomeSystem, nereidesHomeSystem;
+	private float tempSIM, systemRatio, compensator;
 	private GameObject mostValuableSystem;
-	private EnemyAIBasic enemyTurnScript;
 	private LineRenderScript thisLineRenderScript;
-	private TurnInfo turnInfoScript;
-
-	void Awake()
+	
+	public void Expand(AIBasicParent thisPlayer)
 	{
-		turnInfoScript = gameObject.GetComponent<TurnInfo>();
-		enemyTurnScript = gameObject.GetComponent<EnemyAIBasic>();
-
-		materialInUse = enemyMaterial;
-		playerRace = "Selkie";
-		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
-
-		PickRace();
-
-		enemyHomeSystem = homeSystem;
-
-		GP = raceGP;
-
-		lineRenderScript = GameObject.Find(enemyHomeSystem).GetComponent<LineRenderScript>();
-		lineRenderScript.ownedBy = "Enemy";
-
-		StartSystemPlanetColonise(enemyMaterial, enemyHomeSystem, ownedSystems);
-	}
-
-	public void Expand()
-	{
-		while(GP > 0 && turnInfoScript.systemsInPlay < 60)
+		while(GP > 0)
 		{
 			mostValuableSystem = null;
-
-			if(turnInfoScript.systemsInPlay == 55)
-			{
-				foreach(GameObject system in systemList)
-				{
-					if(system == null)
-					{
-						continue;
-					}
-					Debug.Log (system.name);
-				}
-			}
-
-			while(mostValuableSystem == null)
-			{
-				CheckForSuitableSystem();
-
-			}
-
-			guiPlanScript = mostValuableSystem.GetComponent<GUISystemDataScript>();
-			guiPlanScript.FindSystem(enemyTurnScript);
+			compensator = 0.00f;
+			SearchThroughArrays(thisPlayer);
 		}
 
 		GP += raceGP;
+
+		//TurnEnd(ownedSystems);
+		Debug.Log (science);
 	}
 
-	public void CheckForSuitableSystem()
+	public void SearchThroughArrays(AIBasicParent thisPlayer)
+	{
+		string activePlayer = null;
+
+		if(thisPlayer == selkiesTurnScript)
+		{
+			activePlayer = "Selkies";
+		}
+		if(thisPlayer == nereidesTurnScript)
+		{
+			activePlayer = "Nereides";
+		}
+
+		while(mostValuableSystem == null)
+		{
+			CheckForSuitableSystem(activePlayer);
+			compensator += 0.1f;
+
+			if(mostValuableSystem == null || compensator > 1.0f)
+			{
+				break;
+			}
+
+			guiPlanScript = mostValuableSystem.GetComponent<GUISystemDataScript>();
+			guiPlanScript.FindSystem(thisPlayer);
+		}
+	}
+
+	public void CheckForSuitableSystem(string player)
 	{
 		foreach(GameObject system in systemList)
 		{
@@ -73,7 +62,7 @@ public class EnemyAIBasic : TurnInfo
 
 			lineRenderScript = system.GetComponent<LineRenderScript>();
 
-			if(lineRenderScript.ownedBy == "Enemy" || lineRenderScript.ownedBy == "Player")
+			if(lineRenderScript.ownedBy == "Selkies" || lineRenderScript.ownedBy == "Player" || lineRenderScript.ownedBy == "Nereides")
 			{
 				continue;
 			}
@@ -87,10 +76,15 @@ public class EnemyAIBasic : TurnInfo
 
 				thisLineRenderScript = connection.GetComponent<LineRenderScript>();
 
-				if(thisLineRenderScript.ownedBy == "Enemy")
+				if(thisLineRenderScript.ownedBy == player)
 				{
 					CalculateSIMRatio(system);
 					RandomNumber(system);
+
+					if(mostValuableSystem != null)
+					{
+						break;
+					}
 				}
 			}
 		}
@@ -98,8 +92,13 @@ public class EnemyAIBasic : TurnInfo
 
 	private void RandomNumber(GameObject thisSystem)
 	{
-		if(systemRatio < Random.Range (0.00f, 1.00f))
+		if(systemRatio < Random.Range (compensator, 1.00f))
 		{
+			if(compensator == 1.0f)
+			{
+				mostValuableSystem = thisSystem;
+			}
+
 			mostValuableSystem = thisSystem;
 		}
 	}
@@ -131,5 +130,10 @@ public class EnemyAIBasic : TurnInfo
 		float tempRatio = tempSIM / guiPlanScript.numPlanets;
 
 		systemRatio = (1.0f/16.7f) * (tempRatio/2.0f);
+
+		if(systemRatio >= 1.0f)
+		{
+			systemRatio = 0.9f;
+		}
 	}
 }
