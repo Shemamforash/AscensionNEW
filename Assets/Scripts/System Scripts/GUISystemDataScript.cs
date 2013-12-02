@@ -29,6 +29,7 @@ public class GUISystemDataScript : MonoBehaviour
 	private TurnInfo turnInfoScript;
 	private PlayerTurn playerTurnScript;
 	private SelkiesAIBasic selkiesTurnScript;
+	private NereidesAIBasic nereidesTurnScript;
 	private LineRenderScript lineRenderScript;
 	private CameraFunctions cameraFunctionsScript;
 	private TechTreeScript techTreeScript;
@@ -38,6 +39,7 @@ public class GUISystemDataScript : MonoBehaviour
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
 		selkiesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SelkiesAIBasic>();
+		nereidesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<NereidesAIBasic>();
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 
@@ -95,6 +97,12 @@ public class GUISystemDataScript : MonoBehaviour
 		if(thisPlayer == selkiesTurnScript)
 		{
 			ownedByString  = "Selkies";
+			isOkToColonise = true;
+		}
+
+		if(thisPlayer == nereidesTurnScript)
+		{
+			ownedByString = "Nereides";
 			isOkToColonise = true;
 		}
 

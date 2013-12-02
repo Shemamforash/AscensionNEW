@@ -18,6 +18,7 @@ public class TurnInfo : MonoBehaviour
 	public Camera mainCamera;
 	public Material selkiesMaterial;
 	public Material playerMaterial;
+	public Material nereidesMaterial;
 	public Material materialInUse;
 	
 	public string playerRace, homeSystem;
@@ -29,6 +30,8 @@ public class TurnInfo : MonoBehaviour
 	public HeroScript heroScript;
 	public LineRenderScript lineRenderScript;
 	public SelkiesAIBasic selkiesTurnScript;
+	public NereidesAIBasic nereidesTurnScript;
+	public TurnInfo turnInfoScript;
 	public PlayerTurn playerTurnScript;
 
 	void Awake()
@@ -93,6 +96,7 @@ public class TurnInfo : MonoBehaviour
 
 				thisSystemArray[i].renderer.material = playerMaterial;
 
+				nereidesTurnScript.systemList[i] = null;
 				selkiesTurnScript.systemList[i] = null;
 				playerTurnScript.systemList[i] = null;
 
