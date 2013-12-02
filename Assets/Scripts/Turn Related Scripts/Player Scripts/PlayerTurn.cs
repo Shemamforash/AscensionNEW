@@ -5,6 +5,7 @@ public class PlayerTurn : TurnInfo
 {
 	public string playerHomeSystem;
 	public GameObject tempObject;
+	private TurnInfo turnInfoScript;
 	private MainGUIScript mainGUIScript;
 
 	void Awake()
@@ -12,6 +13,7 @@ public class PlayerTurn : TurnInfo
 		playerRace = null;
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
+		turnInfoScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<TurnInfo>();
 		materialInUse = playerMaterial;
 		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
 	}
@@ -48,7 +50,6 @@ public class PlayerTurn : TurnInfo
 		
 		if(mainGUIScript.resourceToSpend == "Money")
 		{
-			Debug.Log (guiPlanScript.improvementCost * 2);
 			money -= (int)(guiPlanScript.improvementCost * 2);
 		}
 	}
@@ -58,6 +59,8 @@ public class PlayerTurn : TurnInfo
 		PickRace ();
 
 		playerHomeSystem = homeSystem;
+
+		turnInfoScript.systemsInPlay++;
 
 		lineRenderScript = GameObject.Find(playerHomeSystem).GetComponent<LineRenderScript>();
 		lineRenderScript.ownedBy = "Player";

@@ -16,7 +16,7 @@ public class TurnInfo : MonoBehaviour
 	[HideInInspector]
 	public bool endTurn;
 	public Camera mainCamera;
-	public Material enemyMaterial;
+	public Material selkiesMaterial;
 	public Material playerMaterial;
 	public Material materialInUse;
 	
@@ -28,7 +28,7 @@ public class TurnInfo : MonoBehaviour
 	public TechTreeScript techTreeScript;
 	public HeroScript heroScript;
 	public LineRenderScript lineRenderScript;
-	public EnemyAIBasic enemyTurnScript;
+	public SelkiesAIBasic selkiesTurnScript;
 	public PlayerTurn playerTurnScript;
 
 	void Awake()
@@ -93,7 +93,7 @@ public class TurnInfo : MonoBehaviour
 
 				thisSystemArray[i].renderer.material = playerMaterial;
 
-				enemyTurnScript.systemList[i] = null;
+				selkiesTurnScript.systemList[i] = null;
 				playerTurnScript.systemList[i] = null;
 
 				++systemsInPlay;

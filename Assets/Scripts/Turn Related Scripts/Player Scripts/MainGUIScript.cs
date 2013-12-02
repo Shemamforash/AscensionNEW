@@ -12,7 +12,7 @@ public class MainGUIScript : MonoBehaviour
 	private HeroScript heroScript;
 	private GUISystemDataScript guiPlanScript;
 	private PlayerTurn playerTurnScript;
-	private EnemyAIBasic enemyTurnScript;
+	private SelkiesAIBasic selkiesTurnScript;
 	
 	public bool spendMenu = false, hasColonised = false;
 	public string resourceToSpend;
@@ -24,7 +24,7 @@ public class MainGUIScript : MonoBehaviour
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		enemyTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyAIBasic>();
+		selkiesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SelkiesAIBasic>();
 
 		turnInfoScript.playerRace = null;
 
@@ -142,7 +142,7 @@ public class MainGUIScript : MonoBehaviour
 		{
 			turnInfoScript.turn++;
 			playerTurnScript.TurnEnd (playerTurnScript.ownedSystems);
-			enemyTurnScript.Expand();
+			selkiesTurnScript.Expand();
 		}
 		
 		GUI.Box (new Rect(15, 15, 100, 130), "");

@@ -11,7 +11,7 @@ public class LineRenderScript : MonoBehaviour
 	public GUITextScript guiTextScript;
 	[HideInInspector]
 	public PlayerTurn playerTurnScript;
-	public EnemyAIBasic enemyTurnScript;
+	public SelkiesAIBasic selkiesTurnScript;
 	public GUIText activeGUI;
 	public GameObject[] connections = new GameObject[4];
 	[HideInInspector]
@@ -20,7 +20,7 @@ public class LineRenderScript : MonoBehaviour
 	public Vector3[,] lineRotationsScalePosition = new Vector3[4,3];
 	public GameObject quadA;
 	public GameObject ownedQuad;
-	public GameObject enemyOwnedQuad;
+	public GameObject selkiesOwnedQuad;
 	[HideInInspector]
 	public int i = 0;
 	[HideInInspector]
@@ -33,7 +33,7 @@ public class LineRenderScript : MonoBehaviour
 	void Start()
 	{	
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		enemyTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyAIBasic>();
+		selkiesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SelkiesAIBasic>();
 
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
@@ -65,10 +65,10 @@ public class LineRenderScript : MonoBehaviour
 				quad = ownedQuad;
 			}
 
-			if(ownedBy == "Enemy")
+			if(ownedBy == "Selkies")
 			{
-				tempSystemArray = enemyTurnScript.ownedSystems;
-				quad = enemyOwnedQuad;
+				tempSystemArray = selkiesTurnScript.ownedSystems;
+				quad = selkiesOwnedQuad;
 			}
 
 			foreach(GameObject system in tempSystemArray)

@@ -119,6 +119,21 @@ public class TechTreeScript : MonoBehaviour
 			industryPointBonus += turnInfoScript.planetsColonisedThisTurn * 50.0f;
 		}
 
+		if(techTreeComplete[1,4,1] == "Built")
+		{
+			foreach(GameObject connection in lineRenderScript.connections)
+			{
+				lineRenderScript = connection.GetComponent<LineRenderScript>();
+
+				if(lineRenderScript.ownedBy == "Selkies")
+				{
+					industryPercentBonus += 0.5f;
+				}
+
+				lineRenderScript = gameObject.GetComponent<LineRenderScript>();
+			}
+		}
+
 		if(techTreeComplete[2,1,1] == "Built") //Unionisation
 		{
 			Unionisation();
