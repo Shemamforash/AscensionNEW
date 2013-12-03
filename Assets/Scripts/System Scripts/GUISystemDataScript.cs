@@ -28,8 +28,7 @@ public class GUISystemDataScript : MonoBehaviour
 
 	private TurnInfo turnInfoScript;
 	private PlayerTurn playerTurnScript;
-	private SelkiesAIBasic selkiesTurnScript;
-	private NereidesAIBasic nereidesTurnScript;
+	private AIBasicParent baseAIScript;
 	private LineRenderScript lineRenderScript;
 	private CameraFunctions cameraFunctionsScript;
 	private TechTreeScript techTreeScript;
@@ -38,8 +37,6 @@ public class GUISystemDataScript : MonoBehaviour
 	{
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		selkiesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SelkiesAIBasic>();
-		nereidesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<NereidesAIBasic>();
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 
@@ -83,26 +80,17 @@ public class GUISystemDataScript : MonoBehaviour
 		
 		systemConnections = lineRenderScript.connections;
 
-		string ownedByString = null;
-
 		int arrayPosition = 0;
 
-		if(thisPlayer == playerTurnScript)
+		if(thisPlayer.playerRace == playerTurnScript.playerRace)
 		{
-			ownedByString  = "Player";
 			PlayerColoniseSystem(systemConnections);
+
 			lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		}
 
-		if(thisPlayer == selkiesTurnScript)
+		if(thisPlayer.playerRace != playerTurnScript.playerRace)
 		{
-			ownedByString  = "Selkies";
-			isOkToColonise = true;
-		}
-
-		if(thisPlayer == nereidesTurnScript)
-		{
-			ownedByString = "Nereides";
 			isOkToColonise = true;
 		}
 
@@ -110,10 +98,10 @@ public class GUISystemDataScript : MonoBehaviour
 		{
 			for(int i = 0; i < 60; i ++)
 			{
-				if(thisPlayer.systemList[i] == gameObject)
+				if(turnInfoScript.systemList[i] == gameObject)
 				{
-					thisPlayer.systemList[i] = null;
-					playerTurnScript.systemList[i] = null;
+					turnInfoScript.systemList[i] = null;
+					turnInfoScript.systemList[i] = null;
 					arrayPosition = i;
 					break;
 				}
@@ -121,7 +109,7 @@ public class GUISystemDataScript : MonoBehaviour
 
 			thisPlayer.ownedSystems[arrayPosition] = gameObject;
 			
-			lineRenderScript.ownedBy = ownedByString;
+			lineRenderScript.ownedBy = thisPlayer.name;
 			
 			gameObject.renderer.material = thisPlayer.materialInUse;
 			
@@ -145,6 +133,7 @@ public class GUISystemDataScript : MonoBehaviour
 			}
 
 			lineRenderScript = connection.GetComponent<LineRenderScript>();
+
 			if(lineRenderScript.ownedBy == "Player")
 			{
 				isOkToColonise = true;

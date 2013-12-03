@@ -10,19 +10,17 @@ public class LineRenderScript : MonoBehaviour
 	[HideInInspector]
 	public GUITextScript guiTextScript;
 	[HideInInspector]
+
 	public PlayerTurn playerTurnScript;
-	public SelkiesAIBasic selkiesTurnScript;
-	public NereidesAIBasic nereidesTurnScript;
+	public AIBasicParent baseAIScript;
+
 	public GUIText activeGUI;
 	public GameObject[] connections = new GameObject[4];
 	[HideInInspector]
 	public GameObject[] connectedLines = new GameObject[4];
 	[HideInInspector]
 	public Vector3[,] lineRotationsScalePosition = new Vector3[4,3];
-	public GameObject quadA;
-	public GameObject ownedQuad;
-	public GameObject selkiesOwnedQuad;
-	public GameObject nereidesOwnedQuad;
+	public GameObject quadA, humansOwnedQuad, selkiesOwnedQuad, nereidesOwnedQuad;
 	[HideInInspector]
 	public int i = 0;
 	[HideInInspector]
@@ -35,8 +33,6 @@ public class LineRenderScript : MonoBehaviour
 	void Start()
 	{	
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		selkiesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SelkiesAIBasic>();
-		nereidesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<NereidesAIBasic>();
 
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
@@ -61,23 +57,44 @@ public class LineRenderScript : MonoBehaviour
 		if(owned == false)
 		{ 
 			GameObject quad = null;
+			string thisRace = null;
 
 			if(ownedBy == "Player")
 			{
 				tempSystemArray = playerTurnScript.ownedSystems;
-				quad = ownedQuad;
+				thisRace = playerTurnScript.playerRace;
+				quad = humansOwnedQuad;
 			}
 
-			if(ownedBy == "Selkies")
+			if(ownedBy == "EnemyOne")
 			{
-				tempSystemArray = selkiesTurnScript.ownedSystems;
+				baseAIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
+				tempSystemArray = baseAIScript.ownedSystems;
+				thisRace = baseAIScript.playerRace;
 				quad = selkiesOwnedQuad;
 			}
 
-			if(ownedBy == "Nereides")
+			if(ownedBy == "EnemyTwo")
 			{
-				tempSystemArray = nereidesTurnScript.ownedSystems;
+				baseAIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
+				tempSystemArray = baseAIScript.ownedSystems;
+				thisRace = baseAIScript.playerRace;
 				quad = nereidesOwnedQuad;
+			}
+
+			switch (thisRace)
+			{
+				case "Humans":
+					quad = humansOwnedQuad;
+					break;
+
+				case "Selkies":
+					quad = selkiesOwnedQuad;
+					break;
+				case "Nereides":
+
+					quad = nereidesOwnedQuad;
+					break;
 			}
 
 			foreach(GameObject system in tempSystemArray)

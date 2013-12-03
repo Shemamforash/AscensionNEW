@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AIBasicParent : TurnInfo 
 {
-	public string selkiesHomeSystem, nereidesHomeSystem;
+	public string selkiesHomeSystem, nereidesHomeSystem, humansHomeSystem;
 	private float tempSIM, systemRatio, compensator;
 	private GameObject mostValuableSystem;
 	private LineRenderScript thisLineRenderScript;
@@ -20,25 +20,13 @@ public class AIBasicParent : TurnInfo
 		GP += raceGP;
 
 		//TurnEnd(ownedSystems);
-		Debug.Log (science);
 	}
 
 	public void SearchThroughArrays(AIBasicParent thisPlayer)
 	{
-		string activePlayer = null;
-
-		if(thisPlayer == selkiesTurnScript)
-		{
-			activePlayer = "Selkies";
-		}
-		if(thisPlayer == nereidesTurnScript)
-		{
-			activePlayer = "Nereides";
-		}
-
 		while(mostValuableSystem == null)
 		{
-			CheckForSuitableSystem(activePlayer);
+			CheckForSuitableSystem(thisPlayer);
 			compensator += 0.1f;
 
 			if(mostValuableSystem == null || compensator > 1.0f)
@@ -51,9 +39,9 @@ public class AIBasicParent : TurnInfo
 		}
 	}
 
-	public void CheckForSuitableSystem(string player)
+	public void CheckForSuitableSystem(AIBasicParent thisPlayer)
 	{
-		foreach(GameObject system in systemList)
+		foreach(GameObject system in turnInfoScript.systemList)
 		{
 			if(system == null)
 			{
@@ -62,7 +50,7 @@ public class AIBasicParent : TurnInfo
 
 			lineRenderScript = system.GetComponent<LineRenderScript>();
 
-			if(lineRenderScript.ownedBy == "Selkies" || lineRenderScript.ownedBy == "Player" || lineRenderScript.ownedBy == "Nereides")
+			if(lineRenderScript.ownedBy == "Player" || lineRenderScript.ownedBy == "EnemyOne" || lineRenderScript.ownedBy == "EnemyTwo")
 			{
 				continue;
 			}
@@ -76,7 +64,7 @@ public class AIBasicParent : TurnInfo
 
 				thisLineRenderScript = connection.GetComponent<LineRenderScript>();
 
-				if(thisLineRenderScript.ownedBy == player)
+				if(thisLineRenderScript.ownedBy == thisPlayer.name)
 				{
 					CalculateSIMRatio(system);
 					RandomNumber(system);

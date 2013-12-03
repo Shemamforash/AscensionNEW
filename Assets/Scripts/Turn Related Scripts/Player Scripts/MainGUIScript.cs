@@ -11,9 +11,10 @@ public class MainGUIScript : MonoBehaviour
 	private CameraFunctions cameraFunctionsScript;
 	private HeroScript heroScript;
 	private GUISystemDataScript guiPlanScript;
+
 	private PlayerTurn playerTurnScript;
-	private SelkiesAIBasic selkiesTurnScript;
-	private NereidesAIBasic nereidesTurnScript;
+	private EnemyOne enemyOneTurnScript;
+	private EnemyTwo enemyTwoTurnScript;
 	
 	public bool spendMenu = false, hasColonised = false;
 	public string resourceToSpend;
@@ -25,8 +26,8 @@ public class MainGUIScript : MonoBehaviour
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		selkiesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SelkiesAIBasic>();
-		nereidesTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<NereidesAIBasic>();
+		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
+		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 
 		turnInfoScript.playerRace = null;
 
@@ -115,22 +116,24 @@ public class MainGUIScript : MonoBehaviour
 			
 			if(GUI.Button (new Rect(Screen.width/2 - 130, Screen.height/2, 80, 20), "Humans"))
 			{
-				playerTurnScript.playerRace = "Human";
+				playerTurnScript.playerRace = "Humans";
 			}
 			
 			if(GUI.Button (new Rect(Screen.width/2 -40, Screen.height/2, 80, 20), "Selkies"))
 			{
-				playerTurnScript.playerRace = "Selkie";
+				playerTurnScript.playerRace = "Selkies";
 			}
 
 			if(GUI.Button (new Rect(Screen.width/2 + 50, Screen.height/2, 80, 20), "Nereides"))
 			{
-				playerTurnScript.playerRace = "Nereid";
+				playerTurnScript.playerRace = "Nereides";
 			}
 
 			if(playerTurnScript.playerRace != null)
 			{
 				playerTurnScript.StartTurn();
+				enemyOneTurnScript.SetRace();
+				enemyTwoTurnScript.SetRace();
 			}
 		}
 		#endregion
@@ -144,8 +147,8 @@ public class MainGUIScript : MonoBehaviour
 		{
 			turnInfoScript.turn++;
 			playerTurnScript.TurnEnd (playerTurnScript.ownedSystems);
-			selkiesTurnScript.Expand(selkiesTurnScript);
-			nereidesTurnScript.Expand(nereidesTurnScript);
+			enemyOneTurnScript.Expand(enemyOneTurnScript);
+			enemyTwoTurnScript.Expand(enemyTwoTurnScript);
 		}
 		
 		GUI.Box (new Rect(15, 15, 100, 130), "");

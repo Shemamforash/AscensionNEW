@@ -17,7 +17,7 @@ public class TurnInfo : MonoBehaviour
 	public bool endTurn;
 	public Camera mainCamera;
 	public Material selkiesMaterial;
-	public Material playerMaterial;
+	public Material playerMaterial, humansMaterial;
 	public Material nereidesMaterial;
 	public Material materialInUse;
 	
@@ -25,18 +25,25 @@ public class TurnInfo : MonoBehaviour
 	public int turn = 0, systemsInPlay = 0;
 	
 	public GUISystemDataScript guiPlanScript;
-	public CameraFunctions cameraFunctionsScript;
 	public TechTreeScript techTreeScript;
 	public HeroScript heroScript;
 	public LineRenderScript lineRenderScript;
-	public SelkiesAIBasic selkiesTurnScript;
-	public NereidesAIBasic nereidesTurnScript;
 	public TurnInfo turnInfoScript;
+
 	public PlayerTurn playerTurnScript;
+	public EnemyOne enemyOneTurnScript;
+	public EnemyTwo enemyTwoTurnScript;
 
 	void Awake()
 	{			
+		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
+		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
+		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+
 		LoadPlanetData();
+
+		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
 	}
 	
 	void LoadPlanetData() //Loads up planet stats into array
@@ -58,7 +65,7 @@ public class TurnInfo : MonoBehaviour
 
 	public void PickRace() //Start of turn function. Race choice dictates starting planet and inherent bonuses as well as racial technologies.
 	{
-		if(playerRace == "Human")
+		if(playerRace == "Humans")
 		{
 			raceScience = 1;
 			raceIndustry = 1;
@@ -66,7 +73,7 @@ public class TurnInfo : MonoBehaviour
 			raceGP = 3;
 			homeSystem = "Sol";
 		}
-		if(playerRace == "Selkie")
+		if(playerRace == "Selkies")
 		{
 			raceScience = 1;
 			raceIndustry = 3;
@@ -74,7 +81,7 @@ public class TurnInfo : MonoBehaviour
 			raceGP = 2;
 			homeSystem = "Heracles";
 		}
-		if(playerRace == "Nereid")
+		if(playerRace == "Nereides")
 		{
 			raceScience = 6;
 			raceIndustry = 2;
@@ -92,13 +99,11 @@ public class TurnInfo : MonoBehaviour
 		{
 			if(systemList[i].name == homeSystem)
 			{
-				thisSystemArray[i] = systemList[i];
+				thisSystemArray[i] = turnInfoScript.systemList[i];
 
 				thisSystemArray[i].renderer.material = playerMaterial;
 
-				nereidesTurnScript.systemList[i] = null;
-				selkiesTurnScript.systemList[i] = null;
-				playerTurnScript.systemList[i] = null;
+				turnInfoScript.systemList[i] = null;
 
 				++systemsInPlay;
 

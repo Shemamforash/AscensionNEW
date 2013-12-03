@@ -6,6 +6,7 @@ public class PlayerTurn : TurnInfo
 	public string playerHomeSystem;
 	public GameObject tempObject;
 	private MainGUIScript mainGUIScript;
+	private CameraFunctions cameraFunctionsScript;
 
 	void Awake()
 	{
@@ -14,7 +15,6 @@ public class PlayerTurn : TurnInfo
 		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
 		turnInfoScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<TurnInfo>();
 		materialInUse = playerMaterial;
-		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
 	}
 
 	void Update()
@@ -23,7 +23,7 @@ public class PlayerTurn : TurnInfo
 		{			
 			tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
 			
-			if(tempObject.tag == "StarSystem")
+			if(tempObject.tag == "StarSystem" && tempObject != null)
 			{
 				guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
 				techTreeScript = tempObject.GetComponent<TechTreeScript>();
