@@ -5,6 +5,7 @@ public class MainGUIScript : MonoBehaviour
 {
 	private Rect[] allPlanetsGUI, allButtonsGUI; 
 	private Rect[,] tierButtonsGUI;
+	public GUISkin mySkin;
 
 	private TurnInfo turnInfoScript;
 	private TechTreeScript techTreeScript;
@@ -109,6 +110,8 @@ public class MainGUIScript : MonoBehaviour
 
 	void OnGUI() //Urgh. Unity demands that all GUI related script should come from one OnGUI to prevent excessive numbers of calls to the CPU
 	{
+		GUI.skin = mySkin;
+
 		#region playerrace
 		if(playerTurnScript.playerRace == null)
 		{
@@ -148,7 +151,7 @@ public class MainGUIScript : MonoBehaviour
 			turnInfoScript.turn++;
 			playerTurnScript.TurnEnd (playerTurnScript.ownedSystems);
 			enemyOneTurnScript.Expand(enemyOneTurnScript);
-			enemyTwoTurnScript.Expand(enemyTwoTurnScript);
+			//enemyTwoTurnScript.Expand(enemyTwoTurnScript);
 		}
 		
 		GUI.Box (new Rect(15, 15, 100, 130), "");

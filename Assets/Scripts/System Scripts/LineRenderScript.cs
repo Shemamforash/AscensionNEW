@@ -63,7 +63,6 @@ public class LineRenderScript : MonoBehaviour
 			{
 				tempSystemArray = playerTurnScript.ownedSystems;
 				thisRace = playerTurnScript.playerRace;
-				quad = humansOwnedQuad;
 			}
 
 			if(ownedBy == "EnemyOne")
@@ -71,7 +70,6 @@ public class LineRenderScript : MonoBehaviour
 				baseAIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
 				tempSystemArray = baseAIScript.ownedSystems;
 				thisRace = baseAIScript.playerRace;
-				quad = selkiesOwnedQuad;
 			}
 
 			if(ownedBy == "EnemyTwo")
@@ -79,22 +77,19 @@ public class LineRenderScript : MonoBehaviour
 				baseAIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 				tempSystemArray = baseAIScript.ownedSystems;
 				thisRace = baseAIScript.playerRace;
-				quad = nereidesOwnedQuad;
 			}
 
-			switch (thisRace)
+			if(thisRace == "Humans")
 			{
-				case "Humans":
-					quad = humansOwnedQuad;
-					break;
-
-				case "Selkies":
-					quad = selkiesOwnedQuad;
-					break;
-				case "Nereides":
-
-					quad = nereidesOwnedQuad;
-					break;
+				quad = humansOwnedQuad;
+			}
+			if(thisRace == "Selkies")
+			{
+				quad = selkiesOwnedQuad;
+			}
+			if(thisRace == "Nereides")
+			{
+				quad = nereidesOwnedQuad;
 			}
 
 			foreach(GameObject system in tempSystemArray)

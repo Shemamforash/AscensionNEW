@@ -7,47 +7,34 @@ public class EnemyTwo : AIBasicParent
 	{
 		turnInfoScript = gameObject.GetComponent<TurnInfo>();
 		enemyTwoTurnScript = gameObject.GetComponent<EnemyTwo>();
+		playerTurnScript = gameObject.GetComponent<PlayerTurn>();
 	}
 
 	public void SetRace()
 	{
 		if(playerTurnScript.playerRace == "Humans" || playerTurnScript.playerRace == "Nereides")
 		{
-			SelkiesStart ();
+			RaceStart ("Selkies", selkiesHomeSystem, selkiesMaterial);
 		}
-
-		if(playerTurnScript.playerRace == "Selkies")
+		if(playerTurnScript.playerRace == "Nereides")
 		{
-			HumansStart ();
+			RaceStart ("Humans", humansHomeSystem, humansMaterial);
 		}
 	}
-
-	void SelkiesStart()
-	{
-		playerRace = "Selkies";
-		materialInUse = selkiesMaterial;
-		selkiesHomeSystem = homeSystem;
-		RaceStart (playerRace, selkiesHomeSystem, materialInUse);
-	}
-
-	void HumansStart()
-	{
-		playerRace = "Humans";
-		materialInUse = humansMaterial;
-		humansHomeSystem = homeSystem;
-		RaceStart (playerRace, humansHomeSystem, materialInUse);
-	}
-
+	
 	void RaceStart(string thisRace, string thisHome, Material thisMaterial)
-	{
-		PickRace();
-		
+	{		
+		playerRace = thisRace;
+		PickRace ();
+		materialInUse = thisMaterial;
+		thisHome = homeSystem;
+
 		turnInfoScript.systemsInPlay++;
 		
 		GP = raceGP;
 		
 		lineRenderScript = GameObject.Find(thisHome).GetComponent<LineRenderScript>();
-		lineRenderScript.ownedBy = thisRace;
+		lineRenderScript.ownedBy = "EnemyTwo";
 		
 		StartSystemPlanetColonise(thisMaterial, thisHome, ownedSystems);
 	}

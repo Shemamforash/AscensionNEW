@@ -62,6 +62,7 @@ public class PlayerTurn : TurnInfo
 		turnInfoScript.systemsInPlay++;
 
 		lineRenderScript = GameObject.Find(playerHomeSystem).GetComponent<LineRenderScript>();
+
 		lineRenderScript.ownedBy = "Player";
 
 		StartSystemPlanetColonise(playerMaterial, playerHomeSystem, ownedSystems);
@@ -69,5 +70,14 @@ public class PlayerTurn : TurnInfo
 		GP = raceGP;
 
 		cameraFunctionsScript.selectedSystem = playerHomeSystem; //Set the selected system
+
+		foreach(GameObject system in ownedSystems)
+		{
+			if(system == null)
+			{
+				continue;
+			}
+		Debug.Log (system.name);
+		}
 	}
 }

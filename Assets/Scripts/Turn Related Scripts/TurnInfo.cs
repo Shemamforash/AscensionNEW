@@ -39,7 +39,7 @@ public class TurnInfo : MonoBehaviour
 		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
 		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 
 		LoadPlanetData();
 
@@ -97,7 +97,7 @@ public class TurnInfo : MonoBehaviour
 		
 		for(int i = 0; i < 60; i++) //Find selected system and set it to owned
 		{
-			if(systemList[i].name == homeSystem)
+			if(turnInfoScript.systemList[i] == GameObject.Find (homeSystem))
 			{
 				thisSystemArray[i] = turnInfoScript.systemList[i];
 
@@ -127,6 +127,13 @@ public class TurnInfo : MonoBehaviour
 		
 		foreach(GameObject system in systems)
 		{
+			if(system == null)
+			{
+				continue;
+			}
+
+			Debug.Log (system.name);
+
 			if(system != null)
 			{
 				guiPlanScript = system.GetComponent<GUISystemDataScript>();
