@@ -7,51 +7,35 @@ public class EnemyOne : AIBasicParent
 	{
 		turnInfoScript = gameObject.GetComponent<TurnInfo>();
 		enemyOneTurnScript = gameObject.GetComponent<EnemyOne>();
+		playerTurnScript = gameObject.GetComponent<PlayerTurn>();
 	}
 	
 	public void SetRace()
 	{
-		Debug.Log(playerTurnScript.playerRace);
-
 		if(playerTurnScript.playerRace == "Humans" || playerTurnScript.playerRace == "Selkies")
 		{
-			NereidesStart ();
+			RaceStart ("Nereides", nereidesHomeSystem, nereidesMaterial);
 		}
 		if(playerTurnScript.playerRace == "Nereides")
 		{
-			HumansStart ();
+			RaceStart ("Humans", humansHomeSystem, humansMaterial);
 		}
 	}
 	
-	void NereidesStart()
-	{
-		playerRace = "Nereides";
-		materialInUse = nereidesMaterial;
-		nereidesHomeSystem = homeSystem;
-		RaceStart (playerRace, nereidesHomeSystem, materialInUse);
-	}
-	
-	void HumansStart()
-	{
-		playerRace = "Humans";
-		materialInUse = humansMaterial;
-		humansHomeSystem = homeSystem;
-		RaceStart (playerRace, humansHomeSystem, materialInUse);
-	}
-	
 	void RaceStart(string thisRace, string thisHome, Material thisMaterial)
-	{
-		Debug.Log (thisRace + thisHome);
+	{		
+		playerRace = thisRace;
+		PickRace ();
+		materialInUse = thisMaterial;
+		thisHome = homeSystem;
 
-		PickRace();
-		
 		turnInfoScript.systemsInPlay++;
 		
 		GP = raceGP;
 		
 		lineRenderScript = GameObject.Find(thisHome).GetComponent<LineRenderScript>();
-		lineRenderScript.ownedBy = thisRace;
-		
+		lineRenderScript.ownedBy = "EnemyOne";
+
 		StartSystemPlanetColonise(thisMaterial, thisHome, ownedSystems);
 	}
 }
