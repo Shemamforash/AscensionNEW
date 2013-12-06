@@ -10,7 +10,7 @@ public class AIBasicParent : TurnInfo
 	
 	public void Expand(AIBasicParent thisPlayer)
 	{
-		while(GP > 0)
+		for(int i = GP; i > 0; --i)
 		{
 			mostValuableSystem = null;
 			compensator = 0.00f;
@@ -29,13 +29,16 @@ public class AIBasicParent : TurnInfo
 			CheckForSuitableSystem(thisPlayer);
 			compensator += 0.1f;
 
-			if(mostValuableSystem == null || compensator > 1.0f)
+			if(compensator > 1.0f)
 			{
 				break;
 			}
 
-			guiPlanScript = mostValuableSystem.GetComponent<GUISystemDataScript>();
-			guiPlanScript.FindSystem(thisPlayer);
+			if(mostValuableSystem != null)
+			{
+				guiPlanScript = mostValuableSystem.GetComponent<GUISystemDataScript>();
+				guiPlanScript.FindSystem(thisPlayer);
+			}
 		}
 	}
 
@@ -64,7 +67,7 @@ public class AIBasicParent : TurnInfo
 
 				thisLineRenderScript = connection.GetComponent<LineRenderScript>();
 
-				if(thisLineRenderScript.ownedBy == thisPlayer.name)
+				if(thisLineRenderScript.ownedBy == thisPlayer.playerRace)
 				{
 					CalculateSIMRatio(system);
 					RandomNumber(system);
@@ -80,13 +83,8 @@ public class AIBasicParent : TurnInfo
 
 	private void RandomNumber(GameObject thisSystem)
 	{
-		if(systemRatio < Random.Range (compensator, 1.00f))
+		if(systemRatio < Random.Range (compensator, 1.00f) || compensator > 0.9f)
 		{
-			if(compensator == 1.0f)
-			{
-				mostValuableSystem = thisSystem;
-			}
-
 			mostValuableSystem = thisSystem;
 		}
 	}

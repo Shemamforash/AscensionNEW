@@ -14,29 +14,28 @@ public class EnemyOne : AIBasicParent
 	{
 		if(playerTurnScript.playerRace == "Humans" || playerTurnScript.playerRace == "Selkies")
 		{
-			RaceStart ("Nereides", nereidesHomeSystem, nereidesMaterial);
+			RaceStart ("Nereides");
 		}
 		if(playerTurnScript.playerRace == "Nereides")
 		{
-			RaceStart ("Humans", humansHomeSystem, humansMaterial);
+			RaceStart ("Humans");
 		}
 	}
 	
-	void RaceStart(string thisRace, string thisHome, Material thisMaterial)
+	void RaceStart(string thisRace)
 	{		
 		playerRace = thisRace;
+
 		PickRace ();
-		materialInUse = thisMaterial;
-		thisHome = homeSystem;
 
 		turnInfoScript.systemsInPlay++;
 		
 		GP = raceGP;
 		
-		lineRenderScript = GameObject.Find(thisHome).GetComponent<LineRenderScript>();
-		lineRenderScript.ownedBy = "EnemyOne";
+		lineRenderScript = GameObject.Find(homeSystem).GetComponent<LineRenderScript>();
+		lineRenderScript.ownedBy = playerRace;
 
-		StartSystemPlanetColonise(thisMaterial, thisHome, ownedSystems);
+		StartSystemPlanetColonise(materialInUse, homeSystem, ownedSystems);
 	}
 }
 
