@@ -109,7 +109,7 @@ public class GUISystemDataScript : MonoBehaviour
 
 			thisPlayer.ownedSystems[arrayPosition] = gameObject;
 			
-			lineRenderScript.ownedBy = thisPlayer.name;
+			lineRenderScript.ownedBy = thisPlayer.playerRace;
 			
 			gameObject.renderer.material = thisPlayer.materialInUse;
 			
@@ -134,7 +134,7 @@ public class GUISystemDataScript : MonoBehaviour
 
 			lineRenderScript = connection.GetComponent<LineRenderScript>();
 
-			if(lineRenderScript.ownedBy == "Player")
+			if(lineRenderScript.ownedBy == playerTurnScript.playerRace)
 			{
 				isOkToColonise = true;
 			}

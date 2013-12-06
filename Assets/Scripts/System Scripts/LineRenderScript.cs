@@ -13,6 +13,8 @@ public class LineRenderScript : MonoBehaviour
 
 	public PlayerTurn playerTurnScript;
 	public AIBasicParent baseAIScript;
+	private EnemyOne enemyOneTurnScript;
+	private EnemyTwo enemyTwoTurnScript;
 
 	public GUIText activeGUI;
 	public GameObject[] connections = new GameObject[4];
@@ -33,6 +35,8 @@ public class LineRenderScript : MonoBehaviour
 	void Start()
 	{	
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
+		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
@@ -54,29 +58,27 @@ public class LineRenderScript : MonoBehaviour
 
 	void Update()
 	{
-		if(owned == false)
+		if(ownedBy != "" && owned == false)
 		{ 
 			GameObject quad = null;
 			string thisRace = null;
 
-			if(ownedBy == "Player")
+			if(ownedBy == playerTurnScript.playerRace)
 			{
 				tempSystemArray = playerTurnScript.ownedSystems;
 				thisRace = playerTurnScript.playerRace;
 			}
 
-			if(ownedBy == "EnemyOne")
+			if(ownedBy == enemyOneTurnScript.playerRace)
 			{
-				baseAIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
-				tempSystemArray = baseAIScript.ownedSystems;
-				thisRace = baseAIScript.playerRace;
+				tempSystemArray = enemyOneTurnScript.ownedSystems;
+				thisRace = enemyOneTurnScript.playerRace;
 			}
 
-			if(ownedBy == "EnemyTwo")
+			if(ownedBy == enemyTwoTurnScript.playerRace)
 			{
-				baseAIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
-				tempSystemArray = baseAIScript.ownedSystems;
-				thisRace = baseAIScript.playerRace;
+				tempSystemArray = enemyTwoTurnScript.ownedSystems;
+				thisRace = enemyTwoTurnScript.playerRace;
 			}
 
 			if(thisRace == "Humans")

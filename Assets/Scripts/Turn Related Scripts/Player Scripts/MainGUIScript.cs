@@ -115,19 +115,19 @@ public class MainGUIScript : MonoBehaviour
 		#region playerrace
 		if(playerTurnScript.playerRace == null)
 		{
-			GUI.Box (new Rect(Screen.width/2 - 150, Screen.height/2 - 40, 300, 80), "Select Race");
+			GUI.Box (new Rect(Screen.width/2 - 150, Screen.height/2 - 40, 300, 80), "\nSelect Race");
 			
-			if(GUI.Button (new Rect(Screen.width/2 - 130, Screen.height/2, 80, 20), "Humans"))
+			if(GUI.Button (new Rect(Screen.width/2 - 140, Screen.height/2, 90, 20), "Humans"))
 			{
 				playerTurnScript.playerRace = "Humans";
 			}
 			
-			if(GUI.Button (new Rect(Screen.width/2 -40, Screen.height/2, 80, 20), "Selkies"))
+			if(GUI.Button (new Rect(Screen.width/2 -45, Screen.height/2, 90, 20), "Selkies"))
 			{
 				playerTurnScript.playerRace = "Selkies";
 			}
 
-			if(GUI.Button (new Rect(Screen.width/2 + 50, Screen.height/2, 80, 20), "Nereides"))
+			if(GUI.Button (new Rect(Screen.width/2 + 50, Screen.height/2, 90, 20), "Nereides"))
 			{
 				playerTurnScript.playerRace = "Nereides";
 			}
@@ -151,7 +151,7 @@ public class MainGUIScript : MonoBehaviour
 			turnInfoScript.turn++;
 			playerTurnScript.TurnEnd (playerTurnScript.ownedSystems);
 			enemyOneTurnScript.Expand(enemyOneTurnScript);
-			//enemyTwoTurnScript.Expand(enemyTwoTurnScript);
+			enemyTwoTurnScript.Expand(enemyTwoTurnScript);
 		}
 		
 		GUI.Box (new Rect(15, 15, 100, 130), "");

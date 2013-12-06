@@ -16,9 +16,7 @@ public class TurnInfo : MonoBehaviour
 	[HideInInspector]
 	public bool endTurn;
 	public Camera mainCamera;
-	public Material selkiesMaterial;
-	public Material playerMaterial, humansMaterial;
-	public Material nereidesMaterial;
+	public Material nereidesMaterial, humansMaterial, selkiesMaterial;
 	public Material materialInUse;
 	
 	public string playerRace, homeSystem;
@@ -72,6 +70,7 @@ public class TurnInfo : MonoBehaviour
 			raceMoney = 2;
 			raceGP = 3;
 			homeSystem = "Sol";
+			materialInUse = turnInfoScript.humansMaterial;
 		}
 		if(playerRace == "Selkies")
 		{
@@ -80,6 +79,7 @@ public class TurnInfo : MonoBehaviour
 			raceMoney = 2;
 			raceGP = 2;
 			homeSystem = "Heracles";
+			materialInUse = turnInfoScript.selkiesMaterial;
 		}
 		if(playerRace == "Nereides")
 		{
@@ -88,6 +88,7 @@ public class TurnInfo : MonoBehaviour
 			raceMoney = 4;
 			raceGP = 1;
 			homeSystem = "Nepthys";
+			materialInUse = turnInfoScript.nereidesMaterial;
 		}
 	}
 
@@ -131,8 +132,6 @@ public class TurnInfo : MonoBehaviour
 			{
 				continue;
 			}
-
-			Debug.Log (system.name);
 
 			if(system != null)
 			{

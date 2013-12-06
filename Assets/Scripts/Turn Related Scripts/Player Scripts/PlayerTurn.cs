@@ -14,7 +14,6 @@ public class PlayerTurn : TurnInfo
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
 		turnInfoScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<TurnInfo>();
-		materialInUse = playerMaterial;
 	}
 
 	void Update()
@@ -57,19 +56,17 @@ public class PlayerTurn : TurnInfo
 	{
 		PickRace ();
 
-		playerHomeSystem = homeSystem;
-
 		turnInfoScript.systemsInPlay++;
 
-		lineRenderScript = GameObject.Find(playerHomeSystem).GetComponent<LineRenderScript>();
+		lineRenderScript = GameObject.Find(homeSystem).GetComponent<LineRenderScript>();
 
-		lineRenderScript.ownedBy = "Player";
+		lineRenderScript.ownedBy = playerRace;
 
-		StartSystemPlanetColonise(playerMaterial, playerHomeSystem, ownedSystems);
+		StartSystemPlanetColonise(materialInUse, homeSystem, ownedSystems);
 
 		GP = raceGP;
 
-		cameraFunctionsScript.selectedSystem = playerHomeSystem; //Set the selected system
+		cameraFunctionsScript.selectedSystem = homeSystem; //Set the selected system
 
 		foreach(GameObject system in ownedSystems)
 		{
@@ -77,7 +74,6 @@ public class PlayerTurn : TurnInfo
 			{
 				continue;
 			}
-		Debug.Log (system.name);
 		}
 	}
 }
