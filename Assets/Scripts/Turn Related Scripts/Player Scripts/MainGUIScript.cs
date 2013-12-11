@@ -1,22 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.IO;
 
-public class MainGUIScript : MonoBehaviour 
+public class MainGUIScript : MasterScript 
 {
 	private Rect[] allPlanetsGUI, allButtonsGUI; 
 	private Rect[,] tierButtonsGUI;
 	public GUISkin mySkin;
-
-	private TurnInfo turnInfoScript;
-	private TechTreeScript techTreeScript;
-	private CameraFunctions cameraFunctionsScript;
-	private HeroScript heroScript;
-	private GUISystemDataScript guiPlanScript;
-
-	private PlayerTurn playerTurnScript;
-	private EnemyOne enemyOneTurnScript;
-	private EnemyTwo enemyTwoTurnScript;
-	
 	public bool spendMenu = false, hasColonised = false;
 	public string resourceToSpend;
 	private string cost, indSpend, monSpend;

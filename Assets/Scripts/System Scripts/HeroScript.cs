@@ -1,13 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class HeroScript : MonoBehaviour 
+public class HeroScript : MasterScript 
 {
 	public string[] heroesInSystem = new string[3];
-
-	private TechTreeScript techTreeScript;
-	private LineRenderScript lineRenderScript;
-	private HeroScript heroScript;
 
 	void Start()
 	{

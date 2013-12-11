@@ -2,19 +2,13 @@
 using System.Collections;
 using System.IO;
 
-public class TechTreeScript : MonoBehaviour 
+public class TechTreeScript : MasterScript 
 {
 	public int techToBuildTier, techToBuildPosition;
 	public string[,,] techTreeComplete = new string[4,6,2];
 	public float[,] techTreeCost = new float[4,6];
 	public string planetToCheck;
 
-	private LineRenderScript lineRenderScript;
-	private TurnInfo turnInfoScript;
-	private GUISystemDataScript systemDataScript;
-	private TechTreeScript techTreeScript;
-	private HeroScript heroScript;
-	
 	public float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
 	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
 
@@ -28,7 +22,7 @@ public class TechTreeScript : MonoBehaviour
 
 	void Start()
 	{
-		systemDataScript = gameObject.GetComponent<GUISystemDataScript>(); //References to scripts again.
+		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScript>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
@@ -154,7 +148,7 @@ public class TechTreeScript : MonoBehaviour
 	{
 		industryPercentBonus += 0.1f;
 		
-		if(systemDataScript.totalSystemMoney == 0)
+		if(guiPlanScript.totalSystemMoney == 0)
 		{
 			industryPercentBonus += 0.1f;
 		}
@@ -212,12 +206,12 @@ public class TechTreeScript : MonoBehaviour
 	{
 		if(capitalism == true && planetToCheck == "Plains" || planetToCheck == "Ocean" || planetToCheck == "Forest")
 		{
-			systemDataScript.tempMon += 10;
+			guiPlanScript.tempMon += 10;
 		}
 		
 		//if(familiarity == true && planetToCheck == turnInfoScript.homePlanet)
 		//{
-			//systemDataScript.tempMon += systemDataScript.tempMon * 0.5f;
+			//guiPlanScript.tempMon += guiPlanScript.tempMon * 0.5f;
 		//}
 	}
 }

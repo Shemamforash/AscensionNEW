@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GUITextScript : MonoBehaviour 
+public class GUITextScript : MasterScript
 {
 	//This class has been created simply to offset (with more control) the GUI text that appears when hovering over a system.
 
