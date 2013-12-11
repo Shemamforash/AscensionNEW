@@ -5,8 +5,7 @@ public class PlayerTurn : TurnInfo
 {
 	public string playerHomeSystem;
 	public GameObject tempObject;
-	private MainGUIScript mainGUIScript;
-	private CameraFunctions cameraFunctionsScript;
+	
 
 	void Awake()
 	{

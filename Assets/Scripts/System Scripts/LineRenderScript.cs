@@ -1,21 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
-public class LineRenderScript : MonoBehaviour 
+public class LineRenderScript : MasterScript 
 {
 	[HideInInspector]
 	public bool showText, owned = false;
-	[HideInInspector]
-	public GUISystemDataScript guiPlanScript;
-	[HideInInspector]
 	public GUITextScript guiTextScript;
 	[HideInInspector]
-
-	public PlayerTurn playerTurnScript;
-	public AIBasicParent baseAIScript;
-	private EnemyOne enemyOneTurnScript;
-	private EnemyTwo enemyTwoTurnScript;
-
 	public GUIText activeGUI;
 	public GameObject[] connections = new GameObject[4];
 	[HideInInspector]

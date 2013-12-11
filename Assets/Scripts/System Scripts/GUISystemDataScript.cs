@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-public class GUISystemDataScript : MonoBehaviour 
+public class GUISystemDataScript : MasterScript
 {
 	//THIS IS A PROTOTYPE ONLY CLASS. THIS WILL BE USED TO STORE PLANET DATA AND DISPLAY IT IN A GUI UNTIL A TRUE UI AND PLANET SCREEN CAN BE CREATED
 
@@ -26,21 +26,38 @@ public class GUISystemDataScript : MonoBehaviour
 	private string text = " ";
 	private GameObject[] systemConnections = new GameObject[4];
 
-	private TurnInfo turnInfoScript;
-	private PlayerTurn playerTurnScript;
-	private AIBasicParent baseAIScript;
-	private LineRenderScript lineRenderScript;
-	private CameraFunctions cameraFunctionsScript;
-	private TechTreeScript techTreeScript;
+	private TurnInfo playerOwnedSystem;
 
 	void Awake()
 	{
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
 		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
+		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
+		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 
 		LoadFile();		
+	}
+
+	void Update()
+	{
+		if(lineRenderScript.ownedBy != null && playerOwnedSystem == null)
+		{
+			if(lineRenderScript.ownedBy == playerTurnScript.playerRace)
+			{
+				playerOwnedSystem = playerTurnScript;
+			}
+			if(lineRenderScript.ownedBy == enemyOneTurnScript.playerRace)
+			{
+				playerOwnedSystem = enemyOneTurnScript;
+			}
+			if(lineRenderScript.ownedBy == enemyTwoTurnScript.playerRace)
+			{
+				playerOwnedSystem = enemyTwoTurnScript;
+			}
+		}
 	}
 
 	private void LoadFile() //This fills the systems array with all the planets in the system, whether they are owned, and their improvement level
@@ -82,14 +99,14 @@ public class GUISystemDataScript : MonoBehaviour
 
 		int arrayPosition = 0;
 
-		if(thisPlayer.playerRace == playerTurnScript.playerRace)
+		if(thisPlayer.playerRace == playerTurnScript.playerRace && lineRenderScript.ownedBy == null)
 		{
 			PlayerColoniseSystem(systemConnections);
 
 			lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		}
 
-		if(thisPlayer.playerRace != playerTurnScript.playerRace)
+		if(thisPlayer.playerRace != playerTurnScript.playerRace && lineRenderScript.ownedBy == null)
 		{
 			isOkToColonise = true;
 		}
@@ -100,8 +117,6 @@ public class GUISystemDataScript : MonoBehaviour
 			{
 				if(turnInfoScript.systemList[i] == gameObject)
 				{
-					turnInfoScript.systemList[i] = null;
-					turnInfoScript.systemList[i] = null;
 					arrayPosition = i;
 					break;
 				}
@@ -165,27 +180,36 @@ public class GUISystemDataScript : MonoBehaviour
 				{
 					if(turnInfoScript.planetRIM[j,0] == planetType)
 					{
-						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]) * resourceBonus * playerTurnScript.raceScience; //Need to sort out variable types, too much casting
-						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]) * resourceBonus * playerTurnScript.raceIndustry;
-						tempMon = float.Parse(turnInfoScript.planetRIM[j,3]) * resourceBonus * playerTurnScript.raceMoney;
+						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]); //Need to sort out variable types, too much casting
+						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]);
+						tempMon = float.Parse(turnInfoScript.planetRIM[j,3]);
+
 						techTreeScript.planetToCheck = planetType;
+
 						techTreeScript.CheckPlanets();
 					}
 
 					allPlanetsInfo[n] = gameObject.name + " " + (n+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-						+ ((int)(tempSci)).ToString() + "\n" + ((int)(tempInd)).ToString() + "\n" + ((int)(tempMon)).ToString();
+						+ ((int)(tempSci * resourceBonus * playerOwnedSystem.raceScience)).ToString() + "\n" 
+						+ ((int)(tempInd * resourceBonus * playerOwnedSystem.raceIndustry)).ToString() + "\n" 
+						+ ((int)(tempMon * resourceBonus * playerOwnedSystem.raceMoney)).ToString();
 				}
 
 				totalSystemScience += (tempSci * techTreeScript.sciencePercentBonus) + techTreeScript.sciencePointBonus;
 				totalSystemIndustry += (tempInd * techTreeScript.industryPercentBonus) + techTreeScript.industryPointBonus;
 				totalSystemMoney += (tempMon * techTreeScript.moneyPercentBonus) + techTreeScript.moneyPointBonus;
+
+				turnInfoScript.RefreshPlanetPower();
 			}
 		}
-		
+	}
+
+	private void CheckUnlockedTier()
+	{
 		if(turnInfoScript.endTurn == true) //Checks tech tier unlocked
 		{
 			totalSystemSIM += totalSystemScience + totalSystemIndustry + totalSystemMoney;
-
+			
 			if(totalSystemSIM >= 1600.0f && totalSystemSIM < 3200)
 			{
 				techTreeScript.techTier = 1;
@@ -198,6 +222,38 @@ public class GUISystemDataScript : MonoBehaviour
 			{
 				techTreeScript.techTier = 3;
 			}
+		}
+	}
+
+	public void UpdatePlanetPowerArray()
+	{
+		for(int i = 0; i < numPlanets; ++i)
+		{
+			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 0] = gameObject.name;
+			
+			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 1] = i.ToString();
+			
+			for(int j = 0; j < 12; ++j)
+			{
+				if(turnInfoScript.planetRIM[j, 0] == planNameOwnImprov[i, 0])
+				{								
+					improvementNumber = int.Parse (planNameOwnImprov[i, 2]);
+					
+					CheckImprovement();
+					
+					float tempSciInt = float.Parse (turnInfoScript.planetRIM[i,1]); 
+					float tempIndInt = float.Parse (turnInfoScript.planetRIM[i,2]); 
+					float tempMonInt = float.Parse (turnInfoScript.planetRIM[i,3]); 
+					
+					float tempInt = tempSciInt + tempIndInt + tempMonInt;
+					
+					turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 2] = tempInt.ToString();
+					
+					break;
+				}
+			}
+
+			++turnInfoScript.savedIterator;
 		}
 	}
 
