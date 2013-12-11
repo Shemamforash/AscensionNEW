@@ -27,7 +27,7 @@ public class AIBasicParent : TurnInfo
 		while(mostValuableSystem == null)
 		{
 			CheckForSuitableSystem(thisPlayer);
-			compensator += 0.1f;
+			compensator += 0.25f;
 
 			if(compensator > 1.0f)
 			{
@@ -155,7 +155,7 @@ public class AIBasicParent : TurnInfo
 		{
 			lineRenderScript = system.GetComponent<LineRenderScript>();
 
-			if(lineRenderScript.ownedBy == "Player" || lineRenderScript.ownedBy == "EnemyOne" || lineRenderScript.ownedBy == "EnemyTwo")
+			if(lineRenderScript.ownedBy == "Selkies" || lineRenderScript.ownedBy == "Humans" || lineRenderScript.ownedBy == "Nereides")
 			{
 				continue;
 			}
