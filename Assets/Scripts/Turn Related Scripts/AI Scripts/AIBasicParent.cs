@@ -131,7 +131,7 @@ public class AIBasicParent : TurnInfo
 			}
 		}
 
-		if(tempSystem != null)
+		if(tempSystem != null && GP > 0)
 		{
 			ColonisePlanet(tempSystem, tempPlanet);
 		}
@@ -142,7 +142,9 @@ public class AIBasicParent : TurnInfo
 		guiPlanScript = system.GetComponent<GUISystemDataScript>();
 
 		GP -= 1;
+
 		guiPlanScript.planNameOwnImprov[planet, 1] = "Yes";
+
 		++planetsColonisedThisTurn;
 
 	}
