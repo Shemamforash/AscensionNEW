@@ -99,19 +99,19 @@ public class GUISystemDataScript : MasterScript
 
 		int arrayPosition = 0;
 
-		if(thisPlayer.playerRace == playerTurnScript.playerRace && lineRenderScript.ownedBy == null)
+		if(thisPlayer.playerRace == playerTurnScript.playerRace)
 		{
 			PlayerColoniseSystem(systemConnections);
 
 			lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		}
 
-		if(thisPlayer.playerRace != playerTurnScript.playerRace && lineRenderScript.ownedBy == null)
+		if(thisPlayer.playerRace != playerTurnScript.playerRace)
 		{
 			isOkToColonise = true;
 		}
 
-		if(isOkToColonise == true)
+		if(isOkToColonise == true && thisPlayer.GP > 0)
 		{
 			for(int i = 0; i < 60; i ++)
 			{
@@ -241,9 +241,10 @@ public class GUISystemDataScript : MasterScript
 					
 					CheckImprovement();
 					
-					float tempSciInt = float.Parse (turnInfoScript.planetRIM[i,1]); 
-					float tempIndInt = float.Parse (turnInfoScript.planetRIM[i,2]); 
-					float tempMonInt = float.Parse (turnInfoScript.planetRIM[i,3]); 
+					float tempSciInt = float.Parse (turnInfoScript.planetRIM[j,1]); 
+
+					float tempIndInt = float.Parse (turnInfoScript.planetRIM[j,2]); 
+					float tempMonInt = float.Parse (turnInfoScript.planetRIM[j,3]); 
 					
 					float tempInt = tempSciInt + tempIndInt + tempMonInt;
 					
