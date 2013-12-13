@@ -42,23 +42,152 @@ public class AIBasicParent : TurnInfo
 		}
 	}
 
-	public void CheckToImprovePlanet()
+	public void CheckForSuitableSystem(AIBasicParent thisPlayer)
 	{
-		for(int i = 0; i < 211; i ++)
+		foreach(GameObject system in turnInfoScript.systemList)
 		{
-			foreach(GameObject system in ownedSystems)
+			lineRenderScript = system.GetComponent<LineRenderScript>();
+			
+			if(lineRenderScript.ownedBy == "Selkies" || lineRenderScript.ownedBy == "Humans" || lineRenderScript.ownedBy == "Nereides")
 			{
-				if(system == null)
+				continue;
+			}
+			
+			foreach(GameObject connection in lineRenderScript.connections)
+			{
+				if(connection == null)
 				{
 					continue;
 				}
-
-				if(turnInfoScript.mostPowerfulPlanets[i,0] == system.name)
+				
+				thisLineRenderScript = connection.GetComponent<LineRenderScript>();
+				
+				if(thisLineRenderScript.ownedBy == thisPlayer.playerRace)
 				{
-					ImprovePlanet(int.Parse (turnInfoScript.mostPowerfulPlanets[i,1]), system);
+					CalculateSIMRatio(system);
+					CheckForSuitablePlanet (systemRatio);
+					RandomNumber(system);
+					
+					if(mostValuableSystem != null)
+					{
+						break;
+					}
 				}
 			}
 		}
+	}
+
+	void CalculateSIMRatio(GameObject thisSystem)
+	{
+		tempSIM = 0.0f;
+		
+		guiPlanScript = thisSystem.GetComponent<GUISystemDataScript>();
+		
+		for(int i = 0; i < guiPlanScript.numPlanets; i++)
+		{
+			for(int f = 0; f < 12; f++)
+			{
+				if(guiPlanScript.planNameOwnImprov[i, 0] == turnInfoScript.planetRIM[f, 0])
+				{
+					float tempSci = float.Parse (turnInfoScript.planetRIM[f,1]);
+					float tempInd = float.Parse (turnInfoScript.planetRIM[f,2]);
+					float tempMon = float.Parse (turnInfoScript.planetRIM[f,3]);
+					
+					tempSIM += (tempSci + tempInd + tempMon);
+					
+					break;
+				}
+			}
+		}
+		
+		
+		float tempRatio = tempSIM / guiPlanScript.numPlanets;
+		
+		systemRatio = (1.0f/16.7f) * (tempRatio/2.0f);
+		
+		if(systemRatio >= 1.0f)
+		{
+			systemRatio = 0.9f;
+		}
+	}
+
+	public void CheckToImprovePlanet(GameObject system)
+	{
+		for(int i = 0; i < 211; i++)
+		{
+			if(turnInfoScript.mostPowerfulPlanets[i,0] == system.name)
+			{
+				ImprovePlanet(int.Parse (turnInfoScript.mostPowerfulPlanets[i,1]), system);
+			}
+		}
+	}
+
+	public void CheckForSuitablePlanet(float ratio)
+	{
+		int tempPlanet = 0;
+		GameObject tempSystem = null;
+		
+		foreach(GameObject system in ownedSystems)
+		{
+			if(system == null)
+			{
+				continue;
+			}
+
+			CheckToImprovePlanet(system);
+			
+			guiPlanScript = system.GetComponent<GUISystemDataScript>();
+			
+			for(int i = 0; i < guiPlanScript.numPlanets; i++)
+			{
+				for(int f = 0; f < 12; f++)
+				{
+					if(guiPlanScript.planNameOwnImprov[i, 0] == turnInfoScript.planetRIM[f, 0] && guiPlanScript.planNameOwnImprov[i, 1] == "No")
+					{
+						float tempSci = float.Parse (turnInfoScript.planetRIM[f,1]);
+						float tempInd = float.Parse (turnInfoScript.planetRIM[f,2]);
+						float tempMon = float.Parse (turnInfoScript.planetRIM[f,3]);
+						
+						tempSIM = (tempSci + tempInd + tempMon);
+						
+						float tempRatio = (1.0f/16.7f) * (tempSIM/2.0f);
+						
+						if(tempRatio > ratio)
+						{
+							tempPlanet = i;
+							tempSystem = system;
+						}
+						
+						break;
+					}
+				}
+			}
+		}
+		
+		if(tempSystem != null && GP > 0)
+		{
+			ColonisePlanet(tempSystem, tempPlanet);
+		}
+	}
+
+	private void RandomNumber(GameObject thisSystem)
+	{
+		if(systemRatio < Random.Range (compensator, 1.00f) || compensator > 0.9f)
+		{
+			mostValuableSystem = thisSystem;
+		}
+	}
+
+	public void ColonisePlanet(GameObject system, int planet)
+	{
+		guiPlanScript = system.GetComponent<GUISystemDataScript>();
+		
+		GP -= 1;
+		
+		guiPlanScript.planNameOwnImprov[planet, 1] = "Yes";
+		
+		++planetsColonisedThisTurn;
+		
 	}
 
 	public void ImprovePlanet(int planetPosition, GameObject thisSystem)
@@ -90,140 +219,5 @@ public class AIBasicParent : TurnInfo
 			}
 		}
 	}
-
-	public void CheckForSuitablePlanet(float ratio)
-	{
-		int tempPlanet = 0;
-		GameObject tempSystem = null;
-
-		foreach(GameObject system in ownedSystems)
-		{
-			if(system == null)
-			{
-				continue;
-			}
-
-			guiPlanScript = system.GetComponent<GUISystemDataScript>();
-
-			for(int i = 0; i < guiPlanScript.numPlanets; i++)
-			{
-				for(int f = 0; f < 12; f++)
-				{
-					if(guiPlanScript.planNameOwnImprov[i, 0] == turnInfoScript.planetRIM[f, 0] && guiPlanScript.planNameOwnImprov[i, 1] == "No")
-					{
-						float tempSci = float.Parse (turnInfoScript.planetRIM[f,1]);
-						float tempInd = float.Parse (turnInfoScript.planetRIM[f,2]);
-						float tempMon = float.Parse (turnInfoScript.planetRIM[f,3]);
-						
-						tempSIM = (tempSci + tempInd + tempMon);
-
-						float tempRatio = (1.0f/16.7f) * (tempSIM/2.0f);
-
-						if(tempRatio > ratio)
-						{
-							tempPlanet = i;
-							tempSystem = system;
-						}
-						
-						break;
-					}
-				}
-			}
-		}
-
-		if(tempSystem != null && GP > 0)
-		{
-			ColonisePlanet(tempSystem, tempPlanet);
-		}
-	}
-
-	public void ColonisePlanet(GameObject system, int planet)
-	{
-		guiPlanScript = system.GetComponent<GUISystemDataScript>();
-
-		GP -= 1;
-
-		guiPlanScript.planNameOwnImprov[planet, 1] = "Yes";
-
-		++planetsColonisedThisTurn;
-
-	}
-
-	public void CheckForSuitableSystem(AIBasicParent thisPlayer)
-	{
-		foreach(GameObject system in turnInfoScript.systemList)
-		{
-			lineRenderScript = system.GetComponent<LineRenderScript>();
-
-			if(lineRenderScript.ownedBy == "Selkies" || lineRenderScript.ownedBy == "Humans" || lineRenderScript.ownedBy == "Nereides")
-			{
-				continue;
-			}
-
-			foreach(GameObject connection in lineRenderScript.connections)
-			{
-				if(connection == null)
-				{
-					continue;
-				}
-
-				thisLineRenderScript = connection.GetComponent<LineRenderScript>();
-
-				if(thisLineRenderScript.ownedBy == thisPlayer.playerRace)
-				{
-					CalculateSIMRatio(system);
-					CheckToImprovePlanet();
-					CheckForSuitablePlanet (systemRatio);
-					RandomNumber(system);
-
-					if(mostValuableSystem != null)
-					{
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	private void RandomNumber(GameObject thisSystem)
-	{
-		if(systemRatio < Random.Range (compensator, 1.00f) || compensator > 0.9f)
-		{
-			mostValuableSystem = thisSystem;
-		}
-	}
-
-	void CalculateSIMRatio(GameObject thisSystem)
-	{
-		tempSIM = 0.0f;
-
-		guiPlanScript = thisSystem.GetComponent<GUISystemDataScript>();
-
-		for(int i = 0; i < guiPlanScript.numPlanets; i++)
-		{
-			for(int f = 0; f < 12; f++)
-			{
-				if(guiPlanScript.planNameOwnImprov[i, 0] == turnInfoScript.planetRIM[f, 0])
-				{
-					float tempSci = float.Parse (turnInfoScript.planetRIM[f,1]);
-					float tempInd = float.Parse (turnInfoScript.planetRIM[f,2]);
-					float tempMon = float.Parse (turnInfoScript.planetRIM[f,3]);
-
-					tempSIM += (tempSci + tempInd + tempMon);
-
-					break;
-				}
-			}
-		}
-
-
-		float tempRatio = tempSIM / guiPlanScript.numPlanets;
-
-		systemRatio = (1.0f/16.7f) * (tempRatio/2.0f);
-
-		if(systemRatio >= 1.0f)
-		{
-			systemRatio = 0.9f;
-		}
-	}
 }
+
