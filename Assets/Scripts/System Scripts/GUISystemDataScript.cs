@@ -197,33 +197,30 @@ public class GUISystemDataScript : MasterScript
 						+ ((int)(tempMon * resourceBonus * playerOwnedSystem.raceMoney)).ToString();
 				}
 
-				totalSystemScience += (tempSci * techTreeScript.sciencePercentBonus) + techTreeScript.sciencePointBonus;
-				totalSystemIndustry += (tempInd * techTreeScript.industryPercentBonus) + techTreeScript.industryPointBonus;
-				totalSystemMoney += (tempMon * techTreeScript.moneyPercentBonus) + techTreeScript.moneyPointBonus;
+				totalSystemScience += (tempSci * techTreeScript.sciencePercentBonus * resourceBonus * playerOwnedSystem.raceScience) + techTreeScript.sciencePointBonus;
+				totalSystemIndustry += (tempInd * techTreeScript.industryPercentBonus * resourceBonus * playerOwnedSystem.raceIndustry) + techTreeScript.industryPointBonus;
+				totalSystemMoney += (tempMon * techTreeScript.moneyPercentBonus * resourceBonus * playerOwnedSystem.raceMoney) + techTreeScript.moneyPointBonus;
 
 				turnInfoScript.RefreshPlanetPower();
 			}
 		}
 	}
 
-	private void CheckUnlockedTier()
+	public void CheckUnlockedTier()
 	{
-		if(turnInfoScript.endTurn == true) //Checks tech tier unlocked
-		{
-			totalSystemSIM += totalSystemScience + totalSystemIndustry + totalSystemMoney;
+		totalSystemSIM += totalSystemScience + totalSystemIndustry + totalSystemMoney;
 			
-			if(totalSystemSIM >= 1600.0f && totalSystemSIM < 3200)
-			{
-				techTreeScript.techTier = 1;
-			}
-			if(totalSystemSIM >= 3200.0f && totalSystemSIM < 6400)
-			{
-				techTreeScript.techTier = 2;
-			}
-			if(totalSystemSIM >= 6400.0f)
-			{
-				techTreeScript.techTier = 3;
-			}
+		if(totalSystemSIM >= 1600.0f && totalSystemSIM < 3200)
+		{
+			techTreeScript.techTier = 1;
+		}
+		if(totalSystemSIM >= 3200.0f && totalSystemSIM < 6400)
+		{
+			techTreeScript.techTier = 2;
+		}
+		if(totalSystemSIM >= 6400.0f)
+		{
+			techTreeScript.techTier = 3;
 		}
 	}
 

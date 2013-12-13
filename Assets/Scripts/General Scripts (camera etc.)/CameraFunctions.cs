@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CameraFunctions : MonoBehaviour 
+public class CameraFunctions : MasterScript
 {
 
 	//This class contains all functions related to camera behaviour. This includes panning and zooming of the main camera, as well as using raycasts to update the current selected object.
@@ -19,33 +19,48 @@ public class CameraFunctions : MonoBehaviour
 	private float updatedX, updatedY;
 	private GameObject thisObject;
 
+	void Awake()
+	{
+		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
+	}
+
 	void Update()
 	{
-		ZoomCamera();
+		if(openMenu != true)
+		{
+			ZoomCamera();
 
-		PanCamera();
+			PanCamera();
+
+			ClickSystem ();
+		}
 		
 		if(Input.GetKeyDown ("escape")) //Used to close all open menus, and to reset doubleclick
 		{
 			coloniseMenu = false;
 			openMenu = false;
 			doubleClick = false;
+			mainGUIScript.spendMenu = false;
+			mainGUIScript.openImprovementList = false;
 		}
-		
+	}
+
+	private void ClickSystem()
+	{
 		if(Input.GetMouseButtonDown(0)) //Used to start double click events and to identify systems when clicked on. Throws up error if click on a connector object.
 		{
 			if(doubleClick == false)
 			{
 				DoubleClick ();
 			}
-
+			
 			RaycastHit hit = new RaycastHit();
-		
+			
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
 				selectedSystem = hit.collider.name;
 				coloniseMenu = true; //Shows the colonise button on single click
-
+				
 				if(doubleClick == true)
 				{
 					openMenu = true; //Opens system menu on double click

@@ -162,12 +162,12 @@ public class MainGUIScript : MasterScript
 		#region turninfo				
 		GUI.Label (new Rect(Screen.width - 80, Screen.height - 50, 50, 20), turnNumber);
 		
-		if(GUI.Button (new Rect(Screen.width - 80, Screen.height - 30, 70, 20), "End turn") && playerTurnScript.playerRace != null)
+		if(GUI.Button (new Rect(Screen.width - 80, Screen.height - 30, 70, 20), "End turn") && playerTurnScript.playerRace != null) //Endturnbutton
 		{
 			EndTurnFunction();
 		}
 		
-		GUI.Box (new Rect(15, 15, 100, 130), "");
+		GUI.Box (new Rect(15, 15, 100, 130), ""); //Empire resources box
 		
 		GUI.Label (new Rect(20, 20, 60, 20), playerTurnScript.playerRace);
 				
@@ -181,7 +181,7 @@ public class MainGUIScript : MasterScript
 		#endregion
 		
 		#region colonisebutton
-		Rect coloniseButton = new Rect(10, Screen.height - 40, 75, 30);
+		Rect coloniseButton = new Rect(10, Screen.height - 40, 75, 30); //Colonise button
 		
 		if(cameraFunctionsScript.coloniseMenu == true)
 		{
@@ -282,7 +282,7 @@ public class MainGUIScript : MasterScript
 			#region techtreedata
 			if(openImprovementList == true)
 			{
-				if(GUI.Button (new Rect(xLoc + 180.0f, yLoc, 20.0f, 20.0f), "X"))
+				if(GUI.Button (new Rect(xLoc + 200.0f, yLoc, 20.0f, 20.0f), "X"))
 				{
 					openImprovementList = false;
 				}
@@ -302,11 +302,9 @@ public class MainGUIScript : MasterScript
 
 						techBuildButtonText = techTreeScript.techTreeComplete[i,j,0].ToString () + "\n" + techTreeScript.techTreeCost[i,j].ToString();
 
-						if(GUILayout.Button(techBuildButtonText))
+						if(GUILayout.Button(techBuildButtonText, GUILayout.Height(40.0f)))
 						{
-							techTreeScript.techToBuildPosition = j;
-							techTreeScript.techToBuildTier = i;
-							techTreeScript.ImproveSystem();
+							techTreeScript.ImproveSystem(i,j);
 						}
 					}
 				}

@@ -146,6 +146,7 @@ public class TurnInfo : MasterScript
 				//techTreeScript.ActiveTechnologies();
 				//heroScript.CheckHeroesInSystem();
 				guiPlanScript.SystemSIMCounter();
+				guiPlanScript.CheckUnlockedTier();
 
 				science += (int)guiPlanScript.totalSystemScience;
 				industry += (int)guiPlanScript.totalSystemIndustry;
