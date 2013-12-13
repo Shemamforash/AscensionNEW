@@ -41,7 +41,7 @@ public class GUISystemDataScript : MasterScript
 		LoadFile();		
 	}
 
-	void Update()
+	public void CheckOwnership()
 	{
 		if(lineRenderScript.ownedBy != null && playerOwnedSystem == null)
 		{
@@ -135,6 +135,8 @@ public class GUISystemDataScript : MasterScript
 			cameraFunctionsScript.coloniseMenu = false;
 			
 			planNameOwnImprov[0,1] = "Yes";
+
+			CheckOwnership();
 		}
 	}
 
