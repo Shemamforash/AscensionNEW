@@ -26,16 +26,17 @@ public class TechTreeScript : MasterScript
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScript>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
+		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
 
 		LoadTechTree();
 	}
 
-	public void ImproveSystem() //Occurs if button of tech is clicked.
+	public void ImproveSystem(int tier, int position) //Occurs if button of tech is clicked.
 	{
-		if(turnInfoScript.industry >= techTreeCost[techToBuildTier, techToBuildPosition]) //Checks cost of tech and current industry
+		if(playerTurnScript.industry >= techTreeCost[tier, position]) //Checks cost of tech and current industry
 		{
-			turnInfoScript.industry -= (int)techTreeCost[techToBuildTier, techToBuildPosition];
-			techTreeComplete[techToBuildTier, techToBuildPosition, 1] = "Built";
+			playerTurnScript.industry -= (int)techTreeCost[tier, position];
+			techTreeComplete[tier, position, 1] = "Built";
 			secondaryResearch = true; //Activates tech ability
 		}
 	}
@@ -74,7 +75,7 @@ public class TechTreeScript : MasterScript
 
 		if(techTreeComplete[0,0,1] == "Built" && secondaryResearch == true) //Secondary Research
 		{
-			turnInfoScript.science += 50;
+			playerTurnScript.science += 50;
 			secondaryResearch = false;
 		}
 
@@ -110,7 +111,7 @@ public class TechTreeScript : MasterScript
 
 		if(techTreeComplete[1,1,1] == "Built") //Quick Starters
 		{
-			industryPointBonus += turnInfoScript.planetsColonisedThisTurn * 50.0f;
+			industryPointBonus += playerTurnScript.planetsColonisedThisTurn * 50.0f;
 		}
 
 		if(techTreeComplete[1,4,1] == "Built")
@@ -170,7 +171,7 @@ public class TechTreeScript : MasterScript
 					break;
 				}
 				
-				if(system == turnInfoScript.ownedSystems[i])
+				if(system == playerTurnScript.ownedSystems[i])
 				{
 					industryPercentBonus += 0.05f;
 				}
@@ -182,7 +183,7 @@ public class TechTreeScript : MasterScript
 	{		
 		currentPlanetsWithHyperNet = 0;
 		
-		foreach(GameObject system in turnInfoScript.ownedSystems)
+		foreach(GameObject system in playerTurnScript.ownedSystems)
 		{
 			if(system == null)
 			{
