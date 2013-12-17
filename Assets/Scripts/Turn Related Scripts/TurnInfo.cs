@@ -8,7 +8,7 @@ public class TurnInfo : MasterScript
 	public int GP, raceGP, science, industry, money, planetsColonisedThisTurn, savedIterator;
 	public float raceScience, raceIndustry, raceMoney;
 	[HideInInspector]
-	public string[,] planetRIM = new string[12,4];
+	public string[,] planetRIM = new string[12,5];
 	public string[,] mostPowerfulPlanets = new string[211,3];
 	[HideInInspector]
 	public GameObject[] systemList = new GameObject[60];
@@ -42,7 +42,7 @@ public class TurnInfo : MasterScript
 		{
 			for(int i = 0; i < 12; i++)
 			{
-				for(int j = 0; j < 4; j++)
+				for(int j = 0; j < 5; j++)
 				{
 					text = reader.ReadLine();
 					planetRIM[i,j] = text;
@@ -143,7 +143,7 @@ public class TurnInfo : MasterScript
 				techTreeScript = system.GetComponent<TechTreeScript>();
 				heroScript = system.GetComponent<HeroScript>();
 
-				//techTreeScript.ActiveTechnologies();
+				techTreeScript.ActiveTechnologies();
 				//heroScript.CheckHeroesInSystem();
 				guiPlanScript.SystemSIMCounter();
 				guiPlanScript.CheckUnlockedTier();

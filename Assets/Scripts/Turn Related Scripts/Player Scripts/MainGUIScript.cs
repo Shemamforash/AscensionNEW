@@ -225,9 +225,19 @@ public class MainGUIScript : MasterScript
 					openImprovementList = true;
 					xLoc = allImprovementButtonsGUI[i].xMax;
 					yLoc = allImprovementButtonsGUI[i].yMax;
+					thisPlanet = i;
 				}
 
 				GUI.Label (allPlanetsGUI[i], guiPlanScript.allPlanetsInfo[i]);
+
+				GUILayout.BeginArea(new Rect(allImprovementButtonsGUI[i].x, Screen.height / 2 + 100.0f, 200.0f, 400.0f));
+
+				for(int j = 0; j < int.Parse (guiPlanScript.planNameOwnImprov[i,3]); ++j)
+				{
+					GUILayout.Label (techTreeScript.improvementsOnPlanet[i,j], GUILayout.Height(50.0f));
+				}
+
+				GUILayout.EndArea();
 			}
 			#endregion
 
@@ -300,11 +310,29 @@ public class MainGUIScript : MasterScript
 							continue;
 						}
 
-						techBuildButtonText = techTreeScript.techTreeComplete[i,j,0].ToString () + "\n" + techTreeScript.techTreeCost[i,j].ToString();
+						techBuildButtonText = techTreeScript.techTreeComplete[i,j,0] + "\n" + techTreeScript.techTreeCost[i,j].ToString();
 
 						if(GUILayout.Button(techBuildButtonText, GUILayout.Height(40.0f)))
 						{
 							techTreeScript.ImproveSystem(i,j);
+							if(techTreeScript.techTreeComplete[i,j,1] == "Built")
+							{
+								for(int k = 0; k < 4; k++)
+								{
+									bool improved = false;
+									
+									if(techTreeScript.improvementsOnPlanet[thisPlanet, k] == null)
+									{
+										techTreeScript.improvementsOnPlanet[thisPlanet, k] = techTreeScript.techTreeComplete[i,j,0];
+										improved = true;
+									}
+									
+									if(improved == true)
+									{
+										break;
+									}
+								}
+							}
 						}
 					}
 				}
@@ -312,7 +340,27 @@ public class MainGUIScript : MasterScript
 
 				GUILayout.EndArea ();
 			}
+
+			#region systembenefits
 			
+			GUILayout.BeginArea (new Rect(Screen.width / 2 + 750.0f, Screen.height / 2 - 200.0f, 200.0f, 400.0f));
+
+			scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+
+			for(int i = 0; i < 24; ++i)
+			{
+				if(techTreeScript.improvementMessageArray[i] != null || techTreeScript.improvementMessageArray[i] != "")
+				{
+					GUILayout.Label(techTreeScript.improvementMessageArray[i], GUILayout.Height (40.0f));
+				}
+			}
+
+			GUILayout.EndScrollView();
+
+			GUILayout.EndArea();
+
+			#endregion
+
 			#endregion
 			
 			if(GUI.Button (new Rect(Screen.width / 2 - 800.0f, Screen.height/2, 150.0f, 50.0f), "President"))

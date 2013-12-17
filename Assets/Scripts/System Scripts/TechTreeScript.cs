@@ -6,8 +6,10 @@ public class TechTreeScript : MasterScript
 {
 	public int techToBuildTier, techToBuildPosition;
 	public string[,,] techTreeComplete = new string[4,6,2];
+	public string[,] improvementsOnPlanet = new string[6,4];
 	public float[,] techTreeCost = new float[4,6];
 	public string planetToCheck;
+	public string[] improvementMessageArray = new string[24];
 
 	public float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
 	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
@@ -19,6 +21,7 @@ public class TechTreeScript : MasterScript
 
 	private bool capitalism = false, familiarity = false, secondaryResearch = false;
 	public bool leadership = false;
+	private float tempValue;
 
 	void Start()
 	{
@@ -67,6 +70,11 @@ public class TechTreeScript : MasterScript
 		}
 	}
 
+	public void AddImprovementMessage(string message, int tech)
+	{
+		improvementMessageArray[tech] = message;
+	}
+
 	public void ActiveTechnologies() //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
 		sciencePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
@@ -76,16 +84,20 @@ public class TechTreeScript : MasterScript
 		if(techTreeComplete[0,0,1] == "Built" && secondaryResearch == true) //Secondary Research
 		{
 			playerTurnScript.science += 50;
+			AddImprovementMessage("+50 Science on Improvement", 0);
 			secondaryResearch = false;
 		}
 
 		if(techTreeComplete[0,1,1] == "Built") //Synergy
 		{
 			Synergy();
+			AddImprovementMessage ("+" + tempValue.ToString () + "% Industry on system", 1);
 		}
 
 		if(techTreeComplete[0,2,1] == "Built") //Morale
 		{
+			tempValue = 0.0f;
+
 			foreach(string hero in heroScript.heroesInSystem)
 			{
 				if(hero == null)
@@ -95,8 +107,11 @@ public class TechTreeScript : MasterScript
 				else
 				{
 					moneyPointBonus += 10.0f;
+					tempValue += 10.0f;
 				}
 			}
+
+			AddImprovementMessage("+" + tempValue.ToString() + " Money from heroes in System", 2);
 		}
 
 		if(techTreeComplete[0,3,1] == "Built" && capitalism == false) //Capitalism
@@ -112,6 +127,8 @@ public class TechTreeScript : MasterScript
 		if(techTreeComplete[1,1,1] == "Built") //Quick Starters
 		{
 			industryPointBonus += playerTurnScript.planetsColonisedThisTurn * 50.0f;
+			tempValue = playerTurnScript.planetsColonisedThisTurn * 50.0f;
+			AddImprovementMessage("+" + tempValue + " Industry from planets colonised this turn", 5);
 		}
 
 		if(techTreeComplete[1,4,1] == "Built")
@@ -122,16 +139,18 @@ public class TechTreeScript : MasterScript
 
 				if(lineRenderScript.ownedBy == "Selkies")
 				{
+					lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 					industryPercentBonus += 0.5f;
+					AddImprovementMessage ("+ 50% Industry from Selkies adjacency", 8);
+					break;
 				}
-
-				lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 			}
 		}
 
 		if(techTreeComplete[2,1,1] == "Built") //Unionisation
 		{
 			Unionisation();
+			AddImprovementMessage ("+" + tempValue + "% Industry from Economic status", 10);
 		}
 
 		if(techTreeComplete[2,2,1] == "Built" && familiarity == false) //Familiarity
@@ -142,21 +161,28 @@ public class TechTreeScript : MasterScript
 		if(techTreeComplete[2,5,1] == "Built") //Hypernet
 		{
 			HyperNet();
+			AddImprovementMessage ("+" + tempValue + "% SIM from systems with Hypernet", 14);
 		}
 	}
 
 	private void Unionisation()
 	{
+		tempValue = 0.0f;
+
 		industryPercentBonus += 0.1f;
+		tempValue += 0.1f;
 		
 		if(guiPlanScript.totalSystemMoney == 0)
 		{
 			industryPercentBonus += 0.1f;
+			tempValue += 0.1f;
 		}
 	}
 
 	private void Synergy()
 	{
+		float tempFloat = 0.0f;
+
 		for(int i = 0; i < 4; ++i)
 		{
 			connectedSystems[i] = lineRenderScript.connections[i];
@@ -174,6 +200,7 @@ public class TechTreeScript : MasterScript
 				if(system == playerTurnScript.ownedSystems[i])
 				{
 					industryPercentBonus += 0.05f;
+					tempFloat += 0.05f;
 				}
 			}
 		}
@@ -201,6 +228,8 @@ public class TechTreeScript : MasterScript
 		sciencePercentBonus += currentPlanetsWithHyperNet * 0.005f;
 		industryPercentBonus += currentPlanetsWithHyperNet * 0.005f;
 		moneyPercentBonus += currentPlanetsWithHyperNet * 0.005f;
+
+		tempValue = currentPlanetsWithHyperNet * 0.005f;
 	}
 
 	public void CheckPlanets() //This function contains effects caused by tech, but cannot be activated within this script.
