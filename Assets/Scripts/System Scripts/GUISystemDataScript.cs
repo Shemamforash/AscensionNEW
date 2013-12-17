@@ -16,7 +16,7 @@ public class GUISystemDataScript : MasterScript
 	[HideInInspector]
 	public string[] allPlanetsInfo = new string[6];	//Unique to object
 	[HideInInspector]
-	public string[,] planNameOwnImprov = new string[6,3]; //Unique to object
+	public string[,] planNameOwnImprov = new string[6,4]; //Unique to object
 	[HideInInspector]
 	public bool canImprove, foundPlanetData, isOkToColonise;
 
@@ -83,6 +83,8 @@ public class GUISystemDataScript : MasterScript
 						planNameOwnImprov[i,1] = "No";
 						
 						planNameOwnImprov[i,2] = "0";
+
+						FindPlanetImprovementSlots(i);
 					}
 				
 					break;
@@ -90,7 +92,18 @@ public class GUISystemDataScript : MasterScript
 			}
 		}
 	}
-	
+
+	private void FindPlanetImprovementSlots(int thisInt)
+	{
+		for(int j = 0; j < 12; ++j)
+		{
+			if(planNameOwnImprov[thisInt, 0] == turnInfoScript.planetRIM[j, 0])
+			{
+				planNameOwnImprov[thisInt, 3] = turnInfoScript.planetRIM[j, 4];
+			}
+		}
+	}
+
 	public void FindSystem(TurnInfo thisPlayer) //This function is used to check if the highlighted system can be colonised, and if it can, to colonise it
 	{		
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
