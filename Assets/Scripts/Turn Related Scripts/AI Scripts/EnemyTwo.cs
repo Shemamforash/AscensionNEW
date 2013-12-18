@@ -3,13 +3,6 @@ using System.Collections;
 
 public class EnemyTwo : AIBasicParent
 {
-	void Awake()
-	{
-		turnInfoScript = gameObject.GetComponent<TurnInfo>();
-		enemyTwoTurnScript = gameObject.GetComponent<EnemyTwo>();
-		playerTurnScript = gameObject.GetComponent<PlayerTurn>();
-	}
-
 	public void SetRace()
 	{
 		if(playerTurnScript.playerRace == "Humans" || playerTurnScript.playerRace == "Nereides")

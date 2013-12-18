@@ -3,7 +3,7 @@ using System.Collections;
 
 public class EnemyOne : AIBasicParent
 {
-	void Awake()
+	void Start()
 	{
 		turnInfoScript = gameObject.GetComponent<TurnInfo>();
 		enemyOneTurnScript = gameObject.GetComponent<EnemyOne>();

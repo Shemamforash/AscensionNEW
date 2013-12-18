@@ -20,7 +20,7 @@ public class GUISystemDataScript : MasterScript
 	[HideInInspector]
 	public bool canImprove, foundPlanetData, isOkToColonise;
 
-	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM;
+	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM, tempTotalSci, tempTotalInd, tempTotalMon;
 	public float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
 	
 	private string text = " ";
@@ -28,15 +28,11 @@ public class GUISystemDataScript : MasterScript
 
 	private TurnInfo playerOwnedSystem;
 
-	void Awake()
+	void Start()
 	{
-		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
-		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
-		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
-		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
+		heroScript = gameObject.GetComponent<HeroScript>();
 
 		LoadFile();		
 	}
@@ -177,9 +173,9 @@ public class GUISystemDataScript : MasterScript
 
 	public void SystemSIMCounter() //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{				
-		totalSystemScience = 0.0f;
-		totalSystemIndustry = 0.0f;
-		totalSystemMoney = 0.0f;
+		tempTotalSci = 0.0f;
+		tempTotalInd = 0.0f;
+		tempTotalMon = 0.0f;
 
 		for(int n = 0; n < numPlanets; ++n)
 		{
@@ -210,13 +206,19 @@ public class GUISystemDataScript : MasterScript
 						+ ((int)(tempMon * resourceBonus * playerOwnedSystem.raceMoney)).ToString();
 				}
 
-				totalSystemScience += (tempSci * techTreeScript.sciencePercentBonus * resourceBonus * playerOwnedSystem.raceScience) + techTreeScript.sciencePointBonus;
-				totalSystemIndustry += (tempInd * techTreeScript.industryPercentBonus * resourceBonus * playerOwnedSystem.raceIndustry) + techTreeScript.industryPointBonus;
-				totalSystemMoney += (tempMon * techTreeScript.moneyPercentBonus * resourceBonus * playerOwnedSystem.raceMoney) + techTreeScript.moneyPointBonus;
-
-				turnInfoScript.RefreshPlanetPower();
+				tempTotalSci += tempSci * techTreeScript.sciencePercentBonus * resourceBonus * playerOwnedSystem.raceScience;
+				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * playerOwnedSystem.raceIndustry;
+				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * playerOwnedSystem.raceMoney;
 			}
 		}
+
+		heroScript.CheckHeroesInSystem();
+
+		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus + heroScript.heroSciBonus;
+		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus  + heroScript.heroIndBonus;
+		totalSystemMoney = tempTotalMon + techTreeScript.moneyPointBonus  + heroScript.heroMonBonus;
+		
+		turnInfoScript.RefreshPlanetPower();
 	}
 
 	public void CheckUnlockedTier()

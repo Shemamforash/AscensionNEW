@@ -4,6 +4,10 @@ using System.Collections;
 public class HeroScript : MasterScript 
 {
 	public string[] heroesInSystem = new string[3];
+	public string[] allLinkableSystems = new string[60];
+	public string linked = null;
+
+	public float heroSciBonus, heroIndBonus, heroMonBonus;
 
 	void Start()
 	{
@@ -21,9 +25,53 @@ public class HeroScript : MasterScript
 				President ();
 				break;
 
+			case "Merchant":
+				Merchant();
+				break;
+
 			default:
 				break;
 			}
+		}
+	}
+
+	public void AddMerchant()
+	{
+		for(int i = 0; i < 60; ++i)
+		{
+			if(turnInfoScript.systemList[i] == null)
+			{
+				continue;
+			}
+
+			string tempSystem = turnInfoScript.systemList[i].name;
+			
+			lineRenderScript = GameObject.Find (tempSystem).GetComponent<LineRenderScript>();
+			
+			if(lineRenderScript.ownedBy != null)
+			{
+				heroScript = GameObject.Find (tempSystem).GetComponent<HeroScript>();
+				
+				for(int j = 0; j < 3; ++j)
+				{
+					if(heroScript.heroesInSystem[j] == "Merchant")
+					{
+						allLinkableSystems[i] = tempSystem;
+					}
+				}
+			}
+		}
+	}
+
+	private void Merchant()
+	{
+		if(linked != null)
+		{
+			guiPlanScript = GameObject.Find (linked).GetComponent<GUISystemDataScript>();
+
+			heroSciBonus = guiPlanScript.tempTotalSci / 2;
+			heroIndBonus = guiPlanScript.tempTotalInd / 2;
+			heroMonBonus = guiPlanScript.tempTotalMon / 2;
 		}
 	}
 

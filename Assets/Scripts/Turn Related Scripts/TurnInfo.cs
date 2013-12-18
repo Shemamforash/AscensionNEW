@@ -22,13 +22,8 @@ public class TurnInfo : MasterScript
 	public string playerRace, homeSystem;
 	public int turn = 0, systemsInPlay = 0;
 
-	void Awake()
+	void Start()
 	{			
-		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
-		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
-		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
-
 		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
 
 		LoadPlanetData();
@@ -137,6 +132,13 @@ public class TurnInfo : MasterScript
 				continue;
 			}
 
+			lineRenderScript = system.GetComponent<LineRenderScript>();
+
+			if(lineRenderScript.ownedBy == null || lineRenderScript.ownedBy == "")
+			{
+				continue;
+			}
+
 			if(system != null)
 			{
 				guiPlanScript = system.GetComponent<GUISystemDataScript>();
@@ -144,7 +146,6 @@ public class TurnInfo : MasterScript
 				heroScript = system.GetComponent<HeroScript>();
 
 				techTreeScript.ActiveTechnologies();
-				//heroScript.CheckHeroesInSystem();
 				guiPlanScript.SystemSIMCounter();
 				guiPlanScript.CheckUnlockedTier();
 

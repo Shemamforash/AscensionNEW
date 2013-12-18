@@ -25,10 +25,6 @@ public class LineRenderScript : MasterScript
 
 	void Start()
 	{	
-		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
-		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
-
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
 
