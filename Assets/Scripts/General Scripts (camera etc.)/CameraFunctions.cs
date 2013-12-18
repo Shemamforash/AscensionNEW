@@ -19,11 +19,6 @@ public class CameraFunctions : MasterScript
 	private float updatedX, updatedY;
 	private GameObject thisObject;
 
-	void Awake()
-	{
-		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
-	}
-
 	void Update()
 	{
 		if(openMenu != true)
@@ -42,6 +37,7 @@ public class CameraFunctions : MasterScript
 			doubleClick = false;
 			mainGUIScript.spendMenu = false;
 			mainGUIScript.openImprovementList = false;
+			mainGUIScript.openMerchantConnectionMenu = false;
 		}
 	}
 

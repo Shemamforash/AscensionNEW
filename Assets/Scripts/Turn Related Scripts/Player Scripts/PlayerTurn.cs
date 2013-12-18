@@ -7,12 +7,9 @@ public class PlayerTurn : TurnInfo
 	public GameObject tempObject;
 	
 
-	void Awake()
+	void Start()
 	{
 		playerRace = null;
-		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
-		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
-		turnInfoScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<TurnInfo>();
 	}
 
 	void Update()
@@ -21,7 +18,7 @@ public class PlayerTurn : TurnInfo
 		{			
 			tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
 			
-			if(tempObject.tag == "StarSystem" && tempObject != null)
+			if(tempObject != null && tempObject.tag == "StarSystem")
 			{
 				guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
 				techTreeScript = tempObject.GetComponent<TechTreeScript>();

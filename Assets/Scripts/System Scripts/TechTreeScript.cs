@@ -28,8 +28,6 @@ public class TechTreeScript : MasterScript
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScript>();
-		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
-		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
 
 		LoadTechTree();
 	}
@@ -133,18 +131,28 @@ public class TechTreeScript : MasterScript
 
 		if(techTreeComplete[1,4,1] == "Built")
 		{
+			bool industryBonus = false;
+			bool scienceBonus = false;
+
 			foreach(GameObject connection in lineRenderScript.connections)
 			{
 				lineRenderScript = connection.GetComponent<LineRenderScript>();
 
-				if(lineRenderScript.ownedBy == "Selkies")
+				if(lineRenderScript.ownedBy == "Selkies" && industryBonus == false)
 				{
-					lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 					industryPercentBonus += 0.5f;
 					AddImprovementMessage ("+ 50% Industry from Selkies adjacency", 8);
-					break;
+					industryBonus = true;
+				}
+
+				if(lineRenderScript.ownedBy == "Nereides" && scienceBonus == false)
+				{
+					industryPercentBonus += 0.5f;
+					AddImprovementMessage ("+ 50% Science from Nereides adjacency", 9);
+					scienceBonus = true;
 				}
 			}
+			lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		}
 
 		if(techTreeComplete[2,1,1] == "Built") //Unionisation
