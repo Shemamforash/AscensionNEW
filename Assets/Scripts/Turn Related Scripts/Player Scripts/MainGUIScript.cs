@@ -6,9 +6,9 @@ public class MainGUIScript : MasterScript
 {
 	private Rect[] allPlanetsGUI, allButtonsGUI, allImprovementButtonsGUI; 
 	public GUISkin mySkin;
-	public bool spendMenu = false, hasColonised = false, openImprovementList = false, openMerchantConnectionMenu;
+	public bool spendMenu = false, hasColonised = false, openImprovementList = false;
 	public string resourceToSpend;
-	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, merchantMessage;
+	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace;
 	private int thisPlanet, selectedImprovement;
 	private float xLoc, yLoc;
 	private Vector2 scrollPosition = Vector2.zero;
@@ -24,7 +24,7 @@ public class MainGUIScript : MasterScript
 		{
 			guiPlanScript = playerTurnScript.tempObject.GetComponent<GUISystemDataScript>();
 			techTreeScript = playerTurnScript.tempObject.GetComponent<TechTreeScript>();
-			heroScript = playerTurnScript.tempObject.GetComponent<HeroScript>();
+			heroScript = playerTurnScript.tempObject.GetComponent<HeroScriptParent>();
 		}
 	}
 
@@ -87,16 +87,6 @@ public class MainGUIScript : MasterScript
 			industryStr = playerTurnScript.industry.ToString ();
 			moneyStr = playerTurnScript.money.ToString ();
 			GPString = playerTurnScript.GP.ToString ();
-
-			if(heroScript.linked == "" || heroScript.linked == null)
-			{
-				merchantMessage = "Unlinked";
-			}
-
-			else
-			{
-				merchantMessage = "Linked to " + heroScript.linked;
-			}
 
 			if(cameraFunctionsScript.openMenu == true)
 			{
@@ -363,45 +353,27 @@ public class MainGUIScript : MasterScript
 
 			#endregion
 
-			if(openMerchantConnectionMenu == true)
+			for(int i = 0; i < 3; ++i)
 			{
-				heroScript.AddMerchant();
+				string heroName;
 
-				if(GUI.Button (new Rect(Screen.width / 2 + 100.0f, Screen.height / 2 - 200.0f, 20.0f, 20.0f), "X"))
+				if(heroScript.heroesInSystem[i] == null)
 				{
-					openMerchantConnectionMenu = false;
+					heroName = "";
 				}
 
-				GUILayout.BeginArea (new Rect(Screen.width / 2 - 100.0f, Screen.height / 2 - 200.0f, 200.0f, 400.0f));
-
-				scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-
-				for(int i = 0; i < 60; ++i)
+				else
 				{
-					if(heroScript.allLinkableSystems[i] != "" && heroScript.allLinkableSystems[i] != playerTurnScript.tempObject.name)
+					heroName = heroScript.heroesInSystem[i].name;
+				}
+
+				if(GUI.Button(new Rect(Screen.width / 2 -350.0f, Screen.height / 2 + 500.0f, 200.0f, 40.0f), heroName))
+				{
+					if(heroScript.heroesInSystem[i].name == "Merchant")
 					{
-						if(GUILayout.Button (heroScript.allLinkableSystems[i], GUILayout.Height (40.0f)))
-						{
-							heroScript.linked = heroScript.allLinkableSystems[i];
-
-							heroScript = GameObject.Find (heroScript.allLinkableSystems[i]).GetComponent<HeroScript>();
-
-							heroScript.linked = playerTurnScript.tempObject.name;
-
-							openMerchantConnectionMenu = false;
-						}
+						heroGUIScript.openMerchantConnectionMenu = true;
 					}
 				}
-
-				GUILayout.EndScrollView();
-				
-				GUILayout.EndArea();
-			}
-
-			if(GUI.Button (new Rect(Screen.width / 2 - 700.0f, Screen.height / 2 - 400.0f, 150.0f, 40.0f), merchantMessage))
-			{
-				heroScript.heroesInSystem[0] = "Merchant";
-				openMerchantConnectionMenu = true;
 			}
 
 			GUI.Label (new Rect(Screen.width/2 - 700.0f, Screen.height / 2 + 400.0f, 100.0f, 40.0f), diplomacyScript.playerStates[1]);

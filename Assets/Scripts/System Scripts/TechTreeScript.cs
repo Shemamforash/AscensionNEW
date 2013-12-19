@@ -27,7 +27,7 @@ public class TechTreeScript : MasterScript
 	{
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
-		heroScript = gameObject.GetComponent<HeroScript>();
+		heroScript = gameObject.GetComponent<HeroScriptParent>();
 
 		LoadTechTree();
 	}
@@ -96,7 +96,7 @@ public class TechTreeScript : MasterScript
 		{
 			tempValue = 0.0f;
 
-			foreach(string hero in heroScript.heroesInSystem)
+			foreach(GameObject hero in heroScript.heroesInSystem)
 			{
 				if(hero == null)
 				{

@@ -32,12 +32,13 @@ public class CameraFunctions : MasterScript
 		
 		if(Input.GetKeyDown ("escape")) //Used to close all open menus, and to reset doubleclick
 		{
+			heroGUIScript.openMerchantConnectionMenu = false;
+			heroGUIScript.openHeroScreen = false;
 			coloniseMenu = false;
 			openMenu = false;
 			doubleClick = false;
 			mainGUIScript.spendMenu = false;
 			mainGUIScript.openImprovementList = false;
-			mainGUIScript.openMerchantConnectionMenu = false;
 		}
 	}
 

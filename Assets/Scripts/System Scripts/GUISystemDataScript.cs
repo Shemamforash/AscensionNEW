@@ -32,7 +32,7 @@ public class GUISystemDataScript : MasterScript
 	{
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
-		heroScript = gameObject.GetComponent<HeroScript>();
+		heroScript = gameObject.GetComponent<HeroScriptParent>();
 
 		LoadFile();		
 	}
