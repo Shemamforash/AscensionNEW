@@ -22,7 +22,7 @@ public class PlayerTurn : TurnInfo
 			{
 				guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
 				techTreeScript = tempObject.GetComponent<TechTreeScript>();
-				heroScript = tempObject.GetComponent<HeroScript>();
+				heroScript = tempObject.GetComponent<HeroScriptParent>();
 			}
 		}
 		

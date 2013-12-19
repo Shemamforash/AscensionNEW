@@ -143,7 +143,7 @@ public class TurnInfo : MasterScript
 			{
 				guiPlanScript = system.GetComponent<GUISystemDataScript>();
 				techTreeScript = system.GetComponent<TechTreeScript>();
-				heroScript = system.GetComponent<HeroScript>();
+				heroScript = system.GetComponent<HeroScriptParent>();
 
 				techTreeScript.ActiveTechnologies();
 				guiPlanScript.SystemSIMCounter();

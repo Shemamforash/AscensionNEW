@@ -27,12 +27,16 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public TechTreeScript techTreeScript;
 	[HideInInspector]
-	public HeroScript heroScript;
+	public HeroScriptParent heroScript;
 	[HideInInspector]
 	public DiplomacyControlScript diplomacyScript;
+	[HideInInspector]
+	public MerchantHeroScript merchantScript;
 
 	[HideInInspector]
 	public MainGUIScript mainGUIScript;
+	[HideInInspector]
+	public GUIHeroScreen heroGUIScript;
 
 	public void Awake()
 	{
@@ -43,6 +47,7 @@ public class MasterScript : MonoBehaviour
 		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 		diplomacyScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<DiplomacyControlScript>();
 		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
+		heroGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GUIHeroScreen>();
 
 	}
 }
