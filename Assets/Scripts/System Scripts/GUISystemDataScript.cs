@@ -124,7 +124,7 @@ public class GUISystemDataScript : MasterScript
 		{
 			for(int i = 0; i < 60; i ++)
 			{
-				if(turnInfoScript.systemList[i] == gameObject)
+				if(masterScript.systemList[i].systemObject == gameObject)
 				{
 					arrayPosition = i;
 					break;

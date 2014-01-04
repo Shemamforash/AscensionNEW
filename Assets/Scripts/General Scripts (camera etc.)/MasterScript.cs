@@ -41,9 +41,9 @@ public class MasterScript : MonoBehaviour
 	public GUIHeroScreen heroGUIScript;
 
 	[HideInInspector]
-	List<SystemInfo> systemList = new List<SystemInfo>();
+	public List<SystemInfo> systemList = new List<SystemInfo>();
 	[HideInInspector]
-	List<PlanetInfo> planetList = new List<PlanetInfo>();
+	public List<PlanetInfo> planetList = new List<PlanetInfo>();
 
 	public void Awake()
 	{
@@ -87,6 +87,8 @@ public class MasterScript : MonoBehaviour
 
 				system.systemName = typeReader.ReadLine();
 
+				system.systemObject = GameObject.Find (system.systemName);
+
 				system.systemSize = int.Parse (typeReader.ReadLine());
 				
 				for(int j = 0; j < system.systemSize; ++j)
@@ -96,25 +98,43 @@ public class MasterScript : MonoBehaviour
 					system.planetType.Add (typeReader.ReadLine ());
 					system.planetImprovementLevel.Add (0);
 
-					system.improvementSlots.Add (FindPlanetImprovementSlots(system.planetType[j]));
-
-					systemList.Add (system);
+					system.planetScience.Add (FindPlanetSIM(system.planetType[j], "Science"));
+					system.planetIndustry.Add (FindPlanetSIM(system.planetType[j], "Industry"));
+					system.planetMoney.Add (FindPlanetSIM(system.planetType[j], "Money"));
+					system.improvementSlots.Add ((int)FindPlanetSIM(system.planetType[j], "Improvement Slots"));
 				}
+
+				systemList.Add (system);
 			}
 		}
 	}
 
-	private int FindPlanetImprovementSlots(string planetType)
+	private float FindPlanetSIM(string planetType, string resourceType)
 	{
-		for(int j = 0; j < 12; ++j)
+		for(int i = 0; i < 12; ++i)
 		{
-			if(planetList[j].planetType == planetType)
+			if(planetList[i].planetType == planetType)
 			{
-				return planetList[j].improvementSlots;
+				if(resourceType == "ImprovementSlots")
+				{
+					return planetList[i].improvementSlots;
+				}
+				else if(resourceType == "Science")
+				{
+					return planetList[i].science;
+				}
+				else if(resourceType == "Industry")
+				{
+					return planetList[i].industry;
+				}
+				else if(resourceType == "Money")
+				{
+					return planetList[i].money;
+				}
 			}
 		}
 
-		return 0;
+		return 0.0f;
 	}
 }
 
@@ -127,10 +147,14 @@ public class PlanetInfo
 public class SystemInfo
 {
 	public string systemName, systemOwnedBy;
+	public GameObject systemObject;
 	public int systemSize;
 	public List<GameObject> heroesInSystem = new List<GameObject>();
 	public List<string> planetName = new List<string>();
 	public List<string> planetType = new List<string>();
+	public List<float> planetScience = new List<float>();
+	public List<float> planetIndustry = new List<float>();
+	public List<float> planetMoney = new List<float>();
 	public List<int> planetImprovementLevel = new List<int>();
 	public List<int> improvementSlots= new List<int>();
 }

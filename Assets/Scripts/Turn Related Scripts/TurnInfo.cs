@@ -11,8 +11,6 @@ public class TurnInfo : MasterScript
 	public string[,] planetRIM = new string[12,5];
 	public string[,] mostPowerfulPlanets = new string[211,3];
 	[HideInInspector]
-	public GameObject[] systemList = new GameObject[60];
-	[HideInInspector]
 	public GameObject[] ownedSystems = new GameObject[60];
 	public bool endTurn;
 	public Camera mainCamera;
@@ -24,27 +22,6 @@ public class TurnInfo : MasterScript
 
 	void Start()
 	{			
-		systemList = GameObject.FindGameObjectsWithTag("StarSystem");
-
-		LoadPlanetData();
-	}
-	
-	void LoadPlanetData() //Loads up planet stats into array
-	{
-		string text = " ";
-
-		using(StreamReader reader =  new StreamReader("PlanetRIMData.txt"))
-		{
-			for(int i = 0; i < 12; i++)
-			{
-				for(int j = 0; j < 5; j++)
-				{
-					text = reader.ReadLine();
-					planetRIM[i,j] = text;
-				}
-			}			
-		}
-
 		RefreshPlanetPower();
 	}
 
@@ -52,9 +29,9 @@ public class TurnInfo : MasterScript
 	{
 		savedIterator = 0;
 
-		foreach(GameObject system in systemList)
+		for(int i = 0; i < 60; i++)
 		{
-			guiPlanScript = system.GetComponent<GUISystemDataScript>();
+			guiPlanScript = masterScript.systemList[i].systemObject;
 			
 			guiPlanScript.UpdatePlanetPowerArray();
 		}
@@ -97,9 +74,9 @@ public class TurnInfo : MasterScript
 		
 		for(int i = 0; i < 60; i++) //Find selected system and set it to owned
 		{
-			if(turnInfoScript.systemList[i] == GameObject.Find (homeSystem))
+			if(masterScript.systemList[i].systemObject == GameObject.Find (homeSystem))
 			{
-				thisSystemArray[i] = turnInfoScript.systemList[i];
+				thisSystemArray[i] = masterScript.systemList[i].systemObject;
 
 				thisSystemArray[i].renderer.material = playerMaterial;
 

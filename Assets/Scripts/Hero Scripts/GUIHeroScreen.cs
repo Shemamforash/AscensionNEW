@@ -47,11 +47,11 @@ public class GUIHeroScreen : MasterScript
 			{
 				systemsWithHeroSlot[i] = null;
 
-				lineRenderScript = turnInfoScript.systemList[i].GetComponent<LineRenderScript>();
+				lineRenderScript = masterScript.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
 				if(lineRenderScript.ownedBy == playerTurnScript.playerRace)
 				{
-					heroScript = turnInfoScript.systemList[i].GetComponent<HeroScriptParent>();
+					heroScript = masterScript.systemList[i].systemObject.GetComponent<HeroScriptParent>();
 
 					for(int j = 0; j < 3; ++j)
 					{
@@ -61,7 +61,7 @@ public class GUIHeroScreen : MasterScript
 
 							--playerTurnScript.GP;
 
-							systemsWithHeroSlot[i] = turnInfoScript.systemList[i];
+							systemsWithHeroSlot[i] = masterScript.systemList[i].systemObject;
 
 							break;
 						}
