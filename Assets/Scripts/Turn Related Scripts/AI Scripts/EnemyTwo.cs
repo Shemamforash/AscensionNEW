@@ -25,8 +25,13 @@ public class EnemyTwo : AIBasicParent
 		
 		GP = raceGP;
 		
-		lineRenderScript = GameObject.Find(homeSystem).GetComponent<LineRenderScript>();
-		lineRenderScript.ownedBy = playerRace;
+		for(int i = 0;  i < 60; ++i)
+		{
+			if(masterScript.systemList[i].systemName == homeSystem)
+			{
+				masterScript.systemList[i].systemOwnedBy = playerRace;
+			}
+		}
 		
 		StartSystemPlanetColonise(materialInUse, homeSystem, ownedSystems);
 	}

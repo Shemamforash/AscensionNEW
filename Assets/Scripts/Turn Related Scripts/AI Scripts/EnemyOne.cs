@@ -2,14 +2,7 @@
 using System.Collections;
 
 public class EnemyOne : AIBasicParent
-{
-	void Start()
-	{
-		turnInfoScript = gameObject.GetComponent<TurnInfo>();
-		enemyOneTurnScript = gameObject.GetComponent<EnemyOne>();
-		playerTurnScript = gameObject.GetComponent<PlayerTurn>();
-	}
-	
+{	
 	public void SetRace()
 	{
 		if(playerTurnScript.playerRace == "Humans" || playerTurnScript.playerRace == "Selkies")
@@ -31,9 +24,14 @@ public class EnemyOne : AIBasicParent
 		turnInfoScript.systemsInPlay++;
 		
 		GP = raceGP;
-		
-		lineRenderScript = GameObject.Find(homeSystem).GetComponent<LineRenderScript>();
-		lineRenderScript.ownedBy = playerRace;
+
+		for(int i = 0;  i < 60; ++i)
+		{
+			if(masterScript.systemList[i].systemName == homeSystem)
+			{
+				masterScript.systemList[i].systemOwnedBy = playerRace;
+			}
+		}
 
 		StartSystemPlanetColonise(materialInUse, homeSystem, ownedSystems);
 	}

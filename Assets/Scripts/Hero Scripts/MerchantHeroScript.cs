@@ -21,22 +21,22 @@ public class MerchantHeroScript : HeroScriptParent
 	{
 		for(int i = 0; i < 60; ++i)
 		{
-			if(turnInfoScript.systemList[i] == null)
+			if(masterScript.systemList[i].systemObject == null)
 			{
 				continue;
 			}
 			
-			string tempSystem = turnInfoScript.systemList[i].name;
+			GameObject tempSystem = masterScript.systemList[i].systemObject;
 			
-			lineRenderScript = GameObject.Find (tempSystem).GetComponent<LineRenderScript>();
+			lineRenderScript = tempSystem.GetComponent<LineRenderScript>();
 			
 			if(lineRenderScript.ownedBy != null && linked == "")
 			{
-				heroScript = GameObject.Find (tempSystem).GetComponent<HeroScriptParent>();
+				heroScript = tempSystem.GetComponent<HeroScriptParent>();
 				
 				for(int j = 0; j < 3; ++j)
 				{
-					if(heroScript.heroesInSystem[j].name == "Merchant")
+					if(masterScript.systemList[i].heroesInSystem[j] == "Merchant")
 					{
 						heroScript.allLinkableSystems[i] = tempSystem;
 					}

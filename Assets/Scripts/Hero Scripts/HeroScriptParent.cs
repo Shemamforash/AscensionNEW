@@ -3,9 +3,7 @@ using System.Collections;
 
 public class HeroScriptParent : MasterScript 
 {
-	public GameObject[] heroesInSystem = new GameObject[3];
-	public string[] allLinkableSystems = new string[60];
-
+	public GameObject[] allLinkableSystems = new GameObject[60];
 	public float heroSciBonus, heroIndBonus, heroMonBonus;
 
 	void Start()
