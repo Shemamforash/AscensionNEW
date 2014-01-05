@@ -10,7 +10,7 @@ public class CameraFunctions : MasterScript
 	public Transform cameraMain;
 	public float zoomSpeed, minZoom, maxZoom, panSpeed, zPosition;
 	[HideInInspector]
-	public string selectedSystem = "";
+	public GameObject selectedSystem;
 	[HideInInspector]
 	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false;
 	
@@ -33,7 +33,6 @@ public class CameraFunctions : MasterScript
 		if(Input.GetKeyDown ("escape")) //Used to close all open menus, and to reset doubleclick
 		{
 			heroGUIScript.openMerchantConnectionMenu = false;
-			heroGUIScript.openHeroScreen = false;
 			coloniseMenu = false;
 			openMenu = false;
 			doubleClick = false;
@@ -55,7 +54,7 @@ public class CameraFunctions : MasterScript
 			
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
-				selectedSystem = hit.collider.name;
+				selectedSystem = hit.collider.gameObject;
 				coloniseMenu = true; //Shows the colonise button on single click
 				
 				if(doubleClick == true)
@@ -156,15 +155,13 @@ public class CameraFunctions : MasterScript
 
 	public void CentreCamera() //Used to centre the camera over the last selected object, or the home planet if on first turn.
 	{
-		GameObject planetObject = GameObject.Find (selectedSystem);
-		
 		if(Input.GetKeyDown("f"))
 		{
 			moveCamera = true;
 			
 			timer = Time.time;
 			
-			thisObject = planetObject;
+			thisObject = selectedSystem;
 		}
 		
 		if(moveCamera == true)
