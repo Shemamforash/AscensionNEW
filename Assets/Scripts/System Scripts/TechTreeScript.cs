@@ -96,12 +96,15 @@ public class TechTreeScript : MasterScript
 		{
 			tempValue = 0.0f;
 
-			foreach(GameObject hero in heroScript.heroesInSystem)
+			int i = RefreshCurrentPlanet();
+
+			for(int j = 0; j < 3; ++j)
 			{
-				if(hero == null)
+				if(masterScript.systemList[i].heroesInSystem[j] == null)
 				{
-					break;
+					continue;
 				}
+
 				else
 				{
 					moneyPointBonus += 10.0f;

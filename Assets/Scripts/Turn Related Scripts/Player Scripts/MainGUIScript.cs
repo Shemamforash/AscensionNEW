@@ -353,23 +353,30 @@ public class MainGUIScript : MasterScript
 
 			#endregion
 
+			if(GUI.Button (new Rect(200.0f, Screen.height - 100.0f, 200.0f, 50.0f), "Purchase Hero: 1GP"))
+			{
+				heroGUIScript.CheckIfCanHire(cameraFunctionsScript.selectedSystem);
+			}
+
 			for(int i = 0; i < 3; ++i)
 			{
 				string heroName;
 
-				if(heroScript.heroesInSystem[i] == null)
+				int selectedSystem = RefreshCurrentPlanet();
+
+				if(masterScript.systemList[selectedSystem].heroesInSystem[i] == null)
 				{
 					heroName = "";
 				}
 
 				else
 				{
-					heroName = heroScript.heroesInSystem[i].name;
+					heroName = masterScript.systemList[selectedSystem].heroesInSystem[i].name;
 				}
 
 				if(GUI.Button(new Rect(Screen.width / 2 -350.0f, Screen.height / 2 + 500.0f, 200.0f, 40.0f), heroName))
 				{
-					if(heroScript.heroesInSystem[i].name == "Merchant")
+					if(heroName == "Merchant")
 					{
 						heroGUIScript.openMerchantConnectionMenu = true;
 					}

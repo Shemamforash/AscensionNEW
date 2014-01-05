@@ -16,7 +16,7 @@ public class PlayerTurn : TurnInfo
 	{
 		if(Input.GetMouseButtonDown(0) && cameraFunctionsScript.selectedSystem != null) //Assigns scripts to selected system.
 		{			
-			tempObject = GameObject.Find (cameraFunctionsScript.selectedSystem);
+			tempObject = cameraFunctionsScript.selectedSystem;
 			
 			if(tempObject != null && tempObject.tag == "StarSystem")
 			{
@@ -62,7 +62,7 @@ public class PlayerTurn : TurnInfo
 
 		GP = raceGP;
 
-		cameraFunctionsScript.selectedSystem = homeSystem; //Set the selected system
+		cameraFunctionsScript.selectedSystem = GameObject.Find (homeSystem); //Set the selected system
 
 		foreach(GameObject system in ownedSystems)
 		{
