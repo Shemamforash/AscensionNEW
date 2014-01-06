@@ -4,7 +4,7 @@ using System.Collections;
 public class LineRenderScript : MasterScript 
 {
 	[HideInInspector]
-	public bool showText, owned = false;
+	public bool showText, owned;
 	public GUITextScript guiTextScript;
 	[HideInInspector]
 	public GUIText activeGUI;
@@ -15,87 +15,57 @@ public class LineRenderScript : MasterScript
 	public Vector3[,] lineRotationsScalePosition = new Vector3[4,3];
 	public GameObject quadA, humansOwnedQuad, selkiesOwnedQuad, nereidesOwnedQuad;
 	[HideInInspector]
-	public int i = 0;
+	public int thisSystem;
 	[HideInInspector]
 	private GameObject objectB;
-
-	private GameObject[] tempSystemArray = new GameObject[60];
-
-	public string ownedBy = null;
 
 	void Start()
 	{	
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
 
-		foreach (GameObject connectedObject in connections)
+		for(int i = 0; i < 4; ++i)
 		{
-			if(connectedObject == null)
+			if(connections[i] == null)
 			{
-				break;
+				continue;
 			}
-			
-			objectB = connectedObject;
 
-			OrientationBuild();
+			objectB = connections[i];
+
+			OrientationBuild(i);
 		}
 
 		BuildLine(quadA);
+
+		thisSystem = masterScript.RefreshCurrentSystem(gameObject);
 	}
 
-	void Update()
+	public void SetRaceLineColour(string thisRace)
 	{
-		if(ownedBy != "" && owned == false)
-		{ 
-			GameObject quad = null;
-			string thisRace = null;
+		GameObject quad = null;
 
-			if(ownedBy == playerTurnScript.playerRace)
-			{
-				tempSystemArray = playerTurnScript.ownedSystems;
-				thisRace = playerTurnScript.playerRace;
-			}
-
-			if(ownedBy == enemyOneTurnScript.playerRace)
-			{
-				tempSystemArray = enemyOneTurnScript.ownedSystems;
-				thisRace = enemyOneTurnScript.playerRace;
-			}
-
-			if(ownedBy == enemyTwoTurnScript.playerRace)
-			{
-				tempSystemArray = enemyTwoTurnScript.ownedSystems;
-				thisRace = enemyTwoTurnScript.playerRace;
-			}
-
-			if(thisRace == "Humans")
-			{
-				quad = humansOwnedQuad;
-			}
-			if(thisRace == "Selkies")
-			{
-				quad = selkiesOwnedQuad;
-			}
-			if(thisRace == "Nereides")
-			{
-				quad = nereidesOwnedQuad;
-			}
-
-			foreach(GameObject system in tempSystemArray)
-			{
-				if(gameObject == system && system != null)
-				{
-					BuildLine(quad);
-					owned = true;
-					break;
-				}
-			}
+		if(thisRace == "Humans")
+		{
+			quad = humansOwnedQuad;
 		}
+		if(thisRace == "Selkies")
+		{
+			quad = selkiesOwnedQuad;
+		}
+		if(thisRace == "Nereides")
+		{
+			quad = nereidesOwnedQuad;
+		}
+	
+		BuildLine(quad);
+
+		owned = true;
 	}
 
 	void BuildLine(GameObject aQuad)
 	{
-		for(i = 0; i < 4; ++i)
+		for(int i = 0; i < 4; ++i)
 		{
 			if(owned == false)
 			{
@@ -118,7 +88,7 @@ public class LineRenderScript : MasterScript
 		}
 	}
 
-	void OrientationBuild()
+	void OrientationBuild(int i)
 	{
 		float distance = Vector3.Distance(gameObject.transform.position, objectB.transform.position);
 		
@@ -142,15 +112,13 @@ public class LineRenderScript : MasterScript
 		lineRotationsScalePosition[i,1] = scale;
 		
 		lineRotationsScalePosition[i,2] = midPoint;
-
-		++i;
 	}
 		
 	void OnMouseEnter()
 	{
 		guiTextScript.highlightedSystemName = gameObject.name;
 
-		string systemSize = guiPlanScript.numPlanets.ToString ();
+		string systemSize = masterScript.systemList[thisSystem].systemSize.ToString ();
 
 		guiTextScript.highlightedSystemSize = systemSize;
 

@@ -3,8 +3,10 @@ using System.Collections;
 
 public class HeroScriptParent : MasterScript 
 {
-	public GameObject[] allLinkableSystems = new GameObject[60];
-	public float heroSciBonus, heroIndBonus, heroMonBonus;
+	//This is the basic hero level, with general effects
+	public GameObject heroLocation;
+	public int currentLevel = 1;
+	public float heroSciBonus = 10, heroIndBonus = 10, heroMonBonus = 10;
 
 	void Start()
 	{
@@ -12,31 +14,17 @@ public class HeroScriptParent : MasterScript
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 	}
 
-	public void CheckHeroesInSystem()
+	public void LevelUp()
 	{
-		for(int i = 0; i < 3; ++i)
+		if(playerTurnScript.GP > 0)
 		{
-			if(heroesInSystem[i] == null)
-			{
-				continue;
-			}
-
-			if(heroesInSystem[i].name == "Merchant")
-			{
-				merchantScript = heroesInSystem[i].GetComponent<MerchantHeroScript>();
-				merchantScript.Merchant();
-				continue;
-			}
-
-			if(heroesInSystem[i].name == "President")
-			{
-				President ();
-				continue;
-			}
+			--playerTurnScript.GP;
+			heroGUIScript.openHeroLevellingScreen = true;
+			heroGUIScript.selectedHero = gameObject;
 		}
 	}
 
-	private void President()
+	/*private void President()
 	{
 		techTreeScript.sciencePercentBonus += 0.05f;
 		techTreeScript.industryPercentBonus += 0.05f;
@@ -73,5 +61,5 @@ public class HeroScriptParent : MasterScript
 				}
 			}
 		}
-	}
+	}*/
 }

@@ -3,7 +3,6 @@ using System.Collections;
 
 public class PlayerTurn : TurnInfo
 {
-	public string playerHomeSystem;
 	public GameObject tempObject;
 	
 
@@ -29,14 +28,10 @@ public class PlayerTurn : TurnInfo
 		cameraFunctionsScript.CentreCamera(); //Checks if camera needs centreing
 	}
 
-	public void ImproveButtonClick(int i)
+	public void ImproveButtonClick(int i, int j)
 	{
-		int q = int.Parse(guiPlanScript.planNameOwnImprov[i,2]);
-		
-		q++;
-		
-		guiPlanScript.planNameOwnImprov[i,2] = (q).ToString ();
-		
+		++masterScript.systemList[i].planetImprovementLevel[j];
+
 		if(mainGUIScript.resourceToSpend == "Industry")
 		{
 			industry -= (int)guiPlanScript.improvementCost;
@@ -53,12 +48,16 @@ public class PlayerTurn : TurnInfo
 		PickRace ();
 
 		turnInfoScript.systemsInPlay++;
+		
+		int i = masterScript.RefreshCurrentSystem(GameObject.Find(homeSystem));
 
-		lineRenderScript = GameObject.Find(homeSystem).GetComponent<LineRenderScript>();
+		masterScript.systemList[i].systemOwnedBy = playerRace;
 
-		lineRenderScript.ownedBy = playerRace;
+		lineRenderScript = masterScript.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
-		StartSystemPlanetColonise(materialInUse, homeSystem, ownedSystems);
+		lineRenderScript.SetRaceLineColour(playerRace);
+
+		StartSystemPlanetColonise(materialInUse, homeSystem);
 
 		GP = raceGP;
 
