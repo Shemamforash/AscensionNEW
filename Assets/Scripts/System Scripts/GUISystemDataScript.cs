@@ -16,14 +16,11 @@ public class GUISystemDataScript : MasterScript
 	[HideInInspector]
 	public string[] allPlanetsInfo = new string[6];	//Unique to object
 	[HideInInspector]
-	public string[,] planNameOwnImprov = new string[6,4]; //Unique to object
-	[HideInInspector]
 	public bool canImprove, foundPlanetData, isOkToColonise;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM, tempTotalSci, tempTotalInd, tempTotalMon;
 	public float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
-	
-	private string text = " ";
+
 	private GameObject[] systemConnections = new GameObject[4];
 
 	private TurnInfo playerOwnedSystem;
@@ -33,69 +30,25 @@ public class GUISystemDataScript : MasterScript
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent>();
-
-		LoadFile();		
 	}
 
 	public void CheckOwnership()
 	{
-		if(lineRenderScript.ownedBy != null && playerOwnedSystem == null)
+		int i = masterScript.RefreshCurrentSystem(gameObject);
+
+		if(masterScript.systemList[i].systemOwnedBy != null && playerOwnedSystem == null)
 		{
-			if(lineRenderScript.ownedBy == playerTurnScript.playerRace)
+			if(masterScript.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
 			{
 				playerOwnedSystem = playerTurnScript;
 			}
-			if(lineRenderScript.ownedBy == enemyOneTurnScript.playerRace)
+			if(masterScript.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace)
 			{
 				playerOwnedSystem = enemyOneTurnScript;
 			}
-			if(lineRenderScript.ownedBy == enemyTwoTurnScript.playerRace)
+			if(masterScript.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace)
 			{
 				playerOwnedSystem = enemyTwoTurnScript;
-			}
-		}
-	}
-
-	private void LoadFile() //This fills the systems array with all the planets in the system, whether they are owned, and their improvement level
-	{
-		using(StreamReader reader =  new StreamReader("SystemTypeData.txt"))
-		{
-			while(text != null)
-			{
-				text = reader.ReadLine();
-			
-				if(text == gameObject.name)
-				{		
-					text = reader.ReadLine();
-			
-					numPlanets = int.Parse (text);
-			
-					for(int i = 0; i < numPlanets; i++)
-					{
-						text = reader.ReadLine();
-					
-						planNameOwnImprov[i,0] = text;
-						
-						planNameOwnImprov[i,1] = "No";
-						
-						planNameOwnImprov[i,2] = "0";
-
-						FindPlanetImprovementSlots(i);
-					}
-				
-					break;
-				}
-			}
-		}
-	}
-
-	private void FindPlanetImprovementSlots(int thisInt)
-	{
-		for(int j = 0; j < 12; ++j)
-		{
-			if(planNameOwnImprov[thisInt, 0] == turnInfoScript.planetRIM[j, 0])
-			{
-				planNameOwnImprov[thisInt, 3] = turnInfoScript.planetRIM[j, 4];
 			}
 		}
 	}
@@ -105,8 +58,6 @@ public class GUISystemDataScript : MasterScript
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		
 		systemConnections = lineRenderScript.connections;
-
-		int arrayPosition = 0;
 
 		if(thisPlayer.playerRace == playerTurnScript.playerRace)
 		{
@@ -126,24 +77,23 @@ public class GUISystemDataScript : MasterScript
 			{
 				if(masterScript.systemList[i].systemObject == gameObject)
 				{
-					arrayPosition = i;
+					masterScript.systemList[i].systemOwnedBy = thisPlayer.playerRace;
+
+					lineRenderScript = masterScript.systemList[i].systemObject.GetComponent<LineRenderScript>();
+
+					lineRenderScript.SetRaceLineColour(playerTurnScript.playerRace);
+
+					gameObject.renderer.material = thisPlayer.materialInUse;
+
+					thisPlayer.GP -= 1;
+					
+					++turnInfoScript.systemsInPlay;
+					
+					cameraFunctionsScript.coloniseMenu = false;
+
 					break;
 				}
 			}
-
-			thisPlayer.ownedSystems[arrayPosition] = gameObject;
-			
-			lineRenderScript.ownedBy = thisPlayer.playerRace;
-			
-			gameObject.renderer.material = thisPlayer.materialInUse;
-			
-			thisPlayer.GP -= 1;
-
-			++turnInfoScript.systemsInPlay;
-			
-			cameraFunctionsScript.coloniseMenu = false;
-			
-			planNameOwnImprov[0,1] = "Yes";
 
 			CheckOwnership();
 		}
@@ -151,19 +101,28 @@ public class GUISystemDataScript : MasterScript
 
 	void PlayerColoniseSystem(GameObject[] connections)
 	{
-		foreach(GameObject connection in connections)
+		for(int i = 0; i < 4; ++i)
 		{
-			if(connection == null)
+			if(connections[i] == null)
 			{
 				break;
 			}
 
-			lineRenderScript = connection.GetComponent<LineRenderScript>();
+			int j = masterScript.RefreshCurrentSystem(connections[i]);
 
-			if(lineRenderScript.ownedBy == playerTurnScript.playerRace)
+			for(int k = 0; k < 60; ++k)
+			{
+				if(masterScript.systemList[k].systemName == "Sol")
+				{
+					Debug.Log(masterScript.systemList[k].systemOwnedBy);
+				}
+			}
+
+			if(masterScript.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
 			{
 				isOkToColonise = true;
 			}
+
 			else
 			{
 				continue;
@@ -171,40 +130,34 @@ public class GUISystemDataScript : MasterScript
 		}
 	}
 
-	public void SystemSIMCounter() //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
+	public void SystemSIMCounter(int i) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{				
 		tempTotalSci = 0.0f;
 		tempTotalInd = 0.0f;
 		tempTotalMon = 0.0f;
 
-		for(int n = 0; n < numPlanets; ++n)
+		for(int j = 0; j < masterScript.systemList[i].systemSize; ++j)
 		{
-			if(planNameOwnImprov[n,0] != null && planNameOwnImprov[n,1] == "Yes")
+			if(masterScript.systemList[i].planetColonised[j] == true)
 			{
-				string planetType = planNameOwnImprov[n,0];
+				string planetType = masterScript.systemList[i].planetType[j];
 
-				improvementNumber = int.Parse (planNameOwnImprov[n,2]);
+				improvementNumber = masterScript.systemList[i].planetImprovementLevel[j];
 
 				CheckImprovement();
 				
-				for(int j = 0; j < 12; ++j)
-				{
-					if(turnInfoScript.planetRIM[j,0] == planetType)
-					{
-						tempSci = float.Parse(turnInfoScript.planetRIM[j,1]); //Need to sort out variable types, too much casting
-						tempInd = float.Parse(turnInfoScript.planetRIM[j,2]);
-						tempMon = float.Parse(turnInfoScript.planetRIM[j,3]);
+				tempSci = masterScript.systemList[i].planetScience[j]; //Need to sort out variable types, too much casting
+				tempInd = masterScript.systemList[i].planetIndustry[j];
+				tempMon = masterScript.systemList[i].planetMoney[j];
 
-						techTreeScript.planetToCheck = planetType;
+				techTreeScript.planetToCheck = planetType;
 
-						techTreeScript.CheckPlanets();
-					}
+				techTreeScript.CheckPlanets();
 
-					allPlanetsInfo[n] = gameObject.name + " " + (n+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-						+ ((int)(tempSci * resourceBonus * playerOwnedSystem.raceScience)).ToString() + "\n" 
-						+ ((int)(tempInd * resourceBonus * playerOwnedSystem.raceIndustry)).ToString() + "\n" 
-						+ ((int)(tempMon * resourceBonus * playerOwnedSystem.raceMoney)).ToString();
-				}
+				allPlanetsInfo[i] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
+					+ ((int)(tempSci * resourceBonus * playerOwnedSystem.raceScience)).ToString() + "\n" 
+					+ ((int)(tempInd * resourceBonus * playerOwnedSystem.raceIndustry)).ToString() + "\n" 
+					+ ((int)(tempMon * resourceBonus * playerOwnedSystem.raceMoney)).ToString();
 
 				tempTotalSci += tempSci * techTreeScript.sciencePercentBonus * resourceBonus * playerOwnedSystem.raceScience;
 				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * playerOwnedSystem.raceIndustry;
@@ -212,7 +165,7 @@ public class GUISystemDataScript : MasterScript
 			}
 		}
 
-		heroScript.CheckHeroesInSystem();
+		//heroGUIScript.CheckHeroesInSystem(); need to include heroscript
 
 		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus + heroScript.heroSciBonus;
 		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus  + heroScript.heroIndBonus;
@@ -239,34 +192,21 @@ public class GUISystemDataScript : MasterScript
 		}
 	}
 
-	public void UpdatePlanetPowerArray()
+	public void UpdatePlanetPowerArray(int k)
 	{
 		for(int i = 0; i < numPlanets; ++i)
 		{
 			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 0] = gameObject.name;
 			
 			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 1] = i.ToString();
+				
+			improvementNumber = masterScript.systemList[k].planetImprovementLevel[i];
 			
-			for(int j = 0; j < 12; ++j)
-			{
-				if(turnInfoScript.planetRIM[j, 0] == planNameOwnImprov[i, 0])
-				{								
-					improvementNumber = int.Parse (planNameOwnImprov[i, 2]);
-					
-					CheckImprovement();
-					
-					float tempSciInt = float.Parse (turnInfoScript.planetRIM[j,1]); 
-
-					float tempIndInt = float.Parse (turnInfoScript.planetRIM[j,2]); 
-					float tempMonInt = float.Parse (turnInfoScript.planetRIM[j,3]); 
-					
-					float tempInt = tempSciInt + tempIndInt + tempMonInt;
-					
-					turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 2] = tempInt.ToString();
-					
-					break;
-				}
-			}
+			CheckImprovement();
+			
+			float tempInt = masterScript.systemList[k].planetScience[i] + masterScript.systemList[k].planetIndustry[i] + masterScript.systemList[k].planetMoney[i];
+			
+			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 2] = tempInt.ToString();
 
 			++turnInfoScript.savedIterator;
 		}

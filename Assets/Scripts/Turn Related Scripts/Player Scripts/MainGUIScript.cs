@@ -9,9 +9,9 @@ public class MainGUIScript : MasterScript
 	public bool spendMenu = false, hasColonised = false, openImprovementList = false;
 	public string resourceToSpend;
 	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace;
-	private int thisPlanet, selectedImprovement;
+	private int selectedSystem, selectedPlanet, selectedImprovement;
 	private float xLoc, yLoc;
-	private Vector2 scrollPosition = Vector2.zero;
+	private Vector2 scrollPositionA = Vector2.zero, scrollPositionB = Vector2.zero;
 
 	void Start()
 	{
@@ -73,7 +73,7 @@ public class MainGUIScript : MasterScript
 	private void EndTurnFunction()
 	{
 		turnInfoScript.turn++;
-		playerTurnScript.TurnEnd (playerTurnScript.ownedSystems);
+		playerTurnScript.TurnEnd (playerTurnScript);
 		enemyOneTurnScript.Expand(enemyOneTurnScript);
 		enemyTwoTurnScript.Expand(enemyTwoTurnScript);
 	}
@@ -87,6 +87,7 @@ public class MainGUIScript : MasterScript
 			industryStr = playerTurnScript.industry.ToString ();
 			moneyStr = playerTurnScript.money.ToString ();
 			GPString = playerTurnScript.GP.ToString ();
+			selectedSystem = masterScript.RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 
 			if(cameraFunctionsScript.openMenu == true)
 			{
@@ -98,7 +99,7 @@ public class MainGUIScript : MasterScript
 
 	private void CheckPlanetImprovement(int i)
 	{
-		guiPlanScript.improvementNumber = int.Parse (guiPlanScript.planNameOwnImprov[i,2]);
+		guiPlanScript.improvementNumber = masterScript.systemList[selectedSystem].planetImprovementLevel[i];
 		
 		guiPlanScript.CheckImprovement();
 		
@@ -112,7 +113,7 @@ public class MainGUIScript : MasterScript
 			cost = "Improve Cost: " + guiPlanScript.improvementCost;
 		}
 		
-		if(guiPlanScript.planNameOwnImprov[i,1] == "No")
+		if(masterScript.systemList[selectedSystem].planetColonised[i] == false)
 		{
 			cost = "Colonise: 1 GP";
 		}
@@ -192,7 +193,7 @@ public class MainGUIScript : MasterScript
 			
 			if(guiPlanScript.foundPlanetData == false)
 			{
-				guiPlanScript.SystemSIMCounter();
+				guiPlanScript.SystemSIMCounter(selectedSystem);
 				guiPlanScript.foundPlanetData = true;
 			}
 			#endregion
@@ -200,14 +201,14 @@ public class MainGUIScript : MasterScript
 			#region settingupbutton			
 			GUI.Label(new Rect (Screen.width/2 - 500.0f, Screen.height/2 - 350.0f, 100.0f, 100.0f), dataSIMString);
 			
-			for(int i = 0; i < guiPlanScript.numPlanets; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
+			for(int i = 0; i < masterScript.systemList[selectedSystem].systemSize; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
 			{	
 				CheckPlanetImprovement(i);
 
-				if(GUI.Button(allButtonsGUI[i], cost) && guiPlanScript.canImprove == true )
+				if(GUI.Button(allButtonsGUI[i], cost) && masterScript.systemList[selectedSystem].planetImprovementLevel[i] < 3)
 				{	
 					spendMenu = true;
-					thisPlanet = i;
+					selectedPlanet = i;
 					indSpend = guiPlanScript.improvementCost + " Industry";
 					monSpend = guiPlanScript.improvementCost * 2 + " Money";
 				}
@@ -217,14 +218,14 @@ public class MainGUIScript : MasterScript
 					openImprovementList = true;
 					xLoc = allImprovementButtonsGUI[i].xMax;
 					yLoc = allImprovementButtonsGUI[i].yMax;
-					thisPlanet = i;
+					selectedPlanet = i;
 				}
 
 				GUI.Label (allPlanetsGUI[i], guiPlanScript.allPlanetsInfo[i]);
 
 				GUILayout.BeginArea(new Rect(allImprovementButtonsGUI[i].x, Screen.height / 2 + 100.0f, 200.0f, 400.0f));
 
-				for(int j = 0; j < int.Parse (guiPlanScript.planNameOwnImprov[i,3]); ++j)
+				for(int j = 0; j < masterScript.systemList[selectedSystem].improvementSlots[i]; ++j)
 				{
 					GUILayout.Label (techTreeScript.improvementsOnPlanet[i,j], GUILayout.Height(50.0f));
 				}
@@ -238,9 +239,9 @@ public class MainGUIScript : MasterScript
 			{
 				GUI.Box (new Rect(Screen.width/2 - 100.0f, Screen.height/2 - 50.0f, 200.0f, 75.0f), "Resource to Spend:");	
 
-				if(guiPlanScript.planNameOwnImprov[thisPlanet, 1] == "Yes")
+				if(masterScript.systemList[selectedSystem].planetColonised[selectedPlanet] == true)
 				{
-					guiPlanScript.improvementNumber = int.Parse (guiPlanScript.planNameOwnImprov[thisPlanet,2]);
+					guiPlanScript.improvementNumber = masterScript.systemList[selectedSystem].planetImprovementLevel[selectedPlanet];
 
 					guiPlanScript.CheckImprovement();
 
@@ -248,24 +249,23 @@ public class MainGUIScript : MasterScript
 					{
 						resourceToSpend = "Industry";
 						spendMenu = false;
-						playerTurnScript.ImproveButtonClick(thisPlanet);
+						playerTurnScript.ImproveButtonClick(selectedSystem, selectedPlanet);
 					}
 
 					if(GUI.Button (new Rect(Screen.width/2 + 2.5f, Screen.height/2 - 15.0f, 92.5f, 35.0f), monSpend) && playerTurnScript.money >= (guiPlanScript.improvementCost * 2))
 					{
 						resourceToSpend = "Money";
 						spendMenu = false;
-						playerTurnScript.ImproveButtonClick(thisPlanet);
+						playerTurnScript.ImproveButtonClick(selectedSystem, selectedPlanet);
 					}
 				}
 
-				if(guiPlanScript.planNameOwnImprov[thisPlanet, 1] == "No")
+				if(masterScript.systemList[selectedSystem].planetColonised[selectedPlanet] == false)
 				{
-					
 					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 190.0f, 35.0f), "1 GP") && playerTurnScript.GP > 0)
 					{
 						playerTurnScript.GP -= 1;
-						guiPlanScript.planNameOwnImprov[thisPlanet, 1] = "Yes";
+						masterScript.systemList[selectedSystem].planetColonised[selectedPlanet] = true;
 						++playerTurnScript.planetsColonisedThisTurn;
 						hasColonised = true;
 						spendMenu = false;
@@ -277,7 +277,7 @@ public class MainGUIScript : MasterScript
 					spendMenu = false;
 				}
 
-				guiPlanScript.SystemSIMCounter();
+				guiPlanScript.SystemSIMCounter(selectedSystem);
 			}
 			#endregion
 			
@@ -291,7 +291,7 @@ public class MainGUIScript : MasterScript
 
 				GUILayout.BeginArea(new Rect(xLoc, yLoc, 200.0f, 400.0f));
 
-				scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+				scrollPositionA = GUILayout.BeginScrollView(scrollPositionA);
 
 				for(int i = 0; i <= techTreeScript.techTier; ++i)
 				{
@@ -307,20 +307,14 @@ public class MainGUIScript : MasterScript
 						if(GUILayout.Button(techBuildButtonText, GUILayout.Height(40.0f)))
 						{
 							techTreeScript.ImproveSystem(i,j);
+
 							if(techTreeScript.techTreeComplete[i,j,1] == "Built")
 							{
-								for(int k = 0; k < 4; k++)
-								{
-									bool improved = false;
-									
-									if(techTreeScript.improvementsOnPlanet[thisPlanet, k] == null)
+								for(int k = 0; k < masterScript.systemList[selectedSystem].improvementSlots[selectedPlanet]; k++)
+								{									
+									if(techTreeScript.improvementsOnPlanet[selectedPlanet, k] == null)
 									{
-										techTreeScript.improvementsOnPlanet[thisPlanet, k] = techTreeScript.techTreeComplete[i,j,0];
-										improved = true;
-									}
-									
-									if(improved == true)
-									{
+										techTreeScript.improvementsOnPlanet[selectedPlanet, k] = techTreeScript.techTreeComplete[i,j,0];
 										break;
 									}
 								}
@@ -337,7 +331,7 @@ public class MainGUIScript : MasterScript
 			
 			GUILayout.BeginArea (new Rect(Screen.width / 2 + 750.0f, Screen.height / 2 - 200.0f, 200.0f, 400.0f));
 
-			scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+			scrollPositionB = GUILayout.BeginScrollView(scrollPositionB);
 
 			for(int i = 0; i < 23; ++i)
 			{
@@ -361,8 +355,6 @@ public class MainGUIScript : MasterScript
 			for(int i = 0; i < 3; ++i)
 			{
 				string heroName;
-
-				int selectedSystem = RefreshCurrentPlanet();
 
 				if(masterScript.systemList[selectedSystem].heroesInSystem[i] == null)
 				{

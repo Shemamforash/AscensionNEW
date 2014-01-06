@@ -30,9 +30,13 @@ public class EnemyTwo : AIBasicParent
 			if(masterScript.systemList[i].systemName == homeSystem)
 			{
 				masterScript.systemList[i].systemOwnedBy = playerRace;
+
+				lineRenderScript = masterScript.systemList[i].systemObject.GetComponent<LineRenderScript>();
+				
+				lineRenderScript.SetRaceLineColour(playerRace);
 			}
 		}
 		
-		StartSystemPlanetColonise(materialInUse, homeSystem, ownedSystems);
+		StartSystemPlanetColonise(materialInUse, homeSystem);
 	}
 }

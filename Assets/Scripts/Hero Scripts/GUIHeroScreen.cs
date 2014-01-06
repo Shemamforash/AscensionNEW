@@ -3,69 +3,75 @@ using System.Collections;
 
 public class GUIHeroScreen : MasterScript 
 {
-	public bool openHeroScreen, canHireHero, openMerchantConnectionMenu;
-	public GameObject merchantObject;
+	public bool openMerchantConnectionMenu, openHeroLevellingScreen;
+	public GameObject heroObject, selectedHero;
+	public string[] heroLevel1Specs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
+	private string[] heroLevel2Specs = new string[9] {"President", "Peacemaker", "Merchant", "Vanguard", "Strike Team", "Warlord", "Spy", "Recon Drone", "Assassin"};
 	public GUISkin mySkin;
-	private GameObject[] systemsWithHeroSlot = new GameObject[60];
-	private Rect[] allHeroGUIButtons;
-	private string[] listOfHeroes;
-	private Vector2 scrollPosition = Vector2.zero;
-	private string tempHero;
-
+	private int heroCounter = 1;
+	private string tempHero, scriptToAdd;
+	private Rect[] tier1, tier2;
 
 	void Start()
 	{
-		heroBoxConstructor();
+		LevellingTreeBuilder();
 	}
 
-	private void heroBoxConstructor()
+	private void LevellingTreeBuilder()
 	{
-		Rect topLeft = new Rect(Screen.width / 2 - 200.0f, Screen.height / 2 - 200.0f, 100.0f, 100.0f);
-		Rect topMiddle = new Rect(Screen.width / 2 - 50.0f, Screen.height / 2 - 200.0f, 100.0f, 100.0f);
-		Rect topRight = new Rect(Screen.width / 2 + 100.0f, Screen.height / 2 - 200.0f, 100.0f, 100.0f);
-		
-		Rect centreLeft = new Rect(Screen.width / 2 - 200.0f, Screen.height / 2 - 50.0f, 100.0f, 100.0f);
-		Rect centreMiddle = new Rect(Screen.width / 2 - 50.0f, Screen.height / 2 - 50.0f, 100.0f, 100.0f);
-		Rect centreRight = new Rect(Screen.width / 2 + 100.0f, Screen.height / 2 - 50.0f, 100.0f, 100.0f);
+		Rect tier1Box1 = new Rect(Screen.height - 162.5f, Screen.width - 90.0f, 180.0f, 50.0f);
+		Rect tier1Box2 = new Rect(Screen.height - 25.0f, Screen.width - 90.0f, 180.0f, 50.0f);
+		Rect tier1Box3 = new Rect(Screen.height + 137.5f, Screen.width - 90.0f, 180.0f, 50.0f);
 
-		Rect bottomLeft = new Rect(Screen.width / 2 - 200.0f, Screen.height / 2 + 100.0f, 100.0f, 100.0f);
-		Rect bottomMiddle = new Rect(Screen.width / 2 - 50.0f, Screen.height / 2 + 100.0f, 100.0f, 100.0f);
-		Rect bottomRight = new Rect(Screen.width / 2 + 100.0f, Screen.height / 2 + 100.0f, 100.0f, 100.0f);
+		tier1 = new Rect[3]{tier1Box1, tier1Box2, tier1Box3};
 
-		allHeroGUIButtons = new Rect[9] {topLeft, topMiddle, topRight, centreLeft, centreMiddle, centreRight, bottomLeft, bottomMiddle, bottomRight};
+		Rect tier2Box1 = new Rect(Screen.height - 265.0f, Screen.width + 110.0f, 180.0f, 50.0f);
+		Rect tier2Box2 = new Rect(Screen.height - 205.0f, Screen.width + 110.0f, 180.0f, 50.0f);
+		Rect tier2Box3 = new Rect(Screen.height - 145.0f, Screen.width + 110.0f, 180.0f, 50.0f);
+		Rect tier2Box4 = new Rect(Screen.height - 85.0f, Screen.width + 110.0f, 180.0f, 50.0f);
+		Rect tier2Box5 = new Rect(Screen.height - 25.0f, Screen.width + 110.0f, 180.0f, 50.0f);
+		Rect tier2Box6 = new Rect(Screen.height + 35.0f, Screen.width + 110.0f, 180.0f, 50.0f);
+		Rect tier2Box7 = new Rect(Screen.height + 95.0f, Screen.width + 110.0f, 180.0f, 50.0f);
+		Rect tier2Box8 = new Rect(Screen.height + 155.0f, Screen.width + 110.0f, 180.0f, 50.0f);
+		Rect tier2Box9 = new Rect(Screen.height - 215.0f, Screen.width + 110.0f, 180.0f, 50.0f);
 
-		listOfHeroes = new string[9] {"President", "Peacemaker", "Merchant",
-									"Strike Team", "Warlord", "Vanguard",
-									"Spy", "Assassin", "Recon Drone"};
+		tier2 = new Rect[9]{tier2Box1, tier2Box2, tier2Box3, tier2Box4, tier2Box5, tier2Box6, tier2Box7, tier2Box8, tier2Box9};
 	}
 
-	private void CheckIfCanHire()
+	public void CheckIfCanHire(GameObject system)
 	{
 		if(playerTurnScript.GP > 0)
 		{
 			for(int i = 0; i < 60; ++i)
 			{
-				systemsWithHeroSlot[i] = null;
-
-				lineRenderScript = masterScript.systemList[i].systemObject.GetComponent<LineRenderScript>();
-
-				if(lineRenderScript.ownedBy == playerTurnScript.playerRace)
+				if(masterScript.systemList[i].systemObject == cameraFunctionsScript.selectedSystem)
 				{
-					heroScript = masterScript.systemList[i].systemObject.GetComponent<HeroScriptParent>();
-
 					for(int j = 0; j < 3; ++j)
 					{
-						if(heroScript.heroesInSystem[j] == null && canHireHero == false)
+						if(masterScript.systemList[i].heroesInSystem[j] == null)
 						{
-							canHireHero = true;
+							GameObject instantiatedHero = (GameObject)Instantiate (heroObject, masterScript.systemList[i].systemObject.transform.position, 
+							                                                       masterScript.systemList[i].systemObject.transform.rotation);
+
+							tempHero = "Hero" + heroCounter.ToString();
+
+							instantiatedHero.name = tempHero;
+							
+							masterScript.systemList[i].heroesInSystem[j] = instantiatedHero;
+
+							heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
+
+							heroScript.heroLocation = masterScript.systemList[i].systemObject;
+
+							++heroCounter;
 
 							--playerTurnScript.GP;
-
-							systemsWithHeroSlot[i] = masterScript.systemList[i].systemObject;
 
 							break;
 						}
 					}
+
+					break;
 				}
 			}
 		}
@@ -75,130 +81,83 @@ public class GUIHeroScreen : MasterScript
 	{
 		GUI.skin = mySkin;
 
-		if(GUI.Button (new Rect(125.0f, 15.0f, 100.0f, 40.0f), "Open Hero Screen"))
+		if(openHeroLevellingScreen == true)
 		{
-			openHeroScreen = true;
 			cameraFunctionsScript.coloniseMenu = false;
 			cameraFunctionsScript.openMenu = false;
 			cameraFunctionsScript.doubleClick = false;
 			mainGUIScript.spendMenu = false;
 			mainGUIScript.openImprovementList = false;
-		}
 
-
-		if(openHeroScreen == true)
-		{
-			GUI.Box (new Rect(0.0f, 0.0f, Screen.width, Screen.height), "\n Heroes for purchase");
-		
-			for(int i = 0; i < 9; ++i)
+			if(GUI.Button (new Rect(Screen.width / 2 + 300.0f, Screen.height / 2 +225.0f, 20.0f, 20.0f), "X"))
 			{
-				if(GUI.Button (allHeroGUIButtons[i], listOfHeroes[i]))
-				{
-					CheckIfCanHire();
+				openHeroLevellingScreen = false;
+			}
 
-					if(canHireHero == true)
+			GUI.Box (new Rect(Screen.width / 2 - 300.0f, Screen.height / 2 - 275.0f, 600.0f, 550.0f), "");
+
+			GUI.Label(new Rect(Screen.width / 2 -290.0f, Screen.height / 2, 180.0f, 50.0f), "Hero");
+
+			heroScript = selectedHero.GetComponent<HeroScriptParent>();
+
+			if(heroScript.currentLevel == 1)
+			{
+				for(int i = 0; i < 3; ++i)
+				{
+					if(GUI.Button (tier1[i], heroLevel1Specs[i]) && playerTurnScript.GP > 0)
 					{
-						tempHero = listOfHeroes[i];
+						--playerTurnScript.GP;
+
+						scriptToAdd = heroLevel1Specs[i] + "Script";
+
+						selectedHero.AddComponent(scriptToAdd);
+
+						++heroScript.currentLevel;
+					}
+				}
+
+				for(int i = 0; i < 9; ++i)
+				{
+					GUI.Label (tier2[i], heroLevel2Specs[i]);
+				}
+			}
+
+			if(heroScript.currentLevel == 2)
+			{
+				for(int i = 0; i < 3; ++i)
+				{
+					GUI.Label (tier1[i], heroLevel1Specs[i]);
+				}
+
+				for(int i = 0; i < 9; ++i)
+				{
+					if(GUI.Button (tier2[i], heroLevel2Specs[i]) && playerTurnScript.GP > 1)
+					{
+						playerTurnScript.GP -= 2;
+						
+						scriptToAdd = heroLevel2Specs[i] + "Script";
+						
+						selectedHero.AddComponent(scriptToAdd);
+						
+						++heroScript.currentLevel;
 					}
 				}
 			}
 
-			if(canHireHero == true)
+			if(heroScript.currentLevel == 3)
 			{
-				GUILayout.BeginArea(new Rect(Screen.width / 2 - 100.0f, Screen.height / 2 - 200.0f, 200.0f, 400.0f));
-
-				scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-
-				for(int i = 0; i < 60; ++i)
+				for(int i = 0; i < 3; ++i)
 				{
-					if(systemsWithHeroSlot[i] == null)
-					{
-						continue;
-					}
-
-					if(GUILayout.Button (systemsWithHeroSlot[i].name, GUILayout.Height(40.0f)))
-					{
-						heroScript = systemsWithHeroSlot[i].GetComponent<HeroScriptParent>();
-
-						for(int j = 0; j < 3; ++j)
-						{
-							if(heroScript.heroesInSystem[j] == null)
-							{
-								GameObject instantiatedHero = (GameObject)Instantiate (merchantObject, systemsWithHeroSlot[i].transform.position, systemsWithHeroSlot[i].transform.rotation);
-
-								instantiatedHero.name = tempHero;
-
-								heroScript.heroesInSystem[j] = instantiatedHero;
-
-								break;
-							}
-						}
-					}
+					GUI.Label (tier1[i], heroLevel1Specs[i]);
 				}
 
-				GUILayout.EndScrollView();
-
-				GUILayout.EndArea();
-			}
-		}
-
-
-		if(openMerchantConnectionMenu == true)
-		{
-			GameObject tempSystem = playerTurnScript.tempObject;
-
-			heroScript = tempSystem.GetComponent<HeroScriptParent>();
-
-			FindMerchantScript();
-
-			merchantScript.AddMerchant();
-			
-			if(GUI.Button (new Rect(Screen.width / 2 + 100.0f, Screen.height / 2 - 200.0f, 20.0f, 20.0f), "X"))
-			{
-				openMerchantConnectionMenu = false;
-			}
-			
-			GUILayout.BeginArea (new Rect(Screen.width / 2 - 100.0f, Screen.height / 2 - 200.0f, 200.0f, 400.0f));
-			
-			scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-			
-			for(int i = 0; i < 60; ++i)
-			{
-				if(heroScript.allLinkableSystems[i] != "" && heroScript.allLinkableSystems[i] != playerTurnScript.tempObject.name)
+				for(int i = 0; i < 9; ++i)
 				{
-					if(GUILayout.Button (heroScript.allLinkableSystems[i], GUILayout.Height (40.0f)))
-					{
-						merchantScript.linked = heroScript.allLinkableSystems[i];
-						
-						heroScript.allLinkableSystems[i] = "";
-						
-						heroScript = GameObject.Find (merchantScript.linked).GetComponent<HeroScriptParent>();
-						
-						heroScript.allLinkableSystems[i] = "";
-
-						FindMerchantScript();
-						
-						merchantScript.linked = playerTurnScript.tempObject.name;
-						
-						openMerchantConnectionMenu = false;
-					}
+					GUI.Label (tier2[i], heroLevel2Specs[i]);
 				}
 			}
 			
-			GUILayout.EndScrollView();
-			
-			GUILayout.EndArea();
 		}
-	}
 
-	private void FindMerchantScript()
-	{
-		for(int i = 0; i < 3; ++i)
-		{
-			if(heroScript.heroesInSystem[i].name == "Merchant")
-			{
-				merchantScript = heroScript.heroesInSystem[i].GetComponent<MerchantHeroScript>();
-			}
-		}
 	}
 }

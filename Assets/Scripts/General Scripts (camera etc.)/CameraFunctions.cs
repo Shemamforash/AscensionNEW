@@ -55,6 +55,7 @@ public class CameraFunctions : MasterScript
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
 				selectedSystem = hit.collider.gameObject;
+
 				coloniseMenu = true; //Shows the colonise button on single click
 				
 				if(doubleClick == true)

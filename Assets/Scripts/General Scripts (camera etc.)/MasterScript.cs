@@ -45,7 +45,7 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public List<PlanetInfo> planetList = new List<PlanetInfo>();
 
-	public void Awake()
+	private void Awake()
 	{
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
@@ -55,8 +55,22 @@ public class MasterScript : MonoBehaviour
 		diplomacyScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<DiplomacyControlScript>();
 		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
 		heroGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GUIHeroScreen>();
+		masterScript = gameObject.GetComponent<MasterScript>();
 
 		LoadSystemData();
+	}
+
+	public int RefreshCurrentSystem(GameObject thisSystem)
+	{
+		for(int i = 0; i < 60; ++i)
+		{
+			if(masterScript.systemList[i].systemObject == thisSystem)
+			{
+				return i;
+			}
+		}
+
+		return 0;
 	}
 
 	private void LoadSystemData()
@@ -75,7 +89,7 @@ public class MasterScript : MonoBehaviour
 				planet.money = int.Parse (rimReader.ReadLine ());
 				planet.improvementSlots = int.Parse (rimReader.ReadLine ());
 
-				planetList.Add (planet);
+				masterScript.planetList.Add (planet);
 			}
 		}
 
@@ -97,14 +111,14 @@ public class MasterScript : MonoBehaviour
 					system.planetName.Add (planetName);
 					system.planetType.Add (typeReader.ReadLine ());
 					system.planetImprovementLevel.Add (0);
-
+					system.planetColonised.Add (false);
 					system.planetScience.Add (FindPlanetSIM(system.planetType[j], "Science"));
 					system.planetIndustry.Add (FindPlanetSIM(system.planetType[j], "Industry"));
 					system.planetMoney.Add (FindPlanetSIM(system.planetType[j], "Money"));
 					system.improvementSlots.Add ((int)FindPlanetSIM(system.planetType[j], "Improvement Slots"));
 				}
 
-				systemList.Add (system);
+				masterScript.systemList.Add (system);
 			}
 		}
 	}
@@ -113,23 +127,23 @@ public class MasterScript : MonoBehaviour
 	{
 		for(int i = 0; i < 12; ++i)
 		{
-			if(planetList[i].planetType == planetType)
+			if(masterScript.planetList[i].planetType == planetType)
 			{
 				if(resourceType == "ImprovementSlots")
 				{
-					return planetList[i].improvementSlots;
+					return masterScript.planetList[i].improvementSlots;
 				}
 				else if(resourceType == "Science")
 				{
-					return planetList[i].science;
+					return masterScript.planetList[i].science;
 				}
 				else if(resourceType == "Industry")
 				{
-					return planetList[i].industry;
+					return masterScript.planetList[i].industry;
 				}
 				else if(resourceType == "Money")
 				{
-					return planetList[i].money;
+					return masterScript.planetList[i].money;
 				}
 			}
 		}
@@ -141,6 +155,7 @@ public class MasterScript : MonoBehaviour
 public class PlanetInfo
 {
 	public string planetType;
+	public bool colonised;
 	public int science, industry, money, improvementSlots;
 }
 
@@ -155,6 +170,7 @@ public class SystemInfo
 	public List<float> planetScience = new List<float>();
 	public List<float> planetIndustry = new List<float>();
 	public List<float> planetMoney = new List<float>();
+	public List<bool> planetColonised = new List<bool>();
 	public List<int> planetImprovementLevel = new List<int>();
 	public List<int> improvementSlots= new List<int>();
 }

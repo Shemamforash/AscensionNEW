@@ -15,7 +15,6 @@ public class TechTreeScript : MasterScript
 	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
 
 	public int techTier = 0;
-	private GameObject[] connectedSystems = new GameObject[4];
 
 	private int currentPlanetsWithHyperNet = 0;
 
@@ -73,7 +72,7 @@ public class TechTreeScript : MasterScript
 		improvementMessageArray[tech] = message;
 	}
 
-	public void ActiveTechnologies() //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
+	public void ActiveTechnologies(TurnInfo selectedPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
 		sciencePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
 		industryPercentBonus = 1.0f;
@@ -88,7 +87,7 @@ public class TechTreeScript : MasterScript
 
 		if(techTreeComplete[0,1,1] == "Built") //Synergy
 		{
-			Synergy();
+			Synergy(selectedPlayer);
 			AddImprovementMessage ("+" + tempValue.ToString () + "% Industry on system", 1);
 		}
 
@@ -96,7 +95,7 @@ public class TechTreeScript : MasterScript
 		{
 			tempValue = 0.0f;
 
-			int i = RefreshCurrentPlanet();
+			int i = masterScript.RefreshCurrentSystem(gameObject);
 
 			for(int j = 0; j < 3; ++j)
 			{
@@ -137,25 +136,29 @@ public class TechTreeScript : MasterScript
 			bool industryBonus = false;
 			bool scienceBonus = false;
 
-			foreach(GameObject connection in lineRenderScript.connections)
+			for(int i = 0; i < 4; ++i)
 			{
-				lineRenderScript = connection.GetComponent<LineRenderScript>();
+				if(lineRenderScript.connections[i] == null)
+				{
+					break;
+				}
 
-				if(lineRenderScript.ownedBy == "Selkies" && industryBonus == false)
+				int j = masterScript.RefreshCurrentSystem(lineRenderScript.connections[i]);
+
+				if(masterScript.systemList[j].systemOwnedBy == "Selkies" && industryBonus == false)
 				{
 					industryPercentBonus += 0.5f;
 					AddImprovementMessage ("+ 50% Industry from Selkies adjacency", 8);
 					industryBonus = true;
 				}
 
-				if(lineRenderScript.ownedBy == "Nereides" && scienceBonus == false)
+				if(masterScript.systemList[j].systemOwnedBy == "Nereides" && scienceBonus == false)
 				{
 					industryPercentBonus += 0.5f;
 					AddImprovementMessage ("+ 50% Science from Nereides adjacency", 9);
 					scienceBonus = true;
 				}
 			}
-			lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		}
 
 		if(techTreeComplete[2,1,1] == "Built") //Unionisation
@@ -190,29 +193,23 @@ public class TechTreeScript : MasterScript
 		}
 	}
 
-	private void Synergy()
+	private void Synergy(TurnInfo selectedPlayer)
 	{
 		float tempFloat = 0.0f;
 
 		for(int i = 0; i < 4; ++i)
 		{
-			connectedSystems[i] = lineRenderScript.connections[i];
-		}
-		
-		foreach (GameObject system in connectedSystems)
-		{
-			for(int i = 0; i < 60; ++i)
+			if(lineRenderScript.connections[i] = null)
 			{
-				if(system == null)
-				{
-					break;
-				}
-				
-				if(system == playerTurnScript.ownedSystems[i])
-				{
-					industryPercentBonus += 0.05f;
-					tempFloat += 0.05f;
-				}
+				break;
+			}
+
+			int j = masterScript.RefreshCurrentSystem(lineRenderScript.connections[i]);
+
+			if(masterScript.systemList[j].systemOwnedBy == selectedPlayer.playerRace)
+			{
+				industryPercentBonus += 0.05f;
+				tempFloat += 0.05f;
 			}
 		}
 	}

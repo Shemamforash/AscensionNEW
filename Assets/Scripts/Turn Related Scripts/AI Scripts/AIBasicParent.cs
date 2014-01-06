@@ -18,7 +18,7 @@ public class AIBasicParent : TurnInfo
 			SearchThroughArrays(thisPlayer);
 		}
 
-		TurnEnd(ownedSystems);
+		TurnEnd(thisPlayer);
 	}
 
 	public void SearchThroughArrays(AIBasicParent thisPlayer)
@@ -77,18 +77,14 @@ public class AIBasicParent : TurnInfo
 	void CalculateSIMRatio(int system)
 	{
 		tempSIM = 0.0f;
-		
-		guiPlanScript = thisSystem.GetComponent<GUISystemDataScript>();
-		
+
 		for(int i = 0; i < masterScript.systemList[system].systemSize; ++i)
 		{
-			float tempSci = float.Parse (masterScript.systemList[system].planetScience[i]);
-			float tempInd = float.Parse (masterScript.systemList[system].planetIndustry[i]);
-			float tempMon = float.Parse (masterScript.systemList[system].planetMoney[i]);
+			float tempSci = masterScript.systemList[system].planetScience[i];
+			float tempInd = masterScript.systemList[system].planetIndustry[i];
+			float tempMon = masterScript.systemList[system].planetMoney[i];
 				
 			tempSIM = (tempSci + tempInd + tempMon);
-			
-			break;
 		}
 		
 		float tempRatio = tempSIM / guiPlanScript.numPlanets;
@@ -114,22 +110,22 @@ public class AIBasicParent : TurnInfo
 
 	public void CheckForSuitablePlanet(float ratio, AIBasicParent thisPlayer)
 	{
-		int tempPlanet = 0, tempSystem = 0;
+		int tempPlanet = -1, tempSystem = -1;
 		
 		for(int i = 0; i < 60; ++i)
 		{
-			if(masterScript.systemList[i].systemOwnedBy != thisPlayer)
+			if(masterScript.systemList[i].systemOwnedBy != thisPlayer.playerRace)
 			{
 				continue;
 			}
 
 			CheckToImprovePlanet(i);
 			
-			for(int j = 0; j < masterScript.systemList[j].systemSize; ++j)
+			for(int j = 0; j < masterScript.systemList[i].systemSize; ++j)
 			{
-				float tempSci = float.Parse (masterScript.systemList[i].planetScience[j]);
-				float tempInd = float.Parse (masterScript.systemList[i].planetIndustry[j]);
-				float tempMon = float.Parse (masterScript.systemList[i].planetMoney[j]);
+				float tempSci = masterScript.systemList[i].planetScience[j];
+				float tempInd = masterScript.systemList[i].planetIndustry[j];
+				float tempMon = masterScript.systemList[i].planetMoney[j];
 						
 				tempSIM = (tempSci + tempInd + tempMon);
 						
@@ -140,12 +136,10 @@ public class AIBasicParent : TurnInfo
 					tempPlanet = j;
 					tempSystem = i;
 				}
-						
-				break;
 			}
 		}
 		
-		if(tempSystem != null && GP > 0)
+		if(tempSystem > 0 && GP > 0)
 		{
 			ColonisePlanet(tempSystem, tempPlanet, thisPlayer);
 		}
@@ -161,13 +155,15 @@ public class AIBasicParent : TurnInfo
 
 	public void ColonisePlanet(int system, int planet, AIBasicParent thisPlayer)
 	{
-		
 		GP -= 1;
 		
-		masterScript.systemList[system].systemOwnedBy = thisPlayer;
+		masterScript.systemList[system].systemOwnedBy = thisPlayer.playerRace;
+
+		lineRenderScript = masterScript.systemList[system].systemObject.GetComponent<LineRenderScript>();
+
+		lineRenderScript.SetRaceLineColour(thisPlayer.playerRace);
 		
 		++planetsColonisedThisTurn;
-		
 	}
 
 	public void ImprovePlanet(int planetPosition, int system)
