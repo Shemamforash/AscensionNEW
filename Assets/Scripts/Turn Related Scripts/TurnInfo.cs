@@ -73,7 +73,7 @@ public class TurnInfo : MasterScript
 
 		for(int i = 0; i < 60; ++i)
 		{
-			if(systemListConstructor.systemList[i].systemOwnedBy == null || systemListConstructor.systemList[i].systemOwnedBy == "")
+			if(systemListConstructor.systemList[i].systemOwnedBy != selectedPlayer.playerRace)
 			{
 				continue;
 			}
@@ -85,6 +85,17 @@ public class TurnInfo : MasterScript
 			techTreeScript.ActiveTechnologies(selectedPlayer);
 			guiPlanScript.SystemSIMCounter(i, selectedPlayer);
 			guiPlanScript.CheckUnlockedTier();
+
+			for(int j = 0; j < 3; ++j)
+			{
+				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
+				{
+					continue;
+				}
+
+				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
+				heroScript.HeroEndTurnFunctions();
+			}
 
 			selectedPlayer.science += (int)guiPlanScript.totalSystemScience;
 			selectedPlayer.industry += (int)guiPlanScript.totalSystemIndustry;

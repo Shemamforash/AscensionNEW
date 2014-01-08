@@ -33,7 +33,7 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public DiplomacyControlScript diplomacyScript;
 	[HideInInspector]
-	public MerchantHeroScript merchantScript;
+	public MerchantScript merchantScript;
 
 	[HideInInspector]
 	public MainGUIScript mainGUIScript;

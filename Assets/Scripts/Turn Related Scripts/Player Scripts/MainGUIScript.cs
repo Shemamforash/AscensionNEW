@@ -5,7 +5,7 @@ using System.IO;
 
 public class MainGUIScript : MasterScript 
 {
-	private Rect[] allPlanetsGUI, allButtonsGUI, allImprovementButtonsGUI; 
+	private Rect[] allPlanetsGUI, allButtonsGUI, allImprovementButtonsGUI, allHeroLabels, allHeroButtons; 
 	public GUISkin mySkin;
 	public bool spendMenu = false, hasColonised = false, openImprovementList = false;
 	public string resourceToSpend;
@@ -55,6 +55,19 @@ public class MainGUIScript : MasterScript
 		Rect farRight = new Rect(Screen.width/2 + 525.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Bottom right		
 		Rect buttonFarRight = new Rect(Screen.width/2 + 525.0f, Screen.height / 2 + 50.0f, 200.0f, 50.0f);
 		Rect improveButtonFarRight = new Rect(Screen.width/2 + 525.0f, Screen.height / 2 - 100.0f, 200.0f, 50.0f);
+
+		Rect heroLabel1 = new Rect(Screen.width / 2 - 450.0f, Screen.height / 2 + 300.0f, 100.0f, 50.0f);//Hero labels
+		Rect heroLabel2 = new Rect(Screen.width / 2 - 340.0f, Screen.height / 2 + 300.0f, 100.0f, 50.0f);
+		Rect heroLabel3 = new Rect(Screen.width / 2 - 230.0f, Screen.height / 2 + 300.0f, 100.0f, 50.0f);
+		
+		Rect heroButton1 = new Rect(Screen.width / 2 - 450.0f, Screen.height / 2 + 360.0f, 100.0f, 25.0f);//Hero buttons
+		Rect heroButton2 = new Rect(Screen.width / 2 - 340.0f, Screen.height / 2 + 360.0f, 100.0f, 25.0f);
+		Rect heroButton3 = new Rect(Screen.width / 2 - 230.0f, Screen.height / 2 + 360.0f, 100.0f, 25.0f);
+
+
+		allHeroLabels = new Rect[3]{heroLabel1, heroLabel2, heroLabel3};
+
+		allHeroButtons = new Rect[3] {heroButton1, heroButton2, heroButton3};
 
 		allPlanetsGUI = new Rect[6] {farLeft, closeLeft, middleLeft, middleRight, closeRight, farRight};
 		
@@ -348,9 +361,9 @@ public class MainGUIScript : MasterScript
 
 			#endregion
 
-			if(GUI.Button (new Rect(200.0f, Screen.height - 100.0f, 200.0f, 50.0f), "Purchase Hero: 1GP"))
+			if(GUI.Button (new Rect(Screen.width / 2 - 610.0f, Screen.height / 2 + 300.0f, 150.0f, 50.0f), "Purchase Hero: 1GP"))
 			{
-				heroGUIScript.CheckIfCanHire(cameraFunctionsScript.selectedSystem);
+				heroGUIScript.CheckIfCanHire(selectedSystem);
 			}
 
 			for(int i = 0; i < 3; ++i)
@@ -362,12 +375,12 @@ public class MainGUIScript : MasterScript
 
 				RefreshHeroInfo(i);
 			
-				if(GUI.Button(new Rect(Screen.width / 2 -350.0f, Screen.height / 2 + 500.0f, 200.0f, 40.0f), heroName))
+				GUI.Label (allHeroLabels[i], heroName);
+
+				if(GUI.Button (allHeroButtons[i], "Level Up"))
 				{
-					if(heroName == "Merchant")
-					{
-						heroGUIScript.openMerchantConnectionMenu = true;
-					}
+					heroScript =  systemListConstructor.systemList[selectedSystem].heroesInSystem[i].GetComponent<HeroScriptParent>();
+					heroScript.LevelUp ();
 				}
 			}
 
