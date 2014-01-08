@@ -95,11 +95,11 @@ public class TechTreeScript : MasterScript
 		{
 			tempValue = 0.0f;
 
-			int i = masterScript.RefreshCurrentSystem(gameObject);
+			int i = RefreshCurrentSystem(gameObject);
 
 			for(int j = 0; j < 3; ++j)
 			{
-				if(masterScript.systemList[i].heroesInSystem[j] == null)
+				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
 				{
 					continue;
 				}
@@ -143,16 +143,16 @@ public class TechTreeScript : MasterScript
 					break;
 				}
 
-				int j = masterScript.RefreshCurrentSystem(lineRenderScript.connections[i]);
+				int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
 
-				if(masterScript.systemList[j].systemOwnedBy == "Selkies" && industryBonus == false)
+				if(systemListConstructor.systemList[j].systemOwnedBy == "Selkies" && industryBonus == false)
 				{
 					industryPercentBonus += 0.5f;
 					AddImprovementMessage ("+ 50% Industry from Selkies adjacency", 8);
 					industryBonus = true;
 				}
 
-				if(masterScript.systemList[j].systemOwnedBy == "Nereides" && scienceBonus == false)
+				if(systemListConstructor.systemList[j].systemOwnedBy == "Nereides" && scienceBonus == false)
 				{
 					industryPercentBonus += 0.5f;
 					AddImprovementMessage ("+ 50% Science from Nereides adjacency", 9);
@@ -204,9 +204,9 @@ public class TechTreeScript : MasterScript
 				break;
 			}
 
-			int j = masterScript.RefreshCurrentSystem(lineRenderScript.connections[i]);
+			int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
 
-			if(masterScript.systemList[j].systemOwnedBy == selectedPlayer.playerRace)
+			if(systemListConstructor.systemList[j].systemOwnedBy == selectedPlayer.playerRace)
 			{
 				industryPercentBonus += 0.05f;
 				tempFloat += 0.05f;
@@ -218,14 +218,9 @@ public class TechTreeScript : MasterScript
 	{		
 		currentPlanetsWithHyperNet = 0;
 		
-		foreach(GameObject system in playerTurnScript.ownedSystems)
+		for(int i = 0; i < 60; ++i)
 		{
-			if(system == null)
-			{
-				continue;
-			}
-			
-			techTreeScript = system.GetComponent<TechTreeScript>();
+			techTreeScript = systemListConstructor.systemList[i].systemObject.GetComponent<TechTreeScript>();
 			
 			if(techTreeScript.techTreeComplete[2,5,1] == "Built")
 			{

@@ -4,7 +4,7 @@ using System.Collections;
 public class LineRenderScript : MasterScript 
 {
 	[HideInInspector]
-	public bool showText, owned;
+	public bool showText;
 	public GUITextScript guiTextScript;
 	[HideInInspector]
 	public GUIText activeGUI;
@@ -38,7 +38,7 @@ public class LineRenderScript : MasterScript
 
 		BuildLine(quadA);
 
-		thisSystem = masterScript.RefreshCurrentSystem(gameObject);
+		thisSystem = RefreshCurrentSystem(gameObject);
 	}
 
 	public void SetRaceLineColour(string thisRace)
@@ -59,18 +59,13 @@ public class LineRenderScript : MasterScript
 		}
 	
 		BuildLine(quad);
-
-		owned = true;
 	}
 
 	void BuildLine(GameObject aQuad)
 	{
 		for(int i = 0; i < 4; ++i)
 		{
-			if(owned == false)
-			{
-				Destroy (connectedLines[i]);
-			}
+			Destroy (connectedLines[i]);
 
 			Vector3 midPoint = lineRotationsScalePosition[i,2];
 
@@ -118,7 +113,7 @@ public class LineRenderScript : MasterScript
 	{
 		guiTextScript.highlightedSystemName = gameObject.name;
 
-		string systemSize = masterScript.systemList[thisSystem].systemSize.ToString ();
+		string systemSize = systemListConstructor.systemList[thisSystem].systemSize.ToString ();
 
 		guiTextScript.highlightedSystemSize = systemSize;
 

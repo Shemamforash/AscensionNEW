@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerTurn : TurnInfo
 {
 	public GameObject tempObject;
-	
+	public bool isOkToColonise, systemHasBeenColonised;
 
 	void Start()
 	{
@@ -28,9 +28,86 @@ public class PlayerTurn : TurnInfo
 		cameraFunctionsScript.CentreCamera(); //Checks if camera needs centreing
 	}
 
+	public void FindSystem(int system) //This function is used to check if the highlighted system can be colonised, and if it can, to colonise it
+	{		
+		lineRenderScript = systemListConstructor.systemList[system].systemObject.GetComponent<LineRenderScript>();
+		
+		for(int i = 0; i < 4; ++i)
+		{
+			if(lineRenderScript.connections[i] == null)
+			{
+				break;
+			}
+			
+			int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
+			
+			if(systemListConstructor.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
+			{
+				isOkToColonise = true;
+			}
+			
+			else
+			{
+				continue;
+			}
+		}
+		
+		if(isOkToColonise == true && GP > 0)
+		{
+			systemListConstructor.systemList[system].systemOwnedBy = playerRace;
+			
+			lineRenderScript.SetRaceLineColour(playerRace);
+			
+			systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
+			
+			--GP;
+			
+			++turnInfoScript.systemsInPlay;
+			
+			cameraFunctionsScript.coloniseMenu = false;
+			
+			isOkToColonise = false;
+
+			systemHasBeenColonised = true;
+		}
+	}
+
+	public void OnGUI()
+	{
+		GUI.skin = mainGUIScript.mySkin;
+
+		if(systemHasBeenColonised == true)
+		{
+			int selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
+
+			GUILayout.BeginArea(new Rect(Screen.width / 2 - 185.0f, Screen.height / 2 - 60.0f, 120.0f, 370.0f));
+
+			GUILayout.Box("Select Planet");
+
+			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
+			{
+				float planetSIM = systemListConstructor.systemList[selectedSystem].planetScience[i] + systemListConstructor.systemList[selectedSystem].planetIndustry[i] +
+					systemListConstructor.systemList[selectedSystem].planetMoney[i];
+
+				string planetInfo = systemListConstructor.systemList[selectedSystem].planetType[i] + " " + planetSIM.ToString() + " SIM";
+
+				if(GUILayout.Button(planetInfo, GUILayout.Height (50.0f)))
+				{
+					systemListConstructor.systemList[selectedSystem].planetColonised[i] = true;
+
+					++planetsColonisedThisTurn;
+
+					systemHasBeenColonised = false;
+				}
+			}
+
+			GUILayout.EndArea();
+		}
+	}
+
 	public void ImproveButtonClick(int i, int j)
 	{
-		++masterScript.systemList[i].planetImprovementLevel[j];
+		++systemListConstructor.systemList[i].planetImprovementLevel[j];
 
 		if(mainGUIScript.resourceToSpend == "Industry")
 		{
@@ -47,28 +124,29 @@ public class PlayerTurn : TurnInfo
 	{
 		PickRace ();
 
+		cameraFunctionsScript.selectedSystem = GameObject.Find (homeSystem); //Set the selected system
+
 		turnInfoScript.systemsInPlay++;
 		
-		int i = masterScript.RefreshCurrentSystem(GameObject.Find(homeSystem));
+		int i = RefreshCurrentSystem(GameObject.Find(homeSystem));
 
-		masterScript.systemList[i].systemOwnedBy = playerRace;
+		systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 
-		lineRenderScript = masterScript.systemList[i].systemObject.GetComponent<LineRenderScript>();
+		systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
+
+		lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
 		lineRenderScript.SetRaceLineColour(playerRace);
 
-		StartSystemPlanetColonise(materialInUse, homeSystem);
-
-		GP = raceGP;
-
-		cameraFunctionsScript.selectedSystem = GameObject.Find (homeSystem); //Set the selected system
-
-		foreach(GameObject system in ownedSystems)
+		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
-			if(system == null)
+			if(systemListConstructor.systemList[i].planetType[j] == homePlanetType)
 			{
-				continue;
+				systemListConstructor.systemList[i].planetColonised[j] = true;
+				break;
 			}
 		}
+
+		GP = raceGP;
 	}
 }

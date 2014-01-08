@@ -26,17 +26,22 @@ public class MerchantHeroScript : HeroScriptParent
 
 	private void FillLinkableSystems()
 	{
-		linkableSystems = null;
-
 		for(int i = 0; i < 60; ++i)
 		{
-			if(masterScript.systemList[i].systemObject != heroScript.heroLocation && masterScript.systemList[i].systemOwnedBy != playerTurnScript.playerRace)
+			linkableSystems[i] = null;
+
+			if(systemListConstructor.systemList[i].systemObject != heroScript.heroLocation && systemListConstructor.systemList[i].systemOwnedBy != playerTurnScript.playerRace)
 			{
-				for(int j = 0; i < 3; ++j)
+				for(int j = 0; j < 3; ++j)
 				{
-					if(masterScript.systemList[i].heroesInSystem[j].name == "Merchant")
+					if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
 					{
-						linkableSystems[i] = masterScript.systemList[i].systemObject;
+						continue;
+					}
+
+					if(systemListConstructor.systemList[i].heroesInSystem[j].name == "Merchant")
+					{
+						linkableSystems[i] = systemListConstructor.systemList[i].systemObject;
 					}
 				}
 			}

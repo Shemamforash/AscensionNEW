@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GUIHeroScreen : MasterScript 
 {
@@ -44,24 +45,24 @@ public class GUIHeroScreen : MasterScript
 		{
 			for(int i = 0; i < 60; ++i)
 			{
-				if(masterScript.systemList[i].systemObject == cameraFunctionsScript.selectedSystem)
+				if(systemListConstructor.systemList[i].systemObject == cameraFunctionsScript.selectedSystem)
 				{
 					for(int j = 0; j < 3; ++j)
 					{
-						if(masterScript.systemList[i].heroesInSystem[j] == null)
+						if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
 						{
-							GameObject instantiatedHero = (GameObject)Instantiate (heroObject, masterScript.systemList[i].systemObject.transform.position, 
-							                                                       masterScript.systemList[i].systemObject.transform.rotation);
+							GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[i].systemObject.transform.position, 
+							                                                       systemListConstructor.systemList[i].systemObject.transform.rotation);
 
 							tempHero = "Hero" + heroCounter.ToString();
 
 							instantiatedHero.name = tempHero;
 							
-							masterScript.systemList[i].heroesInSystem[j] = instantiatedHero;
+							systemListConstructor.systemList[i].heroesInSystem[j] = instantiatedHero;
 
 							heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
 
-							heroScript.heroLocation = masterScript.systemList[i].systemObject;
+							heroScript.heroLocation = systemListConstructor.systemList[i].systemObject;
 
 							++heroCounter;
 

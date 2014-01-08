@@ -27,17 +27,28 @@ public class EnemyOne : AIBasicParent
 
 		for(int i = 0;  i < 60; ++i)
 		{
-			if(masterScript.systemList[i].systemName == homeSystem)
+			if(systemListConstructor.systemList[i].systemName == homeSystem)
 			{
-				masterScript.systemList[i].systemOwnedBy = playerRace;
+				systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 
-				lineRenderScript = masterScript.systemList[i].systemObject.GetComponent<LineRenderScript>();
+				systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
+
+				lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
 				lineRenderScript.SetRaceLineColour(playerRace);
+
+				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
+				{
+					if(systemListConstructor.systemList[i].planetType[j] == homePlanetType)
+					{
+						systemListConstructor.systemList[i].planetColonised[j] = true;
+						break;
+					}
+				}
+
+				break;
 			}
 		}
-
-		StartSystemPlanetColonise(materialInUse, homeSystem);
 	}
 }
 

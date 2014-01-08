@@ -16,14 +16,10 @@ public class GUISystemDataScript : MasterScript
 	[HideInInspector]
 	public string[] allPlanetsInfo = new string[6];	//Unique to object
 	[HideInInspector]
-	public bool canImprove, foundPlanetData, isOkToColonise;
+	public bool canImprove, foundPlanetData;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM, tempTotalSci, tempTotalInd, tempTotalMon;
 	public float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
-
-	private GameObject[] systemConnections = new GameObject[4];
-
-	private TurnInfo playerOwnedSystem;
 
 	void Start()
 	{
@@ -32,136 +28,38 @@ public class GUISystemDataScript : MasterScript
 		heroScript = gameObject.GetComponent<HeroScriptParent>();
 	}
 
-	public void CheckOwnership()
-	{
-		int i = masterScript.RefreshCurrentSystem(gameObject);
-
-		if(masterScript.systemList[i].systemOwnedBy != null && playerOwnedSystem == null)
-		{
-			if(masterScript.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
-			{
-				playerOwnedSystem = playerTurnScript;
-			}
-			if(masterScript.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace)
-			{
-				playerOwnedSystem = enemyOneTurnScript;
-			}
-			if(masterScript.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace)
-			{
-				playerOwnedSystem = enemyTwoTurnScript;
-			}
-		}
-	}
-
-	public void FindSystem(TurnInfo thisPlayer) //This function is used to check if the highlighted system can be colonised, and if it can, to colonise it
-	{		
-		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
-		
-		systemConnections = lineRenderScript.connections;
-
-		if(thisPlayer.playerRace == playerTurnScript.playerRace)
-		{
-			PlayerColoniseSystem(systemConnections);
-
-			lineRenderScript = gameObject.GetComponent<LineRenderScript>();
-		}
-
-		if(thisPlayer.playerRace != playerTurnScript.playerRace)
-		{
-			isOkToColonise = true;
-		}
-
-		if(isOkToColonise == true && thisPlayer.GP > 0)
-		{
-			for(int i = 0; i < 60; i ++)
-			{
-				if(masterScript.systemList[i].systemObject == gameObject)
-				{
-					masterScript.systemList[i].systemOwnedBy = thisPlayer.playerRace;
-
-					lineRenderScript = masterScript.systemList[i].systemObject.GetComponent<LineRenderScript>();
-
-					lineRenderScript.SetRaceLineColour(playerTurnScript.playerRace);
-
-					gameObject.renderer.material = thisPlayer.materialInUse;
-
-					thisPlayer.GP -= 1;
-					
-					++turnInfoScript.systemsInPlay;
-					
-					cameraFunctionsScript.coloniseMenu = false;
-
-					break;
-				}
-			}
-
-			CheckOwnership();
-		}
-	}
-
-	void PlayerColoniseSystem(GameObject[] connections)
-	{
-		for(int i = 0; i < 4; ++i)
-		{
-			if(connections[i] == null)
-			{
-				break;
-			}
-
-			int j = masterScript.RefreshCurrentSystem(connections[i]);
-
-			for(int k = 0; k < 60; ++k)
-			{
-				if(masterScript.systemList[k].systemName == "Sol")
-				{
-					Debug.Log(masterScript.systemList[k].systemOwnedBy);
-				}
-			}
-
-			if(masterScript.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
-			{
-				isOkToColonise = true;
-			}
-
-			else
-			{
-				continue;
-			}
-		}
-	}
-
-	public void SystemSIMCounter(int i) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
+	public void SystemSIMCounter(int i, TurnInfo thisPlayer) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{				
 		tempTotalSci = 0.0f;
 		tempTotalInd = 0.0f;
 		tempTotalMon = 0.0f;
 
-		for(int j = 0; j < masterScript.systemList[i].systemSize; ++j)
+		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
-			if(masterScript.systemList[i].planetColonised[j] == true)
+			if(systemListConstructor.systemList[i].planetColonised[j] == true)
 			{
-				string planetType = masterScript.systemList[i].planetType[j];
+				string planetType = systemListConstructor.systemList[i].planetType[j];
 
-				improvementNumber = masterScript.systemList[i].planetImprovementLevel[j];
+				improvementNumber = systemListConstructor.systemList[i].planetImprovementLevel[j];
 
 				CheckImprovement();
 				
-				tempSci = masterScript.systemList[i].planetScience[j]; //Need to sort out variable types, too much casting
-				tempInd = masterScript.systemList[i].planetIndustry[j];
-				tempMon = masterScript.systemList[i].planetMoney[j];
+				tempSci = systemListConstructor.systemList[i].planetScience[j]; //Need to sort out variable types, too much casting
+				tempInd = systemListConstructor.systemList[i].planetIndustry[j];
+				tempMon = systemListConstructor.systemList[i].planetMoney[j];
 
 				techTreeScript.planetToCheck = planetType;
 
 				techTreeScript.CheckPlanets();
 
-				allPlanetsInfo[i] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-					+ ((int)(tempSci * resourceBonus * playerOwnedSystem.raceScience)).ToString() + "\n" 
-					+ ((int)(tempInd * resourceBonus * playerOwnedSystem.raceIndustry)).ToString() + "\n" 
-					+ ((int)(tempMon * resourceBonus * playerOwnedSystem.raceMoney)).ToString();
+				allPlanetsInfo[j] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
+					+ ((int)(tempSci * resourceBonus * thisPlayer.raceScience)).ToString() + "\n" 
+					+ ((int)(tempInd * resourceBonus * thisPlayer.raceIndustry)).ToString() + "\n" 
+					+ ((int)(tempMon * resourceBonus * thisPlayer.raceMoney)).ToString();
 
-				tempTotalSci += tempSci * techTreeScript.sciencePercentBonus * resourceBonus * playerOwnedSystem.raceScience;
-				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * playerOwnedSystem.raceIndustry;
-				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * playerOwnedSystem.raceMoney;
+				tempTotalSci += tempSci * techTreeScript.sciencePercentBonus * resourceBonus * thisPlayer.raceScience;
+				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * thisPlayer.raceIndustry;
+				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * thisPlayer.raceMoney;
 			}
 		}
 
@@ -200,11 +98,11 @@ public class GUISystemDataScript : MasterScript
 			
 			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 1] = i.ToString();
 				
-			improvementNumber = masterScript.systemList[k].planetImprovementLevel[i];
+			improvementNumber = systemListConstructor.systemList[k].planetImprovementLevel[i];
 			
 			CheckImprovement();
 			
-			float tempInt = masterScript.systemList[k].planetScience[i] + masterScript.systemList[k].planetIndustry[i] + masterScript.systemList[k].planetMoney[i];
+			float tempInt = systemListConstructor.systemList[k].planetScience[i] + systemListConstructor.systemList[k].planetIndustry[i] + systemListConstructor.systemList[k].planetMoney[i];
 			
 			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 2] = tempInt.ToString();
 
