@@ -6,8 +6,8 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation;
 	public int currentLevel = 1;
-	public float heroSciBonus = 10, heroIndBonus = 10, heroMonBonus = 10;
-	public bool endTurnBonus;
+	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0;
+	public string heroTier2, heroTier3;
 
 	void Start()
 	{
@@ -15,13 +15,41 @@ public class HeroScriptParent : MasterScript
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 	}
 
+	public virtual void HeroBonusFunction()
+	{
+		heroSciBonus += 10; 
+		heroIndBonus += 10;
+		heroMonBonus += 10;
+	}
+
 	public void HeroEndTurnFunctions()
 	{
-		heroSciBonus = 10; 
-		heroIndBonus = 10;
-		heroMonBonus = 10;
+		heroSciBonus = 0; 
+		heroIndBonus = 0;
+		heroMonBonus = 0;
 
-		endTurnBonus = true;
+		if(heroTier2 == "Diplomat")
+		{
+			heroScript = gameObject.GetComponent<DiplomatScript>();
+
+			heroScript.HeroBonusFunction();
+		}
+
+		if(heroTier2 == "Infiltrator")
+		{
+			heroScript = gameObject.GetComponent<InfiltratorScript>();
+			
+			heroScript.HeroBonusFunction();
+		}
+
+		if(heroTier2 == "Soldier")
+		{
+			heroScript = gameObject.GetComponent<SoldierScript>();
+			
+			heroScript.HeroBonusFunction();
+		}
+
+		Debug.Log (heroScript.heroSciBonus);
 	}
 
 	public void LevelUp()
@@ -73,3 +101,5 @@ public class HeroScriptParent : MasterScript
 		}
 	}*/
 }
+
+

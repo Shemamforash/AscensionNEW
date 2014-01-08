@@ -62,8 +62,9 @@ public class GUISystemDataScript : MasterScript
 				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * thisPlayer.raceMoney;
 			}
 		}
+		//Debug.Log(tempTotalSci + " " + techTreeScript.sciencePointBonus + " " + heroScript.heroSciBonus);
 
-		//heroGUIScript.CheckHeroesInSystem(); need to include heroscript
+		Debug.Log (heroScript.heroSciBonus);
 
 		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus + heroScript.heroSciBonus;
 		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus  + heroScript.heroIndBonus;
