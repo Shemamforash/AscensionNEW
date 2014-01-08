@@ -78,6 +78,17 @@ public class TurnInfo : MasterScript
 				continue;
 			}
 
+			for(int j = 0; j < 3; ++j)
+			{
+				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
+				{
+					continue;
+				}
+				
+				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
+				heroScript.HeroEndTurnFunctions();
+			}
+
 			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
 			techTreeScript = systemListConstructor.systemList[i].systemObject.GetComponent<TechTreeScript>();
 			heroScript = systemListConstructor.systemList[i].systemObject.GetComponent<HeroScriptParent>();
@@ -85,17 +96,6 @@ public class TurnInfo : MasterScript
 			techTreeScript.ActiveTechnologies(selectedPlayer);
 			guiPlanScript.SystemSIMCounter(i, selectedPlayer);
 			guiPlanScript.CheckUnlockedTier();
-
-			for(int j = 0; j < 3; ++j)
-			{
-				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
-				{
-					continue;
-				}
-
-				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
-				heroScript.HeroEndTurnFunctions();
-			}
 
 			selectedPlayer.science += (int)guiPlanScript.totalSystemScience;
 			selectedPlayer.industry += (int)guiPlanScript.totalSystemIndustry;

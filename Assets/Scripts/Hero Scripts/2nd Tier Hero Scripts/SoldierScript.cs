@@ -8,7 +8,7 @@ public class SoldierScript : HeroScriptParent
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
 	}
 	
-	void Update()
+	public void HeroBonusFunction2()
 	{
 		if(heroScript.endTurnBonus == true)
 		{

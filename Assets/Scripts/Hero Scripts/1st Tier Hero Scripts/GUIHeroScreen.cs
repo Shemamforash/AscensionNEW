@@ -16,15 +16,13 @@ public class GUIHeroScreen : MasterScript
 	void Start()
 	{
 		LevellingTreeBuilder();
-
-		Debug.Log (heroLevel3Specs [1]);
 	}
 
 	private void LevellingTreeBuilder()
 	{
-		Rect tier1Box1 = new Rect(Screen.width / 2 - 90.0f, Screen.height / 2 - 162.5f, 180.0f, 50.0f);
+		Rect tier1Box1 = new Rect(Screen.width / 2 - 90.0f, Screen.height / 2 - 205.0f, 180.0f, 50.0f);
 		Rect tier1Box2 = new Rect(Screen.width / 2 - 90.0f, Screen.height /2 - 25.0f, 180.0f, 50.0f);
-		Rect tier1Box3 = new Rect(Screen.width / 2 - 90.0f, Screen.height / 2 + 137.5f, 180.0f, 50.0f);
+		Rect tier1Box3 = new Rect(Screen.width / 2 - 90.0f, Screen.height / 2 + 155.0f, 180.0f, 50.0f);
 
 		tier1 = new Rect[3]{tier1Box1, tier1Box2, tier1Box3};
 
@@ -91,7 +89,7 @@ public class GUIHeroScreen : MasterScript
 
 			GUI.Box (new Rect(Screen.width / 2 - 300.0f, Screen.height / 2 - 275.0f, 600.0f, 550.0f), "");
 
-			GUI.Label(new Rect(Screen.width / 2 -290.0f, Screen.height / 2, 180.0f, 50.0f), "Hero");
+			GUI.Label(new Rect(Screen.width / 2 -290.0f, Screen.height / 2 - 25.0f, 180.0f, 50.0f), "Hero");
 
 			heroScript = selectedHero.GetComponent<HeroScriptParent>();
 
@@ -103,7 +101,11 @@ public class GUIHeroScreen : MasterScript
 					{
 						playerTurnScript.GP -= 2;
 
-						scriptToAdd = heroLevel2Specs[i] + "Script";
+						string deSpacer = heroLevel2Specs[i].Replace (" ", "");
+
+						scriptToAdd = deSpacer + "Script";
+
+						heroScript.heroTier2 = heroLevel2Specs[i];
 
 						selectedHero.AddComponent(scriptToAdd);
 
@@ -132,7 +134,11 @@ public class GUIHeroScreen : MasterScript
 					{
 						playerTurnScript.GP -= 3;
 						
-						scriptToAdd = heroLevel3Specs[i] + "Script";
+						string deSpacer = heroLevel3Specs[i].Replace (" ", "");
+						
+						scriptToAdd = deSpacer + "Script";
+
+						heroScript.heroTier3 = heroLevel3Specs[i];
 						
 						selectedHero.AddComponent(scriptToAdd);
 
