@@ -3,7 +3,6 @@ using System.Collections;
 
 public class CameraFunctions : MasterScript
 {
-
 	//This class contains all functions related to camera behaviour. This includes panning and zooming of the main camera, as well as using raycasts to update the current selected object.
 	//It also includes mouse functions (double click).
 	
