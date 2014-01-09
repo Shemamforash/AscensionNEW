@@ -54,7 +54,10 @@ public class CameraFunctions : MasterScript
 			
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
-				selectedSystem = hit.collider.gameObject;
+				if(hit.collider.gameObject.tag == "StarSystem")
+				{
+					selectedSystem = hit.collider.gameObject;
+				}
 
 				int i = RefreshCurrentSystem(selectedSystem);
 
