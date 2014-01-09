@@ -25,7 +25,6 @@ public class GUISystemDataScript : MasterScript
 	{
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
-		heroScript = gameObject.GetComponent<HeroScriptParent>();
 	}
 
 	public void SystemSIMCounter(int i, TurnInfo thisPlayer) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
@@ -62,13 +61,26 @@ public class GUISystemDataScript : MasterScript
 				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * thisPlayer.raceMoney;
 			}
 		}
-		//Debug.Log(tempTotalSci + " " + techTreeScript.sciencePointBonus + " " + heroScript.heroSciBonus);
 
-		Debug.Log (heroScript.heroSciBonus);
+		for(int j = 0; j < 3; ++j)
+		{
+			int k = RefreshCurrentSystem(gameObject);
 
-		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus + heroScript.heroSciBonus;
-		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus  + heroScript.heroIndBonus;
-		totalSystemMoney = tempTotalMon + techTreeScript.moneyPointBonus  + heroScript.heroMonBonus;
+			if(systemListConstructor.systemList[k].heroesInSystem[j] == null)
+			{
+				continue;
+			}
+
+			heroScript = systemListConstructor.systemList[k].heroesInSystem[j].GetComponent<HeroScriptParent>();
+
+			tempTotalSci += heroScript.heroSciBonus;
+			tempTotalInd += heroScript.heroIndBonus;
+			tempTotalMon += heroScript.heroMonBonus;
+		}
+
+		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus;
+		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
+		totalSystemMoney = tempTotalMon + techTreeScript.moneyPointBonus;
 		
 		turnInfoScript.RefreshPlanetPower();
 	}

@@ -192,7 +192,7 @@ public class MainGUIScript : MasterScript
 		
 		if(cameraFunctionsScript.coloniseMenu == true)
 		{
-			if(GUI.Button (coloniseButton, "Colonise") && playerTurnScript.GP > 0)
+			if(GUI.Button (coloniseButton, "Colonise") && playerTurnScript.GP > 0 && systemListConstructor.systemList[selectedSystem].systemOwnedBy == null)
 			{			
 				playerTurnScript.FindSystem (selectedSystem);
 			}
@@ -375,7 +375,20 @@ public class MainGUIScript : MasterScript
 
 				RefreshHeroInfo(i);
 			
-				GUI.Label (allHeroLabels[i], heroName);
+				if(heroName == "Merchant" && tier3HeroScript.linkableSystemsExist == true)
+				{
+					if(GUI.Button (allHeroLabels[i], heroName))
+					{
+						tier3HeroScript.openSystemLinkScreen = true;
+						tier3HeroScript.selectedHero = systemListConstructor.systemList[selectedSystem].heroesInSystem[i];
+						tier3HeroScript.FillLinkableSystems();
+					}
+				}
+
+				else
+				{
+					GUI.Label (allHeroLabels[i], heroName);
+				}
 
 				if(GUI.Button (allHeroButtons[i], "Level Up"))
 				{

@@ -31,12 +31,13 @@ public class CameraFunctions : MasterScript
 		
 		if(Input.GetKeyDown ("escape")) //Used to close all open menus, and to reset doubleclick
 		{
-			heroGUIScript.openMerchantConnectionMenu = false;
 			coloniseMenu = false;
 			openMenu = false;
 			doubleClick = false;
 			mainGUIScript.spendMenu = false;
 			mainGUIScript.openImprovementList = false;
+			tier3HeroScript.openSystemLinkScreen = false;
+			heroGUIScript.openHeroLevellingScreen = false;
 		}
 	}
 
@@ -55,9 +56,14 @@ public class CameraFunctions : MasterScript
 			{
 				selectedSystem = hit.collider.gameObject;
 
-				coloniseMenu = true; //Shows the colonise button on single click
-				
-				if(doubleClick == true)
+				int i = RefreshCurrentSystem(selectedSystem);
+
+				if(systemListConstructor.systemList[i].systemOwnedBy == null)
+				{
+					coloniseMenu = true; //Shows the colonise button on single click
+				}
+
+				if(doubleClick == true && systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
 				{
 					openMenu = true; //Opens system menu on double click
 				}

@@ -31,9 +31,11 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public HeroScriptParent heroScript;
 	[HideInInspector]
-	public DiplomacyControlScript diplomacyScript;
+	public Tier2HeroScript tier2HeroScript;
 	[HideInInspector]
-	public MerchantScript merchantScript;
+	public Tier3HeroScript tier3HeroScript;
+	[HideInInspector]
+	public DiplomacyControlScript diplomacyScript;
 
 	[HideInInspector]
 	public MainGUIScript mainGUIScript;
@@ -52,6 +54,8 @@ public class MasterScript : MonoBehaviour
 		diplomacyScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<DiplomacyControlScript>();
 		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
 		heroGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GUIHeroScreen>();
+		tier2HeroScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Tier2HeroScript> ();
+		tier3HeroScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Tier3HeroScript> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem)
