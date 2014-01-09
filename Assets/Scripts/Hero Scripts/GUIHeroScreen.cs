@@ -4,18 +4,105 @@ using System.Collections.Generic;
 
 public class GUIHeroScreen : MasterScript 
 {
-	public bool openHeroLevellingScreen;
-	public GameObject heroObject, selectedHero;
+	public bool openHeroLevellingScreen, heroIsMoving;
+	public GameObject heroObject, merchantQuad;
+	private GameObject tempHero, targetSystem;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
 	private string[] heroLevelThreeSpecs = new string[9] {"President", "Peacemaker", "Merchant", "Vanguard", "Strike Team", "Warlord", "Spy", "Recon Drone", "Assassin"};
 	public GUISkin mySkin;
-	private int heroCounter = 1;
-	private string tempHero, scriptToAdd;
+	public int heroCounter = 1, selectedHero, j;
+	private float timer;
 	private Rect[] tier1, tier2;
 
 	void Start()
 	{
 		LevellingTreeBuilder();
+	}
+
+	void Update()
+	{
+		RaycastHit hit = new RaycastHit();
+		
+		if(Input.GetMouseButtonDown(0) && heroIsMoving == false) //Used to start double click events and to identify systems when clicked on. Throws up error if click on a connector object.
+		{
+			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
+			{
+				if(hit.collider.gameObject.tag == "Hero")
+				{
+					tempHero = hit.collider.gameObject;
+				}
+			}
+		}
+
+		if(Input.GetMouseButtonDown (1) && tempHero != null && heroIsMoving == false)
+		{
+			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
+			{
+				if(hit.collider.gameObject.tag == "StarSystem")
+				{
+					targetSystem = hit.collider.gameObject;
+
+					int i = RefreshCurrentSystem (targetSystem);
+
+					if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
+					{
+						StartHeroMovement(tempHero, i);
+					}
+				}
+			}
+		}
+
+		if (heroIsMoving == true) 
+		{
+			MoveHero();
+		}
+	}
+
+	private void MoveHero()
+	{		
+		Vector3 targetPosition = heroScript.HeroPositionAroundStar();
+		Vector3 currentPosition = tempHero.transform.position;
+		
+		if(tempHero.transform.position == targetPosition || Time.time > timer + 1.0f) //If lerp exceeds timer, camera position will lock to point at object
+		{
+			tempHero.transform.position = targetPosition;
+			
+			timer = 0.0f; //Reset timer
+			
+			heroIsMoving = false;
+		}
+		
+		tempHero.transform.position = Vector3.Lerp (currentPosition, targetPosition, 0.1f);
+	}
+
+	private void StartHeroMovement(GameObject hero, int targetSystem)
+	{
+		if(heroIsMoving == false)
+		{
+			heroScript = hero.GetComponent<HeroScriptParent> ();
+
+			int k = RefreshCurrentSystem(heroScript.heroLocation);
+
+			systemListConstructor.systemList[j].heroesInSystem[heroScript.thisHeroNumber] = null;
+
+			heroScript.thisHeroNumber = j;
+
+			heroScript.heroLocation = systemListConstructor.systemList[targetSystem].systemObject;
+
+			k = RefreshCurrentSystem(heroScript.heroLocation);
+			
+			systemListConstructor.systemList[j].heroesInSystem[heroScript.thisHeroNumber] = hero;
+
+			for(j = 0; j < 3; ++j)
+			{
+				if(systemListConstructor.systemList[targetSystem].heroesInSystem[j] == null)
+				{
+					timer = Time.time;
+					heroIsMoving = true;
+					break;
+				}
+			}
+		}
 	}
 
 	private void LevellingTreeBuilder()
@@ -50,7 +137,7 @@ public class GUIHeroScreen : MasterScript
 					GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[system].systemObject.transform.position, 
 					                                                       systemListConstructor.systemList[system].systemObject.transform.rotation);
 
-					tempHero = "Basic Hero";
+					string tempHero = "Basic Hero";
 
 					instantiatedHero.name = tempHero;
 					
@@ -60,7 +147,9 @@ public class GUIHeroScreen : MasterScript
 
 					heroScript.heroLocation = systemListConstructor.systemList[system].systemObject;
 
-					heroScript.HeroPositionAroundStar();
+					heroScript.thisHeroNumber = j;
+
+					instantiatedHero.transform.position = heroScript.HeroPositionAroundStar();
 
 					++heroCounter;
 
@@ -93,7 +182,7 @@ public class GUIHeroScreen : MasterScript
 
 			GUI.Label(new Rect(Screen.width / 2 -290.0f, Screen.height / 2 - 25.0f, 180.0f, 50.0f), "Hero");
 
-			heroScript = selectedHero.GetComponent<HeroScriptParent>();
+			heroScript = systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[selectedHero].GetComponent<HeroScriptParent>();
 
 			if(heroScript.currentLevel == 1)
 			{
@@ -105,7 +194,7 @@ public class GUIHeroScreen : MasterScript
 
 						heroScript.heroTier2 = heroLevelTwoSpecs[i];
 
-						selectedHero.name = heroLevelTwoSpecs[i];
+						systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[selectedHero].name = heroLevelTwoSpecs[i];
 
 						++heroScript.currentLevel;
 					}
@@ -132,7 +221,7 @@ public class GUIHeroScreen : MasterScript
 
 						heroScript.heroTier3 = heroLevelThreeSpecs[i];
 
-						selectedHero.name = heroLevelThreeSpecs[i];
+						systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[selectedHero].name = heroLevelThreeSpecs[i];
 
 						++heroScript.currentLevel;
 					}
@@ -151,8 +240,6 @@ public class GUIHeroScreen : MasterScript
 					GUI.Label (tier2[i], heroLevelThreeSpecs[i]);
 				}
 			}
-			
 		}
-
 	}
 }

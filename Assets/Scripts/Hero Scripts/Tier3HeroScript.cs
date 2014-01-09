@@ -6,12 +6,11 @@ public class Tier3HeroScript : HeroScriptParent
 	public GameObject[] linkableSystems = new GameObject[60];
 	private Vector2 scrollPosition = Vector2.zero;
 	public bool openSystemLinkScreen, linkableSystemsExist;
-	public GameObject selectedHero;
 	private int availableSystems;
 
 	public void CheckTier3Heroes()
 	{
-		heroScript = selectedHero.GetComponent<HeroScriptParent> ();
+		heroScript = systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[heroGUIScript.selectedHero].GetComponent<HeroScriptParent> ();
 		
 		guiPlanScript = heroScript.heroLocation.GetComponent<GUISystemDataScript>();
 
@@ -64,15 +63,20 @@ public class Tier3HeroScript : HeroScriptParent
 
 	public void Merchant()
 	{
-		if(heroScript.linked != null)
+		if(heroScript.linkedHeroObject != null)
 		{
-			guiPlanScript = heroScript.linked.GetComponent<GUISystemDataScript>();
+			Debug.Log (heroScript.linkedHeroObject);
+
+			int i = RefreshCurrentSystem(heroScript.linkedHeroObject);
+
+			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
 			
 			heroScript.heroSciBonus += guiPlanScript.tempTotalSci / 2;
 			heroScript.heroIndBonus += guiPlanScript.tempTotalInd / 2;
 			heroScript.heroMonBonus += guiPlanScript.tempTotalMon / 2;
 		}
 	}
+
 	public void Peacemaker()
 	{
 	}
@@ -114,9 +118,7 @@ public class Tier3HeroScript : HeroScriptParent
 
 				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
 
-				Debug.Log (systemListConstructor.systemList[i].heroesInSystem[j].name);
-
-				if(systemListConstructor.systemList[i].heroesInSystem[j].name == "Merchant" && systemListConstructor.systemList[i].systemObject != heroScript.heroLocation && heroScript.linked == null)
+				if(systemListConstructor.systemList[i].heroesInSystem[j].name == "Merchant" && systemListConstructor.systemList[mainGUIScript.selectedSystem].systemObject != heroScript.heroLocation && heroScript.linkedHeroObject == null)
 				{
 					linkableSystems[i] = systemListConstructor.systemList[i].systemObject;
 					availableSystems++;
@@ -136,7 +138,7 @@ public class Tier3HeroScript : HeroScriptParent
 
 		if(openSystemLinkScreen == true && linkableSystemsExist == true)
 		{
-			heroScript = selectedHero.GetComponent<HeroScriptParent>();
+			heroScript = systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[heroGUIScript.selectedHero].GetComponent<HeroScriptParent>();
 
 			if(GUI.Button (new Rect(Screen.width / 2 + 100.0f, Screen.height / 2 - 270.0f, 20.0f, 20.0f), "X"))
 			{
@@ -158,15 +160,7 @@ public class Tier3HeroScript : HeroScriptParent
 
 				if(GUILayout.Button (linkableSystems[i].name, GUILayout.Height (50.0f)))
 				{
-					GameObject tempLocation = null;
-
-					tempLocation = heroScript.heroLocation;
-
-					heroScript.linked = linkableSystems[i];
-
-					heroScript = linkableSystems[i].GetComponent<HeroScriptParent>();
-
-					heroScript.linked = tempLocation;
+					LinkHeroes (mainGUIScript.selectedSystem, heroGUIScript.selectedHero, i);
 
 					openSystemLinkScreen = false;
 				}
@@ -176,5 +170,25 @@ public class Tier3HeroScript : HeroScriptParent
 
 			GUILayout.EndArea();
 		}
+	}
+
+	void LinkHeroes(int thisSystem, int thisHero, int targetSystem)
+	{
+		int j = 0;
+
+		for(j = 0; j < 3; ++j)
+		{
+			heroScript = systemListConstructor.systemList[targetSystem].heroesInSystem[j].GetComponent<HeroScriptParent>();
+
+			if(systemListConstructor.systemList[targetSystem].heroesInSystem[j].name == "Merchant" && heroScript.linkedHeroObject == null)
+			{
+				heroScript.linkedHeroObject = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero];
+				break;
+			}
+		}
+
+		heroScript = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero].GetComponent<HeroScriptParent> ();
+		
+		heroScript.linkedHeroObject = systemListConstructor.systemList [targetSystem].heroesInSystem [j];
 	}
 }

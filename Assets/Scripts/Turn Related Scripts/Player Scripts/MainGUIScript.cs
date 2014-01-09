@@ -10,7 +10,7 @@ public class MainGUIScript : MasterScript
 	public bool spendMenu = false, hasColonised = false, openImprovementList = false;
 	public string resourceToSpend;
 	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, heroName;
-	private int selectedSystem, selectedPlanet, selectedImprovement;
+	public int selectedSystem, selectedPlanet, selectedImprovemen;
 	private float xLoc, yLoc;
 	private Vector2 scrollPositionA = Vector2.zero, scrollPositionB = Vector2.zero;
 
@@ -375,12 +375,14 @@ public class MainGUIScript : MasterScript
 
 				RefreshHeroInfo(i);
 			
+				tier3HeroScript.FillLinkableSystems();
+
 				if(heroName == "Merchant" && tier3HeroScript.linkableSystemsExist == true)
 				{
 					if(GUI.Button (allHeroLabels[i], heroName))
 					{
 						tier3HeroScript.openSystemLinkScreen = true;
-						tier3HeroScript.selectedHero = systemListConstructor.systemList[selectedSystem].heroesInSystem[i];
+						heroGUIScript.selectedHero = i;
 						tier3HeroScript.FillLinkableSystems();
 					}
 				}

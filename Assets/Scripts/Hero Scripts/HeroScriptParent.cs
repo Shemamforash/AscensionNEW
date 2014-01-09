@@ -4,8 +4,8 @@ using System.Collections;
 public class HeroScriptParent : MasterScript 
 {
 	//This is the basic hero level, with general effects
-	public GameObject heroLocation,  linked = null;
-	public int currentLevel = 1;
+	public GameObject heroLocation, linkedHeroObject = null, clone;
+	public int currentLevel = 1, thisHeroNumber;
 	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0;
 	public string heroTier2, heroTier3;
 	private Vector3 position;
@@ -17,44 +17,65 @@ public class HeroScriptParent : MasterScript
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
 	}
 
-	public void HeroPositionAroundStar()
+	public void Update()
 	{
-		int i = 0;
-
-		for (i = 0; i < 3; ++i) 
+		if(linkedHeroObject != null)
 		{
-			int j = RefreshCurrentSystem(heroLocation);
+			Destroy(clone);
 
-			if(systemListConstructor.systemList[j].heroesInSystem[i] == gameObject)
+			float distance = Vector3.Distance(gameObject.transform.position, linkedHeroObject.transform.position);
+			
+			float rotationZRad = Mathf.Acos ((linkedHeroObject.transform.position.y - gameObject.transform.position.y) / distance);
+			
+			float rotationZ = rotationZRad * Mathf.Rad2Deg;
+
+			if(gameObject.transform.position.x < linkedHeroObject.transform.position.x)
 			{
-				break;
+				rotationZ = -rotationZ;
 			}
+			
+			Vector3 rotation = new Vector3(0.0f, 0.0f, rotationZ);
+			
+			Vector3 midPoint = (gameObject.transform.position + linkedHeroObject.transform.position)/2;
+			
+			Vector3 scale = new Vector3(0.2f, distance, 0.0f);
+			
+			Quaternion directQuat = new Quaternion();
+			
+			directQuat.eulerAngles = rotation;
+			
+			clone = (GameObject)Instantiate (heroGUIScript.merchantQuad, midPoint, directQuat);
+			
+			clone.transform.localScale = scale;
 		}
-
-		if(i == 0)
-		{
-			position.x = gameObject.transform.position.x;
-			position.y = gameObject.transform.position.y + 1.5f;
-		}
-
-		if(i == 1)
-		{
-			position.x = gameObject.transform.position.x + 0.75f;
-			position.y = gameObject.transform.position.y - 0.5f;
-		}
-
-		if(i == 2)
-		{
-			position.x = gameObject.transform.position.x - 0.75f;
-			position.y = gameObject.transform.position.y - 0.5f;
-		}
-
-		position.z = gameObject.transform.position.z;
-
-		gameObject.transform.position = position;
 	}
 
-	public virtual void HeroBonusFunction()
+	public Vector3 HeroPositionAroundStar()
+	{
+		if(thisHeroNumber == 0)
+		{
+			position.x = heroLocation.transform.position.x;
+			position.y = heroLocation.transform.position.y + 1.5f;
+		}
+
+		if(thisHeroNumber == 1)
+		{
+			position.x = heroLocation.transform.position.x + 0.75f;
+			position.y = heroLocation.transform.position.y - 0.5f;
+		}
+
+		if(thisHeroNumber == 2)
+		{
+			position.x = heroLocation.transform.position.x - 0.75f;
+			position.y = heroLocation.transform.position.y - 0.5f;
+		}
+
+		position.z = heroLocation.transform.position.z;
+
+		return position;
+	}
+
+	public void HeroBonusFunction()
 	{
 		heroSciBonus += 10; 
 		heroIndBonus += 10;
@@ -75,7 +96,7 @@ public class HeroScriptParent : MasterScript
 
 			if(heroTier3 != "")
 			{
-				tier3HeroScript.selectedHero = gameObject;
+				heroGUIScript.selectedHero = thisHeroNumber;
 				tier3HeroScript.CheckTier3Heroes ();
 			}
 		}
@@ -83,7 +104,7 @@ public class HeroScriptParent : MasterScript
 
 	public void LevelUp()
 	{
-		heroGUIScript.selectedHero = gameObject;
+		heroGUIScript.selectedHero = thisHeroNumber;
 		heroGUIScript.openHeroLevellingScreen = true;
 	}
 
