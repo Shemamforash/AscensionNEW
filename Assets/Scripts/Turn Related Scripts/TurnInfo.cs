@@ -5,7 +5,7 @@ using System.IO;
 public class TurnInfo : MasterScript
 {
 	[HideInInspector]
-	public int GP, raceGP, planetsColonisedThisTurn, savedIterator;
+	public int GP, raceGP, planetsColonisedThisTurn, savedIterator, warCounter, peaceCounter, stalemateCounter;
 	public float raceScience, raceIndustry, raceMoney, science, industry, money;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,5];
@@ -15,7 +15,7 @@ public class TurnInfo : MasterScript
 	public Camera mainCamera;
 	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse;
 
-	public string playerRace, homeSystem, homePlanetType;
+	public string playerRace, homeSystem, homePlanetType, diplomaticState;
 	public int turn = 0, systemsInPlay = 0;
 
 	void Start()
@@ -100,6 +100,8 @@ public class TurnInfo : MasterScript
 			selectedPlayer.industry += guiPlanScript.totalSystemIndustry;
 			selectedPlayer.money += guiPlanScript.totalSystemMoney;
 		}
+
+		diplomacyScript.CheckForDiplomaticStateChange (selectedPlayer);
 
 		turnInfoScript.SortSystemPower();
 		
