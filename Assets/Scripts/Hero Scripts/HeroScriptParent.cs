@@ -15,6 +15,21 @@ public class HeroScriptParent : MasterScript
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
+
+		int i = RefreshCurrentSystem (heroLocation);
+
+		if (systemListConstructor.systemList [i].systemOwnedBy == playerTurnScript.playerRace) 
+		{
+			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
+		}
+		if (systemListConstructor.systemList [i].systemOwnedBy == enemyOneTurnScript.playerRace) 
+		{
+			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
+		}
+		if (systemListConstructor.systemList [i].systemOwnedBy == enemyTwoTurnScript.playerRace) 
+		{
+			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
+		}
 	}
 
 	public void Update()
