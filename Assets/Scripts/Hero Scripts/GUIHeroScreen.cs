@@ -83,22 +83,24 @@ public class GUIHeroScreen : MasterScript
 
 			int k = RefreshCurrentSystem(heroScript.heroLocation);
 
-			systemListConstructor.systemList[j].heroesInSystem[heroScript.thisHeroNumber] = null;
-
-			heroScript.thisHeroNumber = j;
+			systemListConstructor.systemList[k].heroesInSystem[heroScript.thisHeroNumber] = null;
 
 			heroScript.heroLocation = systemListConstructor.systemList[targetSystem].systemObject;
 
 			k = RefreshCurrentSystem(heroScript.heroLocation);
-			
-			systemListConstructor.systemList[j].heroesInSystem[heroScript.thisHeroNumber] = hero;
 
 			for(j = 0; j < 3; ++j)
 			{
 				if(systemListConstructor.systemList[targetSystem].heroesInSystem[j] == null)
 				{
 					timer = Time.time;
+
+					heroScript.thisHeroNumber = j;
+
+					systemListConstructor.systemList[k].heroesInSystem[j] = hero;
+
 					heroIsMoving = true;
+
 					break;
 				}
 			}

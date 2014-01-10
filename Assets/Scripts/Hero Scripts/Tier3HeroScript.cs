@@ -8,29 +8,35 @@ public class Tier3HeroScript : HeroScriptParent
 	public bool openSystemLinkScreen, linkableSystemsExist;
 	private int availableSystems;
 
-	public void CheckTier3Heroes()
+	public void CheckTier3Heroes(HeroScriptParent heroScript)
 	{
-		heroScript = systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[heroGUIScript.selectedHero].GetComponent<HeroScriptParent> ();
-		
 		guiPlanScript = heroScript.heroLocation.GetComponent<GUISystemDataScript>();
 
 		if(heroScript.heroTier2 == "Diplomat")
 		{
+			heroScript.heroSciBonus += 0.10f * guiPlanScript.tempTotalSci;
+			heroScript.heroIndBonus += 0.10f * guiPlanScript.tempTotalInd;
+			heroScript.heroMonBonus += 0.20f * guiPlanScript.tempTotalMon;
+
 			if(heroScript.heroTier3 == "Peacemaker")
 			{
 				Peacemaker ();
 			}
 			if(heroScript.heroTier3 == "President")
 			{
-				President ();
+				President (heroScript);
 			}
 			if(heroScript.heroTier3 == "Merchant")
 			{
-				Merchant ();
+				Merchant (heroScript);
 			}
 		}
 		if(heroScript.heroTier2 == "Infiltrator")
 		{
+			heroScript.heroSciBonus += 0.20f * guiPlanScript.tempTotalSci;
+			heroScript.heroIndBonus += 0.10f * guiPlanScript.tempTotalInd;
+			heroScript.heroMonBonus += 0.10f * guiPlanScript.tempTotalMon;
+
 			if(heroScript.heroTier3 == "Spy")
 			{
 				Spy ();
@@ -46,6 +52,10 @@ public class Tier3HeroScript : HeroScriptParent
 		}
 		if(heroScript.heroTier2 == "Soldier")
 		{
+			heroScript.heroSciBonus += 0.10f * guiPlanScript.tempTotalSci;
+			heroScript.heroIndBonus += 0.20f * guiPlanScript.tempTotalInd;
+			heroScript.heroMonBonus += 0.10f * guiPlanScript.tempTotalMon;
+
 			if(heroScript.heroTier3 == "Warlord")
 			{
 				Warlord ();
@@ -61,13 +71,11 @@ public class Tier3HeroScript : HeroScriptParent
 		}
 	}
 
-	public void Merchant()
+	public void Merchant(HeroScriptParent heroScript)
 	{
 		if(heroScript.linkedHeroObject != null)
 		{
-			Debug.Log (heroScript.linkedHeroObject);
-
-			int i = RefreshCurrentSystem(heroScript.linkedHeroObject);
+			int i = RefreshCurrentSystem(heroScript.heroLocation);
 
 			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
 			
@@ -80,9 +88,14 @@ public class Tier3HeroScript : HeroScriptParent
 	public void Peacemaker()
 	{
 	}
-	public void President()
+
+	public void President(HeroScriptParent heroScript)
 	{
+		heroScript.heroSciBonus += guiPlanScript.tempTotalSci * 0.25f;
+		heroScript.heroIndBonus += guiPlanScript.tempTotalInd * 0.25f;
+		heroScript.heroMonBonus += guiPlanScript.tempTotalMon * 0.25f;
 	}
+
 	public void Spy()
 	{
 	}
@@ -183,6 +196,9 @@ public class Tier3HeroScript : HeroScriptParent
 			if(systemListConstructor.systemList[targetSystem].heroesInSystem[j].name == "Merchant" && heroScript.linkedHeroObject == null)
 			{
 				heroScript.linkedHeroObject = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero];
+
+				heroScript.CreateConnectionLine();
+
 				break;
 			}
 		}

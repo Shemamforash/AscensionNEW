@@ -19,35 +19,40 @@ public class HeroScriptParent : MasterScript
 
 	public void Update()
 	{
-		if(linkedHeroObject != null)
+		if(linkedHeroObject != null && heroGUIScript.heroIsMoving == true)
 		{
 			Destroy(clone);
 
-			float distance = Vector3.Distance(gameObject.transform.position, linkedHeroObject.transform.position);
-			
-			float rotationZRad = Mathf.Acos ((linkedHeroObject.transform.position.y - gameObject.transform.position.y) / distance);
-			
-			float rotationZ = rotationZRad * Mathf.Rad2Deg;
-
-			if(gameObject.transform.position.x < linkedHeroObject.transform.position.x)
-			{
-				rotationZ = -rotationZ;
-			}
-			
-			Vector3 rotation = new Vector3(0.0f, 0.0f, rotationZ);
-			
-			Vector3 midPoint = (gameObject.transform.position + linkedHeroObject.transform.position)/2;
-			
-			Vector3 scale = new Vector3(0.2f, distance, 0.0f);
-			
-			Quaternion directQuat = new Quaternion();
-			
-			directQuat.eulerAngles = rotation;
-			
-			clone = (GameObject)Instantiate (heroGUIScript.merchantQuad, midPoint, directQuat);
-			
-			clone.transform.localScale = scale;
+			CreateConnectionLine();
 		}
+	}
+
+	public void CreateConnectionLine()
+	{
+		float distance = Vector3.Distance(gameObject.transform.position, linkedHeroObject.transform.position);
+		
+		float rotationZRad = Mathf.Acos ((linkedHeroObject.transform.position.y - gameObject.transform.position.y) / distance);
+		
+		float rotationZ = rotationZRad * Mathf.Rad2Deg;
+		
+		if(gameObject.transform.position.x < linkedHeroObject.transform.position.x)
+		{
+			rotationZ = -rotationZ;
+		}
+		
+		Vector3 rotation = new Vector3(0.0f, 0.0f, rotationZ);
+		
+		Vector3 midPoint = (gameObject.transform.position + linkedHeroObject.transform.position)/2;
+		
+		Vector3 scale = new Vector3(0.2f, distance, 0.0f);
+		
+		Quaternion directQuat = new Quaternion();
+		
+		directQuat.eulerAngles = rotation;
+		
+		clone = (GameObject)Instantiate (heroGUIScript.merchantQuad, midPoint, directQuat);
+		
+		clone.transform.localScale = scale;
 	}
 
 	public Vector3 HeroPositionAroundStar()
@@ -97,7 +102,8 @@ public class HeroScriptParent : MasterScript
 			if(heroTier3 != "")
 			{
 				heroGUIScript.selectedHero = thisHeroNumber;
-				tier3HeroScript.CheckTier3Heroes ();
+
+				tier3HeroScript.CheckTier3Heroes (heroScript);
 			}
 		}
 	}
@@ -107,46 +113,6 @@ public class HeroScriptParent : MasterScript
 		heroGUIScript.selectedHero = thisHeroNumber;
 		heroGUIScript.openHeroLevellingScreen = true;
 	}
-
-
-	/*private void President()
-	{
-		techTreeScript.sciencePercentBonus += 0.05f;
-		techTreeScript.industryPercentBonus += 0.05f;
-		techTreeScript.moneyPercentBonus += 0.05f;
-
-		foreach(GameObject system in lineRenderScript.connections)
-		{
-			if(system == null)
-			{
-				break;
-			}
-
-			heroScript = system.GetComponent<HeroScriptParent>();
-
-			int presidentNum = 0;
-
-			foreach(GameObject hero in heroScript.heroesInSystem)
-			{
-				if(hero.name == "President")
-				{
-					if(presidentNum > 0 && techTreeScript.leadership == false)
-					{
-						break;
-					}
-
-					else
-					{
-						techTreeScript.sciencePercentBonus += 0.025f;
-						techTreeScript.industryPercentBonus += 0.025f;
-						techTreeScript.moneyPercentBonus += 0.025f;
-					}
-
-					presidentNum++;
-				}
-			}
-		}
-	}*/
 }
 
 
