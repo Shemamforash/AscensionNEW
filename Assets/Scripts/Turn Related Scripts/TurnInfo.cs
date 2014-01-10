@@ -5,8 +5,8 @@ using System.IO;
 public class TurnInfo : MasterScript
 {
 	[HideInInspector]
-	public int GP, raceGP, science, industry, money, planetsColonisedThisTurn, savedIterator;
-	public float raceScience, raceIndustry, raceMoney;
+	public int GP, raceGP, planetsColonisedThisTurn, savedIterator;
+	public float raceScience, raceIndustry, raceMoney, science, industry, money;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,5];
 	public string[,] mostPowerfulPlanets = new string[211,3];
@@ -91,15 +91,14 @@ public class TurnInfo : MasterScript
 
 			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
 			techTreeScript = systemListConstructor.systemList[i].systemObject.GetComponent<TechTreeScript>();
-			heroScript = systemListConstructor.systemList[i].systemObject.GetComponent<HeroScriptParent>();
 
 			techTreeScript.ActiveTechnologies(selectedPlayer);
 			guiPlanScript.SystemSIMCounter(i, selectedPlayer);
 			guiPlanScript.CheckUnlockedTier();
 
-			selectedPlayer.science += (int)guiPlanScript.totalSystemScience;
-			selectedPlayer.industry += (int)guiPlanScript.totalSystemIndustry;
-			selectedPlayer.money += (int)guiPlanScript.totalSystemMoney;
+			selectedPlayer.science += guiPlanScript.totalSystemScience;
+			selectedPlayer.industry += guiPlanScript.totalSystemIndustry;
+			selectedPlayer.money += guiPlanScript.totalSystemMoney;
 		}
 
 		turnInfoScript.SortSystemPower();

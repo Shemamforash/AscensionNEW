@@ -10,7 +10,7 @@ public class GUISystemDataScript : MasterScript
 	[HideInInspector]
 	public int numPlanets, improvementNumber;
 	[HideInInspector]
-	public float pScience, pIndustry, pMoney, improvementCost, resourceBonus;
+	public float pScience, pIndustry, pMoney, improvementCost, resourceBonus, adjacencyBonus;
 	[HideInInspector]
 	public string improvementLevel;
 	[HideInInspector]
@@ -28,7 +28,7 @@ public class GUISystemDataScript : MasterScript
 	}
 
 	public void SystemSIMCounter(int i, TurnInfo thisPlayer) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
-	{				
+	{	
 		tempTotalSci = 0.0f;
 		tempTotalInd = 0.0f;
 		tempTotalMon = 0.0f;
@@ -62,27 +62,63 @@ public class GUISystemDataScript : MasterScript
 			}
 		}
 
+		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus;
+		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
+		totalSystemMoney = tempTotalMon + techTreeScript.moneyPointBonus;
+
 		for(int j = 0; j < 3; ++j)
 		{
 			int k = RefreshCurrentSystem(gameObject);
-
+			
 			if(systemListConstructor.systemList[k].heroesInSystem[j] == null)
 			{
 				continue;
 			}
-
+			
 			heroScript = systemListConstructor.systemList[k].heroesInSystem[j].GetComponent<HeroScriptParent>();
-
-			tempTotalSci += heroScript.heroSciBonus;
-			tempTotalInd += heroScript.heroIndBonus;
-			tempTotalMon += heroScript.heroMonBonus;
+			
+			totalSystemScience += heroScript.heroSciBonus;
+			totalSystemIndustry += heroScript.heroIndBonus;
+			totalSystemMoney += heroScript.heroMonBonus;
 		}
 
-		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus;
-		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
-		totalSystemMoney = tempTotalMon + techTreeScript.moneyPointBonus;
-		
+		adjacencyBonus = FindAdjacencyBonuses ();
+
+		totalSystemScience += totalSystemScience * adjacencyBonus;
+		totalSystemIndustry += totalSystemIndustry * adjacencyBonus;
+		totalSystemMoney += totalSystemMoney * adjacencyBonus;
+
 		turnInfoScript.RefreshPlanetPower();
+	}
+
+	private float FindAdjacencyBonuses()
+	{
+		float totalAdjacencyBonus = 0.0f;
+
+		for(int i = 0; i < 4; ++i)
+		{
+			if(lineRenderScript.connections[i] == null)
+			{
+				continue;
+			}
+
+			int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
+
+			for(int k = 0; k < 3; ++k)
+			{
+				if(systemListConstructor.systemList[j].heroesInSystem[k] == null)
+				{
+					continue;
+				}
+
+				if(systemListConstructor.systemList[j].heroesInSystem[k].name == "President")
+				{
+					totalAdjacencyBonus += 0.1f;
+				}
+			}
+		}
+
+		return totalAdjacencyBonus;
 	}
 
 	public void CheckUnlockedTier()

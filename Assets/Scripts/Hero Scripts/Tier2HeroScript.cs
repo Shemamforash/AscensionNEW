@@ -25,22 +25,22 @@ public class Tier2HeroScript : HeroScriptParent
 
 	public void Diplomat()
 	{				
-		heroScript.heroSciBonus += 0.05f * guiPlanScript.totalSystemScience;
-		heroScript.heroIndBonus += 0.05f * guiPlanScript.totalSystemIndustry;
-		heroScript.heroMonBonus += 0.10f * guiPlanScript.totalSystemMoney;
+		heroScript.heroSciBonus += 0.05f * guiPlanScript.tempTotalSci;
+		heroScript.heroIndBonus += 0.05f * guiPlanScript.tempTotalInd;
+		heroScript.heroMonBonus += 0.10f * guiPlanScript.tempTotalMon;
 	}
 
 	public void Infiltrator()
 	{
-		heroScript.heroSciBonus += 0.10f * guiPlanScript.totalSystemScience;
-		heroScript.heroIndBonus += 0.05f * guiPlanScript.totalSystemIndustry;
-		heroScript.heroMonBonus += 0.05f * guiPlanScript.totalSystemMoney;
+		heroScript.heroSciBonus += 0.10f * guiPlanScript.tempTotalSci;
+		heroScript.heroIndBonus += 0.05f * guiPlanScript.tempTotalInd;
+		heroScript.heroMonBonus += 0.05f * guiPlanScript.tempTotalMon;
 	}
 
 	public void Soldier()
 	{
-		heroScript.heroSciBonus += 0.05f * guiPlanScript.totalSystemScience;
-		heroScript.heroIndBonus += 0.10f * guiPlanScript.totalSystemIndustry;
-		heroScript.heroMonBonus += 0.05f * guiPlanScript.totalSystemMoney;
+		heroScript.heroSciBonus += 0.05f * guiPlanScript.tempTotalSci;
+		heroScript.heroIndBonus += 0.10f * guiPlanScript.tempTotalInd;
+		heroScript.heroMonBonus += 0.05f * guiPlanScript.tempTotalMon;
 	}
 }

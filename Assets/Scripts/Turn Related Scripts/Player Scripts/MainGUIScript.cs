@@ -97,9 +97,9 @@ public class MainGUIScript : MasterScript
 		if(playerTurnScript.playerRace != null && cameraFunctionsScript.selectedSystem != null)
 		{
 			turnNumber = "Turn: " + turnInfoScript.turn.ToString();
-			scienceStr = playerTurnScript.science.ToString();
-			industryStr = playerTurnScript.industry.ToString ();
-			moneyStr = playerTurnScript.money.ToString ();
+			scienceStr = ((int)playerTurnScript.science).ToString();
+			industryStr = ((int)playerTurnScript.industry).ToString ();
+			moneyStr = ((int)playerTurnScript.money).ToString ();
 			GPString = playerTurnScript.GP.ToString ();
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 
