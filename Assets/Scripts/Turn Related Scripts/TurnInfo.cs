@@ -5,13 +5,13 @@ using System.IO;
 public class TurnInfo : MasterScript
 {
 	[HideInInspector]
-	public int GP, raceGP, planetsColonisedThisTurn, savedIterator, warCounter, peaceCounter, stalemateCounter;
-	public float raceScience, raceIndustry, raceMoney, science, industry, money;
+	public int GP, raceGP, planetsColonisedThisTurn, savedIterator, warCounter, peaceCounter, turnsAtColdWar, turnsAtPeace;
+	public float raceScience, raceIndustry, raceMoney, science, industry, money, peaceBonus, warBonus;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,5];
 	public string[,] mostPowerfulPlanets = new string[211,3];
 	[HideInInspector]
-	public bool endTurn;
+	public bool endTurn, canDeclareWar, ceaseFirePeriodExpired;
 	public Camera mainCamera;
 	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse;
 

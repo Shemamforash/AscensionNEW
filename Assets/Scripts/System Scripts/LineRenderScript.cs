@@ -57,6 +57,10 @@ public class LineRenderScript : MasterScript
 		{
 			quad = nereidesOwnedQuad;
 		}
+		if(thisRace == "None")
+		{
+			quad = quadA;
+		}
 	
 		BuildLine(quad);
 	}

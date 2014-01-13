@@ -75,7 +75,7 @@ public class Tier3HeroScript : HeroScriptParent
 	{
 		if(heroScript.linkedHeroObject != null)
 		{
-			int i = RefreshCurrentSystem(heroScript.heroLocation);
+			int i = RefreshCurrentSystem(heroScript.linkedHeroObject);
 
 			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
 			
@@ -121,17 +121,9 @@ public class Tier3HeroScript : HeroScriptParent
 		{
 			linkableSystems[i] = null;
 
-			/*&& systemListConstructor.systemList[i].systemOwnedBy != playerTurnScript.playerRace*/
-			for(int j = 0; j < 3; ++j)
+			if(systemListConstructor.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace || systemListConstructor.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace && systemListConstructor.systemList[i].tradeRoute == null)
 			{
-				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
-				{
-					continue;
-				}
-
-				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
-
-				if(systemListConstructor.systemList[i].heroesInSystem[j].name == "Merchant" && systemListConstructor.systemList[mainGUIScript.selectedSystem].systemObject != heroScript.heroLocation && heroScript.linkedHeroObject == null)
+				if(systemListConstructor.systemList[i].systemObject != heroScript.heroLocation && heroScript.linkedHeroObject == null)
 				{
 					linkableSystems[i] = systemListConstructor.systemList[i].systemObject;
 					availableSystems++;
@@ -173,7 +165,7 @@ public class Tier3HeroScript : HeroScriptParent
 
 				if(GUILayout.Button (linkableSystems[i].name, GUILayout.Height (50.0f)))
 				{
-					LinkHeroes (mainGUIScript.selectedSystem, heroGUIScript.selectedHero, i);
+					SetUpTradeRoute (mainGUIScript.selectedSystem, heroGUIScript.selectedHero, i);
 
 					openSystemLinkScreen = false;
 				}
@@ -185,26 +177,12 @@ public class Tier3HeroScript : HeroScriptParent
 		}
 	}
 
-	void LinkHeroes(int thisSystem, int thisHero, int targetSystem)
+	void SetUpTradeRoute(int thisSystem, int thisHero, int targetSystem)
 	{
-		int j = 0;
-
-		for(j = 0; j < 3; ++j)
-		{
-			heroScript = systemListConstructor.systemList[targetSystem].heroesInSystem[j].GetComponent<HeroScriptParent>();
-
-			if(systemListConstructor.systemList[targetSystem].heroesInSystem[j].name == "Merchant" && heroScript.linkedHeroObject == null)
-			{
-				heroScript.linkedHeroObject = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero];
-
-				heroScript.CreateConnectionLine();
-
-				break;
-			}
-		}
+		systemListConstructor.systemList [targetSystem].tradeRoute = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero];
 
 		heroScript = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero].GetComponent<HeroScriptParent> ();
-		
-		heroScript.linkedHeroObject = systemListConstructor.systemList [targetSystem].heroesInSystem [j];
+
+		heroScript.linkedHeroObject = systemListConstructor.systemList [targetSystem].systemObject;
 	}
 }

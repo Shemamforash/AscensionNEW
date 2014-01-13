@@ -45,8 +45,7 @@ public class MainGUIScript : MasterScript
 		Rect middleRight = new Rect(Screen.width/2 + 25.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Middle right		
 		Rect buttonMiddleRight = new Rect(Screen.width/2 + 25.0f, Screen.height / 2 + 50.0f, 200.0f, 50.0f);
 		Rect improveButtonMiddleRight = new Rect(Screen.width/2 + 25.0f, Screen.height / 2 - 100.0f, 200.0f, 50.0f);
-		
-		
+
 		Rect closeRight = new Rect(Screen.width/2 + 275.0f, Screen.height / 2 - 50.0f, 200.0f, 100.0f); //Bottom left		
 		Rect buttonCloseRight = new Rect(Screen.width/2 + 275.0f, Screen.height / 2 +50.0f, 200.0f, 50.0f);
 		Rect improveButtonCloseRight = new Rect(Screen.width/2 + 275.0f, Screen.height / 2 - 100.0f, 200.0f, 50.0f);
@@ -241,7 +240,7 @@ public class MainGUIScript : MasterScript
 
 				GUILayout.BeginArea(new Rect(allImprovementButtonsGUI[i].x, Screen.height / 2 + 100.0f, 200.0f, 400.0f));
 
-				for(int j = 0; j < systemListConstructor.systemList[selectedSystem].improvementSlots[i]; ++j)
+				for(int j = 0; j < systemListConstructor.systemList[selectedSystem].improvementSlots[i]; ++j) //Display improvements on system
 				{
 					GUILayout.Label (techTreeScript.improvementsOnPlanet[i,j], GUILayout.Height(50.0f));
 				}

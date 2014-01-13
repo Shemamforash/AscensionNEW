@@ -4,14 +4,17 @@ using System.Collections;
 public class HeroScriptParent : MasterScript 
 {
 	//This is the basic hero level, with general effects
-	public GameObject heroLocation, linkedHeroObject = null, clone;
-	public int currentLevel = 1, thisHeroNumber;
-	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0;
-	public string heroTier2, heroTier3;
+	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
+	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets;
+	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower, invasionStrength;
+	public string heroTier2, heroTier3, heroOwnedBy;
 	private Vector3 position;
+	public bool isInvading = false;
 
 	void Start()
 	{
+		offensivePower = 14.0f;
+
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
@@ -36,7 +39,7 @@ public class HeroScriptParent : MasterScript
 	{
 		if(linkedHeroObject != null && heroGUIScript.heroIsMoving == true)
 		{
-			Destroy(clone);
+			Destroy(merchantLine);
 
 			CreateConnectionLine();
 		}
@@ -65,9 +68,9 @@ public class HeroScriptParent : MasterScript
 		
 		directQuat.eulerAngles = rotation;
 		
-		clone = (GameObject)Instantiate (heroGUIScript.merchantQuad, midPoint, directQuat);
+		merchantLine = (GameObject)Instantiate (heroGUIScript.merchantQuad, midPoint, directQuat);
 		
-		clone.transform.localScale = scale;
+		merchantLine.transform.localScale = scale;
 	}
 
 	public Vector3 HeroPositionAroundStar()
@@ -121,12 +124,82 @@ public class HeroScriptParent : MasterScript
 				tier3HeroScript.CheckTier3Heroes (heroScript);
 			}
 		}
+
+		if(isInvading == true)
+		{
+			ContinueInvasion();
+		}
 	}
 
 	public void LevelUp()
 	{
 		heroGUIScript.selectedHero = thisHeroNumber;
 		heroGUIScript.openHeroLevellingScreen = true;
+	}
+
+	public void StartSystemInvasion()
+	{
+		int i = RefreshCurrentSystem (heroLocation);
+
+		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
+		{
+			if(systemListConstructor.systemList[i].planetColonised[j] == false)
+			{
+				continue;
+			}
+
+			++noOfColonisedPlanets;
+		}
+
+		invasionStrength = offensivePower / noOfColonisedPlanets;
+
+		isInvading = true;
+
+		invasionObject = (GameObject)Instantiate (heroGUIScript.invasionQuad, systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[i].systemObject.transform.rotation);
+	}
+
+	private void ContinueInvasion()
+	{
+		int i = RefreshCurrentSystem (heroLocation);
+
+		bool planetsRemaining = false;
+
+		invasionStrength = offensivePower / noOfColonisedPlanets;
+
+		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
+		{
+			if(systemListConstructor.systemList[i].planetColonised[j] == false)
+			{
+				continue;
+			}
+
+			systemListConstructor.systemList[i].planetOwnership[j] -= (int)invasionStrength;
+
+			if(systemListConstructor.systemList[i].planetOwnership[j] < 0)
+			{
+				systemListConstructor.systemList[i].planetColonised[j] = false;
+				systemListConstructor.systemList[i].planetImprovementLevel[j] = 0;
+				--noOfColonisedPlanets;
+			}
+
+			planetsRemaining = true;
+		}
+
+		if(planetsRemaining == false)
+		{
+			isInvading = false;
+
+			systemListConstructor.systemList[i].systemOwnedBy = playerTurnScript.playerRace;
+			systemListConstructor.systemList[i].tradeRoute = null;
+
+			Destroy (invasionObject);
+
+			lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
+
+			lineRenderScript.SetRaceLineColour("None");
+
+			systemListConstructor.systemList[i].systemObject.renderer.material = heroGUIScript.unownedMaterial;
+		}
 	}
 }
 

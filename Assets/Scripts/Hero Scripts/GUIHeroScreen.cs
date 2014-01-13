@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public class GUIHeroScreen : MasterScript 
 {
 	public bool openHeroLevellingScreen, heroIsMoving;
-	public GameObject heroObject, merchantQuad;
+	public Material unownedMaterial;
+	public GameObject heroObject, merchantQuad, invasionQuad;
 	private GameObject tempHero, targetSystem;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
 	private string[] heroLevelThreeSpecs = new string[9] {"President", "Peacemaker", "Merchant", "Vanguard", "Strike Team", "Warlord", "Spy", "Recon Drone", "Assassin"};
@@ -43,11 +44,8 @@ public class GUIHeroScreen : MasterScript
 					targetSystem = hit.collider.gameObject;
 
 					int i = RefreshCurrentSystem (targetSystem);
-
-					if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
-					{
-						StartHeroMovement(tempHero, i);
-					}
+			
+					StartHeroMovement(tempHero, i);
 				}
 			}
 		}
@@ -151,6 +149,8 @@ public class GUIHeroScreen : MasterScript
 
 					heroScript.thisHeroNumber = j;
 
+					heroScript.heroOwnedBy = playerTurnScript.playerRace;
+
 					instantiatedHero.transform.position = heroScript.HeroPositionAroundStar();
 
 					++heroCounter;
@@ -163,10 +163,37 @@ public class GUIHeroScreen : MasterScript
 		}
 	}
 
+	private bool CheckIfCanInvade(HeroScriptParent heroScript)
+	{
+		int i = RefreshCurrentSystem (heroScript.heroLocation);
+
+		if(systemListConstructor.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace || systemListConstructor.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace && heroScript.isInvading == false)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	void OnGUI()
 	{
 		GUI.skin = mySkin;
 
+		if(tempHero != null)
+		{
+			heroScript = tempHero.GetComponent<HeroScriptParent> ();
+
+			bool canInvade = CheckIfCanInvade (heroScript);
+
+			if(canInvade == true)
+			{
+				if(GUI.Button (new Rect(Screen.width / 2 - 75.0f, Screen.height / 2 + 400.0f, 150.0f, 60.0f), "Start Invasion"))
+				{
+					heroScript.StartSystemInvasion();
+				}
+			}
+		}
+	
 		if(openHeroLevellingScreen == true)
 		{
 			cameraFunctionsScript.coloniseMenu = false;

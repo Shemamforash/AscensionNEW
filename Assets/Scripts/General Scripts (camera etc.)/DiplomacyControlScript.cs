@@ -5,72 +5,74 @@ using System;
 public class DiplomacyControlScript : MasterScript 
 {
 	public string[] playerStates = new string[3]; //player-enemy1, player-enemy2, enemy1-enemy2
-	private float e = 2.718281859f, baseChangePercentage, warChangePercentage, peaceChangePercentage, diplomacyCoefficient = 0.00095650705f, tempChangePercentage, randomNumber;
 	public string tempState;
+
+	public void CheckForWarDeclarationAndPeaceExpiration(TurnInfo thisPlayer)
+	{
+		if(thisPlayer.turnsAtColdWar > 10)
+		{
+			thisPlayer.canDeclareWar = true;
+		}
+
+		if(thisPlayer.turnsAtPeace > 10)
+		{
+			thisPlayer.ceaseFirePeriodExpired = true;
+		}
+	}
 
 	public void CheckForDiplomaticStateChange(TurnInfo thisPlayer)
 	{
 		RefreshNumbers (thisPlayer);
 
-		baseChangePercentage = diplomacyCoefficient * (float)Math.Pow (thisPlayer.stalemateCounter, e);
+		InvokeDiplomaticStateBonuses (thisPlayer);
 
-		if(baseChangePercentage > 1.0f)
+		CheckForWarDeclarationAndPeaceExpiration (thisPlayer);
+
+		if(thisPlayer.peaceCounter > 66 || thisPlayer.ceaseFirePeriodExpired == false)
 		{
-			baseChangePercentage = 1.0f;
+			thisPlayer.diplomaticState = "Peace";
+
+			if(thisPlayer.peaceCounter < 66)
+			{
+				thisPlayer.peaceCounter = 66;
+			}
 		}
 
-		GenerateNumber ();
-
-		if(randomNumber < thisPlayer.peaceCounter / 100.0f)
+		if(thisPlayer.warCounter > 66)
 		{
-			tempChangePercentage = baseChangePercentage * (thisPlayer.peaceCounter / 100.0f);
-			tempState = "Peace";
+			thisPlayer.diplomaticState = "War";
 		}
 
-		if (randomNumber > (thisPlayer.peaceCounter / 100.0f) && randomNumber < ((thisPlayer.peaceCounter + thisPlayer.warCounter) / 100.0f)) 
+		if(thisPlayer.peaceCounter < 66 &&  thisPlayer.warCounter < 66 && thisPlayer.ceaseFirePeriodExpired == true)
 		{
-			tempChangePercentage = baseChangePercentage * (thisPlayer.warCounter / 100.0f);
-			tempState = "War";
-		}
-
-		if(tempChangePercentage > 1.0f)
-		{
-			tempChangePercentage = 1.0f;
-		}
-
-		GenerateNumber();
-			
-		if(randomNumber < tempChangePercentage)
-		{
-			thisPlayer.diplomaticState = tempState;
-			thisPlayer.stalemateCounter -= 2;
-		}
-
-		if (randomNumber > tempChangePercentage) 
-		{
-			thisPlayer.diplomaticState = "Stalemate";
-			++thisPlayer.stalemateCounter;
+			thisPlayer.diplomaticState = "Cold War";
 		}
 	}
 
-	private void GenerateNumber()
+	public void InvokeDiplomaticStateBonuses(TurnInfo thisPlayer)
 	{
-		randomNumber = UnityEngine.Random.Range (0.00f, 1.00f);
+		thisPlayer.peaceBonus = thisPlayer.peaceCounter / 1000.0f;
+		
+		thisPlayer.warBonus = thisPlayer.warCounter / 100.0f;
+
+		if (thisPlayer.diplomaticState == "War")
+		{
+			//prevent adjacency bonuses, merchants etc.
+		}
+
+		if (thisPlayer.diplomaticState == "Peace")
+		{
+			//prevent invasions, start timer for peace
+		}
+
+		if(thisPlayer.diplomaticState == "Cold War")
+		{
+			//increase possibility of stealth detection
+		}
 	}
 
 	private void RefreshNumbers(TurnInfo thisPlayer)
 	{
-		tempChangePercentage = 0.0f;
-		tempState = "";
-
-		if(thisPlayer.diplomaticState == "War")
-		{
-			thisPlayer.warCounter += 10;
-		}
-		if(thisPlayer.diplomaticState == "Peace")
-		{
-			thisPlayer.peaceCounter += 10;
-		}
 		if (thisPlayer.peaceCounter > 100) 
 		{
 			thisPlayer.peaceCounter = 100;
@@ -87,9 +89,9 @@ public class DiplomacyControlScript : MasterScript
 		{
 			thisPlayer.warCounter = 0;
 		}
-		if(thisPlayer.stalemateCounter < 0)
+		if(thisPlayer.turnsAtColdWar < 0)
 		{
-			thisPlayer.stalemateCounter = 0;
+			thisPlayer.turnsAtColdWar = 0;
 		}
 	}
 }
