@@ -4,9 +4,8 @@ using System.Collections;
 public class AIBasicParent : TurnInfo 
 {
 	public string selkiesHomeSystem, nereidesHomeSystem, humansHomeSystem;
-	private float tempSIM, systemRatio, compensator, tempRatio;
-	private GameObject mostValuableSystem;
-	private int tempPlanet, tempSystem, planetToColonise;
+	private float tempSIM, highestSIM, systemRatio;
+	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem;
 	
 	public void Expand(AIBasicParent thisPlayer)
 	{
@@ -14,217 +13,191 @@ public class AIBasicParent : TurnInfo
 
 		for(int i = GP; i > 0; --i)
 		{
-			mostValuableSystem = null;
-			compensator = 0.00f;
-			SearchThroughArrays(thisPlayer);
+			AIExpansion(thisPlayer);
 		}
 
 		TurnEnd(thisPlayer);
 	}
 
-	public void SearchThroughArrays(AIBasicParent thisPlayer)
+	public void AIExpansion(TurnInfo thisPlayer)
 	{
-		while(mostValuableSystem == null)
-		{
-			CheckForSuitableSystem(thisPlayer);
-			compensator += 0.25f;
+		currentPlanet = -1;
+		currentSystem = -1;
 
-			if(compensator > 1.0f)
-			{
-				break;
-			}
+		float planetSIM = CheckThroughPlanets (thisPlayer);
+		
+		float systemSIM = CheckThroughSystems (thisPlayer);
+		
+		if(planetSIM > systemSIM)
+		{
+			currentPlanet = tempPlanet;
+			
+			currentSystem = tempSystem;
+		}
+		
+		if(systemSIM > planetSIM)
+		{
+			currentPlanet = tempPlanetB;
+			
+			currentSystem = tempSystemB;
+			
+			systemListConstructor.systemList[currentSystem].systemOwnedBy = thisPlayer.playerRace;
+			
+			lineRenderScript = systemListConstructor.systemList[currentSystem].systemObject.GetComponent<LineRenderScript>();
+			
+			lineRenderScript.SetRaceLineColour(thisPlayer.playerRace);
+			
+			systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
+			
+			++systemsInPlay;
 		}
 
-		if(mostValuableSystem != null)
+		if(currentPlanet != -1 && currentPlanet != -1)
 		{
-			int i = RefreshCurrentSystem(mostValuableSystem);
-			guiPlanScript = mostValuableSystem.GetComponent<GUISystemDataScript>();
-			ColoniseSystem(i, thisPlayer);
+			systemListConstructor.systemList[currentSystem].planetColonised[currentPlanet] = true;
+			
+			++planetsColonisedThisTurn;
+			
+			--GP;
+
+			CheckToImprovePlanet (thisPlayer);
 		}
 	}
 
-	public void ColoniseSystem(int system, AIBasicParent thisPlayer)
+	public float CheckThroughPlanets(TurnInfo thisPlayer)
 	{
-		systemListConstructor.systemList [system].systemOwnedBy = playerRace;
+		highestSIM = 0;
 
-		lineRenderScript = systemListConstructor.systemList[system].systemObject.GetComponent<LineRenderScript>();
-		
-		lineRenderScript.SetRaceLineColour(thisPlayer.playerRace);
-		
-		systemListConstructor.systemList[system].systemObject.renderer.material = thisPlayer.materialInUse;
-
-		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
-		{
-			CalculateSIMRatioOfPlanetsInSystem(system, 0.0f);
-
-			float tempRatio2 = tempRatio;
-
-			if(tempRatio2 > tempRatio)
-			{
-				tempRatio = tempRatio2;
-				planetToColonise = i;
-			}
-		}
-
-		ColonisePlanet (system, planetToColonise);
-
-		++turnInfoScript.systemsInPlay;
-		
-		cameraFunctionsScript.coloniseMenu = false;
-	}
-
-	public void CheckForSuitableSystem(AIBasicParent thisPlayer)
-	{
 		for(int i = 0; i < 60; ++i)
 		{
-			lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
-			
-			if(systemListConstructor.systemList[i].systemOwnedBy == "Selkies" || systemListConstructor.systemList[i].systemOwnedBy == "Humans" || systemListConstructor.systemList[i].systemOwnedBy == "Nereides")
+			if(systemListConstructor.systemList[i].systemOwnedBy == thisPlayer.playerRace)
 			{
-				continue;
-			}
-			
-			for(int j = 0; j < 4; ++j)
-			{
-				if(lineRenderScript.connections[j] == null)
+				guiPlanScript = systemListConstructor.systemList [i].systemObject.GetComponent<GUISystemDataScript> ();
+				
+				if(guiPlanScript.underInvasion == true)
 				{
 					continue;
 				}
 
-				int k = RefreshCurrentSystem(lineRenderScript.connections[j]);
-				
-				if(systemListConstructor.systemList[k].systemOwnedBy == thisPlayer.playerRace)
+				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 				{
-					CalculateSIMRatio(i);
-					CheckForSuitablePlanet (systemRatio, thisPlayer);
-					RandomNumber(i);
-					
-					if(mostValuableSystem != null)
+					if(systemListConstructor.systemList[i].planetColonised[j] == true || systemListConstructor.systemList[i].planetImprovementLevel[j] == 3)
 					{
-						break;
+						continue;
+					}
+
+					tempSIM = systemListConstructor.systemList[i].planetScience[j] + systemListConstructor.systemList[i].planetIndustry[j] + systemListConstructor.systemList[i].planetMoney[j]
+						* (systemListConstructor.systemList[i].improvementSlots[j] * 3.0f);
+
+					if(tempSIM > highestSIM)
+					{
+						highestSIM = tempSIM;
+
+						tempPlanet = j;
+						
+						tempSystem = i;
 					}
 				}
 			}
 		}
+
+		return highestSIM;
 	}
 
-	void CalculateSIMRatio(int system)
+	public float CheckThroughSystems(TurnInfo thisPlayer)
 	{
-		tempSIM = 0.0f;
-
-		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
-		{
-			float tempSci = systemListConstructor.systemList[system].planetScience[i];
-			float tempInd = systemListConstructor.systemList[system].planetIndustry[i];
-			float tempMon = systemListConstructor.systemList[system].planetMoney[i];
-				
-			tempSIM = (tempSci + tempInd + tempMon);
-		}
-		
-		float tempRatio = tempSIM / guiPlanScript.numPlanets;
-		
-		systemRatio = (1.0f/16.7f) * (tempRatio/2.0f);
-		
-		if(systemRatio >= 1.0f)
-		{
-			systemRatio = 0.9f;
-		}
-	}
-
-	public void CheckToImprovePlanet(int system)
-	{
-		for(int i = 0; i < 211; i++)
-		{
-			if(turnInfoScript.mostPowerfulPlanets[i,0] == systemListConstructor.systemList[system].systemName)
-			{
-				ImprovePlanet(int.Parse (turnInfoScript.mostPowerfulPlanets[i,1]), system);
-			}
-		}
-	}
-
-	public void CheckForSuitablePlanet(float ratio, AIBasicParent thisPlayer)
-	{
-		tempPlanet = -1; 
-		tempSystem = -1;
+		highestSIM = 0;
 
 		for(int i = 0; i < 60; ++i)
 		{
-			if(systemListConstructor.systemList[i].systemOwnedBy != thisPlayer.playerRace)
+			if(systemListConstructor.systemList[i].systemOwnedBy == thisPlayer.playerRace)
 			{
-				continue;
+				lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
+
+				for(int j = 0; j < 4; ++j)
+				{
+					tempSIM = 0.0f;
+
+					if(lineRenderScript.connections[j] == null)
+					{
+						break;
+					}
+
+					int k = RefreshCurrentSystem(lineRenderScript.connections[j]);
+
+					if(systemListConstructor.systemList[k].systemOwnedBy == null)
+					{
+						float tempPlanetSIM = 0.0f;
+						float tempHighestPlanetSIM = 0.0f;
+
+						for(int l = 0; l < systemListConstructor.systemList[k].systemSize; ++l)
+						{
+							tempPlanetSIM = systemListConstructor.systemList[k].planetScience[l] + systemListConstructor.systemList[k].planetIndustry[l] + systemListConstructor.systemList[k].planetMoney[l] 
+												* (systemListConstructor.systemList[k].improvementSlots[l] * 1.5f);
+
+							if(tempPlanetSIM > tempHighestPlanetSIM)
+							{
+								tempHighestPlanetSIM = tempPlanetSIM;
+
+								tempPlanetB = l;
+							}
+
+							tempSIM += tempPlanetSIM;
+						}
+
+						tempSIM = (tempSIM / systemListConstructor.systemList[k].systemSize);
+
+						if(tempSIM > highestSIM)
+						{
+							highestSIM = tempSIM;
+
+							tempSystemB = k;
+						}
+					}
+				}
+			}
+		}
+
+		return highestSIM;
+	}
+
+	public void CheckToImprovePlanet(TurnInfo thisPlayer)
+	{
+		for(int i = 0; i < turnInfoScript.mostPowerfulPlanets.Count - 1; i++)
+		{
+			if(thisPlayer.industry < 10.0f && thisPlayer.money < 20.0f)
+			{
+				break;
 			}
 
-			CheckToImprovePlanet(i);
-			CalculateSIMRatioOfPlanetsInSystem(i, ratio);
-		}
-		
-		if(tempSystem > 0 && GP > 0)
-		{
-			ColonisePlanet(tempSystem, tempPlanet);
-		}
-	}
+			int j = RefreshCurrentSystem(turnInfoScript.mostPowerfulPlanets[i].system);
 
-	private void CalculateSIMRatioOfPlanetsInSystem(int system, float ratio)
-	{
-		for(int j = 0; j < systemListConstructor.systemList[system].systemSize; ++j)
-		{
-			if(systemListConstructor.systemList[system].planetColonised[j] == false)
+			if(systemListConstructor.systemList[j].systemOwnedBy == thisPlayer.playerRace)
 			{
-				continue;
-			}
-			
-			float tempSci = systemListConstructor.systemList[system].planetScience[j];
-			float tempInd = systemListConstructor.systemList[system].planetIndustry[j];
-			float tempMon = systemListConstructor.systemList[system].planetMoney[j];
-			
-			tempSIM = (tempSci + tempInd + tempMon);
-			
-			tempRatio = (1.0f/16.7f) * (tempSIM/2.0f);
-			
-			if(tempRatio > ratio)
-			{
-				tempPlanet = j;
-				tempSystem = system;
+				ImprovePlanet(turnInfoScript.mostPowerfulPlanets[i].planetPosition, j);
 			}
 		}
 	}
-
-	private void RandomNumber(int system)
-	{
-		if(systemRatio < Random.Range (compensator, 1.00f) || compensator > 0.9f)
-		{
-			mostValuableSystem = systemListConstructor.systemList[system].systemObject;
-		}
-	}
-
-	public void ColonisePlanet(int system, int planet)
-	{
-		systemListConstructor.systemList[system].planetColonised[planet] = true;
-
-		++planetsColonisedThisTurn;
-
-		--GP;
-	}
-
+	
 	public void ImprovePlanet(int planetPosition, int system)
 	{
 		guiPlanScript.improvementNumber = systemListConstructor.systemList[system].planetImprovementLevel[planetPosition];
-
+		
 		guiPlanScript.CheckImprovement();
-
-		if(guiPlanScript.canImprove == true)
+		
+		if(guiPlanScript.canImprove == true && guiPlanScript.underInvasion == false)
 		{
 			if(industry >= guiPlanScript.improvementCost)
 			{
 				++systemListConstructor.systemList[system].planetImprovementLevel[planetPosition];
-
+				
 				industry -= (int)guiPlanScript.improvementCost;
 			}
-
+			
 			else if(money >= guiPlanScript.improvementCost * 2)
 			{
 				++systemListConstructor.systemList[system].planetImprovementLevel[planetPosition];
-
+				
 				money -= ((int)guiPlanScript.improvementCost * 2);
 			}
 		}

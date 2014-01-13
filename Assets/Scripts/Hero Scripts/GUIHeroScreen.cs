@@ -5,8 +5,7 @@ using System.Collections.Generic;
 public class GUIHeroScreen : MasterScript 
 {
 	public bool openHeroLevellingScreen, heroIsMoving;
-	public Material unownedMaterial;
-	public GameObject heroObject, merchantQuad, invasionQuad;
+	public GameObject heroObject, merchantQuad;
 	private GameObject tempHero, targetSystem;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
 	private string[] heroLevelThreeSpecs = new string[9] {"President", "Peacemaker", "Merchant", "Vanguard", "Strike Team", "Warlord", "Spy", "Recon Drone", "Assassin"};
@@ -189,7 +188,7 @@ public class GUIHeroScreen : MasterScript
 			{
 				if(GUI.Button (new Rect(Screen.width / 2 - 75.0f, Screen.height / 2 + 400.0f, 150.0f, 60.0f), "Start Invasion"))
 				{
-					heroScript.StartSystemInvasion();
+					diplomacyScript.StartSystemInvasion(heroScript);
 				}
 			}
 		}
