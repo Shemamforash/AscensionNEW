@@ -159,6 +159,7 @@ public class MainGUIScript : MasterScript
 			if(tempRace != null)
 			{
 				SelectRace(tempRace);
+				turnInfoScript.RefreshPlanetPower();
 			}
 		}
 		#endregion

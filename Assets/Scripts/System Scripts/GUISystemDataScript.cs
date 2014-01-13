@@ -16,7 +16,7 @@ public class GUISystemDataScript : MasterScript
 	[HideInInspector]
 	public string[] allPlanetsInfo = new string[6];	//Unique to object
 	[HideInInspector]
-	public bool canImprove, foundPlanetData;
+	public bool canImprove, foundPlanetData, underInvasion;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM, tempTotalSci, tempTotalInd, tempTotalMon;
 	public float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
@@ -61,7 +61,7 @@ public class GUISystemDataScript : MasterScript
 				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * thisPlayer.raceIndustry;
 				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * thisPlayer.raceMoney;
 
-				if(systemListConstructor.systemList[i].planetOwnership[j] < maxOwnership)
+				if(systemListConstructor.systemList[i].planetOwnership[j] < maxOwnership && underInvasion == false)
 				{
 					++systemListConstructor.systemList[i].planetOwnership[j];
 				}
@@ -147,19 +147,23 @@ public class GUISystemDataScript : MasterScript
 
 	public void UpdatePlanetPowerArray(int k)
 	{
-		for(int i = 0; i < numPlanets; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[k].systemSize; ++i)
 		{
-			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 0] = gameObject.name;
-			
-			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 1] = i.ToString();
-				
+			PlanetPower planet = new PlanetPower();
+
+			planet.system = gameObject;
+
 			improvementNumber = systemListConstructor.systemList[k].planetImprovementLevel[i];
 			
 			CheckImprovement();
-			
-			float tempInt = systemListConstructor.systemList[k].planetScience[i] + systemListConstructor.systemList[k].planetIndustry[i] + systemListConstructor.systemList[k].planetMoney[i];
-			
-			turnInfoScript.mostPowerfulPlanets[turnInfoScript.savedIterator, 2] = tempInt.ToString();
+
+			float tempSIM = (systemListConstructor.systemList[k].planetScience[i] + systemListConstructor.systemList[k].planetIndustry[i] + systemListConstructor.systemList[k].planetMoney[i]) * resourceBonus;
+
+			planet.simOutput = tempSIM;
+
+			planet.planetPosition = i;
+				
+			turnInfoScript.mostPowerfulPlanets.Add (planet);
 
 			++turnInfoScript.savedIterator;
 		}

@@ -66,7 +66,7 @@ public class CameraFunctions : MasterScript
 					coloniseMenu = true; //Shows the colonise button on single click
 				}
 
-				if(doubleClick == true && systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
+				if(doubleClick == true /*&& systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace*/)
 				{
 					openMenu = true; //Opens system menu on double click
 				}

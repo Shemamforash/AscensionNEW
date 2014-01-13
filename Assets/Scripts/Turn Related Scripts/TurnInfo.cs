@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 public class TurnInfo : MasterScript
@@ -9,7 +10,7 @@ public class TurnInfo : MasterScript
 	public float raceScience, raceIndustry, raceMoney, science, industry, money, peaceBonus, warBonus;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,5];
-	public string[,] mostPowerfulPlanets = new string[211,3];
+	public List<PlanetPower> mostPowerfulPlanets = new List<PlanetPower>();
 	[HideInInspector]
 	public bool endTurn, canDeclareWar, ceaseFirePeriodExpired;
 	public Camera mainCamera;
@@ -18,19 +19,25 @@ public class TurnInfo : MasterScript
 	public string playerRace, homeSystem, homePlanetType, diplomaticState;
 	public int turn = 0, systemsInPlay = 0;
 
-	void Start()
-	{			
-		RefreshPlanetPower();
-	}
-
 	public void RefreshPlanetPower()
 	{
+		mostPowerfulPlanets.Clear ();
+
+		turnInfoScript.savedIterator = 0;
+
 		for(int i = 0; i < 60; i++)
 		{
+			if(systemListConstructor.systemList[i].systemOwnedBy == null)
+			{
+				continue;
+			}
+
 			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
 			
 			guiPlanScript.UpdatePlanetPowerArray(i);
 		}
+
+		SortSystemPower ();
 	}
 
 	public void PickRace() //Start of turn function. Race choice dictates starting planet and inherent bonuses as well as racial technologies.
@@ -114,35 +121,29 @@ public class TurnInfo : MasterScript
 
 	public void SortSystemPower()
 	{
-		int i, j; 
-		string[] temp = new string[3];
+		GameObject tempObject;
+		float tempFloat;
+		int tempInt;
 
-		for(i = 210; i >= 0; --i)
+		for(int i = turnInfoScript.mostPowerfulPlanets.Count - 1; i >= 0; --i)
 		{
-			if(mostPowerfulPlanets[i, 0] == "" || mostPowerfulPlanets[i,0] == null)
-			{
-				continue;
-			}
-
-			Debug.Log (mostPowerfulPlanets[i,0]);
-
 			bool swaps = false;
 
-			for(j = 1; j <= i; ++j)
+			for(int j = 1; j <= i; ++j)
 			{
-				if(float.Parse (mostPowerfulPlanets[j-1, 2]) < float.Parse (mostPowerfulPlanets[j, 2]))
+				if(mostPowerfulPlanets[j-1].simOutput < mostPowerfulPlanets[j].simOutput)
 				{
-					temp[0] = mostPowerfulPlanets[j-1, 0].ToString ();
-					temp[1] = mostPowerfulPlanets[j-1, 1].ToString();
-					temp[2] = mostPowerfulPlanets[j-1, 2].ToString();
+					tempObject = mostPowerfulPlanets[j-1].system;
+					tempFloat = mostPowerfulPlanets[j-1].simOutput;
+					tempInt = mostPowerfulPlanets[j-1].planetPosition;
 
-					mostPowerfulPlanets[j-1, 0] = mostPowerfulPlanets[j, 0];
-					mostPowerfulPlanets[j-1, 1] = mostPowerfulPlanets[j, 1];
-					mostPowerfulPlanets[j-1, 2] = mostPowerfulPlanets[j, 2];
+					mostPowerfulPlanets[j-1].system = mostPowerfulPlanets[j].system;
+					mostPowerfulPlanets[j-1].simOutput = mostPowerfulPlanets[j].simOutput;
+					mostPowerfulPlanets[j-1].planetPosition = mostPowerfulPlanets[j].planetPosition;
 
-					mostPowerfulPlanets[j, 0] = temp[0];
-					mostPowerfulPlanets[j, 1] = temp[1];
-					mostPowerfulPlanets[j, 2] = temp[2];
+					mostPowerfulPlanets[j].system = tempObject;
+					mostPowerfulPlanets[j].simOutput = tempFloat;
+					mostPowerfulPlanets[j].planetPosition = tempInt;
 
 					swaps = true;
 				}
@@ -154,4 +155,11 @@ public class TurnInfo : MasterScript
 			}
 		}
 	}
+}
+
+public class PlanetPower
+{
+	public GameObject system;
+	public float simOutput;
+	public int planetPosition;
 }
