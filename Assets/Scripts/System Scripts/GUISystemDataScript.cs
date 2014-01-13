@@ -8,7 +8,7 @@ public class GUISystemDataScript : MasterScript
 	//THIS IS A PROTOTYPE ONLY CLASS. THIS WILL BE USED TO STORE PLANET DATA AND DISPLAY IT IN A GUI UNTIL A TRUE UI AND PLANET SCREEN CAN BE CREATED
 
 	[HideInInspector]
-	public int numPlanets, improvementNumber;
+	public int numPlanets, improvementNumber, maxOwnership;
 	[HideInInspector]
 	public float pScience, pIndustry, pMoney, improvementCost, resourceBonus, adjacencyBonus;
 	[HideInInspector]
@@ -52,6 +52,7 @@ public class GUISystemDataScript : MasterScript
 				techTreeScript.CheckPlanets();
 
 				allPlanetsInfo[j] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
+					+ systemListConstructor.systemList[i].planetOwnership[j] + "% Owned\n"
 					+ ((int)(tempSci * resourceBonus * thisPlayer.raceScience)).ToString() + "\n" 
 					+ ((int)(tempInd * resourceBonus * thisPlayer.raceIndustry)).ToString() + "\n" 
 					+ ((int)(tempMon * resourceBonus * thisPlayer.raceMoney)).ToString();
@@ -59,6 +60,11 @@ public class GUISystemDataScript : MasterScript
 				tempTotalSci += tempSci * techTreeScript.sciencePercentBonus * resourceBonus * thisPlayer.raceScience;
 				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * thisPlayer.raceIndustry;
 				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * thisPlayer.raceMoney;
+
+				if(systemListConstructor.systemList[i].planetOwnership[j] < maxOwnership)
+				{
+					++systemListConstructor.systemList[i].planetOwnership[j];
+				}
 			}
 		}
 
@@ -164,29 +170,31 @@ public class GUISystemDataScript : MasterScript
 		if(improvementNumber == 0)
 		{
 			improvementLevel = "Poor";
-			resourceBonus = 0.5f;
+			maxOwnership = 33;
 			canImprove = true;
 			improvementCost = 10.0f;
 		}
 		if(improvementNumber == 1)
 		{
 			improvementLevel = "Normal";
-			resourceBonus = 1.0f;
+			maxOwnership = 50;
 			canImprove = true;
 			improvementCost = 20.0f;
 		}
 		if(improvementNumber == 2)
 		{
 			improvementLevel = "Good";
-			resourceBonus = 2.0f;
+			maxOwnership = 66;
 			canImprove = true;
 			improvementCost = 40.0f;
 		}
 		if(improvementNumber == 3)
 		{
 			improvementLevel = "Superb";
-			resourceBonus = 3.0f;
+			maxOwnership = 100;
 			canImprove = false;
 		}
+
+		resourceBonus = (float)maxOwnership / 66.6666f;
 	}
 }

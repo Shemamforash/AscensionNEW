@@ -54,6 +54,7 @@ public class SystemListConstructor : MasterScript
 					system.planetType.Add (typeReader.ReadLine ());
 					system.planetImprovementLevel.Add (0);
 					system.planetColonised.Add (false);
+					system.planetOwnership.Add (0);
 					system.planetScience.Add (FindPlanetSIM(system.planetType[j], "Science"));
 					system.planetIndustry.Add (FindPlanetSIM(system.planetType[j], "Industry"));
 					system.planetMoney.Add (FindPlanetSIM(system.planetType[j], "Money"));
@@ -71,7 +72,7 @@ public class SystemListConstructor : MasterScript
 		{
 			if(planetList[i].planetType == planetType)
 			{
-				if(resourceType == "ImprovementSlots")
+				if(resourceType == "Improvement Slots")
 				{
 					return planetList[i].improvementSlots;
 				}
@@ -105,14 +106,20 @@ public class SystemInfo
 {
 	public string systemName, systemOwnedBy;
 	public GameObject systemObject;
+	public GameObject tradeRoute;
 	public int systemSize;
+
 	public GameObject[] heroesInSystem = new GameObject[3];
+
 	public List<string> planetName = new List<string>();
 	public List<string> planetType = new List<string>();
+
 	public List<float> planetScience = new List<float>();
 	public List<float> planetIndustry = new List<float>();
 	public List<float> planetMoney = new List<float>();
 	public List<bool> planetColonised = new List<bool>();
+
+	public List<int> planetOwnership = new List<int> ();
 	public List<int> planetImprovementLevel = new List<int>();
 	public List<int> improvementSlots= new List<int>();
 }
