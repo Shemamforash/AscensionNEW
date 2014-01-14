@@ -6,6 +6,11 @@ public class PlayerTurn : TurnInfo
 	public GameObject tempObject;
 	public bool isOkToColonise, systemHasBeenColonised;
 
+	void Start()
+	{
+		playerRace = null;
+	}
+
 	void Update()
 	{
 		if(Input.GetMouseButtonDown(0) && cameraFunctionsScript.selectedSystem != null) //Assigns scripts to selected system.

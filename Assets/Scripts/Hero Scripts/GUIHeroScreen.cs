@@ -78,6 +78,14 @@ public class GUIHeroScreen : MasterScript
 		{
 			heroScript = hero.GetComponent<HeroScriptParent> ();
 
+			Destroy (heroScript.invasionObject);
+
+			heroScript.isInvading = false;
+
+			guiPlanScript = heroScript.heroLocation.GetComponent<GUISystemDataScript>();
+
+			guiPlanScript.underInvasion = false;
+
 			int k = RefreshCurrentSystem(heroScript.heroLocation);
 
 			systemListConstructor.systemList[k].heroesInSystem[heroScript.thisHeroNumber] = null;
@@ -188,7 +196,7 @@ public class GUIHeroScreen : MasterScript
 			{
 				if(GUI.Button (new Rect(Screen.width / 2 - 75.0f, Screen.height / 2 + 400.0f, 150.0f, 60.0f), "Start Invasion"))
 				{
-					diplomacyScript.StartSystemInvasion(heroScript);
+					heroScript.StartSystemInvasion();
 				}
 			}
 		}

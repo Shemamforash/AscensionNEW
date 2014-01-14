@@ -7,8 +7,8 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
 	public DiplomaticPosition tempObject;
-	public int currentLevel = 1, thisHeroNumber;
-	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, heroDiplomacyChange;
+	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets;
+	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength;
 	public string heroTier2, heroTier3, heroOwnedBy;
 	private Vector3 position;
 	public bool isInvading = false;
@@ -149,8 +149,6 @@ public class HeroScriptParent : MasterScript
 		heroIndBonus = 10.0f;
 		heroMonBonus = 10.0f;
 
-		heroDiplomacyChange = 0.0f;
-
 		offensivePower = 14.0f;
 		defensivePower = 7.0f;
 
@@ -168,7 +166,7 @@ public class HeroScriptParent : MasterScript
 
 		if(isInvading == true)
 		{
-			diplomacyScript.ContinueInvasion(heroScript);
+			ContinueInvasion();
 		}
 	}
 
@@ -176,6 +174,89 @@ public class HeroScriptParent : MasterScript
 	{
 		heroGUIScript.selectedHero = thisHeroNumber;
 		heroGUIScript.openHeroLevellingScreen = true;
+	}
+
+	public void StartSystemInvasion()
+	{
+		int i = RefreshCurrentSystem (heroLocation);
+		
+		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
+		{
+			if(systemListConstructor.systemList[i].planetColonised[j] == false)
+			{
+				continue;
+			}
+			
+			++noOfColonisedPlanets;
+		}
+		
+		invasionStrength = offensivePower / noOfColonisedPlanets;
+		
+		isInvading = true;
+		
+		invasionObject = (GameObject)Instantiate (diplomacyScript.invasionQuad, systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[i].systemObject.transform.rotation);
+		
+		guiPlanScript = systemListConstructor.systemList [i].systemObject.GetComponent<GUISystemDataScript> ();
+		
+		guiPlanScript.underInvasion = true;
+	}
+	
+	public void ContinueInvasion()
+	{
+		int i = RefreshCurrentSystem (heroScript.heroLocation);
+		
+		bool planetsRemaining = false;
+		
+		invasionStrength = offensivePower / noOfColonisedPlanets;
+		
+		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
+		{
+			if(systemListConstructor.systemList[i].planetColonised[j] == false)
+			{
+				continue;
+			}
+			
+			systemListConstructor.systemList[i].planetOwnership[j] -= (int)invasionStrength;
+			
+			if(systemListConstructor.systemList[i].planetOwnership[j] < 0)
+			{
+				systemListConstructor.systemList[i].planetColonised[j] = false;
+				systemListConstructor.systemList[i].planetImprovementLevel[j] = 0;
+				systemListConstructor.systemList[i].planetOwnership[j] = 0;
+			}
+		}
+		
+		noOfColonisedPlanets = 0;
+		
+		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
+		{
+			if(systemListConstructor.systemList[i].planetColonised[j] == true)
+			{
+				planetsRemaining = true;
+				++noOfColonisedPlanets;
+			}
+		}
+		
+		if(planetsRemaining == false)
+		{
+			isInvading = false;
+			
+			systemListConstructor.systemList[i].systemOwnedBy = null;
+			
+			systemListConstructor.systemList[i].tradeRoute = null;
+			
+			Destroy (invasionObject);
+			
+			lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
+			
+			lineRenderScript.SetRaceLineColour("None");
+			
+			systemListConstructor.systemList[i].systemObject.renderer.material = diplomacyScript.unownedMaterial;
+			
+			guiPlanScript = systemListConstructor.systemList [i].systemObject.GetComponent<GUISystemDataScript> ();
+			
+			guiPlanScript.underInvasion = false;
+		}
 	}
 }
 

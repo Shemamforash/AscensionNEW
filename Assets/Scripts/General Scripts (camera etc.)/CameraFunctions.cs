@@ -131,7 +131,7 @@ public class CameraFunctions : MasterScript
 		
 		if(Input.GetAxis ("Mouse ScrollWheel") < 0) //Zoom in
 		{
-			zPosition -= zoomSpeed/10;
+			zPosition -= zoomSpeed * Time.deltaTime;
 		
 			if(zPosition < maxZoom)
 			{
@@ -147,7 +147,7 @@ public class CameraFunctions : MasterScript
 
 		if(Input.GetAxis ("Mouse ScrollWheel") > 0) //Zoom out
 		{
-			zPosition += zoomSpeed/10;
+			zPosition += zoomSpeed * Time.deltaTime;
 			
 			if(zPosition > minZoom)
 			{

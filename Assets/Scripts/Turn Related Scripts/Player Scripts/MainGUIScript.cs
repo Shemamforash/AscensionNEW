@@ -8,7 +8,7 @@ public class MainGUIScript : MasterScript
 	public GUISkin mySkin;
 	public bool spendMenu = false, hasColonised = false, openImprovementList = false;
 	public string resourceToSpend;
-	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, heroName;
+	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, heroName, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
 	public int selectedSystem, selectedPlanet, selectedImprovemen;
 	private float xLoc, yLoc;
 	private Vector2 scrollPositionA = Vector2.zero, scrollPositionB = Vector2.zero;
@@ -100,6 +100,8 @@ public class MainGUIScript : MasterScript
 			moneyStr = ((int)playerTurnScript.money).ToString ();
 			GPString = playerTurnScript.GP.ToString ();
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
+			playerEnemyOneDiplomacy = diplomacyScript.playerEnemyOneRelations.diplomaticState + " | " + diplomacyScript.playerEnemyOneRelations.peaceCounter;
+			playerEnemyTwoDiplomacy = diplomacyScript.playerEnemyTwoRelations.diplomaticState + " | " + diplomacyScript.playerEnemyTwoRelations.peaceCounter;
 
 			if(cameraFunctionsScript.openMenu == true)
 			{
@@ -197,6 +199,9 @@ public class MainGUIScript : MasterScript
 			}
 		}
 		#endregion
+
+		GUI.Label (new Rect (10, Screen.height - 120.0f, 160.0f, 30.0f), playerEnemyOneDiplomacy);
+		GUI.Label (new Rect (10, Screen.height - 80.0f, 160.0f, 30.0f), playerEnemyTwoDiplomacy);
 		
 		#region planetinfomenu
 		if(cameraFunctionsScript.openMenu == true)

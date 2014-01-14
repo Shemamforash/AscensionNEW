@@ -34,7 +34,10 @@ public class Tier2HeroScript : HeroScriptParent
 		heroScript.offensivePower -= 7.0f;
 		heroScript.defensivePower -= 7.0f;
 
-		++tempObject.peaceCounter;
+		if(tempObject != null)
+		{
+			++tempObject.peaceCounter;
+		}
 	}
 
 	public void Infiltrator()
@@ -43,13 +46,16 @@ public class Tier2HeroScript : HeroScriptParent
 		heroScript.heroIndBonus += 0.05f * guiPlanScript.tempTotalInd;
 		heroScript.heroMonBonus += 0.05f * guiPlanScript.tempTotalMon;
 
-		if (tempObject.peaceCounter > 50) 
+		if(tempObject != null)
 		{
-			--tempObject.peaceCounter;
-		}
-		if (tempObject.peaceCounter < -50) 
-		{
-			++tempObject.peaceCounter;
+			if (tempObject.peaceCounter > 50) 
+			{
+				--tempObject.peaceCounter;
+			}
+			if (tempObject.peaceCounter < -50) 
+			{
+				++tempObject.peaceCounter;
+			}
 		}
 	}
 
@@ -61,7 +67,10 @@ public class Tier2HeroScript : HeroScriptParent
 
 		heroScript.offensivePower += 7.0f;
 		heroScript.defensivePower += 7.0f;
-		
-		--tempObject.peaceCounter;
+
+		if(tempObject != null)
+		{
+			--tempObject.peaceCounter;
+		}
 	}
 }
