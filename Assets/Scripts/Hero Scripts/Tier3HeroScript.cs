@@ -12,15 +12,20 @@ public class Tier3HeroScript : HeroScriptParent
 	{
 		guiPlanScript = heroScript.heroLocation.GetComponent<GUISystemDataScript>();
 
+		tempObject = heroScript.FindDiplomaticConnection ();
+
 		if(heroScript.heroTier2 == "Diplomat")
 		{
 			heroScript.heroSciBonus += 0.10f * guiPlanScript.tempTotalSci;
 			heroScript.heroIndBonus += 0.10f * guiPlanScript.tempTotalInd;
 			heroScript.heroMonBonus += 0.20f * guiPlanScript.tempTotalMon;
 
+			heroScript.offensivePower = 0.0f;
+			heroScript.defensivePower = 0.0f;
+
 			if(heroScript.heroTier3 == "Peacemaker")
 			{
-				Peacemaker ();
+				Peacemaker (heroScript);
 			}
 			if(heroScript.heroTier3 == "President")
 			{
@@ -39,15 +44,15 @@ public class Tier3HeroScript : HeroScriptParent
 
 			if(heroScript.heroTier3 == "Spy")
 			{
-				Spy ();
+				Spy (heroScript);
 			}
 			if(heroScript.heroTier3 == "Assassin")
 			{
-				Assassin ();
+				Assassin (heroScript);
 			}
 			if(heroScript.heroTier3 == "Recon Drone")
 			{
-				ReconDrone ();
+				ReconDrone (heroScript);
 			}
 		}
 		if(heroScript.heroTier2 == "Soldier")
@@ -56,17 +61,20 @@ public class Tier3HeroScript : HeroScriptParent
 			heroScript.heroIndBonus += 0.20f * guiPlanScript.tempTotalInd;
 			heroScript.heroMonBonus += 0.10f * guiPlanScript.tempTotalMon;
 
+			heroScript.offensivePower += 14.0f;
+			heroScript.defensivePower += 14.0f;
+
 			if(heroScript.heroTier3 == "Warlord")
 			{
-				Warlord ();
+				Warlord (heroScript);
 			}
 			if(heroScript.heroTier3 == "Vanguard")
 			{
-				Vanguard ();
+				Vanguard (heroScript);
 			}
 			if(heroScript.heroTier3 == "Strike Team")
 			{
-				StrikeTeam ();
+				StrikeTeam (heroScript);
 			}
 		}
 	}
@@ -85,8 +93,11 @@ public class Tier3HeroScript : HeroScriptParent
 		}
 	}
 
-	public void Peacemaker()
+	public void Peacemaker(HeroScriptParent heroScript)
 	{
+		heroScript.defensivePower += 7.0f;
+
+		++tempObject.peaceCounter;
 	}
 
 	public void President(HeroScriptParent heroScript)
@@ -96,22 +107,29 @@ public class Tier3HeroScript : HeroScriptParent
 		heroScript.heroMonBonus += guiPlanScript.tempTotalMon * 0.25f;
 	}
 
-	public void Spy()
+	public void Spy(HeroScriptParent heroScript)
 	{
 	}
-	public void Assassin()
+	public void Assassin(HeroScriptParent heroScript)
 	{
 	}
-	public void ReconDrone()
+	public void ReconDrone(HeroScriptParent heroScript)
 	{
 	}
-	public void Warlord()
+
+	public void Warlord(HeroScriptParent heroScript)
 	{
+		heroScript.offensivePower += 14.0f;
+		heroScript.defensivePower -= 7.0f;
 	}
-	public void Vanguard()
+
+	public void Vanguard(HeroScriptParent heroScript)
 	{
+		heroScript.offensivePower -= 7.0f;
+		heroScript.defensivePower += 14.0f;
 	}
-	public void StrikeTeam()
+
+	public void StrikeTeam(HeroScriptParent heroScript)
 	{
 	}
 

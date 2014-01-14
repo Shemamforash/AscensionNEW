@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class HeroScriptParent : MasterScript 
 {
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
+	public DiplomaticPosition tempObject;
 	public int currentLevel = 1, thisHeroNumber;
-	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower;
+	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, heroDiplomacyChange;
 	public string heroTier2, heroTier3, heroOwnedBy;
 	private Vector3 position;
 	public bool isInvading = false;
@@ -43,6 +45,49 @@ public class HeroScriptParent : MasterScript
 
 			CreateConnectionLine();
 		}
+	}
+
+	public DiplomaticPosition FindDiplomaticConnection()
+	{
+		int i = RefreshCurrentSystem (heroLocation);
+
+		if(heroOwnedBy == playerTurnScript.playerRace)
+		{
+			if(systemListConstructor.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace)
+			{
+				return diplomacyScript.playerEnemyOneRelations;
+			}
+			if(systemListConstructor.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace)
+			{
+				return diplomacyScript.playerEnemyTwoRelations;
+			}
+		}
+
+		if(heroOwnedBy == enemyOneTurnScript.playerRace)
+		{
+			if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
+			{
+				return diplomacyScript.playerEnemyOneRelations;
+			}
+			if(systemListConstructor.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace)
+			{
+				return diplomacyScript.enemyOneEnemyTwoRelations;
+			}
+		}
+
+		if(heroOwnedBy == enemyTwoTurnScript.playerRace)
+		{
+			if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
+			{
+				return diplomacyScript.playerEnemyTwoRelations;
+			}
+			if(systemListConstructor.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace)
+			{
+				return diplomacyScript.enemyOneEnemyTwoRelations;
+			}
+		}
+
+		return null;
 	}
 
 	public void CreateConnectionLine()
@@ -98,20 +143,16 @@ public class HeroScriptParent : MasterScript
 		return position;
 	}
 
-	public void HeroBonusFunction()
-	{
-		heroSciBonus += 10; 
-		heroIndBonus += 10;
-		heroMonBonus += 10;
-	}
-
 	public void HeroEndTurnFunctions()
 	{
-		heroSciBonus = 0; 
-		heroIndBonus = 0;
-		heroMonBonus = 0;
+		heroSciBonus = 10.0f; 
+		heroIndBonus = 10.0f;
+		heroMonBonus = 10.0f;
 
-		HeroBonusFunction ();
+		heroDiplomacyChange = 0.0f;
+
+		offensivePower = 14.0f;
+		defensivePower = 7.0f;
 
 		if(heroTier2 != "")
 		{

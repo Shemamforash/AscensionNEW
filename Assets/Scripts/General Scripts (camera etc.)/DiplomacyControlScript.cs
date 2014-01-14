@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 
 public class DiplomacyControlScript : MasterScript 
@@ -11,91 +12,125 @@ public class DiplomacyControlScript : MasterScript
 	public GameObject invasionQuad;
 	public Material unownedMaterial;
 
-	public void CheckForWarDeclarationAndPeaceExpiration(TurnInfo thisPlayer)
+	public DiplomaticPosition playerEnemyOneRelations = new DiplomaticPosition();
+	public DiplomaticPosition playerEnemyTwoRelations = new DiplomaticPosition();
+	public DiplomaticPosition enemyOneEnemyTwoRelations = new DiplomaticPosition();
+
+	public DiplomaticPosition[] allRelations;
+
+	void Start()
 	{
-		if(thisPlayer.turnsAtColdWar > 10)
+		SetUpRelationsList (playerEnemyOneRelations);
+		SetUpRelationsList (playerEnemyTwoRelations);
+		SetUpRelationsList (enemyOneEnemyTwoRelations);
+	}
+
+	public void SetUpRelationsList(DiplomaticPosition thisObject)
+	{
+		thisObject.diplomaticState = "";
+		thisObject.peaceCounter = 0;
+		thisObject.firstContactCounter = 10;
+		thisObject.turnsAtColdWar = 0;
+		thisObject.turnsAtPeace = 0;
+		thisObject.warBonus = 0.0f;
+		thisObject.peaceBonus = 0.0f;
+		thisObject.canDeclareWar = false;
+		thisObject.ceaseFirePeriodExpired = false;
+		thisObject.hasMadeContact = false;
+	}
+
+	public void CheckForWarDeclarationAndPeaceExpiration(DiplomaticPosition tempObject)
+	{
+		if(tempObject.turnsAtColdWar > 10)
 		{
-			thisPlayer.canDeclareWar = true;
+			tempObject.canDeclareWar = true;
 		}
 
-		if(thisPlayer.turnsAtPeace > 10)
+		if(tempObject.turnsAtPeace > 10)
 		{
-			thisPlayer.ceaseFirePeriodExpired = true;
+			tempObject.ceaseFirePeriodExpired = true;
 		}
 	}
 
-	public void CheckForDiplomaticStateChange(TurnInfo thisPlayer)
+	public void CheckForDiplomaticStateChange(DiplomaticPosition tempObject)
 	{
-		RefreshNumbers (thisPlayer);
+		RefreshNumbers (tempObject);
 
-		InvokeDiplomaticStateBonuses (thisPlayer);
+		InvokeDiplomaticStateBonuses (tempObject);
 
-		CheckForWarDeclarationAndPeaceExpiration (thisPlayer);
+		CheckForWarDeclarationAndPeaceExpiration (tempObject);
 
-		if(thisPlayer.peaceCounter > 66 || thisPlayer.ceaseFirePeriodExpired == false)
+		if(tempObject.peaceCounter > 50 || tempObject.ceaseFirePeriodExpired == false)
 		{
-			thisPlayer.diplomaticState = "Peace";
+			tempObject.diplomaticState = "Peace";
 
-			if(thisPlayer.peaceCounter < 66)
+			if(tempObject.peaceCounter < 50)
 			{
-				thisPlayer.peaceCounter = 66;
+				tempObject.peaceCounter = 50;
 			}
 		}
 
-		if(thisPlayer.warCounter > 66)
+		if(tempObject.peaceCounter < -50)
 		{
-			thisPlayer.diplomaticState = "War";
+			tempObject.diplomaticState = "War";
 		}
 
-		if(thisPlayer.peaceCounter < 66 &&  thisPlayer.warCounter < 66 && thisPlayer.ceaseFirePeriodExpired == true)
+		if(tempObject.peaceCounter < 50 &&  tempObject.peaceCounter > -50 && tempObject.ceaseFirePeriodExpired == true)
 		{
-			thisPlayer.diplomaticState = "Cold War";
+			tempObject.diplomaticState = "Cold War";
 		}
+
+		RefreshNumbers (tempObject);
 	}
 
-	public void InvokeDiplomaticStateBonuses(TurnInfo thisPlayer)
+	public void InvokeDiplomaticStateBonuses(DiplomaticPosition tempObject)
 	{
-		thisPlayer.peaceBonus = thisPlayer.peaceCounter / 1000.0f;
-		
-		thisPlayer.warBonus = thisPlayer.warCounter / 100.0f;
+		if(tempObject.peaceCounter > -50)
+		{
+			tempObject.peaceBonus = (tempObject.peaceCounter + 50) / 1000.0f;
 
-		if (thisPlayer.diplomaticState == "War")
+			if(tempObject.peaceCounter > 50)
+			{
+				tempObject.peaceBonus = 0.1f;
+			}
+		}
+
+		if(tempObject.peaceCounter < 50)
+		{
+			tempObject.warBonus = (tempObject.peaceCounter - 50) / 100.0f;
+
+			if(tempObject.peaceCounter < -50)
+			{
+				tempObject.warBonus = 1.0f;
+			}
+		}
+
+		if (tempObject.diplomaticState == "War")
 		{
 			//prevent adjacency bonuses, merchants etc.
 		}
 
-		if (thisPlayer.diplomaticState == "Peace")
+		if (tempObject.diplomaticState == "Peace")
 		{
 			//prevent invasions, start timer for peace
 		}
 
-		if(thisPlayer.diplomaticState == "Cold War")
+		if(tempObject.diplomaticState == "Cold War")
 		{
 			//increase possibility of stealth detection
 		}
 	}
 
-	private void RefreshNumbers(TurnInfo thisPlayer)
+	private void RefreshNumbers(DiplomaticPosition tempObject)
 	{
-		if (thisPlayer.peaceCounter > 100) 
+		if(tempObject.peaceCounter > 100)
 		{
-			thisPlayer.peaceCounter = 100;
+			tempObject.peaceCounter = 100;
 		}
-		if (thisPlayer.warCounter > 100) 
+
+		if(tempObject.peaceCounter < -100)
 		{
-			thisPlayer.warCounter = 100;
-		}
-		if (thisPlayer.peaceCounter < 0) 
-		{
-			thisPlayer.peaceCounter = 0;
-		}
-		if (thisPlayer.warCounter < 0) 
-		{
-			thisPlayer.warCounter = 0;
-		}
-		if(thisPlayer.turnsAtColdWar < 0)
-		{
-			thisPlayer.turnsAtColdWar = 0;
+			tempObject.peaceCounter = -100;
 		}
 	}
 
@@ -183,3 +218,10 @@ public class DiplomacyControlScript : MasterScript
 	}
 }
 
+public class DiplomaticPosition
+{
+	public string diplomaticState;
+	public int firstContactCounter, peaceCounter, turnsAtPeace, turnsAtColdWar;
+	public float warBonus, peaceBonus;
+	public bool canDeclareWar, ceaseFirePeriodExpired, hasMadeContact;
+}

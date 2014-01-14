@@ -60,11 +60,6 @@ public class GUISystemDataScript : MasterScript
 				tempTotalSci += tempSci * techTreeScript.sciencePercentBonus * resourceBonus * thisPlayer.raceScience;
 				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * thisPlayer.raceIndustry;
 				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * thisPlayer.raceMoney;
-
-				if(systemListConstructor.systemList[i].planetOwnership[j] < maxOwnership && underInvasion == false)
-				{
-					++systemListConstructor.systemList[i].planetOwnership[j];
-				}
 			}
 		}
 
@@ -95,6 +90,26 @@ public class GUISystemDataScript : MasterScript
 		totalSystemMoney += totalSystemMoney * adjacencyBonus;
 
 		turnInfoScript.RefreshPlanetPower();
+	}
+
+	public void IncreaseOwnership()
+	{
+		int i = RefreshCurrentSystem (gameObject);
+
+		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
+		{
+			if(systemListConstructor.systemList[i].planetColonised[j] == true)
+			{
+				improvementNumber = systemListConstructor.systemList[i].planetImprovementLevel[j];
+				
+				CheckImprovement();
+
+				if(systemListConstructor.systemList[i].planetOwnership[j] < maxOwnership && underInvasion == false)
+				{
+					++systemListConstructor.systemList[i].planetOwnership[j];
+				}
+			}
+		}
 	}
 
 	private float FindAdjacencyBonuses()
