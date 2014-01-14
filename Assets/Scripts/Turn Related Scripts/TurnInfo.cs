@@ -6,17 +6,17 @@ using System.IO;
 public class TurnInfo : MasterScript
 {
 	[HideInInspector]
-	public int GP, raceGP, planetsColonisedThisTurn, savedIterator, warCounter, peaceCounter, turnsAtColdWar, turnsAtPeace;
-	public float raceScience, raceIndustry, raceMoney, science, industry, money, peaceBonus, warBonus;
+	public int GP, raceGP, planetsColonisedThisTurn, savedIterator;
+	public float raceScience, raceIndustry, raceMoney, science, industry, money;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,5];
 	public List<PlanetPower> mostPowerfulPlanets = new List<PlanetPower>();
 	[HideInInspector]
-	public bool endTurn, canDeclareWar, ceaseFirePeriodExpired;
+	public bool endTurn, playerHasWon;
 	public Camera mainCamera;
 	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse;
 
-	public string playerRace, homeSystem, homePlanetType, diplomaticState;
+	public string playerRace, homeSystem, homePlanetType, playerHasWonRace;
 	public int turn = 0, systemsInPlay = 0;
 
 	public void RefreshPlanetPower()
@@ -80,6 +80,14 @@ public class TurnInfo : MasterScript
 
 		for(int i = 0; i < 60; ++i)
 		{
+			if(systemListConstructor.systemList[i].systemOwnedBy == selectedPlayer.playerRace || systemListConstructor.systemList[i].systemOwnedBy == null)
+			{
+				playerHasWon = true;
+				playerHasWonRace = selectedPlayer.playerRace;
+			}
+
+			playerHasWon = false;
+
 			if(systemListConstructor.systemList[i].systemOwnedBy != selectedPlayer.playerRace)
 			{
 				continue;
@@ -102,13 +110,14 @@ public class TurnInfo : MasterScript
 			techTreeScript.ActiveTechnologies(selectedPlayer);
 			guiPlanScript.SystemSIMCounter(i, selectedPlayer);
 			guiPlanScript.CheckUnlockedTier();
+			guiPlanScript.IncreaseOwnership();
 
 			selectedPlayer.science += guiPlanScript.totalSystemScience;
 			selectedPlayer.industry += guiPlanScript.totalSystemIndustry;
 			selectedPlayer.money += guiPlanScript.totalSystemMoney;
 		}
 
-		diplomacyScript.CheckForDiplomaticStateChange (selectedPlayer);
+		SelectedPlayerDiplomacyChangeCheck (selectedPlayer);
 
 		turnInfoScript.SortSystemPower();
 		
@@ -117,6 +126,22 @@ public class TurnInfo : MasterScript
 		selectedPlayer.planetsColonisedThisTurn = 0;
 
 		endTurn = false;
+	}
+
+	private void SelectedPlayerDiplomacyChangeCheck(TurnInfo selectedPlayer)
+	{
+		if(selectedPlayer == playerTurnScript || selectedPlayer == enemyOneTurnScript)
+		{
+			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyOneRelations);
+		}
+		if(selectedPlayer == playerTurnScript || selectedPlayer == enemyTwoTurnScript)
+		{
+			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyTwoRelations);
+		}
+		if(selectedPlayer == enemyOneTurnScript || selectedPlayer == enemyTwoTurnScript)
+		{
+			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.enemyOneEnemyTwoRelations);
+		}
 	}
 
 	public void SortSystemPower()
@@ -153,6 +178,17 @@ public class TurnInfo : MasterScript
 			{
 				break;
 			}
+		}
+	}
+
+	void OnGUI()
+	{
+		GUI.skin = mainGUIScript.mySkin;
+
+		if(playerHasWon == true)
+		{
+			GUI.Label (new Rect(Screen.width / 2 - 100.0f, Screen.height / 2 - 100.0f, 200.0f, 200.0f), playerHasWonRace);
+			Time.timeScale = 0;
 		}
 	}
 }

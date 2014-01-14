@@ -9,6 +9,8 @@ public class Tier2HeroScript : HeroScriptParent
 		
 		guiPlanScript = heroScript.heroLocation.GetComponent<GUISystemDataScript>();
 
+		tempObject = heroScript.FindDiplomaticConnection ();
+
 		if(heroScript.heroTier2 == "Diplomat")
 		{
 			Diplomat ();
@@ -29,8 +31,10 @@ public class Tier2HeroScript : HeroScriptParent
 		heroScript.heroIndBonus += 0.05f * guiPlanScript.tempTotalInd;
 		heroScript.heroMonBonus += 0.10f * guiPlanScript.tempTotalMon;
 
-		--turnInfoScript.warCounter;
-		++turnInfoScript.peaceCounter;
+		heroScript.offensivePower -= 7.0f;
+		heroScript.defensivePower -= 7.0f;
+
+		++tempObject.peaceCounter;
 	}
 
 	public void Infiltrator()
@@ -39,21 +43,13 @@ public class Tier2HeroScript : HeroScriptParent
 		heroScript.heroIndBonus += 0.05f * guiPlanScript.tempTotalInd;
 		heroScript.heroMonBonus += 0.05f * guiPlanScript.tempTotalMon;
 
-		if (turnInfoScript.warCounter > 33) 
+		if (tempObject.peaceCounter > 50) 
 		{
-			--turnInfoScript.warCounter;
+			--tempObject.peaceCounter;
 		}
-		if (turnInfoScript.warCounter < 33) 
+		if (tempObject.peaceCounter < -50) 
 		{
-			++turnInfoScript.warCounter;
-		}
-		if (turnInfoScript.peaceCounter > 33) 
-		{
-			--turnInfoScript.peaceCounter;
-		}
-		if (turnInfoScript.peaceCounter < 33) 
-		{
-			++turnInfoScript.peaceCounter;
+			++tempObject.peaceCounter;
 		}
 	}
 
@@ -63,7 +59,9 @@ public class Tier2HeroScript : HeroScriptParent
 		heroScript.heroIndBonus += 0.10f * guiPlanScript.tempTotalInd;
 		heroScript.heroMonBonus += 0.05f * guiPlanScript.tempTotalMon;
 
-		++turnInfoScript.warCounter;
-		--turnInfoScript.peaceCounter;
+		heroScript.offensivePower += 7.0f;
+		heroScript.defensivePower += 7.0f;
+		
+		--tempObject.peaceCounter;
 	}
 }

@@ -8,7 +8,7 @@ public class MainGUIScript : MasterScript
 	public GUISkin mySkin;
 	public bool spendMenu = false, hasColonised = false, openImprovementList = false;
 	public string resourceToSpend;
-	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, heroName, diplomaticState;
+	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, heroName;
 	public int selectedSystem, selectedPlanet, selectedImprovemen;
 	private float xLoc, yLoc;
 	private Vector2 scrollPositionA = Vector2.zero, scrollPositionB = Vector2.zero;
@@ -100,7 +100,6 @@ public class MainGUIScript : MasterScript
 			moneyStr = ((int)playerTurnScript.money).ToString ();
 			GPString = playerTurnScript.GP.ToString ();
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
-			diplomaticState = playerTurnScript.diplomaticState;
 
 			if(cameraFunctionsScript.openMenu == true)
 			{
@@ -165,8 +164,6 @@ public class MainGUIScript : MasterScript
 		#endregion
 
 		UpdateVariables ();
-
-		GUI.Label (new Rect (Screen.width / 2, Screen.height / 2 - 400.0f, 100.0f, 50.0f), diplomaticState);
 
 		#region turninfo				
 		GUI.Label (new Rect(Screen.width - 80, Screen.height - 50, 50, 20), turnNumber);
