@@ -51,6 +51,8 @@ public class GUISystemDataScript : MasterScript
 
 				techTreeScript.CheckPlanets();
 
+				resourceBonus = systemListConstructor.systemList[i].planetOwnership[j] / 66.6666f;
+
 				allPlanetsInfo[j] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
 					+ systemListConstructor.systemList[i].planetOwnership[j] + "% Owned\n"
 					+ ((int)(tempSci * resourceBonus * thisPlayer.raceScience)).ToString() + "\n" 
@@ -213,7 +215,5 @@ public class GUISystemDataScript : MasterScript
 			maxOwnership = 100;
 			canImprove = false;
 		}
-
-		resourceBonus = (float)maxOwnership / 66.6666f;
 	}
 }

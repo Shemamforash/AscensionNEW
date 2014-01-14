@@ -97,7 +97,10 @@ public class Tier3HeroScript : HeroScriptParent
 	{
 		heroScript.defensivePower += 7.0f;
 
-		++tempObject.peaceCounter;
+		if(tempObject != null)
+		{
+			++tempObject.peaceCounter;
+		}
 	}
 
 	public void President(HeroScriptParent heroScript)
@@ -170,7 +173,7 @@ public class Tier3HeroScript : HeroScriptParent
 
 			GUILayout.BeginArea(new Rect(Screen.width / 2 - 100.0f, Screen.height / 2 - 250.0f, 200.0f, 500.0f));
 
-			GUILayout.Box ("Systems with Merchant");
+			GUILayout.Box ("Start Trade With:");
 
 			scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 
@@ -202,5 +205,7 @@ public class Tier3HeroScript : HeroScriptParent
 		heroScript = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero].GetComponent<HeroScriptParent> ();
 
 		heroScript.linkedHeroObject = systemListConstructor.systemList [targetSystem].systemObject;
+
+		heroScript.CreateConnectionLine ();
 	}
 }
