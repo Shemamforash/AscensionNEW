@@ -39,9 +39,9 @@ public class EnemyTwo : AIBasicParent
 				
 				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 				{
-					if(systemListConstructor.systemList[i].planetType[j] == homePlanetType)
+					if(systemListConstructor.systemList[i].planetsInSystem[j].planetType == homePlanetType)
 					{
-						systemListConstructor.systemList[i].planetColonised[j] = true;
+						systemListConstructor.systemList[i].planetsInSystem[j].planetColonised = true;
 						break;
 					}
 				}

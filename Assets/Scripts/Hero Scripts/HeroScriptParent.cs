@@ -37,16 +37,6 @@ public class HeroScriptParent : MasterScript
 		}
 	}
 
-	public void Update()
-	{
-		if(linkedHeroObject != null && heroGUIScript.heroIsMoving == true)
-		{
-			Destroy(merchantLine);
-
-			CreateConnectionLine();
-		}
-	}
-
 	public DiplomaticPosition FindDiplomaticConnection()
 	{
 		int i = RefreshCurrentSystem (heroLocation);
@@ -182,7 +172,7 @@ public class HeroScriptParent : MasterScript
 		
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
-			if(systemListConstructor.systemList[i].planetColonised[j] == false)
+			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == false)
 			{
 				continue;
 			}
@@ -211,18 +201,18 @@ public class HeroScriptParent : MasterScript
 		
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
-			if(systemListConstructor.systemList[i].planetColonised[j] == false)
+			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == false)
 			{
 				continue;
 			}
 			
-			systemListConstructor.systemList[i].planetOwnership[j] -= (int)invasionStrength;
+			systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership -= (int)invasionStrength;
 			
-			if(systemListConstructor.systemList[i].planetOwnership[j] < 0)
+			if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < 0)
 			{
-				systemListConstructor.systemList[i].planetColonised[j] = false;
-				systemListConstructor.systemList[i].planetImprovementLevel[j] = 0;
-				systemListConstructor.systemList[i].planetOwnership[j] = 0;
+				systemListConstructor.systemList[i].planetsInSystem[j].planetColonised = false;
+				systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel = 0;
+				systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership = 0;
 			}
 		}
 		
@@ -230,7 +220,7 @@ public class HeroScriptParent : MasterScript
 		
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
-			if(systemListConstructor.systemList[i].planetColonised[j] == true)
+			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
 			{
 				planetsRemaining = true;
 				++noOfColonisedPlanets;

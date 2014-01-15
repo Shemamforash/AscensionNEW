@@ -6,7 +6,7 @@ public class GUIHeroScreen : MasterScript
 {
 	public bool openHeroLevellingScreen, heroIsMoving;
 	public GameObject heroObject, merchantQuad;
-	private GameObject tempHero, targetSystem;
+	public GameObject tempHero, targetSystem;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
 	private string[] heroLevelThreeSpecs = new string[9] {"President", "Peacemaker", "Merchant", "Vanguard", "Strike Team", "Warlord", "Spy", "Recon Drone", "Assassin"};
 	public GUISkin mySkin;

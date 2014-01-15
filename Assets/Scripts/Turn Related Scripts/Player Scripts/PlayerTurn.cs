@@ -86,14 +86,14 @@ public class PlayerTurn : TurnInfo
 
 			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
 			{
-				float planetSIM = systemListConstructor.systemList[selectedSystem].planetScience[i] + systemListConstructor.systemList[selectedSystem].planetIndustry[i] +
-					systemListConstructor.systemList[selectedSystem].planetMoney[i];
+				float planetSIM = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetScience + systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetIndustry +
+					systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetMoney;
 
-				string planetInfo = systemListConstructor.systemList[selectedSystem].planetType[i] + " " + planetSIM.ToString() + " SIM";
+				string planetInfo = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetType + " " + planetSIM.ToString() + " SIM";
 
 				if(GUILayout.Button(planetInfo, GUILayout.Height (50.0f)))
 				{
-					systemListConstructor.systemList[selectedSystem].planetColonised[i] = true;
+					systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised = true;
 
 					++planetsColonisedThisTurn;
 
@@ -107,7 +107,7 @@ public class PlayerTurn : TurnInfo
 
 	public void ImproveButtonClick(int i, int j)
 	{
-		++systemListConstructor.systemList[i].planetImprovementLevel[j];
+		++systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
 
 		if(mainGUIScript.resourceToSpend == "Industry")
 		{
@@ -140,9 +140,9 @@ public class PlayerTurn : TurnInfo
 
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
-			if(systemListConstructor.systemList[i].planetType[j] == homePlanetType)
+			if(systemListConstructor.systemList[i].planetsInSystem[j].planetType == homePlanetType)
 			{
-				systemListConstructor.systemList[i].planetColonised[j] = true;
+				systemListConstructor.systemList[i].planetsInSystem[j].planetColonised = true;
 				break;
 			}
 		}

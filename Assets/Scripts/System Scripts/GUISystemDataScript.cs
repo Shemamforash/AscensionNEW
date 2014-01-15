@@ -35,22 +35,22 @@ public class GUISystemDataScript : MasterScript
 
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
-			if(systemListConstructor.systemList[i].planetColonised[j] == true)
+			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
 			{
-				string planetType = systemListConstructor.systemList[i].planetType[j];
+				string planetType = systemListConstructor.systemList[i].planetsInSystem[j].planetType;
 
-				improvementNumber = systemListConstructor.systemList[i].planetImprovementLevel[j];
+				improvementNumber = systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
 
 				CheckImprovement();
 				
-				tempSci = systemListConstructor.systemList[i].planetScience[j]; //Need to sort out variable types, too much casting
-				tempInd = systemListConstructor.systemList[i].planetIndustry[j];
-				tempMon = systemListConstructor.systemList[i].planetMoney[j];
+				tempSci = systemListConstructor.systemList[i].planetsInSystem[j].planetScience; //Need to sort out variable types, too much casting
+				tempInd = systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry;
+				tempMon = systemListConstructor.systemList[i].planetsInSystem[j].planetMoney;
 
-				resourceBonus = systemListConstructor.systemList[i].planetOwnership[j] / 66.6666f;
+				resourceBonus = systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership / 66.6666f;
 
 				allPlanetsInfo[j] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-					+ systemListConstructor.systemList[i].planetOwnership[j] + "% Owned\n"
+					+ systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership + "% Owned\n"
 					+ ((int)(tempSci * resourceBonus * thisPlayer.raceScience)).ToString() + "\n" 
 					+ ((int)(tempInd * resourceBonus * thisPlayer.raceIndustry)).ToString() + "\n" 
 					+ ((int)(tempMon * resourceBonus * thisPlayer.raceMoney)).ToString();
@@ -97,15 +97,15 @@ public class GUISystemDataScript : MasterScript
 
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
-			if(systemListConstructor.systemList[i].planetColonised[j] == true)
+			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
 			{
-				improvementNumber = systemListConstructor.systemList[i].planetImprovementLevel[j];
+				improvementNumber = systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
 				
 				CheckImprovement();
 
-				if(systemListConstructor.systemList[i].planetOwnership[j] < maxOwnership && underInvasion == false)
+				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < maxOwnership && underInvasion == false)
 				{
-					++systemListConstructor.systemList[i].planetOwnership[j];
+					++systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership;
 				}
 			}
 		}
@@ -167,11 +167,11 @@ public class GUISystemDataScript : MasterScript
 
 			planet.system = gameObject;
 
-			improvementNumber = systemListConstructor.systemList[k].planetImprovementLevel[i];
+			improvementNumber = systemListConstructor.systemList[k].planetsInSystem[i].planetImprovementLevel;
 			
 			CheckImprovement();
 
-			float tempSIM = (systemListConstructor.systemList[k].planetScience[i] + systemListConstructor.systemList[k].planetIndustry[i] + systemListConstructor.systemList[k].planetMoney[i]) * resourceBonus;
+			float tempSIM = (systemListConstructor.systemList[k].planetsInSystem[i].planetScience + systemListConstructor.systemList[k].planetsInSystem[i].planetIndustry + systemListConstructor.systemList[k].planetsInSystem[i].planetMoney) * resourceBonus;
 
 			planet.simOutput = tempSIM;
 

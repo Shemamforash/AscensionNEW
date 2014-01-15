@@ -39,8 +39,6 @@ public class SystemListConstructor : MasterScript
 		{
 			for(int i = 0; i < 60; ++i)
 			{
-				int tempInt = 0;
-
 				SystemInfo system = new SystemInfo();
 				
 				system.systemName = typeReader.ReadLine();
@@ -52,19 +50,26 @@ public class SystemListConstructor : MasterScript
 				for(int j = 0; j < system.systemSize; ++j)
 				{
 					planetName = system.systemName + " " + j.ToString();
-					system.planetName.Add (planetName);
-					system.planetType.Add (typeReader.ReadLine ());
-					system.planetImprovementLevel.Add (0);
-					system.planetColonised.Add (false);
-					system.planetOwnership.Add (0);
-					system.planetScience.Add (FindPlanetSIM(system.planetType[j], "Science"));
-					system.planetIndustry.Add (FindPlanetSIM(system.planetType[j], "Industry"));
-					system.planetMoney.Add (FindPlanetSIM(system.planetType[j], "Money"));
-					system.improvementSlots.Add ((int)FindPlanetSIM(system.planetType[j], "Improvement Slots"));
-					tempInt += (int)FindPlanetSIM(system.planetType[j], "Improvement Slots");
-				}
 
-				system.improvementsBuilt = new string[tempInt];
+					Planet newPlanet = new Planet();
+
+					newPlanet.planetName = planetName;
+					newPlanet.planetType = typeReader.ReadLine();
+					newPlanet.planetImprovementLevel = 0;
+					newPlanet.planetColonised = false;
+					newPlanet.planetOwnership = 0;
+					newPlanet.planetScience = FindPlanetSIM(newPlanet.planetType, "Science");
+					newPlanet.planetIndustry = FindPlanetSIM(newPlanet.planetType, "Industry");
+					newPlanet.planetMoney = FindPlanetSIM(newPlanet.planetType, "Money");
+					newPlanet.improvementSlots = (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots");
+
+					for(int k = 0; k < (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots"); ++k)
+					{
+						newPlanet.improvementsBuilt.Add (null);
+					}
+
+					system.planetsInSystem.Add (newPlanet);
+				}
 				
 				systemList.Add (system);
 			}
@@ -113,20 +118,16 @@ public class SystemInfo
 	public GameObject systemObject;
 	public GameObject tradeRoute;
 	public int systemSize;
-
 	public GameObject[] heroesInSystem = new GameObject[3];
-	public string[] improvementsBuilt;
+	public List<Planet> planetsInSystem = new List<Planet> ();
+}
 
-	public List<string> planetName = new List<string>();
-	public List<string> planetType = new List<string>();
-
-	public List<float> planetScience = new List<float>();
-	public List<float> planetIndustry = new List<float>();
-	public List<float> planetMoney = new List<float>();
-	public List<bool> planetColonised = new List<bool>();
-
-	public List<int> planetOwnership = new List<int> ();
-	public List<int> planetImprovementLevel = new List<int>();
-	public List<int> improvementSlots= new List<int>();
+public class Planet
+{
+	public string planetName, planetType;
+	public List<string> improvementsBuilt = new List<string> ();
+	public float planetScience, planetIndustry, planetMoney;
+	public bool planetColonised;
+	public int planetOwnership, planetImprovementLevel, improvementSlots;
 }
 

@@ -11,7 +11,7 @@ public class CameraFunctions : MasterScript
 	[HideInInspector]
 	public GameObject selectedSystem;
 	[HideInInspector]
-	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false;
+	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false, lightFading;
 	
 	private float leftBound = -40, rightBound = 40, upperBound = 40, lowerBound = -40;
 	private float timer = 0.0f;
@@ -72,8 +72,9 @@ public class CameraFunctions : MasterScript
 				}
 			}
 		}
+
 	}
-	
+
 	public void PanCamera() //Used to pan camera
 	{		
 		if(Input.GetAxis ("Horizontal") > 0)
