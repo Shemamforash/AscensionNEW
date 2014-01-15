@@ -152,7 +152,7 @@ public class TechTreeScript : MasterScript
 
 				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 				{
-					if(systemListConstructor.systemList[i].planetColonised[j] == true)
+					if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
 					{
 						industryPointBonus += 1;
 						tempCount += 1;
@@ -182,7 +182,7 @@ public class TechTreeScript : MasterScript
 
 			for(int j = 0; j <  systemListConstructor.systemList[i].systemSize; ++j)
 			{
-				if(systemListConstructor.systemList[i].planetColonised[j] == false)
+				if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == false)
 				{
 					sciencePercentBonus += 0.25f;
 					tempCount += 0.25f;
@@ -200,7 +200,7 @@ public class TechTreeScript : MasterScript
 			
 			for(int j = 0; j <  systemListConstructor.systemList[i].systemSize; ++j)
 			{
-				if(systemListConstructor.systemList[i].planetColonised[j] == false)
+				if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == false)
 				{
 					allPlanetsColonised = false;
 				}
@@ -224,11 +224,11 @@ public class TechTreeScript : MasterScript
 			
 			for(int j = 0; j <  systemListConstructor.systemList[i].systemSize; ++j)
 			{
-				if(systemListConstructor.systemList[i].planetType[j] == selectedPlayer.homePlanetType)
+				if(systemListConstructor.systemList[i].planetsInSystem[j].planetType == selectedPlayer.homePlanetType)
 				{
-					sciencePointBonus += systemListConstructor.systemList[i].planetScience[j];
-					industryPointBonus += systemListConstructor.systemList[i].planetIndustry[j];
-					moneyPointBonus += systemListConstructor.systemList[i].planetMoney[j];
+					sciencePointBonus += systemListConstructor.systemList[i].planetsInSystem[j].planetScience;
+					industryPointBonus += systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry;
+					moneyPointBonus += systemListConstructor.systemList[i].planetsInSystem[j].planetMoney;
 				}
 			}
 

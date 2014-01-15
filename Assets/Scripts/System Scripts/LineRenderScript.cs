@@ -18,11 +18,13 @@ public class LineRenderScript : MasterScript
 	public int thisSystem;
 	[HideInInspector]
 	private GameObject objectB;
+	private Light thisLight;
 
 	void Start()
 	{	
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
+		thisLight = gameObject.GetComponent<Light> ();
 
 		for(int i = 0; i < 4; ++i)
 		{
@@ -39,6 +41,18 @@ public class LineRenderScript : MasterScript
 		BuildLine(quadA);
 
 		thisSystem = RefreshCurrentSystem(gameObject);
+	}
+
+	void Update()
+	{
+		if(cameraFunctionsScript.selectedSystem == gameObject)
+		{
+			thisLight.intensity = 4.0f;
+		}
+		if(cameraFunctionsScript.selectedSystem != gameObject)
+		{
+			thisLight.intensity = 0.0f;
+		}
 	}
 
 	public void SetRaceLineColour(string thisRace)

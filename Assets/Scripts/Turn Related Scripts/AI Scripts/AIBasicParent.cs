@@ -54,7 +54,7 @@ public class AIBasicParent : TurnInfo
 
 		if(currentPlanet != -1 && currentPlanet != -1)
 		{
-			systemListConstructor.systemList[currentSystem].planetColonised[currentPlanet] = true;
+			systemListConstructor.systemList[currentSystem].planetsInSystem[currentPlanet].planetColonised = true;
 			
 			++planetsColonisedThisTurn;
 			
@@ -81,13 +81,13 @@ public class AIBasicParent : TurnInfo
 
 				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 				{
-					if(systemListConstructor.systemList[i].planetColonised[j] == true || systemListConstructor.systemList[i].planetImprovementLevel[j] == 3)
+					if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true || systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel == 3)
 					{
 						continue;
 					}
 
-					tempSIM = systemListConstructor.systemList[i].planetScience[j] + systemListConstructor.systemList[i].planetIndustry[j] + systemListConstructor.systemList[i].planetMoney[j]
-						* (systemListConstructor.systemList[i].improvementSlots[j] * 3.0f);
+					tempSIM = systemListConstructor.systemList[i].planetsInSystem[j].planetScience + systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry + systemListConstructor.systemList[i].planetsInSystem[j].planetMoney
+						* (systemListConstructor.systemList[i].planetsInSystem[j].improvementSlots * 3.0f);
 
 					if(tempSIM > highestSIM)
 					{
@@ -132,8 +132,8 @@ public class AIBasicParent : TurnInfo
 
 						for(int l = 0; l < systemListConstructor.systemList[k].systemSize; ++l)
 						{
-							tempPlanetSIM = systemListConstructor.systemList[k].planetScience[l] + systemListConstructor.systemList[k].planetIndustry[l] + systemListConstructor.systemList[k].planetMoney[l] 
-												* (systemListConstructor.systemList[k].improvementSlots[l] * 1.5f);
+							tempPlanetSIM = systemListConstructor.systemList[k].planetsInSystem[l].planetScience + systemListConstructor.systemList[k].planetsInSystem[l].planetIndustry + systemListConstructor.systemList[k].planetsInSystem[l].planetMoney 
+								* (systemListConstructor.systemList[k].planetsInSystem[l].improvementSlots * 1.5f);
 
 							if(tempPlanetSIM > tempHighestPlanetSIM)
 							{
@@ -181,7 +181,7 @@ public class AIBasicParent : TurnInfo
 	
 	public void ImprovePlanet(int planetPosition, int system)
 	{
-		guiPlanScript.improvementNumber = systemListConstructor.systemList[system].planetImprovementLevel[planetPosition];
+		guiPlanScript.improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 		
 		guiPlanScript.CheckImprovement();
 		
@@ -189,14 +189,14 @@ public class AIBasicParent : TurnInfo
 		{
 			if(industry >= guiPlanScript.improvementCost)
 			{
-				++systemListConstructor.systemList[system].planetImprovementLevel[planetPosition];
+				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 				
 				industry -= (int)guiPlanScript.improvementCost;
 			}
 			
 			else if(money >= guiPlanScript.improvementCost * 2)
 			{
-				++systemListConstructor.systemList[system].planetImprovementLevel[planetPosition];
+				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 				
 				money -= ((int)guiPlanScript.improvementCost * 2);
 			}
