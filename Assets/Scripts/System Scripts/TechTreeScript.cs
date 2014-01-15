@@ -1,26 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 public class TechTreeScript : MasterScript 
 {
-	public int techToBuildTier, techToBuildPosition;
-	public string[,,] techTreeComplete = new string[4,6,2];
-	public string[,] improvementsOnPlanet = new string[6,4];
-	public float[,] techTreeCost = new float[4,6];
-	public string planetToCheck;
 	public string[] improvementMessageArray = new string[24];
 
 	public float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
 	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
-
 	public int techTier = 0;
-
 	private int currentPlanetsWithHyperNet = 0;
 
-	private bool capitalism = false, familiarity = false, secondaryResearch = false;
-	public bool leadership = false;
-	private float tempValue;
+	public List<ImprovementClass> listOfImprovements = new List<ImprovementClass>();
 
 	void Start()
 	{
@@ -31,39 +23,31 @@ public class TechTreeScript : MasterScript
 		LoadTechTree();
 	}
 
-	public void ImproveSystem(int tier, int position) //Occurs if button of tech is clicked.
+	public void ImproveSystem(int improvement) //Occurs if button of tech is clicked.
 	{
-		if(playerTurnScript.industry >= techTreeCost[tier, position]) //Checks cost of tech and current industry
+		if(playerTurnScript.industry >= listOfImprovements[improvement].improvementCost) //Checks cost of tech and current industry
 		{
-			playerTurnScript.industry -= (int)techTreeCost[tier, position];
-			techTreeComplete[tier, position, 1] = "Built";
-			secondaryResearch = true; //Activates tech ability
+			playerTurnScript.industry -= listOfImprovements[improvement].improvementCost;
+			listOfImprovements[improvement].hasBeenBuilt = true;;
 		}
 	}
 
 	private void LoadTechTree() //Loads tech tree into two arrays (whether tech has been built, and the cost of each tech)
-	{
-		string text = " ";
-		
-		using(StreamReader reader =  new StreamReader("HumanTechTree.txt"))
+	{		
+		using(StreamReader reader =  new StreamReader("ImprovementList.txt"))
 		{
-			for(int i = 0; i < 4; i++)
+			for(int i = 0; i < 12; ++i)
 			{
-				for(int j = 0; j < 6; j++)
-				{
-					if((i == 0 && j > 4) || (i == 1 && j > 4))
-					{
-						break;
-					}
+				ImprovementClass improvement = new ImprovementClass();
 
-					text = reader.ReadLine();
-					techTreeComplete[i,j,0] = text;
-					techTreeComplete[i,j,1] = "Not Built";
+				improvement.improvementName = reader.ReadLine();
+				improvement.improvementCategory = reader.ReadLine ();
+				improvement.improvementLevel = int.Parse (reader.ReadLine ());
+				improvement.improvementCost = float.Parse(reader.ReadLine ());
+				improvement.hasBeenBuilt = false;
 
-					text = reader.ReadLine();
-					techTreeCost[i,j] = float.Parse(text);
-				}
-			}			
+				listOfImprovements.Add (improvement);
+			}
 		}
 	}
 
@@ -72,28 +56,58 @@ public class TechTreeScript : MasterScript
 		improvementMessageArray[tech] = message;
 	}
 
-	public void ActiveTechnologies(TurnInfo selectedPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
+	public void ActiveTechnologies(int system, TurnInfo selectedPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
 		sciencePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
 		industryPercentBonus = 1.0f;
 		moneyPercentBonus = 1.0f;
 
-		if(techTreeComplete[0,0,1] == "Built" && secondaryResearch == true) //Secondary Research
+		sciencePointBonus = 0.0f;
+		industryPointBonus = 0.0f;
+		moneyPointBonus = 0.0f;
+
+		float tempCount = 0.0f;
+
+		if(listOfImprovements[0].hasBeenBuilt == true) //Secondary Research
 		{
-			playerTurnScript.science += 50;
-			AddImprovementMessage("+50 Science on Improvement", 0);
-			secondaryResearch = false;
+			for(int i = 0; i < listOfImprovements.Count; ++i)
+			{
+				if(listOfImprovements[i].hasBeenBuilt == true)
+				{
+					sciencePercentBonus += 0.05f;
+					tempCount += 0.05f;
+				}
+			}
+
+			AddImprovementMessage("+" + tempCount + "% Science from Improvements", 0);
 		}
 
-		if(techTreeComplete[0,1,1] == "Built") //Synergy
+		if(listOfImprovements[1].hasBeenBuilt == true) //Synergy
 		{
-			Synergy(selectedPlayer);
-			AddImprovementMessage ("+" + tempValue.ToString () + "% Industry on system", 1);
+			tempCount = 0.0f;
+
+			for(int i = 0; i < 4; ++i)
+			{
+				if(lineRenderScript.connections[i] == null)
+				{
+					break;
+				}
+
+				int k = RefreshCurrentSystem(lineRenderScript.connections[i]);
+
+				if(systemListConstructor.systemList[k].systemOwnedBy == selectedPlayer.playerRace)
+				{
+					industryPercentBonus += 0.075f;
+					tempCount += 0.075f;
+				}
+			}
+
+			AddImprovementMessage("+" + tempCount + "% Industry from nearby systems", 1);
 		}
 
-		if(techTreeComplete[0,2,1] == "Built") //Morale
+		if(listOfImprovements[2].hasBeenBuilt == true) //Morale
 		{
-			tempValue = 0.0f;
+			tempCount = 0.0f;
 
 			int i = RefreshCurrentSystem(gameObject);
 
@@ -104,149 +118,230 @@ public class TechTreeScript : MasterScript
 					continue;
 				}
 
-				else
-				{
-					moneyPointBonus += 10.0f;
-					tempValue += 10.0f;
-				}
+				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
+
+				moneyPercentBonus += (heroScript.currentLevel * 5.0f);
+				tempCount += (heroScript.currentLevel * 5.0f);
 			}
 
-			AddImprovementMessage("+" + tempValue.ToString() + " Money from heroes in System", 2);
+			AddImprovementMessage("+" + tempCount + "% from Hero levels", 2);
 		}
 
-		if(techTreeComplete[0,3,1] == "Built" && capitalism == false) //Capitalism
+		if(listOfImprovements[3].hasBeenBuilt == true) //Capitalism
 		{
-			capitalism = true;
+			tempCount = 0.0f;
+
+			int j = CheckDiplomaticStateOfAllPlayers(selectedPlayer, "Peace");
+
+			sciencePointBonus += (turnInfoScript.turn * Mathf.Pow (2.0f, j));
+			tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
+
+			AddImprovementMessage("+" + tempCount + " Science from Peace", 3);
 		}
 
-		if(techTreeComplete[0,4,1] == "Built" && leadership == false) //Leadership
+		if(listOfImprovements[4].hasBeenBuilt == true) //Leadership
 		{
-			leadership = true;
-		}
+			tempCount = 0.0f;
 
-		if(techTreeComplete[1,1,1] == "Built") //Quick Starters
-		{
-			industryPointBonus += playerTurnScript.planetsColonisedThisTurn * 50.0f;
-			tempValue = playerTurnScript.planetsColonisedThisTurn * 50.0f;
-			AddImprovementMessage("+" + tempValue + " Industry from planets colonised this turn", 5);
-		}
-
-		if(techTreeComplete[1,4,1] == "Built")
-		{
-			bool industryBonus = false;
-			bool scienceBonus = false;
-
-			for(int i = 0; i < 4; ++i)
+			for(int i = 0; i < 60; ++i)
 			{
-				if(lineRenderScript.connections[i] == null)
+				if(systemListConstructor.systemList[i].systemOwnedBy != selectedPlayer.playerRace)
 				{
-					break;
+					continue;
 				}
 
-				int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
-
-				if(systemListConstructor.systemList[j].systemOwnedBy == "Selkies" && industryBonus == false)
+				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 				{
-					industryPercentBonus += 0.5f;
-					AddImprovementMessage ("+ 50% Industry from Selkies adjacency", 8);
-					industryBonus = true;
-				}
-
-				if(systemListConstructor.systemList[j].systemOwnedBy == "Nereides" && scienceBonus == false)
-				{
-					industryPercentBonus += 0.5f;
-					AddImprovementMessage ("+ 50% Science from Nereides adjacency", 9);
-					scienceBonus = true;
+					if(systemListConstructor.systemList[i].planetColonised[j] == true)
+					{
+						industryPointBonus += 1;
+						tempCount += 1;
+					}
 				}
 			}
+
+			AddImprovementMessage("+" + tempCount + " Industry from colonisation", 4);
 		}
 
-		if(techTreeComplete[2,1,1] == "Built") //Unionisation
+		if(listOfImprovements[5].hasBeenBuilt == true) //Quick Starters
 		{
-			Unionisation();
-			AddImprovementMessage ("+" + tempValue + "% Industry from Economic status", 10);
+			tempCount = 0.0f;
+
+			int j = CheckDiplomaticStateOfAllPlayers(selectedPlayer, "War");
+
+			industryPercentBonus += (j * 0.25f);
+			tempCount += (j * 0.25f);
+			AddImprovementMessage("+" + tempCount + "% Industry from War", 5);
 		}
 
-		if(techTreeComplete[2,2,1] == "Built" && familiarity == false) //Familiarity
+		if(listOfImprovements[6].hasBeenBuilt == true)
 		{
-			familiarity = true;
+			tempCount = 0.0f;
+
+			int i = RefreshCurrentSystem(gameObject);
+
+			for(int j = 0; j <  systemListConstructor.systemList[i].systemSize; ++j)
+			{
+				if(systemListConstructor.systemList[i].planetColonised[j] == false)
+				{
+					sciencePercentBonus += 0.25f;
+					tempCount += 0.25f;
+				}
+			}
+
+			AddImprovementMessage("+" + tempCount + "% Science from uncolonised planets", 6);
 		}
 
-		if(techTreeComplete[2,5,1] == "Built") //Hypernet
+		if(listOfImprovements[7].hasBeenBuilt == true) //Unionisation
 		{
-			HyperNet();
-			AddImprovementMessage ("+" + tempValue + "% SIM from systems with Hypernet", 14);
-		}
-	}
+			tempCount = 0.0f;
+			bool allPlanetsColonised  = true;
+			int i = RefreshCurrentSystem(gameObject);
+			
+			for(int j = 0; j <  systemListConstructor.systemList[i].systemSize; ++j)
+			{
+				if(systemListConstructor.systemList[i].planetColonised[j] == false)
+				{
+					allPlanetsColonised = false;
+				}
+			}
 
-	private void Unionisation()
-	{
-		tempValue = 0.0f;
+			if(allPlanetsColonised == true)
+			{
+				industryPercentBonus += 0.2f;
+				tempCount += 0.2f;
+			}
 
-		industryPercentBonus += 0.1f;
-		tempValue += 0.1f;
-		
-		if(guiPlanScript.totalSystemMoney == 0)
-		{
 			industryPercentBonus += 0.1f;
-			tempValue += 0.1f;
+			tempCount += 0.1f;
+
+			AddImprovementMessage("+" + tempCount + "% Industry on System", 7);
 		}
-	}
 
-	private void Synergy(TurnInfo selectedPlayer)
-	{
-		float tempFloat = 0.0f;
-
-		for(int i = 0; i < 4; ++i)
+		if(listOfImprovements[8].hasBeenBuilt == true) //Familiarity
 		{
-			if(lineRenderScript.connections[i] = null)
+			int i = RefreshCurrentSystem(gameObject);
+			
+			for(int j = 0; j <  systemListConstructor.systemList[i].systemSize; ++j)
 			{
-				break;
+				if(systemListConstructor.systemList[i].planetType[j] == selectedPlayer.homePlanetType)
+				{
+					sciencePointBonus += systemListConstructor.systemList[i].planetScience[j];
+					industryPointBonus += systemListConstructor.systemList[i].planetIndustry[j];
+					moneyPointBonus += systemListConstructor.systemList[i].planetMoney[j];
+				}
 			}
 
-			int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
+			AddImprovementMessage("2x SIM production on Home-Type Planets", 8);
+		}
 
-			if(systemListConstructor.systemList[j].systemOwnedBy == selectedPlayer.playerRace)
-			{
-				industryPercentBonus += 0.05f;
-				tempFloat += 0.05f;
-			}
+		if(listOfImprovements[9].hasBeenBuilt == true) //Hypernet
+		{
+			tempCount = 0.0f;
+			float tempCountB = 0.0f;
+			float tempCountC = 0.0f;
+
+			sciencePointBonus += guiPlanScript.totalSystemScience;
+			tempCount = guiPlanScript.totalSystemScience;
+
+			industryPointBonus -= (0.5f * turnInfoScript.turn) * guiPlanScript.totalSystemIndustry;
+			tempCountB = (0.5f * turnInfoScript.turn) * guiPlanScript.totalSystemIndustry;
+
+			moneyPointBonus -= (0.5f * turnInfoScript.turn) * guiPlanScript.totalSystemMoney;
+			tempCountC = (0.5f * turnInfoScript.turn) * guiPlanScript.totalSystemMoney;
+
+			AddImprovementMessage("+" + tempCount + " Science, -" + tempCountB + " Industry, -" + tempCountC + "Money on System", 9);
+		}
+
+		if(listOfImprovements[11].hasBeenBuilt == true)
+		{
+			tempCount = 0.0f;
+			int i = HyperNet(selectedPlayer);
+
+			sciencePercentBonus += (i * 0.05f);
+			industryPercentBonus += (i * 0.05f);
+			moneyPercentBonus += (i * 0.05f);
+			tempCount = (i * 0.05f);
+
+			AddImprovementMessage ("+" + tempCount + "% SIM from systems with Hypernet", 14);
 		}
 	}
 
-	private void HyperNet() //Tier 3 tech. Bonus SIM for each connected planet. This function is good.
+	private int CheckDiplomaticStateOfAllPlayers(TurnInfo selectedPlayer, string state)
+	{
+		int noOfPlayersInState = 0;
+
+		if(selectedPlayer == playerTurnScript)
+		{
+			if(diplomacyScript.playerEnemyOneRelations.diplomaticState == state)
+			{
+				++noOfPlayersInState;
+			}
+			
+			if(diplomacyScript.playerEnemyTwoRelations.diplomaticState == state)
+			{
+				++noOfPlayersInState;
+			}
+		}
+		
+		if(selectedPlayer == enemyOneTurnScript)
+		{
+			if(diplomacyScript.playerEnemyOneRelations.diplomaticState == state)
+			{
+				++noOfPlayersInState;
+			}
+			
+			if(diplomacyScript.enemyOneEnemyTwoRelations.diplomaticState == state)
+			{
+				++noOfPlayersInState;
+			}
+		}
+		
+		if(selectedPlayer == enemyTwoTurnScript)
+		{
+			if(diplomacyScript.playerEnemyTwoRelations.diplomaticState == state)
+			{
+				++noOfPlayersInState;
+			}
+			
+			if(diplomacyScript.enemyOneEnemyTwoRelations.diplomaticState == state)
+			{
+				++noOfPlayersInState;
+			}
+		}
+
+		return noOfPlayersInState;
+	}
+
+	private int HyperNet(TurnInfo selectedPlayer) //Tier 3 tech. Bonus SIM for each connected planet. This function is good.
 	{		
 		currentPlanetsWithHyperNet = 0;
 		
 		for(int i = 0; i < 60; ++i)
 		{
+			if(systemListConstructor.systemList[i].systemOwnedBy == null || systemListConstructor.systemList[i].systemOwnedBy == selectedPlayer.playerRace)
+			{
+				continue;
+			}
+
 			techTreeScript = systemListConstructor.systemList[i].systemObject.GetComponent<TechTreeScript>();
 			
-			if(techTreeScript.techTreeComplete[2,5,1] == "Built")
+			if(listOfImprovements[11].hasBeenBuilt == true)
 			{
 				++currentPlanetsWithHyperNet;
 			}
 		}
-		
-		sciencePercentBonus += currentPlanetsWithHyperNet * 0.005f;
-		industryPercentBonus += currentPlanetsWithHyperNet * 0.005f;
-		moneyPercentBonus += currentPlanetsWithHyperNet * 0.005f;
 
-		tempValue = currentPlanetsWithHyperNet * 0.005f;
+		return currentPlanetsWithHyperNet;
 	}
+}
 
-	public void CheckPlanets() //This function contains effects caused by tech, but cannot be activated within this script.
-	{
-		if(capitalism == true && planetToCheck == "Plains" || planetToCheck == "Ocean" || planetToCheck == "Forest")
-		{
-			guiPlanScript.tempMon += 10;
-		}
-		
-		//if(familiarity == true && planetToCheck == turnInfoScript.homePlanet)
-		//{
-			//guiPlanScript.tempMon += guiPlanScript.tempMon * 0.5f;
-		//}
-	}
+public class ImprovementClass
+{
+	public string improvementName, improvementCategory;
+	public float improvementCost;
+	public int improvementLevel;
+	public bool hasBeenBuilt;
 }
 
 

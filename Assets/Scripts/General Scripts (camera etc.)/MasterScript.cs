@@ -41,7 +41,6 @@ public class MasterScript : MonoBehaviour
 	public MainGUIScript mainGUIScript;
 	[HideInInspector]
 	public GUIHeroScreen heroGUIScript;
-	
 
 	private void Awake()
 	{

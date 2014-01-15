@@ -39,6 +39,8 @@ public class SystemListConstructor : MasterScript
 		{
 			for(int i = 0; i < 60; ++i)
 			{
+				int tempInt = 0;
+
 				SystemInfo system = new SystemInfo();
 				
 				system.systemName = typeReader.ReadLine();
@@ -59,7 +61,10 @@ public class SystemListConstructor : MasterScript
 					system.planetIndustry.Add (FindPlanetSIM(system.planetType[j], "Industry"));
 					system.planetMoney.Add (FindPlanetSIM(system.planetType[j], "Money"));
 					system.improvementSlots.Add ((int)FindPlanetSIM(system.planetType[j], "Improvement Slots"));
+					tempInt += (int)FindPlanetSIM(system.planetType[j], "Improvement Slots");
 				}
+
+				system.improvementsBuilt = new string[tempInt];
 				
 				systemList.Add (system);
 			}
@@ -110,6 +115,7 @@ public class SystemInfo
 	public int systemSize;
 
 	public GameObject[] heroesInSystem = new GameObject[3];
+	public string[] improvementsBuilt;
 
 	public List<string> planetName = new List<string>();
 	public List<string> planetType = new List<string>();
