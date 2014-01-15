@@ -47,10 +47,6 @@ public class GUISystemDataScript : MasterScript
 				tempInd = systemListConstructor.systemList[i].planetIndustry[j];
 				tempMon = systemListConstructor.systemList[i].planetMoney[j];
 
-				techTreeScript.planetToCheck = planetType;
-
-				techTreeScript.CheckPlanets();
-
 				resourceBonus = systemListConstructor.systemList[i].planetOwnership[j] / 66.6666f;
 
 				allPlanetsInfo[j] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
@@ -60,6 +56,7 @@ public class GUISystemDataScript : MasterScript
 					+ ((int)(tempMon * resourceBonus * thisPlayer.raceMoney)).ToString();
 
 				tempTotalSci += tempSci * techTreeScript.sciencePercentBonus * resourceBonus * thisPlayer.raceScience;
+
 				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * thisPlayer.raceIndustry;
 				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * thisPlayer.raceMoney;
 			}

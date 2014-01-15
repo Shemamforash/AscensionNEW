@@ -107,7 +107,7 @@ public class TurnInfo : MasterScript
 			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
 			techTreeScript = systemListConstructor.systemList[i].systemObject.GetComponent<TechTreeScript>();
 
-			techTreeScript.ActiveTechnologies(selectedPlayer);
+			techTreeScript.ActiveTechnologies(i, selectedPlayer);
 			guiPlanScript.SystemSIMCounter(i, selectedPlayer);
 			guiPlanScript.CheckUnlockedTier();
 			guiPlanScript.IncreaseOwnership();

@@ -218,7 +218,9 @@ public class MainGUIScript : MasterScript
 
 			#region settingupbutton			
 			GUI.Label(new Rect (Screen.width/2 - 500.0f, Screen.height/2 - 350.0f, 100.0f, 100.0f), dataSIMString);
-			
+
+			int tempInt = 0;
+
 			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
 			{	
 				CheckPlanetImprovement(i);
@@ -243,9 +245,9 @@ public class MainGUIScript : MasterScript
 
 				GUILayout.BeginArea(new Rect(allImprovementButtonsGUI[i].x, Screen.height / 2 + 100.0f, 200.0f, 400.0f));
 
-				for(int j = 0; j < systemListConstructor.systemList[selectedSystem].improvementSlots[i]; ++j) //Display improvements on system
+				for(int j = tempInt; j < systemListConstructor.systemList[selectedSystem].improvementSlots[i]; ++j) //Display improvements on system
 				{
-					GUILayout.Label (techTreeScript.improvementsOnPlanet[i,j], GUILayout.Height(50.0f));
+					GUILayout.Label (systemListConstructor.systemList[selectedSystem].improvementsBuilt[tempInt], GUILayout.Height(50.0f));
 				}
 
 				GUILayout.EndArea();
@@ -311,33 +313,18 @@ public class MainGUIScript : MasterScript
 
 				scrollPositionA = GUILayout.BeginScrollView(scrollPositionA);
 
-				for(int i = 0; i <= techTreeScript.techTier; ++i)
+				for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
 				{
-					for(int j = 0; j < 6; ++j)
+					if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier)
 					{
-						if(techTreeScript.techTreeComplete[i,j,0] == null || techTreeScript.techTreeComplete[i,j,1] == "Built")
-						{
-							continue;
-						}
+						continue;
+					}
 
-						techBuildButtonText = techTreeScript.techTreeComplete[i,j,0] + "\n" + techTreeScript.techTreeCost[i,j].ToString();
+					techBuildButtonText = techTreeScript.listOfImprovements[i].improvementName + "\n" + techTreeScript.listOfImprovements[i].improvementCost;
 
-						if(GUILayout.Button(techBuildButtonText, GUILayout.Height(40.0f)))
-						{
-							techTreeScript.ImproveSystem(i,j);
-
-							if(techTreeScript.techTreeComplete[i,j,1] == "Built")
-							{
-								for(int k = 0; k < systemListConstructor.systemList[selectedSystem].improvementSlots[selectedPlanet]; k++)
-								{									
-									if(techTreeScript.improvementsOnPlanet[selectedPlanet, k] == null)
-									{
-										techTreeScript.improvementsOnPlanet[selectedPlanet, k] = techTreeScript.techTreeComplete[i,j,0];
-										break;
-									}
-								}
-							}
-						}
+					if(GUILayout.Button(techBuildButtonText, GUILayout.Height(40.0f)))
+					{
+						techTreeScript.ImproveSystem(i);
 					}
 				}
 				GUILayout.EndScrollView();
