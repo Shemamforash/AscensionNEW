@@ -82,6 +82,11 @@ public class HeroScriptParent : MasterScript
 
 	public void CreateConnectionLine()
 	{
+		if(heroGUIScript.heroIsMoving == true && merchantLine != null)
+		{
+			Destroy(merchantLine);
+		}
+
 		float distance = Vector3.Distance(gameObject.transform.position, linkedHeroObject.transform.position);
 		
 		float rotationZRad = Mathf.Acos ((linkedHeroObject.transform.position.y - gameObject.transform.position.y) / distance);
@@ -210,9 +215,7 @@ public class HeroScriptParent : MasterScript
 			
 			if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < 0)
 			{
-				systemListConstructor.systemList[i].planetsInSystem[j].planetColonised = false;
-				systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel = 0;
-				systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership = 0;
+				WipePlanetInfo(i, j);
 			}
 		}
 		

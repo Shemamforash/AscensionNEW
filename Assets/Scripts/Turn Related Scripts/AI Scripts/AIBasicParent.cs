@@ -9,8 +9,6 @@ public class AIBasicParent : TurnInfo
 	
 	public void Expand(AIBasicParent thisPlayer)
 	{
-		planetsColonisedThisTurn = 0;
-
 		for(int i = GP; i > 0; --i)
 		{
 			AIExpansion(thisPlayer);
@@ -50,13 +48,15 @@ public class AIBasicParent : TurnInfo
 			systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
 			
 			++systemsInPlay;
+
+			++thisPlayer.systemsColonisedThisTurn;
 		}
 
 		if(currentPlanet != -1 && currentPlanet != -1)
 		{
 			systemListConstructor.systemList[currentSystem].planetsInSystem[currentPlanet].planetColonised = true;
 			
-			++planetsColonisedThisTurn;
+			++thisPlayer.planetsColonisedThisTurn;
 			
 			--GP;
 

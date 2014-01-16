@@ -6,7 +6,7 @@ using System.IO;
 public class TurnInfo : MasterScript
 {
 	[HideInInspector]
-	public int GP, raceGP, planetsColonisedThisTurn, savedIterator;
+	public int GP, raceGP, planetsColonisedThisTurn, systemsColonisedThisTurn, savedIterator;
 	public float raceScience, raceIndustry, raceMoney, science, industry, money;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,5];
@@ -117,6 +117,8 @@ public class TurnInfo : MasterScript
 			selectedPlayer.money += guiPlanScript.totalSystemMoney;
 		}
 
+		racialTraitScript.RacialBonus (selectedPlayer);
+
 		SelectedPlayerDiplomacyChangeCheck (selectedPlayer);
 
 		turnInfoScript.SortSystemPower();
@@ -124,6 +126,8 @@ public class TurnInfo : MasterScript
 		selectedPlayer.GP += selectedPlayer.raceGP;
 
 		selectedPlayer.planetsColonisedThisTurn = 0;
+
+		selectedPlayer.systemsColonisedThisTurn = 0;
 
 		endTurn = false;
 	}

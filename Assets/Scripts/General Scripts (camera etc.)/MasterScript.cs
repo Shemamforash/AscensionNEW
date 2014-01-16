@@ -36,6 +36,8 @@ public class MasterScript : MonoBehaviour
 	public Tier3HeroScript tier3HeroScript;
 	[HideInInspector]
 	public DiplomacyControlScript diplomacyScript;
+	[HideInInspector]
+	public RacialTraits racialTraitScript;
 
 	[HideInInspector]
 	public MainGUIScript mainGUIScript;
@@ -55,6 +57,7 @@ public class MasterScript : MonoBehaviour
 		heroGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GUIHeroScreen>();
 		tier2HeroScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Tier2HeroScript> ();
 		tier3HeroScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Tier3HeroScript> ();
+		racialTraitScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<RacialTraits> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem)
@@ -68,6 +71,26 @@ public class MasterScript : MonoBehaviour
 		}
 		
 		return 0;
+	}
+
+	public void WipePlanetInfo(int system, int planet)
+	{
+		systemListConstructor.systemList [system].planetsInSystem [planet].planetColonised = false;
+		systemListConstructor.systemList [system].planetsInSystem [planet].planetImprovementLevel = 0;
+
+		for(int i = 0; i < systemListConstructor.systemList [system].planetsInSystem [planet].improvementSlots; ++i)
+		{
+			techTreeScript = systemListConstructor.systemList[system].systemObject.GetComponent<TechTreeScript>();
+
+			for(int j = 0; j < techTreeScript.listOfImprovements.Count; ++j)
+			{
+				if(techTreeScript.listOfImprovements[j].improvementName == systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt [i])
+				{
+					techTreeScript.listOfImprovements[j].hasBeenBuilt = false;
+					systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt [i] = null;
+				}
+			}
+		}
 	}
 }
 
