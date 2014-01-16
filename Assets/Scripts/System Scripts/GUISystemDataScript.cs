@@ -27,6 +27,27 @@ public class GUISystemDataScript : MasterScript
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 	}
 
+	public void CheckPlanetValues(int i, int j, TurnInfo thisPlayer)
+	{
+		string planetType = systemListConstructor.systemList[i].planetsInSystem[j].planetType;
+		
+		improvementNumber = systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
+		
+		CheckImprovement();
+
+		resourceBonus = systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership / 66.6666f;
+
+		tempSci = systemListConstructor.systemList[i].planetsInSystem[j].planetScience * resourceBonus * thisPlayer.raceScience * techTreeScript.sciencePercentBonus; //Need to sort out variable types, too much casting
+		tempInd = systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry * resourceBonus * thisPlayer.raceScience * techTreeScript.industryPercentBonus;
+		tempMon = systemListConstructor.systemList[i].planetsInSystem[j].planetMoney * resourceBonus * thisPlayer.raceScience * techTreeScript.moneyPercentBonus;
+
+		allPlanetsInfo[j] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
+			+ systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership + "% Owned\n"
+				+ ((int)tempSci).ToString() + "\n" 
+				+ ((int)tempInd).ToString() + "\n" 
+				+ ((int)tempMon).ToString();
+	}
+
 	public void SystemSIMCounter(int i, TurnInfo thisPlayer) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{	
 		tempTotalSci = 0.0f;
@@ -37,28 +58,16 @@ public class GUISystemDataScript : MasterScript
 		{
 			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
 			{
-				string planetType = systemListConstructor.systemList[i].planetsInSystem[j].planetType;
+				CheckPlanetValues(i, j, thisPlayer);
 
-				improvementNumber = systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
+				tempTotalSci += tempSci;
+				tempTotalInd += tempInd;
+				tempTotalMon += tempMon;
+			}
 
-				CheckImprovement();
-				
-				tempSci = systemListConstructor.systemList[i].planetsInSystem[j].planetScience; //Need to sort out variable types, too much casting
-				tempInd = systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry;
-				tempMon = systemListConstructor.systemList[i].planetsInSystem[j].planetMoney;
-
-				resourceBonus = systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership / 66.6666f;
-
-				allPlanetsInfo[j] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-					+ systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership + "% Owned\n"
-					+ ((int)(tempSci * resourceBonus * thisPlayer.raceScience)).ToString() + "\n" 
-					+ ((int)(tempInd * resourceBonus * thisPlayer.raceIndustry)).ToString() + "\n" 
-					+ ((int)(tempMon * resourceBonus * thisPlayer.raceMoney)).ToString();
-
-				tempTotalSci += tempSci * techTreeScript.sciencePercentBonus * resourceBonus * thisPlayer.raceScience;
-
-				tempTotalInd += tempInd * techTreeScript.industryPercentBonus * resourceBonus * thisPlayer.raceIndustry;
-				tempTotalMon += tempMon * techTreeScript.moneyPercentBonus * resourceBonus * thisPlayer.raceMoney;
+			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == false)
+			{
+				allPlanetsInfo[j] = null;
 			}
 		}
 
@@ -105,10 +114,28 @@ public class GUISystemDataScript : MasterScript
 
 				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < maxOwnership && underInvasion == false)
 				{
-					++systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership;
+					int additionalOwnership = CheckOwnershipBonus(systemListConstructor.systemList[i].systemOwnedBy);
+
+					systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership += (1 + additionalOwnership);
+
+					if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < 0)
+					{
+						systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership = 0;
+						WipePlanetInfo(i, j);
+					}
 				}
 			}
 		}
+	}
+
+	public int CheckOwnershipBonus(string owner)
+	{
+		if(owner == "Humans")
+		{
+			return racialTraitScript.HumanTrait();
+		}
+
+		return 0;
 	}
 
 	private float FindAdjacencyBonuses()

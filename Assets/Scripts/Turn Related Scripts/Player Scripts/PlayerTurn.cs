@@ -95,7 +95,9 @@ public class PlayerTurn : TurnInfo
 				{
 					systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised = true;
 
-					++planetsColonisedThisTurn;
+					++playerTurnScript.planetsColonisedThisTurn;
+
+					++playerTurnScript.systemsColonisedThisTurn;
 
 					systemHasBeenColonised = false;
 				}

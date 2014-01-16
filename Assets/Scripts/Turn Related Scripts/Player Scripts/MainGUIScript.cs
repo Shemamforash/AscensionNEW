@@ -6,10 +6,10 @@ public class MainGUIScript : MasterScript
 {
 	private Rect[] allPlanetsGUI, allButtonsGUI, allImprovementButtonsGUI, allHeroLabels, allHeroButtons; 
 	public GUISkin mySkin;
-	public bool spendMenu = false, hasColonised = false, openImprovementList = false;
+	public bool spendMenu = false, openImprovementList = false;
 	public string resourceToSpend;
 	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, heroName, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
-	public int selectedSystem, selectedPlanet, selectedImprovemen;
+	public int selectedSystem, selectedPlanet;
 	private float xLoc, yLoc;
 	private Vector2 scrollPositionA = Vector2.zero, scrollPositionB = Vector2.zero;
 
@@ -102,6 +102,8 @@ public class MainGUIScript : MasterScript
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 			playerEnemyOneDiplomacy = diplomacyScript.playerEnemyOneRelations.diplomaticState + " | " + diplomacyScript.playerEnemyOneRelations.peaceCounter;
 			playerEnemyTwoDiplomacy = diplomacyScript.playerEnemyTwoRelations.diplomaticState + " | " + diplomacyScript.playerEnemyTwoRelations.peaceCounter;
+			guiPlanScript = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<GUISystemDataScript>();
+			guiPlanScript.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
 
 			if(cameraFunctionsScript.openMenu == true)
 			{
@@ -250,10 +252,21 @@ public class MainGUIScript : MasterScript
 
 				if(GUI.Button(allButtonsGUI[i], cost) && systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel < 3)
 				{	
-					spendMenu = true;
-					selectedPlanet = i;
-					indSpend = guiPlanScript.improvementCost + " Industry";
-					monSpend = guiPlanScript.improvementCost * 2 + " Money";
+					if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
+					{
+						spendMenu = true;
+						selectedPlanet = i;
+						indSpend = guiPlanScript.improvementCost + " Industry";
+						monSpend = guiPlanScript.improvementCost * 2 + " Money";
+					}
+
+					if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
+					{
+						playerTurnScript.GP -= 1;
+						systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
+						++playerTurnScript.planetsColonisedThisTurn;
+						spendMenu = false;
+					}
 				}
 
 				if(GUI.Button (allImprovementButtonsGUI[i], "Improvements"))
@@ -300,18 +313,6 @@ public class MainGUIScript : MasterScript
 						resourceToSpend = "Money";
 						spendMenu = false;
 						playerTurnScript.ImproveButtonClick(selectedSystem, selectedPlanet);
-					}
-				}
-
-				if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
-				{
-					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 190.0f, 35.0f), "1 GP") && playerTurnScript.GP > 0)
-					{
-						playerTurnScript.GP -= 1;
-						systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
-						++playerTurnScript.planetsColonisedThisTurn;
-						hasColonised = true;
-						spendMenu = false;
 					}
 				}
 

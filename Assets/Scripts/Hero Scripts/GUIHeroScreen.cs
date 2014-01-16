@@ -70,12 +70,25 @@ public class GUIHeroScreen : MasterScript
 		}
 		
 		tempHero.transform.position = Vector3.Lerp (currentPosition, targetPosition, 0.1f);
+
+		heroScript = tempHero.GetComponent<HeroScriptParent> ();
+
+		if(heroScript.merchantLine != null)
+		{
+			Destroy(heroScript.merchantLine);
+			heroScript.CreateConnectionLine ();
+		}
 	}
 
 	private void StartHeroMovement(GameObject hero, int targetSystem)
 	{
 		if(heroIsMoving == false)
 		{
+			if(heroScript.merchantLine != null)
+			{
+				Destroy (heroScript.merchantLine);
+			}
+
 			heroScript = hero.GetComponent<HeroScriptParent> ();
 
 			Destroy (heroScript.invasionObject);
