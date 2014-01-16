@@ -117,7 +117,7 @@ public class MainGUIScript : MasterScript
 	{
 		guiPlanScript.improvementNumber = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel;
 		
-		guiPlanScript.CheckImprovement();
+		guiPlanScript.CheckImprovement(selectedSystem, i);
 		
 		if(guiPlanScript.canImprove == false)
 		{
@@ -299,7 +299,7 @@ public class MainGUIScript : MasterScript
 				{
 					guiPlanScript.improvementNumber = systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetImprovementLevel;
 
-					guiPlanScript.CheckImprovement();
+					guiPlanScript.CheckImprovement(selectedSystem, selectedPlanet);
 
 					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 92.5f, 35.0f), indSpend) && playerTurnScript.industry >= guiPlanScript.improvementCost)
 					{
@@ -339,7 +339,9 @@ public class MainGUIScript : MasterScript
 
 				for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
 				{
-					if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier)
+					if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier 
+					   || techTreeScript.listOfImprovements[i].improvementCategory == enemyOneTurnScript.playerRace 
+					   || techTreeScript.listOfImprovements[i].improvementCategory == enemyTwoTurnScript.playerRace)
 					{
 						continue;
 					}
@@ -370,12 +372,9 @@ public class MainGUIScript : MasterScript
 
 			scrollPositionB = GUILayout.BeginScrollView(scrollPositionB);
 
-			for(int i = 0; i < 23; ++i)
+			for(int i = 0; i < techTreeScript.improvementMessageArray.Count; ++i)
 			{
-				if(techTreeScript.improvementMessageArray[i] != null || techTreeScript.improvementMessageArray[i] != "")
-				{
-					GUILayout.Label(techTreeScript.improvementMessageArray[i], GUILayout.Height (40.0f));
-				}
+				GUILayout.Label(techTreeScript.improvementMessageArray[i], GUILayout.Height (40.0f));
 			}
 
 			GUILayout.EndScrollView();

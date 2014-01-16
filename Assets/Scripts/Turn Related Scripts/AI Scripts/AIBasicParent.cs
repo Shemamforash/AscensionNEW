@@ -183,7 +183,7 @@ public class AIBasicParent : TurnInfo
 	{
 		guiPlanScript.improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 		
-		guiPlanScript.CheckImprovement();
+		guiPlanScript.CheckImprovement(planetPosition, system);
 		
 		if(guiPlanScript.canImprove == true && guiPlanScript.underInvasion == false)
 		{

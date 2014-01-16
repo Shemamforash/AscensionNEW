@@ -26,6 +26,7 @@ public class SystemListConstructor : MasterScript
 				PlanetInfo planet = new PlanetInfo();
 				
 				planet.planetType = rimReader.ReadLine ();
+				planet.planetCategory = rimReader.ReadLine ();
 				planet.science = int.Parse (rimReader.ReadLine ());
 				planet.industry = int.Parse (rimReader.ReadLine ());
 				planet.money = int.Parse (rimReader.ReadLine ());
@@ -55,12 +56,14 @@ public class SystemListConstructor : MasterScript
 
 					newPlanet.planetName = planetName;
 					newPlanet.planetType = typeReader.ReadLine();
+					newPlanet.planetCategory = FindPlanetCategory(newPlanet.planetType);
 					newPlanet.planetImprovementLevel = 0;
 					newPlanet.planetColonised = false;
 					newPlanet.planetOwnership = 0;
 					newPlanet.planetScience = FindPlanetSIM(newPlanet.planetType, "Science");
 					newPlanet.planetIndustry = FindPlanetSIM(newPlanet.planetType, "Industry");
 					newPlanet.planetMoney = FindPlanetSIM(newPlanet.planetType, "Money");
+					newPlanet.maxOwnership = 0;
 					newPlanet.improvementSlots = (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots");
 
 					for(int k = 0; k < (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots"); ++k)
@@ -75,7 +78,20 @@ public class SystemListConstructor : MasterScript
 			}
 		}
 	}
-	
+
+	private string FindPlanetCategory(string planetType)
+	{
+		for(int i = 0; i < 12; ++i)
+		{
+			if(planetList[i].planetType == planetType)
+			{
+				return planetList[i].planetCategory;
+			}
+		}
+
+		return null;
+	}
+
 	private float FindPlanetSIM(string planetType, string resourceType)
 	{
 		for(int i = 0; i < 12; ++i)
@@ -107,7 +123,7 @@ public class SystemListConstructor : MasterScript
 
 public class PlanetInfo
 {
-	public string planetType;
+	public string planetType, planetCategory;
 	public bool colonised;
 	public int science, industry, money, improvementSlots;
 }
@@ -124,10 +140,10 @@ public class SystemInfo
 
 public class Planet
 {
-	public string planetName, planetType;
+	public string planetName, planetType, planetCategory;
 	public List<string> improvementsBuilt = new List<string> ();
 	public float planetScience, planetIndustry, planetMoney;
 	public bool planetColonised;
-	public int planetOwnership, planetImprovementLevel, improvementSlots;
+	public int planetOwnership, planetImprovementLevel, improvementSlots, maxOwnership;
 }
 

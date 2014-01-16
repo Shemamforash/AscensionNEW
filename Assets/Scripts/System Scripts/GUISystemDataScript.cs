@@ -8,7 +8,7 @@ public class GUISystemDataScript : MasterScript
 	//THIS IS A PROTOTYPE ONLY CLASS. THIS WILL BE USED TO STORE PLANET DATA AND DISPLAY IT IN A GUI UNTIL A TRUE UI AND PLANET SCREEN CAN BE CREATED
 
 	[HideInInspector]
-	public int numPlanets, improvementNumber, maxOwnership;
+	public int numPlanets, improvementNumber;
 	[HideInInspector]
 	public float pScience, pIndustry, pMoney, improvementCost, resourceBonus, adjacencyBonus;
 	[HideInInspector]
@@ -33,13 +33,20 @@ public class GUISystemDataScript : MasterScript
 		
 		improvementNumber = systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
 		
-		CheckImprovement();
+		CheckImprovement(i, j);
 
 		resourceBonus = systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership / 66.6666f;
 
 		tempSci = systemListConstructor.systemList[i].planetsInSystem[j].planetScience * resourceBonus * thisPlayer.raceScience * techTreeScript.sciencePercentBonus; //Need to sort out variable types, too much casting
 		tempInd = systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry * resourceBonus * thisPlayer.raceScience * techTreeScript.industryPercentBonus;
 		tempMon = systemListConstructor.systemList[i].planetsInSystem[j].planetMoney * resourceBonus * thisPlayer.raceScience * techTreeScript.moneyPercentBonus;
+
+		if(techTreeScript.listOfImprovements[8].hasBeenBuilt == true && systemListConstructor.systemList[i].planetsInSystem[j].planetType == thisPlayer.homePlanetType)
+		{
+			tempSci = tempSci * 2;
+			tempInd = tempInd * 2;
+			tempMon = tempMon * 2;
+		}
 
 		allPlanetsInfo[j] = gameObject.name + " " + (j+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
 			+ systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership + "% Owned\n"
@@ -110,11 +117,16 @@ public class GUISystemDataScript : MasterScript
 			{
 				improvementNumber = systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
 				
-				CheckImprovement();
+				CheckImprovement(i, j);
 
-				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < maxOwnership && underInvasion == false)
+				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership && underInvasion == false)
 				{
 					int additionalOwnership = CheckOwnershipBonus(systemListConstructor.systemList[i].systemOwnedBy);
+
+					if(techTreeScript.listOfImprovements[18].hasBeenBuilt == true)
+					{
+						additionalOwnership = 0;
+					}
 
 					systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership += (1 + additionalOwnership);
 
@@ -196,7 +208,7 @@ public class GUISystemDataScript : MasterScript
 
 			improvementNumber = systemListConstructor.systemList[k].planetsInSystem[i].planetImprovementLevel;
 			
-			CheckImprovement();
+			CheckImprovement(k, i);
 
 			float tempSIM = (systemListConstructor.systemList[k].planetsInSystem[i].planetScience + systemListConstructor.systemList[k].planetsInSystem[i].planetIndustry + systemListConstructor.systemList[k].planetsInSystem[i].planetMoney) * resourceBonus;
 
@@ -210,33 +222,38 @@ public class GUISystemDataScript : MasterScript
 		}
 	}
 
-	public void CheckImprovement() //Contains data on the quality of planets and the bonuses they receive
+	public void CheckImprovement(int system, int planet) //Contains data on the quality of planets and the bonuses they receive
 	{
 		if(improvementNumber == 0)
 		{
 			improvementLevel = "Poor";
-			maxOwnership = 33;
+			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 33;
 			canImprove = true;
 			improvementCost = 10.0f;
 		}
 		if(improvementNumber == 1)
 		{
 			improvementLevel = "Normal";
-			maxOwnership = 50;
+			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 50;
 			canImprove = true;
 			improvementCost = 20.0f;
 		}
 		if(improvementNumber == 2)
 		{
 			improvementLevel = "Good";
-			maxOwnership = 66;
+			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 66;
 			canImprove = true;
 			improvementCost = 40.0f;
 		}
 		if(improvementNumber == 3)
 		{
 			improvementLevel = "Superb";
-			maxOwnership = 100;
+
+			if(systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership <= 100)
+			{
+				systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 100;
+			}
+
 			canImprove = false;
 		}
 	}
