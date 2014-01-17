@@ -62,7 +62,7 @@ public class MasterScript : MonoBehaviour
 
 	public int RefreshCurrentSystem(GameObject thisSystem)
 	{
-		for(int i = 0; i < 60; ++i)
+		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
 		{
 			if(systemListConstructor.systemList[i].systemObject == thisSystem)
 			{

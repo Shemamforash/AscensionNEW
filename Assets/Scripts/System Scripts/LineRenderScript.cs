@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LineRenderScript : MasterScript 
 {
@@ -9,9 +10,9 @@ public class LineRenderScript : MasterScript
 	[HideInInspector]
 	public GUIText activeGUI;
 	[HideInInspector]
-	public GameObject[] connectedLines = new GameObject[5];
+	public List<GameObject> connectedSystems = new List<GameObject>();
 	[HideInInspector]
-	public Vector3[,] lineRotationsScalePosition = new Vector3[5,3];
+	public List<ConnectorLine> connectorLines = new List<ConnectorLine>();
 	public GameObject quadA, humansOwnedQuad, selkiesOwnedQuad, nereidesOwnedQuad;
 	[HideInInspector]
 	public int thisSystem;
@@ -26,12 +27,11 @@ public class LineRenderScript : MasterScript
 		thisLight = gameObject.GetComponent<Light> ();
 		thisSystem = RefreshCurrentSystem (gameObject);
 
-
 		for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
 		{
 			objectB = systemListConstructor.systemList[thisSystem].connectedSystems[i];
 
-			OrientationBuild(i);
+			OrientationBuild();
 		}
 
 		BuildLine(quadA);
@@ -79,27 +79,30 @@ public class LineRenderScript : MasterScript
 	{
 		int system = RefreshCurrentSystem (gameObject);
 
+		for(int i = 0; i < connectedSystems.Count; ++i)
+		{
+			Destroy (connectedSystems[i]);
+		}
+
+		connectedSystems.Clear ();
+
+		//Debug.Log (connectorLines.Count + " | " + systemListConstructor.systemList [system].systemName + " | " + systemListConstructor.systemList [system].numberOfConnections);
+
 		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
 		{
-			Destroy (connectedLines[i]);
-
-			Vector3 midPoint = lineRotationsScalePosition[i,2];
-
 			Quaternion directQuat = new Quaternion();
 
-			directQuat.eulerAngles = lineRotationsScalePosition[i,0];
+			directQuat.eulerAngles = connectorLines[i].rotation;
 
-			Vector3 scale = lineRotationsScalePosition[i,1];
+			GameObject clone = (GameObject)Instantiate (aQuad, connectorLines[i].midPoint, directQuat);
 
-			GameObject clone = (GameObject)Instantiate (aQuad, midPoint, directQuat);
+			clone.transform.localScale = connectorLines[i].scale;
 
-			clone.transform.localScale = scale;
-
-			connectedLines[i] = clone;
+			connectedSystems.Add(clone);
 		}
 	}
 
-	void OrientationBuild(int i)
+	void OrientationBuild()
 	{
 		float distance = Vector3.Distance(gameObject.transform.position, objectB.transform.position);
 		
@@ -118,11 +121,20 @@ public class LineRenderScript : MasterScript
 
 		Vector3 scale = new Vector3(0.2f, distance, 0.0f);
 
-		lineRotationsScalePosition[i,0] = rotation;
+		ConnectorLine newLine = new ConnectorLine ();
+
+		newLine.rotation = rotation;
 		
-		lineRotationsScalePosition[i,1] = scale;
+		newLine.scale = scale;
 		
-		lineRotationsScalePosition[i,2] = midPoint;
+		newLine.midPoint = midPoint;
+
+		connectorLines.Add (newLine);
+	}
+
+	public class ConnectorLine
+	{
+		public Vector3 rotation, scale, midPoint;
 	}
 		
 	void OnMouseEnter()
