@@ -114,16 +114,11 @@ public class AIBasicParent : TurnInfo
 			{
 				lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
-				for(int j = 0; j < 4; ++j)
+				for(int j = 0; j < systemListConstructor.systemList[i].numberOfConnections; ++j)
 				{
 					tempSIM = 0.0f;
 
-					if(lineRenderScript.connections[j] == null)
-					{
-						break;
-					}
-
-					int k = RefreshCurrentSystem(lineRenderScript.connections[j]);
+					int k = RefreshCurrentSystem(systemListConstructor.systemList[i].connectedSystems[j]);
 
 					if(systemListConstructor.systemList[k].systemOwnedBy == null)
 					{

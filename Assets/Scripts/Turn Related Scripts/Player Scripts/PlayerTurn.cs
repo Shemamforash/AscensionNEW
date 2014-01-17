@@ -32,14 +32,9 @@ public class PlayerTurn : TurnInfo
 	{		
 		lineRenderScript = systemListConstructor.systemList[system].systemObject.GetComponent<LineRenderScript>();
 		
-		for(int i = 0; i < 4; ++i)
-		{
-			if(lineRenderScript.connections[i] == null)
-			{
-				break;
-			}
-			
-			int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
+		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
+		{			
+			int j = RefreshCurrentSystem(systemListConstructor.systemList[system].connectedSystems[i]);
 			
 			if(systemListConstructor.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
 			{
@@ -55,6 +50,8 @@ public class PlayerTurn : TurnInfo
 		if(isOkToColonise == true && GP > 0)
 		{
 			systemListConstructor.systemList[system].systemOwnedBy = playerRace;
+
+			Debug.Log (systemListConstructor.systemList[system].systemName);
 			
 			lineRenderScript.SetRaceLineColour(playerRace);
 			

@@ -11,7 +11,7 @@ public class HeroScriptParent : MasterScript
 	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength;
 	public string heroTier2, heroTier3, heroOwnedBy;
 	private Vector3 position;
-	public bool isInvading = false;
+	public bool isInvading = false, isInvisible = false, canSeeEnemySystem = false;
 
 	void Start()
 	{
