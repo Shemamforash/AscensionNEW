@@ -51,8 +51,6 @@ public class PlayerTurn : TurnInfo
 		{
 			systemListConstructor.systemList[system].systemOwnedBy = playerRace;
 
-			Debug.Log (systemListConstructor.systemList[system].systemName);
-			
 			lineRenderScript.SetRaceLineColour(playerRace);
 			
 			systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;

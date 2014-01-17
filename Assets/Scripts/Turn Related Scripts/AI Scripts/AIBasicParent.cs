@@ -52,7 +52,7 @@ public class AIBasicParent : TurnInfo
 			++thisPlayer.systemsColonisedThisTurn;
 		}
 
-		if(currentPlanet != -1 && currentPlanet != -1)
+		if(currentPlanet != -1 && currentSystem != -1)
 		{
 			systemListConstructor.systemList[currentSystem].planetsInSystem[currentPlanet].planetColonised = true;
 			
@@ -178,7 +178,7 @@ public class AIBasicParent : TurnInfo
 	{
 		guiPlanScript.improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 		
-		guiPlanScript.CheckImprovement(planetPosition, system);
+		guiPlanScript.CheckImprovement(system, planetPosition);
 		
 		if(guiPlanScript.canImprove == true && guiPlanScript.underInvasion == false)
 		{

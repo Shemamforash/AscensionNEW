@@ -264,7 +264,7 @@ public class MainGUIScript : MasterScript
 							monSpend = guiPlanScript.improvementCost * 2 + " Money";
 						}
 
-						if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
+						if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false && playerTurnScript.GP > 0)
 						{
 							playerTurnScript.GP -= 1;
 							systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
