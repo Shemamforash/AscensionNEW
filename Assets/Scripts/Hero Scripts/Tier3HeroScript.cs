@@ -134,6 +134,8 @@ public class Tier3HeroScript : HeroScriptParent
 
 	public void StrikeTeam(HeroScriptParent heroScript)
 	{
+		heroScript.offensivePower += 7.0f;
+		heroScript.defensivePower += 7.0f;
 	}
 
 	public void FillLinkableSystems()

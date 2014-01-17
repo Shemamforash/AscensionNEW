@@ -66,9 +66,30 @@ public class CameraFunctions : MasterScript
 					coloniseMenu = true; //Shows the colonise button on single click
 				}
 
-				if(doubleClick == true /*&& systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace*/)
+				if(doubleClick == true)
 				{
-					openMenu = true; //Opens system menu on double click
+					bool canViewSystem = false;
+
+					for(int j = 0; j < 3; ++j)
+					{
+						if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
+						{
+							continue;
+						}
+
+						heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
+
+						if(heroScript.isInvisible == true && heroScript.heroOwnedBy == playerTurnScript.playerRace)
+						{
+							canViewSystem = true;
+							break;
+						}
+					}
+
+					if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace || canViewSystem == true)
+					{
+						openMenu = true; //Opens system menu on double click
+					}
 				}
 			}
 		}

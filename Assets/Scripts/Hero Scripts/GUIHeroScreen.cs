@@ -101,7 +101,18 @@ public class GUIHeroScreen : MasterScript
 
 			int k = RefreshCurrentSystem(heroScript.heroLocation);
 
-			systemListConstructor.systemList[k].heroesInSystem[heroScript.thisHeroNumber] = null;
+			for(int i = 0; i < 3; ++i)
+			{
+				if(systemListConstructor.systemList[k].heroesInSystem[i] == null)
+				{
+					continue;
+				}
+
+				if(systemListConstructor.systemList[k].heroesInSystem[i] == hero)
+				{
+					systemListConstructor.systemList[k].heroesInSystem[i] = null;
+				}
+			}
 
 			heroScript.heroLocation = systemListConstructor.systemList[targetSystem].systemObject;
 
@@ -246,6 +257,11 @@ public class GUIHeroScreen : MasterScript
 						systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[selectedHero].name = heroLevelTwoSpecs[i];
 
 						++heroScript.currentLevel;
+
+						if(heroLevelTwoSpecs[i] == "Infiltrator")
+						{
+							heroScript.isInvisible = true;
+						}
 					}
 				}
 

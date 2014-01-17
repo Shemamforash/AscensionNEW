@@ -154,14 +154,11 @@ public class GUISystemDataScript : MasterScript
 	{
 		float totalAdjacencyBonus = 0.0f;
 
-		for(int i = 0; i < 4; ++i)
-		{
-			if(lineRenderScript.connections[i] == null)
-			{
-				continue;
-			}
+		int thisSystem = RefreshCurrentSystem (gameObject);
 
-			int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
+		{
+			int j = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].connectedSystems[i]);
 
 			for(int k = 0; k < 3; ++k)
 			{

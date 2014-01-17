@@ -6,7 +6,7 @@ public class MainGUIScript : MasterScript
 {
 	private Rect[] allPlanetsGUI, allButtonsGUI, allImprovementButtonsGUI, allHeroLabels, allHeroButtons; 
 	public GUISkin mySkin;
-	public bool spendMenu = false, openImprovementList = false;
+	public bool spendMenu = false, openImprovementList = false, systemOwnedByPlayer;
 	public string resourceToSpend;
 	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, heroName, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
 	public int selectedSystem, selectedPlanet;
@@ -105,6 +105,13 @@ public class MainGUIScript : MasterScript
 			guiPlanScript = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<GUISystemDataScript>();
 			guiPlanScript.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
 
+			systemOwnedByPlayer = false;
+
+			if(systemListConstructor.systemList[selectedSystem].systemOwnedBy == playerTurnScript.playerRace)
+			{
+				systemOwnedByPlayer = true;
+			}
+
 			if(cameraFunctionsScript.openMenu == true)
 			{
 				dataSIMString = "Total SIM: " + guiPlanScript.totalSystemSIM.ToString() + "\n" + "Total Science: " + guiPlanScript.totalSystemScience.ToString() + "\n" 
@@ -199,14 +206,9 @@ public class MainGUIScript : MasterScript
 
 			lineRenderScript = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<LineRenderScript>();
 
-			for(int i = 0; i < 4; ++i)
+			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].numberOfConnections; ++i)
 			{
-				if(lineRenderScript.connections[i] == null)
-				{
-					break;
-				}
-
-				int j = RefreshCurrentSystem(lineRenderScript.connections[i]);
+				int j = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].connectedSystems[i]);
 
 				if(systemListConstructor.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
 				{
@@ -250,31 +252,34 @@ public class MainGUIScript : MasterScript
 			{	
 				CheckPlanetImprovement(i);
 
-				if(GUI.Button(allButtonsGUI[i], cost) && systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel < 3)
-				{	
-					if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
-					{
-						spendMenu = true;
-						selectedPlanet = i;
-						indSpend = guiPlanScript.improvementCost + " Industry";
-						monSpend = guiPlanScript.improvementCost * 2 + " Money";
-					}
-
-					if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
-					{
-						playerTurnScript.GP -= 1;
-						systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
-						++playerTurnScript.planetsColonisedThisTurn;
-						spendMenu = false;
-					}
-				}
-
-				if(GUI.Button (allImprovementButtonsGUI[i], "Improvements"))
+				if(systemOwnedByPlayer == true)
 				{
-					openImprovementList = true;
-					xLoc = allImprovementButtonsGUI[i].xMax;
-					yLoc = allImprovementButtonsGUI[i].yMax;
-					selectedPlanet = i;
+					if(GUI.Button(allButtonsGUI[i], cost) && systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel < 3)
+					{	
+						if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
+						{
+							spendMenu = true;
+							selectedPlanet = i;
+							indSpend = guiPlanScript.improvementCost + " Industry";
+							monSpend = guiPlanScript.improvementCost * 2 + " Money";
+						}
+
+						if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
+						{
+							playerTurnScript.GP -= 1;
+							systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
+							++playerTurnScript.planetsColonisedThisTurn;
+							spendMenu = false;
+						}
+					}
+
+					if(GUI.Button (allImprovementButtonsGUI[i], "Improvements"))
+					{
+						openImprovementList = true;
+						xLoc = allImprovementButtonsGUI[i].xMax;
+						yLoc = allImprovementButtonsGUI[i].yMax;
+						selectedPlanet = i;
+					}
 				}
 
 				GUI.Label (allPlanetsGUI[i], guiPlanScript.allPlanetsInfo[i]);
@@ -383,9 +388,12 @@ public class MainGUIScript : MasterScript
 
 			#endregion
 
-			if(GUI.Button (new Rect(Screen.width / 2 - 610.0f, Screen.height / 2 + 300.0f, 150.0f, 50.0f), "Purchase Hero: 1GP"))
+			if(systemOwnedByPlayer == true)
 			{
-				heroGUIScript.CheckIfCanHire(selectedSystem);
+				if(GUI.Button (new Rect(Screen.width / 2 - 610.0f, Screen.height / 2 + 300.0f, 150.0f, 50.0f), "Purchase Hero: 1GP"))
+				{
+					heroGUIScript.CheckIfCanHire(selectedSystem);
+				}
 			}
 
 			for(int i = 0; i < 3; ++i)
@@ -399,7 +407,7 @@ public class MainGUIScript : MasterScript
 			
 				tier3HeroScript.FillLinkableSystems();
 
-				if(heroName == "Merchant" && tier3HeroScript.linkableSystemsExist == true)
+				if(heroName == "Merchant" && tier3HeroScript.linkableSystemsExist == true && systemOwnedByPlayer == true)
 				{
 					if(GUI.Button (allHeroLabels[i], heroName))
 					{
@@ -414,10 +422,13 @@ public class MainGUIScript : MasterScript
 					GUI.Label (allHeroLabels[i], heroName);
 				}
 
-				if(GUI.Button (allHeroButtons[i], "Level Up"))
+				if(systemOwnedByPlayer == true)
 				{
-					heroScript =  systemListConstructor.systemList[selectedSystem].heroesInSystem[i].GetComponent<HeroScriptParent>();
-					heroScript.LevelUp ();
+					if(GUI.Button (allHeroButtons[i], "Level Up"))
+					{
+						heroScript =  systemListConstructor.systemList[selectedSystem].heroesInSystem[i].GetComponent<HeroScriptParent>();
+						heroScript.LevelUp ();
+					}
 				}
 			}
 

@@ -81,14 +81,11 @@ public class TechTreeScript : MasterScript
 		{
 			tempCount = 0.0f;
 
-			for(int i = 0; i < 4; ++i)
-			{
-				if(lineRenderScript.connections[i] == null)
-				{
-					break;
-				}
+			int thisSystem = RefreshCurrentSystem(gameObject);
 
-				int k = RefreshCurrentSystem(lineRenderScript.connections[i]);
+			for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
+			{
+				int k = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].connectedSystems[i]);
 
 				if(systemListConstructor.systemList[k].systemOwnedBy == selectedPlayer.playerRace)
 				{

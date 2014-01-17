@@ -8,11 +8,10 @@ public class LineRenderScript : MasterScript
 	public GUITextScript guiTextScript;
 	[HideInInspector]
 	public GUIText activeGUI;
-	public GameObject[] connections = new GameObject[4];
 	[HideInInspector]
-	public GameObject[] connectedLines = new GameObject[4];
+	public GameObject[] connectedLines = new GameObject[5];
 	[HideInInspector]
-	public Vector3[,] lineRotationsScalePosition = new Vector3[4,3];
+	public Vector3[,] lineRotationsScalePosition = new Vector3[5,3];
 	public GameObject quadA, humansOwnedQuad, selkiesOwnedQuad, nereidesOwnedQuad;
 	[HideInInspector]
 	public int thisSystem;
@@ -25,15 +24,12 @@ public class LineRenderScript : MasterScript
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
 		thisLight = gameObject.GetComponent<Light> ();
+		thisSystem = RefreshCurrentSystem (gameObject);
 
-		for(int i = 0; i < 4; ++i)
+
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
 		{
-			if(connections[i] == null)
-			{
-				continue;
-			}
-
-			objectB = connections[i];
+			objectB = systemListConstructor.systemList[thisSystem].connectedSystems[i];
 
 			OrientationBuild(i);
 		}
@@ -81,7 +77,9 @@ public class LineRenderScript : MasterScript
 
 	void BuildLine(GameObject aQuad)
 	{
-		for(int i = 0; i < 4; ++i)
+		int system = RefreshCurrentSystem (gameObject);
+
+		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
 		{
 			Destroy (connectedLines[i]);
 
