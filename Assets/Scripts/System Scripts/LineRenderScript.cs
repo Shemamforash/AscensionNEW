@@ -27,9 +27,11 @@ public class LineRenderScript : MasterScript
 		thisLight = gameObject.GetComponent<Light> ();
 		thisSystem = RefreshCurrentSystem (gameObject);
 
+		//Debug.Log (systemListConstructor.systemList [thisSystem].numberOfConnections + " | " + gameObject);
+
 		for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
 		{
-			objectB = systemListConstructor.systemList[thisSystem].connectedSystems[i];
+			objectB = systemListConstructor.systemList[thisSystem].permanentConnections[i];
 
 			OrientationBuild();
 		}
@@ -86,15 +88,11 @@ public class LineRenderScript : MasterScript
 
 		connectedSystems.Clear ();
 
-		//Debug.Log (connectorLines.Count + " | " + systemListConstructor.systemList [system].systemName + " | " + systemListConstructor.systemList [system].numberOfConnections);
-
 		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
 		{
-			Quaternion directQuat = new Quaternion();
+			//Debug.Log (connectorLines.Count + " | " + connectorLines[i].rotation + " | " + gameObject);
 
-			directQuat.eulerAngles = connectorLines[i].rotation;
-
-			GameObject clone = (GameObject)Instantiate (aQuad, connectorLines[i].midPoint, directQuat);
+			GameObject clone = (GameObject)Instantiate (aQuad, connectorLines[i].midPoint, connectorLines[i].rotation);
 
 			clone.transform.localScale = connectorLines[i].scale;
 
@@ -115,7 +113,11 @@ public class LineRenderScript : MasterScript
 			rotationZ = -rotationZ;
 		}
 		
-		Vector3 rotation = new Vector3(0.0f, 0.0f, rotationZ);
+		Vector3 vectRotation = new Vector3(0.0f, 0.0f, rotationZ);
+
+		Quaternion rotation = new Quaternion ();
+
+		rotation.eulerAngles = vectRotation;
 
 		Vector3 midPoint = (gameObject.transform.position + objectB.transform.position)/2;
 
@@ -134,7 +136,8 @@ public class LineRenderScript : MasterScript
 
 	public class ConnectorLine
 	{
-		public Vector3 rotation, scale, midPoint;
+		public Quaternion rotation;
+		public Vector3 scale, midPoint;
 	}
 		
 	void OnMouseEnter()

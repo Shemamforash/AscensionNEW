@@ -85,7 +85,7 @@ public class TechTreeScript : MasterScript
 
 			for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
 			{
-				int k = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].connectedSystems[i]);
+				int k = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[i]);
 
 				if(systemListConstructor.systemList[k].systemOwnedBy == selectedPlayer.playerRace)
 				{

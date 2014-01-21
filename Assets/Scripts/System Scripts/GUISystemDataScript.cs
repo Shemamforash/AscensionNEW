@@ -158,7 +158,7 @@ public class GUISystemDataScript : MasterScript
 
 		for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
 		{
-			int j = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].connectedSystems[i]);
+			int j = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[i]);
 
 			for(int k = 0; k < 3; ++k)
 			{

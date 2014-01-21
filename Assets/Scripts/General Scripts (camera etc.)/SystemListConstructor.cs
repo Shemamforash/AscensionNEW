@@ -14,18 +14,14 @@ public class SystemListConstructor : MasterScript
 	public float distanceMax;
 	private int connections;
 	public GameObject systemClone, originalSystem;
-	private List<GameObject> nearestSystems = new List<GameObject> ();
-	private bool systemUsed = false;
 
 	private void Awake()
 	{
 		LoadSystemData();
 		AssignMaximumConnections ();
-		DrawMapSkeleton ();
-		for(int i = 0; i < systemList.Count; ++i)
-		{
-			GenerateConnections (i);
-		}
+		SortNearestConnections ();
+		DrawMinimumSpanningTree ();
+		ConnectSystems();
 	}
 
 	public int RefreshCurrentSystemA(GameObject thisSystem)
@@ -39,70 +35,6 @@ public class SystemListConstructor : MasterScript
 		}
 		
 		return 0;
-	}
-
-	public void DrawMapSkeleton()
-	{
-		List<GameObject> unlinkedSystems = new List<GameObject> ();
-		List<GameObject> linkedSystems = new List<GameObject> ();
-
-		for(int i = 0; i < systemList.Count; ++i)
-		{
-			unlinkedSystems.Add (systemList[i].systemObject);
-		}
-
-		linkedSystems.Add (unlinkedSystems [0]);
-
-		unlinkedSystems.Remove (linkedSystems[0]);
-
-		using(StreamWriter writer = new StreamWriter("SkeletonConnections.txt"))
-		{
-			for(int k = 0; k < systemList.Count - 1; ++k)
-			{
-				int nearestSystem = 0;
-				int selectedSystem = 0;
-				float tempDistance = distanceMax;
-				bool connect = false;
-
-				for(int i = 0; i < linkedSystems.Count; ++i)
-				{
-					int system = RefreshCurrentSystemA(linkedSystems[i]);
-
-					if(systemList[system].connectedSystems.Count < systemList[system].numberOfConnections)
-					{
-						for(int j = 0; j < unlinkedSystems.Count; ++j)
-						{
-							float distance = Vector3.Distance (linkedSystems[i].transform.position, unlinkedSystems[j].transform.position);
-							
-							if(distance < tempDistance)
-							{
-								tempDistance = distance;
-								nearestSystem = j;
-								selectedSystem = i;
-								connect = true;
-							}
-						}
-					}
-				}
-
-				if(connect == true)
-				{
-					int tempInt = RefreshCurrentSystemA (linkedSystems [selectedSystem]);
-
-					systemList [tempInt].connectedSystems.Add (unlinkedSystems [nearestSystem]);
-
-					int tempInt2 = RefreshCurrentSystemA(unlinkedSystems[nearestSystem]);
-
-					systemList[tempInt2].connectedSystems.Add (linkedSystems[selectedSystem]);
-
-					writer.WriteLine(systemList[tempInt].systemName + " | " + systemList[tempInt].connectedSystems[0]);
-
-					linkedSystems.Add (unlinkedSystems [nearestSystem]);
-
-					unlinkedSystems.Remove (unlinkedSystems [nearestSystem]);
-				}
-			}
-		}
 	}
 
 	public void LoadSystemData()
@@ -186,154 +118,193 @@ public class SystemListConstructor : MasterScript
 	{
 		for(int i = 0; i < systemList.Count; ++i) //Assign number of connections to system
 		{
-			int tempInt = Random.Range (0, 99);
-			
-			if(tempInt < 15)
-			{
-				connections = 2;
-			}
-			if(tempInt >= 15 && tempInt < 35)
-			{
-				connections = 3;
-			}
-			if(tempInt >= 35 && tempInt < 65)
-			{
-				connections = 4;
-			}
-			if(tempInt >= 65 && tempInt < 85)
-			{
-				connections = 5;
-			}
-			if(tempInt >= 85 && tempInt < 99)
-			{
-				connections = 6;
-			}
-
-			if(systemList[i].systemName == "Heracles")
-			{
-				connections = 5;
-			}
-			if(systemList[i].systemName == "Sol")
-			{
-				connections = 4;
-			}
-			if(systemList[i].systemName == "Nepthys")
-			{
-				connections = 3;
-			}
-			
-			systemList[i].numberOfConnections = connections;
-		}
-	}
-
-	private void SelectSystems(int system, int availableConnections)
-	{
-		for(int i = 1; i <= availableConnections; ++i)
-		{
-			float tempDistance = distanceMax;
-			int tempSystem = -1;
-			systemUsed = false;
-
 			for(int j = 0; j < systemList.Count; ++j)
 			{
-				if(j == system)
+				float distance = Vector3.Distance (systemList[i].systemObject.transform.position, systemList[j].systemObject.transform.position);
+				
+				if(distance < distanceMax)
 				{
-					continue;
-				}
-
-				for(int k = 0; k < nearestSystems.Count; ++k)
-				{
-					if(nearestSystems[k] == systemList[j].systemObject)
-					{
-						systemUsed = true;
-						break;
-					}
-				}
-
-				for(int k = 0; k < systemList[system].connectedSystems.Count; ++k) //For all systems connected to current system
-				{
-					if(systemList[system].connectedSystems[k] == systemList[j].systemObject) //If target system is already connected, ignore it
-					{
-						systemUsed = true;
-
-						break;
-					}
-				}
-
-				if(systemUsed == false)
-				{
-					if(systemList[j].connectedSystems.Count < systemList[j].numberOfConnections)
-					{
-						distanceXY = Vector3.Distance(systemList[system].systemObject.transform.position, systemList[j].systemObject.transform.position); //Distance between systems
+					Node nearbySystem = new Node();
 					
-						if(distanceXY < tempDistance) //If distance is less than the maximum range, 
-						{
-							tempDistance = distanceXY;
-							tempSystem = j;
-						}
-					}
+					nearbySystem.targetSystem = systemList[j].systemObject;
+					nearbySystem.targetDistance = distance;
+					
+					systemList[i].tempConnections.Add (nearbySystem);
 				}
 			}
 
-			if(tempSystem != -1)
-			{
-				nearestSystems.Add (systemList[tempSystem].systemObject);
-			}
+			systemList[i].numberOfConnections = systemList[i].tempConnections.Count;
 		}
 	}
 
-	private void GenerateConnections(int system)
+	private void SortNearestConnections()
 	{
-		nearestSystems.Clear();
+		GameObject tempObject;
+		float tempFloat;
 
-		int availableConnections = systemList [system].numberOfConnections - systemList [system].connectedSystems.Count;
-		
-		if(availableConnections != 0)
+		for(int i = 0; i < systemList.Count; ++i)
 		{
-			SelectSystems(system, availableConnections);
-		}
-
-		if(nearestSystems.Count > 1)
-		{
-			for(int j = nearestSystems.Count - 1; j >= 0; --j) //Sort nearest systems in order of size
+			for(int j = systemList[i].tempConnections.Count - 1; j >= 0; --j)
 			{
 				bool swaps = false;
-				
+
 				for(int k = 1; k <= j; ++k)
 				{
-					float tempDistanceA = Vector3.Distance (systemList[system].systemObject.transform.position, nearestSystems[k-1].transform.position);
-					float tempDistanceB = Vector3.Distance (systemList[system].systemObject.transform.position, nearestSystems[k].transform.position);
-					
-					if(tempDistanceA > tempDistanceB)
+					tempObject = systemList[i].tempConnections[k-1].targetSystem;
+					tempFloat = systemList[i].tempConnections[k-1].targetDistance;
+
+					if(systemList[i].tempConnections[k-1].targetDistance > systemList[i].tempConnections[k].targetDistance)
 					{
-						GameObject tempSystem = nearestSystems[k-1];
-						
-						nearestSystems[k-1] = nearestSystems[k];
-						nearestSystems[k] = tempSystem;
-						
+						systemList[i].tempConnections[k-1].targetSystem = systemList[i].tempConnections[k].targetSystem;
+						systemList[i].tempConnections[k-1].targetDistance = systemList[i].tempConnections[k].targetDistance;
+
+						systemList[i].tempConnections[k].targetSystem = tempObject;
+						systemList[i].tempConnections[k].targetDistance = tempFloat;
+
 						swaps = true;
 					}
 				}
-				
+
 				if(swaps == false)
 				{
 					break;
 				}
 			}
+
+			if(systemList[i].tempConnections.Count > 6)
+			{
+				systemList[i].tempConnections.RemoveRange(6, systemList[i].tempConnections.Count - 6);
+				systemList[i].numberOfConnections = systemList[i].tempConnections.Count;
+			}
+		}
+	}
+
+	public void DrawMinimumSpanningTree()
+	{
+		List<GameObject> linkedSystems = new List<GameObject> (); //Create empty list of linkedsystems
+
+		linkedSystems.Add (systemList [0].systemObject); //Add initial system to list
+
+		for(int i = 0; i < systemList.Count; ++i) //For all systems in the game
+		{
+			float tempDistance = 400.0f; //Reset variables
+			int nearestSystem = 0;
+			int thisSystem = 0;
+
+			for(int j = 0; j < linkedSystems.Count; ++j) //For all linked systems
+			{
+				int system = RefreshCurrentSystemA(linkedSystems[j]);
+
+				for(int k = 0; k < systemList[system].tempConnections.Count; ++k) //For all systems connected to this system
+				{
+					bool ignoreSystem = false;
+
+					for(int l = 0; l < linkedSystems.Count; ++l) //If the target system has already been linked
+					{
+						if(systemList[system].tempConnections[k].targetSystem == linkedSystems[l])
+						{
+							ignoreSystem = true; //Ignore it
+						}
+					}
+
+					if(ignoreSystem == true)
+					{
+						continue;
+					}
+
+					if(systemList[system].tempConnections[k].targetDistance < tempDistance) //Find the nearest unlinked system
+					{
+						tempDistance = systemList[system].tempConnections[k].targetDistance;
+						nearestSystem = k;
+						thisSystem = system;
+					}
+				}
+			}
+
+			linkedSystems.Add (systemList[thisSystem].tempConnections[nearestSystem].targetSystem); //Add nearest unlinked system to linkedsystems list
+
+			AddPermanentSystem(thisSystem, nearestSystem);
+		}
+	}
+
+	private void AddPermanentSystem(int thisSystem, int nearestSystem)
+	{
+		systemList[thisSystem].permanentConnections.Add (systemList[thisSystem].tempConnections[nearestSystem].targetSystem); //Add target system to current systems permanent connections
+		
+		int targetSystem = RefreshCurrentSystemA(systemList[thisSystem].tempConnections[nearestSystem].targetSystem); //Do the same for the target systems
+		
+		for(int j = 0; j < systemList[targetSystem].tempConnections.Count; ++j)
+		{
+			if(systemList[targetSystem].tempConnections[j].targetSystem == systemList[thisSystem].systemObject)
+			{
+				systemList[targetSystem].permanentConnections.Add (systemList[targetSystem].tempConnections[j].targetSystem);
+				break;
+			}
+		}
+	}
+
+	private void ConnectSystems()
+	{
+		for(int j = 0; j < systemList.Count; ++j) //For all systems
+		{
+			Debug.Log (systemList[j].permanentConnections.Count);
+
+			if(systemList[j].numberOfConnections == systemList[j].permanentConnections.Count) //If the number of assigned systems equals the maximum number of systems, continue
+			{
+				continue;
+			}
+
+			for(int k = systemList[j].permanentConnections.Count - 1; k < systemList[j].numberOfConnections; ++k) //If the number of permanent connections equals the maximum number of connections, continue
+			{
+				float tempDistance = distanceMax; //Reset variables
+				int nearestSystem = -1;
+				int thisSystem = -1;
+				bool ignoreSystem = false;
+
+				for(int l = 0; l < systemList[j].tempConnections.Count; ++l) //For all tempconnections
+				{
+					int tempSystem = RefreshCurrentSystemA(systemList[j].tempConnections[l].targetSystem); //Get target system
+
+					if(systemList[tempSystem].permanentConnections.Count == systemList[tempSystem].numberOfConnections 
+					   || systemList[j].permanentConnections.Count == systemList[j].numberOfConnections) //If target/this system's connections are already full, continue
+					{
+						continue;
+					}
+
+					for(int m = 0; m > systemList[j].permanentConnections.Count; ++m) //If connections has already been made, continue
+					{
+						if(systemList[j].tempConnections[l].targetSystem == systemList[j].permanentConnections[m])
+						{
+							ignoreSystem = true;
+						}
+					}
+
+					if(ignoreSystem == true) //As above
+					{
+						continue;
+					}
+
+					if(systemList[j].tempConnections[l].targetDistance < tempDistance) //Find the nearest unlinked system
+					{
+						tempDistance = systemList[j].tempConnections[l].targetDistance;
+						nearestSystem = l;
+						thisSystem = j;
+					}
+				}
+
+				if(nearestSystem != -1 && thisSystem != -1)
+				{
+					AddPermanentSystem(thisSystem, nearestSystem);
+				}
+			}
 		}
 
-		for(int j = 0; j < nearestSystems.Count; ++j)
+		for(int i = 0; i < systemList.Count; ++i)
 		{
-			systemList[system].connectedSystems.Add (nearestSystems[j]);
-
-			int k = RefreshCurrentSystemA(nearestSystems[j]);
-
-			systemList[k].connectedSystems.Add (systemList[system].systemObject);
-		}
-
-		if(systemList[system].connectedSystems.Count != systemList[system].numberOfConnections)
-		{
-			systemList[system].numberOfConnections = systemList[system].connectedSystems.Count;
+			if(systemList[i].permanentConnections.Count != systemList[i].numberOfConnections)
+			{
+				systemList[i].numberOfConnections = systemList[i].permanentConnections.Count;
+			}
 		}
 	}
 
@@ -395,7 +366,8 @@ public class SystemInfo
 	public int systemSize, numberOfConnections;
 	public GameObject[] heroesInSystem = new GameObject[3];
 	public List<Planet> planetsInSystem = new List<Planet> ();
-	public List<GameObject> connectedSystems = new List<GameObject>();
+	public List<Node> tempConnections = new List<Node>();
+	public List<GameObject> permanentConnections = new List<GameObject>();
 }
 
 public class Planet
@@ -405,5 +377,11 @@ public class Planet
 	public float planetScience, planetIndustry, planetMoney;
 	public bool planetColonised;
 	public int planetOwnership, planetImprovementLevel, improvementSlots, maxOwnership;
+}
+
+public class Node
+{
+	public GameObject targetSystem;
+	public float targetDistance;
 }
 

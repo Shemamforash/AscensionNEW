@@ -118,7 +118,7 @@ public class AIBasicParent : TurnInfo
 				{
 					tempSIM = 0.0f;
 
-					int k = RefreshCurrentSystem(systemListConstructor.systemList[i].connectedSystems[j]);
+					int k = RefreshCurrentSystem(systemListConstructor.systemList[i].permanentConnections[j]);
 
 					if(systemListConstructor.systemList[k].systemOwnedBy == null)
 					{
