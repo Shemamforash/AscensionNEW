@@ -208,7 +208,7 @@ public class MainGUIScript : MasterScript
 
 			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].numberOfConnections; ++i)
 			{
-				int j = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].connectedSystems[i]);
+				int j = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[i]);
 
 				if(systemListConstructor.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
 				{

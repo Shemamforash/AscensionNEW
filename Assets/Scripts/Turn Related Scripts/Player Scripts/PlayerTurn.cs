@@ -34,7 +34,7 @@ public class PlayerTurn : TurnInfo
 		
 		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
 		{			
-			int j = RefreshCurrentSystem(systemListConstructor.systemList[system].connectedSystems[i]);
+			int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
 			
 			if(systemListConstructor.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
 			{
