@@ -29,7 +29,7 @@ public class LineRenderScript : MasterScript
 
 		//Debug.Log (systemListConstructor.systemList [thisSystem].numberOfConnections + " | " + gameObject);
 
-		for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
 		{
 			objectB = systemListConstructor.systemList[thisSystem].permanentConnections[i];
 
@@ -88,7 +88,7 @@ public class LineRenderScript : MasterScript
 
 		connectedSystems.Clear ();
 
-		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 		{
 			//Debug.Log (connectorLines.Count + " | " + connectorLines[i].rotation + " | " + gameObject);
 
