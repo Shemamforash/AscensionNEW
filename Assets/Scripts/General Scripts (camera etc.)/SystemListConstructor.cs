@@ -116,33 +116,34 @@ public class SystemListConstructor : MasterScript
 
 	public bool TestForIntersection(GameObject thisSystem, GameObject targetSystem)
 	{
-		float tempCoefficientA = targetSystem.transform.position.y - thisSystem.transform.position.y;
-		float tempCoefficientB = thisSystem.transform.position.x - targetSystem.transform.position.x;
-		float tempCoefficientC = (tempCoefficientA * thisSystem.transform.position.x) + (tempCoefficientB * thisSystem.transform.position.y);
+		float A1 = thisSystem.transform.position.y - targetSystem.transform.position.y;
+		float B1 = targetSystem.transform.position.x - thisSystem.transform.position.y;
+		float C1 = (thisSystem.transform.position.x * targetSystem.transform.position.y) - (targetSystem.transform.position.x * thisSystem.transform.position.y);
 
-		for(int i = 0; i < coordinateList.Count; ++i)
+		for (int i = 0; i < coordinateList.Count; ++i) 
 		{
-			float parallel = (tempCoefficientA * coordinateList[i].coefficientB) - (coordinateList[i].coefficientA * tempCoefficientB);
+			float A2 = coordinateList [i].systemA.transform.position.y - coordinateList [i].systemB.transform.position.y;
+			float B2 = coordinateList [i].systemB.transform.position.x - coordinateList [i].systemA.transform.position.x;
+			float C2 = (coordinateList[i].systemA.transform.position.x * coordinateList [i].systemB.transform.position.y) - (coordinateList[i].systemB.transform.position.x * coordinateList [i].systemA.transform.position.y);
 
-			if(parallel == 0)
+			float parallel = (A1 * B2) - (A2 * B1);
+
+			if (parallel == 0) 
 			{
 				continue;
 			}
 
-			float xIntersect = ((coordinateList[i].coefficientB * tempCoefficientC) - (tempCoefficientB * coordinateList[i].coefficientC)) / parallel;
-			float yIntersect = ((tempCoefficientA * coordinateList[i].coefficientC) - (coordinateList[i].coefficientA * tempCoefficientC)) / parallel;
+			float xIntersect = ((B2 * C1) - (B1 * C2)) / parallel;
+			float yIntersect = ((A1 * C2) - (A2 * C1)) / parallel;
 
-			if(Mathf.Min (targetSystem.transform.position.x, thisSystem.transform.position.x) > xIntersect || xIntersect > Mathf.Max (targetSystem.transform.position.x, thisSystem.transform.position.x))
+			if (xIntersect >= Mathf.Min (thisSystem.transform.position.x + 0.001f, targetSystem.transform.position.x + 0.001f) && xIntersect <= Mathf.Max (thisSystem.transform.position.x - 0.001f, targetSystem.transform.position.x - 0.001f)) 
 			{
-				if(Mathf.Min (targetSystem.transform.position.y, thisSystem.transform.position.y) > yIntersect || yIntersect > Mathf.Max (targetSystem.transform.position.y, thisSystem.transform.position.y))
+				if (yIntersect >= Mathf.Min (thisSystem.transform.position.y + 0.001f, targetSystem.transform.position.y + 0.001f) && yIntersect <= Mathf.Max (thisSystem.transform.position.y - 0.001f, targetSystem.transform.position.y - 0.001f)) 
 				{
-					continue;
+					return false;
 				}
 			}
-
-			return false;
 		}
-
 		return true;
 	}
 
@@ -170,6 +171,11 @@ public class SystemListConstructor : MasterScript
 				
 				for(int k = 0; k < unlinkedSystems.Count; ++k) //For all unlinked systems
 				{
+					if(TestForIntersection(linkedSystems[j], unlinkedSystems[k]) == false)
+					{
+						continue;
+					}
+
 					float distance = Vector3.Distance(linkedSystems[j].transform.position, unlinkedSystems[k].transform.position);
 					
 					if(distance < tempDistance) //Find the nearest unlinked system
@@ -203,24 +209,52 @@ public class SystemListConstructor : MasterScript
 
 		ConnectionCoordinates connection = new ConnectionCoordinates ();
 
-		connection.coefficientA = systemList[nearestSystem].systemObject.transform.position.y - systemList[thisSystem].systemObject.transform.position.y;
-		connection.coefficientB = systemList[thisSystem].systemObject.transform.position.x - systemList[nearestSystem].systemObject.transform.position.x;
-		connection.coefficientC = (connection.coefficientA * systemList[thisSystem].systemObject.transform.position.x) 
-			+ (connection.coefficientB * systemList[thisSystem].systemObject.transform.position.y);
-
-		connection.xMax = Mathf.Max (systemList [thisSystem].systemObject.transform.position.x, systemList [nearestSystem].systemObject.transform.position.x);
-		connection.xMin = Mathf.Min (systemList [thisSystem].systemObject.transform.position.x, systemList [nearestSystem].systemObject.transform.position.x);
-		connection.yMax = Mathf.Max (systemList [thisSystem].systemObject.transform.position.y, systemList [nearestSystem].systemObject.transform.position.y);
-		connection.yMin = Mathf.Min (systemList [thisSystem].systemObject.transform.position.y, systemList [nearestSystem].systemObject.transform.position.y);
+		connection.systemA = systemList [thisSystem].systemObject;
+		connection.systemB = systemList [nearestSystem].systemObject;
 
 		coordinateList.Add (connection);
+	}
+
+	private int WeightedConnectionFinder(int randomInt)
+	{
+		if(randomInt < 9)
+		{
+			return 1;
+		}
+		if(randomInt >= 9 && randomInt < 24)
+		{
+			return 2;
+		}
+		if(randomInt >= 24 && randomInt < 49)
+		{
+			return 3;
+		}
+		if(randomInt >= 49 && randomInt < 74)
+		{
+			return 4;
+		}
+		if(randomInt >= 74 && randomInt < 89)
+		{
+			return 5;
+		}
+		if(randomInt >= 89)
+		{
+			return 6;
+		}
+
+		return 0;
 	}
 
 	private void AssignMaximumConnections()
 	{
 		for(int i = 0; i < systemList.Count; ++i) //For all systems
 		{
-			int randomInt = Random.Range (1,6); //Generate number
+			int randomInt = WeightedConnectionFinder(Random.Range (0,99)); //Generate number
+
+			if(systemList[i].systemName == "Heracles" || systemList[i].systemName == "Sol" || systemList[i].systemName == "Nepthys")
+			{
+				randomInt = WeightedConnectionFinder(Random.Range (49, 99));
+			}
 
 			if(systemList[i].numberOfConnections < randomInt) //If number of connections is lower than number
 			{
@@ -355,50 +389,18 @@ public class SystemListConstructor : MasterScript
 						}
 					}
 
-						if(ignoreSystem == false) //As above
+					if(TestForIntersection(systemList[j].systemObject, systemList[targetSystem].systemObject) == false)
+					{
+						continue;
+					}
+
+					if(ignoreSystem == false) //As above
 					{
 						AddPermanentSystem(j, targetSystem);
 					}
 				}
 			}
 		}
-
-		/*for(int i = 0; i < systemList.Count; ++i)
-		{
-			if(systemList[i].permanentConnections.Count < systemList[i].numberOfConnections)
-			{
-				for(int j = 0; j < systemList[i].numberOfConnections - systemList[i].permanentConnections.Count; ++j)
-				{
-					int targetPlanet = 0;
-
-					for(int k = 0; k < systemList.Count; ++k)
-					{
-						float tempDistance = 5000.0f;
-
-						if(k == i)
-						{
-							continue;
-						}
-
-						if(systemList[k].permanentConnections.Count < systemList[k].numberOfConnections)
-						{
-							float distance = Vector3.Distance(systemList[i].systemObject.transform.position, systemList[k].systemObject.transform.position);
-
-							if(distance < tempDistance)
-							{
-								tempDistance = distance;
-								targetPlanet = k;
-							}
-
-							if(TestForIntersection(systemList[i].systemObject, systemList[targetPlanet].systemObject) == true)
-							{
-								AddPermanentSystem(i, k);
-							}
-						}
-					}
-				}
-			}
-		}*/
 
 		for(int i = 0; i < systemList.Count; ++i)
 		{
@@ -455,10 +457,7 @@ public class SystemListConstructor : MasterScript
 
 public class ConnectionCoordinates
 {
-	public float coefficientA;
-	public float coefficientB;
-	public float coefficientC;
-	public float xMax, xMin, yMax, yMin;
+	public GameObject systemA, systemB;
 }
 
 public class PlanetInfo
