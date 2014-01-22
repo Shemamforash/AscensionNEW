@@ -37,9 +37,9 @@ public class GUISystemDataScript : MasterScript
 
 		resourceBonus = systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership / 66.6666f;
 
-		tempSci = systemListConstructor.systemList[i].planetsInSystem[j].planetScience * resourceBonus * thisPlayer.raceScience * techTreeScript.sciencePercentBonus; //Need to sort out variable types, too much casting
-		tempInd = systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry * resourceBonus * thisPlayer.raceScience * techTreeScript.industryPercentBonus;
-		tempMon = systemListConstructor.systemList[i].planetsInSystem[j].planetMoney * resourceBonus * thisPlayer.raceScience * techTreeScript.moneyPercentBonus;
+		tempSci = systemListConstructor.systemList[i].planetsInSystem[j].planetScience * resourceBonus * thisPlayer.raceScience * techTreeScript.sciencePercentBonus * racialTraitScript.IncomeModifier(thisPlayer, "Science"); //Need to sort out variable types, too much casting
+		tempInd = systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry * resourceBonus * thisPlayer.raceScience * techTreeScript.industryPercentBonus * racialTraitScript.IncomeModifier(thisPlayer, "Industry");
+		tempMon = systemListConstructor.systemList[i].planetsInSystem[j].planetMoney * resourceBonus * thisPlayer.raceScience * techTreeScript.moneyPercentBonus * racialTraitScript.IncomeModifier(thisPlayer, "Money");
 
 		if(techTreeScript.listOfImprovements[8].hasBeenBuilt == true && systemListConstructor.systemList[i].planetsInSystem[j].planetType == thisPlayer.homePlanetType)
 		{
