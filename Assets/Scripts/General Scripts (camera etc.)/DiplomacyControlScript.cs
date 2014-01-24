@@ -5,7 +5,6 @@ using System;
 
 public class DiplomacyControlScript : MasterScript 
 {
-	public string[] playerStates = new string[3]; //player-enemy1, player-enemy2, enemy1-enemy2
 	public string tempState;
 	public GameObject invasionQuad;
 	public Material unownedMaterial;

@@ -131,11 +131,11 @@ public class Tier3HeroScript : HeroScriptParent
 
 	void OnGUI()
 	{
-		GUI.skin = mainGUIScript.mySkin;
+		GUI.skin = systemGUI.mySkin;
 
 		if(openSystemLinkScreen == true && linkableSystemsExist == true)
 		{
-			heroScript = systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[heroGUIScript.selectedHero].GetComponent<HeroScriptParent>();
+			heroScript = systemListConstructor.systemList[systemGUI.selectedSystem].heroesInSystem[heroGUI.selectedHero].GetComponent<HeroScriptParent>();
 
 			if(GUI.Button (new Rect(Screen.width / 2 + 100.0f, Screen.height / 2 - 270.0f, 20.0f, 20.0f), "X"))
 			{
@@ -157,7 +157,7 @@ public class Tier3HeroScript : HeroScriptParent
 
 				if(GUILayout.Button (linkableSystems[i].name, GUILayout.Height (50.0f)))
 				{
-					SetUpTradeRoute (mainGUIScript.selectedSystem, heroGUIScript.selectedHero, i);
+					SetUpTradeRoute (systemGUI.selectedSystem, heroGUI.selectedHero, i);
 
 					openSystemLinkScreen = false;
 				}

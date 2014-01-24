@@ -67,51 +67,16 @@ public class PlayerTurn : TurnInfo
 		}
 	}
 
-	public void OnGUI()
-	{
-		GUI.skin = mainGUIScript.mySkin;
-
-		if(systemHasBeenColonised == true)
-		{
-			int selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
-
-			GUILayout.BeginArea(new Rect(Screen.width / 2 - 185.0f, Screen.height / 2 - 60.0f, 120.0f, 370.0f));
-
-			GUILayout.Box("Select Planet");
-
-			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
-			{
-				float planetSIM = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetScience + systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetIndustry +
-					systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetMoney;
-
-				string planetInfo = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetType + " " + planetSIM.ToString() + " SIM";
-
-				if(GUILayout.Button(planetInfo, GUILayout.Height (50.0f)))
-				{
-					systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised = true;
-
-					++playerTurnScript.planetsColonisedThisTurn;
-
-					++playerTurnScript.systemsColonisedThisTurn;
-
-					systemHasBeenColonised = false;
-				}
-			}
-
-			GUILayout.EndArea();
-		}
-	}
-
 	public void ImproveButtonClick(int i, int j)
 	{
 		++systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
 
-		if(mainGUIScript.resourceToSpend == "Industry")
+		if(systemGUI.resourceToSpend == "Industry")
 		{
 			industry -= (int)systemSIMData.improvementCost;
 		}
 		
-		if(mainGUIScript.resourceToSpend == "Money")
+		if(systemGUI.resourceToSpend == "Money")
 		{
 			money -= (int)(systemSIMData.improvementCost * 2);
 		}

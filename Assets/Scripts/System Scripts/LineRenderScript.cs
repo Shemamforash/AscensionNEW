@@ -6,7 +6,6 @@ public class LineRenderScript : MasterScript
 {
 	[HideInInspector]
 	public bool showText;
-	public GUITextScript guiTextScript;
 	[HideInInspector]
 	public GUIText activeGUI;
 	[HideInInspector]
@@ -23,7 +22,6 @@ public class LineRenderScript : MasterScript
 
 	void Start()
 	{	
-		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
 		systemSIMData = gameObject.GetComponent<SystemSIMData>();
 		thisLight = gameObject.GetComponent<Light> ();
 		thisSystem = RefreshCurrentSystem (gameObject);
@@ -163,18 +161,11 @@ public class LineRenderScript : MasterScript
 		
 	void OnMouseEnter()
 	{
-		guiTextScript.highlightedSystemName = gameObject.name;
-
-		string systemSize = systemListConstructor.systemList[thisSystem].systemSize.ToString ();
-
-		guiTextScript.highlightedSystemSize = systemSize;
-
-		guiTextScript.highlightedSystem = gameObject;
+		galaxyGUI.mouseOverSystem = gameObject;
 	}
 	
 	void OnMouseExit()
 	{
-		guiTextScript.highlightedSystemName = null;
-		guiTextScript.highlightedSystemSize = null;
+		galaxyGUI.mouseOverSystem = null;
 	}
 }
