@@ -8,134 +8,103 @@ public class Tier3HeroScript : HeroScriptParent
 	public bool openSystemLinkScreen, linkableSystemsExist;
 	private int availableSystems;
 
-	public void CheckTier3Heroes(HeroScriptParent heroScript)
+	public void CheckTier3Heroes(GameObject selectedHero)
 	{
-		guiPlanScript = heroScript.heroLocation.GetComponent<GUISystemDataScript>();
-
+		heroScript = selectedHero.GetComponent<HeroScriptParent> ();
+		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData>();
 		tempObject = heroScript.FindDiplomaticConnection ();
 
 		if(heroScript.heroTier2 == "Diplomat")
 		{
-			heroScript.heroSciBonus += 0.10f * guiPlanScript.tempTotalSci;
-			heroScript.heroIndBonus += 0.10f * guiPlanScript.tempTotalInd;
-			heroScript.heroMonBonus += 0.20f * guiPlanScript.tempTotalMon;
+			heroScript.heroSciBonus += 0.10f * systemSIMData.tempTotalSci;
+			heroScript.heroIndBonus += 0.10f * systemSIMData.tempTotalInd;
+			heroScript.heroMonBonus += 0.20f * systemSIMData.tempTotalMon;
 
 			heroScript.offensivePower = 0.0f;
 			heroScript.defensivePower = 0.0f;
 
-			if(heroScript.heroTier3 == "Peacemaker")
+			if(heroScript.heroTier3 == "Ambassador")
 			{
-				Peacemaker (heroScript);
+				Ambassador ();
 			}
-			if(heroScript.heroTier3 == "President")
+			if(heroScript.heroTier3 == "Smuggler")
 			{
-				President (heroScript);
-			}
-			if(heroScript.heroTier3 == "Merchant")
-			{
-				Merchant (heroScript);
+				Smuggler ();
 			}
 		}
 		if(heroScript.heroTier2 == "Infiltrator")
 		{
-			heroScript.heroSciBonus += 0.20f * guiPlanScript.tempTotalSci;
-			heroScript.heroIndBonus += 0.10f * guiPlanScript.tempTotalInd;
-			heroScript.heroMonBonus += 0.10f * guiPlanScript.tempTotalMon;
+			heroScript.heroSciBonus += 0.20f * systemSIMData.tempTotalSci;
+			heroScript.heroIndBonus += 0.10f * systemSIMData.tempTotalInd;
+			heroScript.heroMonBonus += 0.10f * systemSIMData.tempTotalMon;
 
-			if(heroScript.heroTier3 == "Spy")
+			if(heroScript.heroTier3 == "Hacker")
 			{
-				Spy (heroScript);
+				Hacker ();
 			}
-			if(heroScript.heroTier3 == "Assassin")
+			if(heroScript.heroTier3 == "Drone")
 			{
-				Assassin (heroScript);
-			}
-			if(heroScript.heroTier3 == "Recon Drone")
-			{
-				ReconDrone (heroScript);
+				Drone ();
 			}
 		}
 		if(heroScript.heroTier2 == "Soldier")
 		{
-			heroScript.heroSciBonus += 0.10f * guiPlanScript.tempTotalSci;
-			heroScript.heroIndBonus += 0.20f * guiPlanScript.tempTotalInd;
-			heroScript.heroMonBonus += 0.10f * guiPlanScript.tempTotalMon;
+			heroScript.heroSciBonus += 0.10f * systemSIMData.tempTotalSci;
+			heroScript.heroIndBonus += 0.20f * systemSIMData.tempTotalInd;
+			heroScript.heroMonBonus += 0.10f * systemSIMData.tempTotalMon;
 
 			heroScript.offensivePower += 14.0f;
 			heroScript.defensivePower += 14.0f;
 
 			if(heroScript.heroTier3 == "Warlord")
 			{
-				Warlord (heroScript);
+				Warlord ();
 			}
 			if(heroScript.heroTier3 == "Vanguard")
 			{
-				Vanguard (heroScript);
-			}
-			if(heroScript.heroTier3 == "Strike Team")
-			{
-				StrikeTeam (heroScript);
+				Vanguard ();
 			}
 		}
 	}
 
-	public void Merchant(HeroScriptParent heroScript)
+	public void Smuggler()
 	{
 		if(heroScript.linkedHeroObject != null)
 		{
 			int i = RefreshCurrentSystem(heroScript.linkedHeroObject);
 
-			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
+			systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
 			
-			heroScript.heroSciBonus += guiPlanScript.tempTotalSci / 2;
-			heroScript.heroIndBonus += guiPlanScript.tempTotalInd / 2;
-			heroScript.heroMonBonus += guiPlanScript.tempTotalMon / 2;
+			heroScript.heroSciBonus += systemSIMData.tempTotalSci / 2;
+			heroScript.heroIndBonus += systemSIMData.tempTotalInd / 2;
+			heroScript.heroMonBonus += systemSIMData.tempTotalMon / 2;
 		}
 	}
 
-	public void Peacemaker(HeroScriptParent heroScript)
+	public void Ambassador()
 	{
-		heroScript.defensivePower += 7.0f;
-
-		if(tempObject != null)
-		{
-			++tempObject.peaceCounter;
-		}
+		heroScript.heroSciBonus += systemSIMData.tempTotalSci * 0.25f;
+		heroScript.heroIndBonus += systemSIMData.tempTotalInd * 0.25f;
+		heroScript.heroMonBonus += systemSIMData.tempTotalMon * 0.25f;
 	}
 
-	public void President(HeroScriptParent heroScript)
-	{
-		heroScript.heroSciBonus += guiPlanScript.tempTotalSci * 0.25f;
-		heroScript.heroIndBonus += guiPlanScript.tempTotalInd * 0.25f;
-		heroScript.heroMonBonus += guiPlanScript.tempTotalMon * 0.25f;
-	}
-
-	public void Spy(HeroScriptParent heroScript)
+	public void Hacker()
 	{
 	}
-	public void Assassin(HeroScriptParent heroScript)
-	{
-	}
-	public void ReconDrone(HeroScriptParent heroScript)
+	public void Drone()
 	{
 	}
 
-	public void Warlord(HeroScriptParent heroScript)
+	public void Warlord()
 	{
 		heroScript.offensivePower += 14.0f;
 		heroScript.defensivePower -= 7.0f;
 	}
 
-	public void Vanguard(HeroScriptParent heroScript)
+	public void Vanguard()
 	{
 		heroScript.offensivePower -= 7.0f;
 		heroScript.defensivePower += 14.0f;
-	}
-
-	public void StrikeTeam(HeroScriptParent heroScript)
-	{
-		heroScript.offensivePower += 7.0f;
-		heroScript.defensivePower += 7.0f;
 	}
 
 	public void FillLinkableSystems()

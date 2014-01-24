@@ -8,7 +8,7 @@ public class GUIHeroScreen : MasterScript
 	public GameObject heroObject, merchantQuad;
 	public GameObject tempHero, targetSystem;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
-	private string[] heroLevelThreeSpecs = new string[9] {"President", "Peacemaker", "Merchant", "Vanguard", "Strike Team", "Warlord", "Spy", "Recon Drone", "Assassin"};
+	private string[] heroLevelThreeSpecs = new string[6] {"Ambassador", "Smuggler", "Vanguard", "Warlord", "Hacker", "Drone"};
 	public GUISkin mySkin;
 	public int heroCounter = 1, selectedHero, j;
 	private float timer;
@@ -95,9 +95,9 @@ public class GUIHeroScreen : MasterScript
 
 			heroScript.isInvading = false;
 
-			guiPlanScript = heroScript.heroLocation.GetComponent<GUISystemDataScript>();
+			systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData>();
 
-			guiPlanScript.underInvasion = false;
+			systemSIMData.underInvasion = false;
 
 			int k = RefreshCurrentSystem(heroScript.heroLocation);
 
@@ -150,11 +150,8 @@ public class GUIHeroScreen : MasterScript
 		Rect tier2Box4 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 - 85.0f, 180.0f, 50.0f);
 		Rect tier2Box5 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 - 25.0f, 180.0f, 50.0f);
 		Rect tier2Box6 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 + 35.0f, 180.0f, 50.0f);
-		Rect tier2Box7 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 + 95.0f, 180.0f, 50.0f);
-		Rect tier2Box8 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 + 155.0f, 180.0f, 50.0f);
-		Rect tier2Box9 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 + 215.0f, 180.0f, 50.0f);
 
-		tier2 = new Rect[9]{tier2Box1, tier2Box2, tier2Box3, tier2Box4, tier2Box5, tier2Box6, tier2Box7, tier2Box8, tier2Box9};
+		tier2 = new Rect[6]{tier2Box1, tier2Box2, tier2Box3, tier2Box4, tier2Box5, tier2Box6};
 	}
 
 	public void CheckIfCanHire(int system)
@@ -265,7 +262,7 @@ public class GUIHeroScreen : MasterScript
 					}
 				}
 
-				for(int i = 0; i < 9; ++i)
+				for(int i = 0; i < 6; ++i)
 				{
 					GUI.Label (tier2[i], heroLevelThreeSpecs[i]);
 				}
@@ -278,7 +275,7 @@ public class GUIHeroScreen : MasterScript
 					GUI.Label (tier1[i], heroLevelTwoSpecs[i]);
 				}
 
-				for(int i = 0; i < 9; ++i)
+				for(int i = 0; i < 6; ++i)
 				{
 					if(GUI.Button (tier2[i], heroLevelThreeSpecs[i]) && playerTurnScript.GP > 2)
 					{
@@ -300,7 +297,7 @@ public class GUIHeroScreen : MasterScript
 					GUI.Label (tier1[i], heroLevelTwoSpecs[i]);
 				}
 
-				for(int i = 0; i < 9; ++i)
+				for(int i = 0; i < 6; ++i)
 				{
 					GUI.Label (tier2[i], heroLevelThreeSpecs[i]);
 				}

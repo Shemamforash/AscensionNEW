@@ -9,7 +9,7 @@ public class MasterScript : MonoBehaviour
 	public SystemListConstructor systemListConstructor;
 
 	[HideInInspector]
-	public GUISystemDataScript guiPlanScript;
+	public SystemSIMData systemSIMData;
 	[HideInInspector]
 	public CameraFunctions cameraFunctionsScript;
 	[HideInInspector]

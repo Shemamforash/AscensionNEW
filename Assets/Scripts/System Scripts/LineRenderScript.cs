@@ -19,11 +19,12 @@ public class LineRenderScript : MasterScript
 	[HideInInspector]
 	private GameObject objectB;
 	private Light thisLight;
+	public Material opaqueMaterial;
 
 	void Start()
 	{	
 		guiTextScript = GameObject.FindGameObjectWithTag("SystemOverlay").GetComponent<GUITextScript>();
-		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>();
+		systemSIMData = gameObject.GetComponent<SystemSIMData>();
 		thisLight = gameObject.GetComponent<Light> ();
 		thisSystem = RefreshCurrentSystem (gameObject);
 
@@ -45,7 +46,7 @@ public class LineRenderScript : MasterScript
 	{
 		if(cameraFunctionsScript.selectedSystem == gameObject)
 		{
-			thisLight.intensity = 4.0f;
+			thisLight.intensity = 10.0f;
 		}
 		if(cameraFunctionsScript.selectedSystem != gameObject)
 		{
@@ -75,6 +76,26 @@ public class LineRenderScript : MasterScript
 		}
 	
 		BuildLine(quad);
+
+		if(thisRace == playerTurnScript.playerRace)
+		{
+			ViewNearbySystems();
+		}
+	}
+
+	private void ViewNearbySystems()
+	{
+		int system = RefreshCurrentSystem (gameObject);
+
+		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
+		{
+			int tempSystem = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
+
+			if(systemListConstructor.systemList[tempSystem].systemOwnedBy == null)
+			{
+				systemListConstructor.systemList[system].permanentConnections[i].renderer.material = opaqueMaterial;
+			}
+		}
 	}
 
 	void BuildLine(GameObject aQuad)

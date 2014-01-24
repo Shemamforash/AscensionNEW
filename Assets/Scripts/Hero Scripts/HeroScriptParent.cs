@@ -155,7 +155,7 @@ public class HeroScriptParent : MasterScript
 			{
 				heroGUIScript.selectedHero = thisHeroNumber;
 
-				tier3HeroScript.CheckTier3Heroes (heroScript);
+				tier3HeroScript.CheckTier3Heroes (gameObject);
 			}
 		}
 
@@ -191,9 +191,9 @@ public class HeroScriptParent : MasterScript
 		
 		invasionObject = (GameObject)Instantiate (diplomacyScript.invasionQuad, systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[i].systemObject.transform.rotation);
 		
-		guiPlanScript = systemListConstructor.systemList [i].systemObject.GetComponent<GUISystemDataScript> ();
+		systemSIMData = systemListConstructor.systemList [i].systemObject.GetComponent<SystemSIMData> ();
 		
-		guiPlanScript.underInvasion = true;
+		systemSIMData.underInvasion = true;
 	}
 	
 	public void ContinueInvasion()
@@ -246,9 +246,9 @@ public class HeroScriptParent : MasterScript
 			
 			systemListConstructor.systemList[i].systemObject.renderer.material = diplomacyScript.unownedMaterial;
 			
-			guiPlanScript = systemListConstructor.systemList [i].systemObject.GetComponent<GUISystemDataScript> ();
+			systemSIMData = systemListConstructor.systemList [i].systemObject.GetComponent<SystemSIMData> ();
 			
-			guiPlanScript.underInvasion = false;
+			systemSIMData.underInvasion = false;
 		}
 	}
 }

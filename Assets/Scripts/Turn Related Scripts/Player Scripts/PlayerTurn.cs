@@ -19,7 +19,7 @@ public class PlayerTurn : TurnInfo
 			
 			if(tempObject != null && tempObject.tag == "StarSystem")
 			{
-				guiPlanScript = tempObject.GetComponent<GUISystemDataScript>();
+				systemSIMData = tempObject.GetComponent<SystemSIMData>();
 				techTreeScript = tempObject.GetComponent<TechTreeScript>();
 				heroScript = tempObject.GetComponent<HeroScriptParent>();
 			}
@@ -108,12 +108,12 @@ public class PlayerTurn : TurnInfo
 
 		if(mainGUIScript.resourceToSpend == "Industry")
 		{
-			industry -= (int)guiPlanScript.improvementCost;
+			industry -= (int)systemSIMData.improvementCost;
 		}
 		
 		if(mainGUIScript.resourceToSpend == "Money")
 		{
-			money -= (int)(guiPlanScript.improvementCost * 2);
+			money -= (int)(systemSIMData.improvementCost * 2);
 		}
 	}
 
