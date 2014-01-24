@@ -6,8 +6,8 @@ public class Tier2HeroScript : HeroScriptParent
 	public void CheckTier2Heroes(GameObject selectedHero)
 	{
 		heroScript = selectedHero.GetComponent<HeroScriptParent> ();
-		
-		guiPlanScript = heroScript.heroLocation.GetComponent<GUISystemDataScript>();
+
+		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData>();
 
 		tempObject = heroScript.FindDiplomaticConnection ();
 
@@ -27,9 +27,9 @@ public class Tier2HeroScript : HeroScriptParent
 
 	public void Diplomat()
 	{				
-		heroScript.heroSciBonus += 0.05f * guiPlanScript.tempTotalSci;
-		heroScript.heroIndBonus += 0.05f * guiPlanScript.tempTotalInd;
-		heroScript.heroMonBonus += 0.10f * guiPlanScript.tempTotalMon;
+		heroScript.heroSciBonus += 0.05f * systemSIMData.tempTotalSci;
+		heroScript.heroIndBonus += 0.05f * systemSIMData.tempTotalInd;
+		heroScript.heroMonBonus += 0.10f * systemSIMData.tempTotalMon;
 
 		heroScript.offensivePower -= 7.0f;
 		heroScript.defensivePower -= 7.0f;
@@ -42,9 +42,9 @@ public class Tier2HeroScript : HeroScriptParent
 
 	public void Infiltrator()
 	{
-		heroScript.heroSciBonus += 0.10f * guiPlanScript.tempTotalSci;
-		heroScript.heroIndBonus += 0.05f * guiPlanScript.tempTotalInd;
-		heroScript.heroMonBonus += 0.05f * guiPlanScript.tempTotalMon;
+		heroScript.heroSciBonus += 0.10f * systemSIMData.tempTotalSci;
+		heroScript.heroIndBonus += 0.05f * systemSIMData.tempTotalInd;
+		heroScript.heroMonBonus += 0.05f * systemSIMData.tempTotalMon;
 
 		if(tempObject != null)
 		{
@@ -61,9 +61,9 @@ public class Tier2HeroScript : HeroScriptParent
 
 	public void Soldier()
 	{
-		heroScript.heroSciBonus += 0.05f * guiPlanScript.tempTotalSci;
-		heroScript.heroIndBonus += 0.10f * guiPlanScript.tempTotalInd;
-		heroScript.heroMonBonus += 0.05f * guiPlanScript.tempTotalMon;
+		heroScript.heroSciBonus += 0.05f * systemSIMData.tempTotalSci;
+		heroScript.heroIndBonus += 0.10f * systemSIMData.tempTotalInd;
+		heroScript.heroMonBonus += 0.05f * systemSIMData.tempTotalMon;
 
 		heroScript.offensivePower += 7.0f;
 		heroScript.defensivePower += 7.0f;

@@ -32,9 +32,9 @@ public class TurnInfo : MasterScript
 				continue;
 			}
 
-			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
+			systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
 			
-			guiPlanScript.UpdatePlanetPowerArray(i);
+			systemSIMData.UpdatePlanetPowerArray(i);
 		}
 
 		SortSystemPower ();
@@ -104,17 +104,17 @@ public class TurnInfo : MasterScript
 				heroScript.HeroEndTurnFunctions();
 			}
 
-			guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
+			systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
 			techTreeScript = systemListConstructor.systemList[i].systemObject.GetComponent<TechTreeScript>();
 
 			techTreeScript.ActiveTechnologies(i, selectedPlayer);
-			guiPlanScript.SystemSIMCounter(i, selectedPlayer);
-			guiPlanScript.CheckUnlockedTier();
-			guiPlanScript.IncreaseOwnership();
+			systemSIMData.SystemSIMCounter(i, selectedPlayer);
+			systemSIMData.CheckUnlockedTier();
+			systemSIMData.IncreaseOwnership();
 
-			selectedPlayer.science += guiPlanScript.totalSystemScience;
-			selectedPlayer.industry += guiPlanScript.totalSystemIndustry;
-			selectedPlayer.money += guiPlanScript.totalSystemMoney;
+			selectedPlayer.science += systemSIMData.totalSystemScience;
+			selectedPlayer.industry += systemSIMData.totalSystemIndustry;
+			selectedPlayer.money += systemSIMData.totalSystemMoney;
 		}
 
 		racialTraitScript.RacialBonus (selectedPlayer);

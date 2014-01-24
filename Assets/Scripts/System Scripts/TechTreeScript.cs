@@ -7,8 +7,8 @@ public class TechTreeScript : MasterScript
 {
 	public List<string> improvementMessageArray = new List<string>();
 
-	public float sciencePercentBonus = 1.0f, industryPercentBonus = 1.0f, moneyPercentBonus = 1.0f;
-	public float sciencePointBonus, industryPointBonus, moneyPointBonus;
+	public float sciencePercentBonus, industryPercentBonus, moneyPercentBonus;
+	public float sciencePointBonus, industryPointBonus, moneyPointBonus, tempCount;
 	public int techTier = 0;
 	private int currentPlanetsWithHyperNet = 0;
 
@@ -16,19 +16,26 @@ public class TechTreeScript : MasterScript
 
 	void Start()
 	{
-		guiPlanScript = gameObject.GetComponent<GUISystemDataScript>(); //References to scripts again.
+		sciencePercentBonus = 0; industryPercentBonus = 0; moneyPercentBonus = 0;
+
+		systemSIMData = gameObject.GetComponent<SystemSIMData>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent>();
 
 		LoadTechTree();
 	}
 
-	public void ImproveSystem(int improvement) //Occurs if button of tech is clicked.
+	public bool ImproveSystem(int improvement) //Occurs if button of tech is clicked.
 	{
 		if(playerTurnScript.industry >= listOfImprovements[improvement].improvementCost) //Checks cost of tech and current industry
 		{
 			playerTurnScript.industry -= listOfImprovements[improvement].improvementCost;
-			listOfImprovements[improvement].hasBeenBuilt = true;;
+			listOfImprovements[improvement].hasBeenBuilt = true;
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 
@@ -51,18 +58,44 @@ public class TechTreeScript : MasterScript
 		}
 	}
 
-	public void ActiveTechnologies(int system, TurnInfo selectedPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
+	public void ActiveTechnologies(int system, TurnInfo thisPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
-		sciencePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
-		industryPercentBonus = 1.0f;
-		moneyPercentBonus = 1.0f;
+		improvementMessageArray.Clear ();
+
+		sciencePercentBonus = 0.0f; //Resets the percentage modifier for SIM. Is there an easier way?
+		industryPercentBonus = 0.0f;
+		moneyPercentBonus = 0.0f;
 
 		sciencePointBonus = 0.0f;
 		industryPointBonus = 0.0f;
 		moneyPointBonus = 0.0f;
 
-		float tempCount = 0.0f;
+		tempCount = 0.0f;
 
+		if(techTier >= 0)
+		{
+			CheckTierZero(system, thisPlayer);
+		}
+		if(techTier >= 1)
+		{
+			CheckTierOne(system, thisPlayer);
+		}
+		if(techTier >= 2)
+		{
+			CheckTierTwo(system, thisPlayer);
+		}
+		if(techTier == 3)
+		{
+			CheckTierThree(system, thisPlayer);
+		}
+		if(thisPlayer.playerRace == "Humans")
+		{
+			CheckHumanImprovements(system, thisPlayer);
+		}
+	}
+
+	public void CheckTierZero(int system, TurnInfo thisPlayer)
+	{
 		if(listOfImprovements[0].hasBeenBuilt == true) //Secondary Research
 		{
 			for(int i = 0; i < listOfImprovements.Count; ++i)
@@ -73,75 +106,78 @@ public class TechTreeScript : MasterScript
 					tempCount += 0.05f;
 				}
 			}
-
+			
 			improvementMessageArray.Add("+" + tempCount * 100 + "% Science from Improvements");
 		}
-
+		
 		if(listOfImprovements[1].hasBeenBuilt == true) //Synergy
 		{
 			tempCount = 0.0f;
-
+			
 			int thisSystem = RefreshCurrentSystem(gameObject);
-
+			
 			for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
 			{
 				int k = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[i]);
-
-				if(systemListConstructor.systemList[k].systemOwnedBy == selectedPlayer.playerRace)
+				
+				if(systemListConstructor.systemList[k].systemOwnedBy == thisPlayer.playerRace)
 				{
 					industryPercentBonus += 0.075f;
 					tempCount += 0.075f;
 				}
 			}
-
+			
 			improvementMessageArray.Add("+" + tempCount * 100 + "% Industry from nearby systems");
 		}
-
+		
 		if(listOfImprovements[2].hasBeenBuilt == true) //Morale
 		{
 			tempCount = 0.0f;
-
+			
 			int i = RefreshCurrentSystem(gameObject);
-
+			
 			for(int j = 0; j < 3; ++j)
 			{
 				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
 				{
 					continue;
 				}
-
+				
 				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
-
+				
 				moneyPercentBonus += (heroScript.currentLevel * 5.0f);
 				tempCount += (heroScript.currentLevel * 5.0f);
 			}
-
+			
 			improvementMessageArray.Add("+" + tempCount * 100 + "% from Hero levels");
 		}
-
+	}
+	
+	public void CheckTierOne(int system, TurnInfo thisPlayer)
+	{
 		if(listOfImprovements[3].hasBeenBuilt == true) //Capitalism
 		{
 			tempCount = 0.0f;
-
-			int j = CheckDiplomaticStateOfAllPlayers(selectedPlayer, "Peace");
-
+			
+			int j = CheckDiplomaticStateOfAllPlayers(thisPlayer, "Peace");
+			
 			sciencePointBonus += (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 			tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
-
+			
 			improvementMessageArray.Add("+" + tempCount + " Science from Peace");
 		}
-
+		
 		if(listOfImprovements[4].hasBeenBuilt == true) //Leadership
 		{
 			tempCount = 0.0f;
-
+			
 			for(int i = 0; i < 60; ++i)
 			{
-				if(systemListConstructor.systemList[i].systemOwnedBy != selectedPlayer.playerRace)
+				if(systemListConstructor.systemList[i].systemOwnedBy != thisPlayer.playerRace)
 				{
 					continue;
 				}
-
+				
 				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 				{
 					if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
@@ -151,27 +187,30 @@ public class TechTreeScript : MasterScript
 					}
 				}
 			}
-
+			
 			improvementMessageArray.Add("+" + tempCount + " Industry from colonisation");
 		}
-
+		
 		if(listOfImprovements[5].hasBeenBuilt == true) //Quick Starters
 		{
 			tempCount = 0.0f;
-
-			int j = CheckDiplomaticStateOfAllPlayers(selectedPlayer, "War");
-
+			
+			int j = CheckDiplomaticStateOfAllPlayers(thisPlayer, "War");
+			
 			industryPercentBonus += (j * 0.25f);
 			tempCount += (j * 0.25f);
 			improvementMessageArray.Add("+" + tempCount * 100 + "% Industry from War");
 		}
-
+	}
+	
+	public void CheckTierTwo(int system, TurnInfo thisPlayer)
+	{
 		if(listOfImprovements[6].hasBeenBuilt == true)
 		{
 			tempCount = 0.0f;
-
+			
 			int i = RefreshCurrentSystem(gameObject);
-
+			
 			for(int j = 0; j <  systemListConstructor.systemList[i].systemSize; ++j)
 			{
 				if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == false)
@@ -180,10 +219,10 @@ public class TechTreeScript : MasterScript
 					tempCount += 0.25f;
 				}
 			}
-
+			
 			improvementMessageArray.Add("+" + tempCount * 100 + "% Science from uncolonised planets");
 		}
-
+		
 		if(listOfImprovements[7].hasBeenBuilt == true) //Unionisation
 		{
 			tempCount = 0.0f;
@@ -197,55 +236,61 @@ public class TechTreeScript : MasterScript
 					allPlanetsColonised = false;
 				}
 			}
-
+			
 			if(allPlanetsColonised == true)
 			{
 				industryPercentBonus += 0.2f;
 				tempCount += 0.2f;
 			}
-
+			
 			industryPercentBonus += 0.1f;
 			tempCount += 0.1f;
-
+			
 			improvementMessageArray.Add("+" + tempCount * 100 + "% Industry on System");
 		}
-
+		
 		if(listOfImprovements[8].hasBeenBuilt == true) //Familiarity
 		{
 			improvementMessageArray.Add("2x SIM production on Home-Type Planets");
 		}
-
+	}
+	
+	public void CheckTierThree(int system, TurnInfo thisPlayer)
+	{
 		if(listOfImprovements[9].hasBeenBuilt == true) //Hypernet
 		{
 			tempCount = 0.0f;
 			float tempCountB = 0.0f;
 			float tempCountC = 0.0f;
-
-			sciencePointBonus += guiPlanScript.totalSystemScience;
-			tempCount = guiPlanScript.totalSystemScience;
-
-			industryPointBonus -= (0.5f * turnInfoScript.turn) * guiPlanScript.totalSystemIndustry;
-			tempCountB = (0.5f * turnInfoScript.turn) * guiPlanScript.totalSystemIndustry;
-
-			moneyPointBonus -= (0.5f * turnInfoScript.turn) * guiPlanScript.totalSystemMoney;
-			tempCountC = (0.5f * turnInfoScript.turn) * guiPlanScript.totalSystemMoney;
-
+			
+			sciencePointBonus += systemSIMData.totalSystemScience;
+			tempCount = systemSIMData.totalSystemScience;
+			
+			industryPointBonus -= (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
+			tempCountB = (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
+			
+			moneyPointBonus -= (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemMoney;
+			tempCountC = (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemMoney;
+			
 			improvementMessageArray.Add("+" + tempCount + " Science, -" + tempCountB + " Industry, -" + tempCountC + "Money on System");
 		}
-
+		
 		if(listOfImprovements[11].hasBeenBuilt == true)
 		{
 			tempCount = 0.0f;
-			int i = HyperNet(selectedPlayer);
-
+			int i = HyperNet(thisPlayer);
+			
 			sciencePercentBonus += (i * 0.05f);
 			industryPercentBonus += (i * 0.05f);
 			moneyPercentBonus += (i * 0.05f);
 			tempCount = (i * 0.05f);
-
+			
 			improvementMessageArray.Add ("+" + tempCount + "% SIM from systems with Hypernet");
 		}
+	}
 
+	public void CheckHumanImprovements(int system, TurnInfo thisPlayer)
+	{
 		if(listOfImprovements[12].hasBeenBuilt == true)
 		{
 			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
@@ -255,10 +300,10 @@ public class TechTreeScript : MasterScript
 					++systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
 				}
 			}
-
+			
 			improvementMessageArray.Add("+1 Ownership per turn");
 		}
-
+		
 		if(listOfImprovements[13].hasBeenBuilt == true)
 		{
 			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
@@ -268,10 +313,10 @@ public class TechTreeScript : MasterScript
 					systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership += 5;
 				}
 			}
-
+			
 			improvementMessageArray.Add("+5 Ownership on Terran");
 		}
-
+		
 		if(listOfImprovements[14].hasBeenBuilt == true)
 		{
 			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
@@ -281,23 +326,23 @@ public class TechTreeScript : MasterScript
 					systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership = 120;
 				}
 			}
-
+			
 			improvementMessageArray.Add("+20% Max Ownership on Fully Improved Systems");
 		}
-
+		
 		if(listOfImprovements[15].hasBeenBuilt == true)
 		{
-			selectedPlayer.money -= guiPlanScript.totalSystemSIM * 0.3f;
-
+			thisPlayer.money -= systemSIMData.totalSystemSIM * 0.3f;
+			
 			sciencePercentBonus -= 0.3f;
 			industryPercentBonus -= 0.3f;
 			moneyPercentBonus -= 0.3f;
-
+			
 			++racialTraitScript.ambitionCounter;
-
+			
 			improvementMessageArray.Add("30% Money Converted to Ambition");
 		}
-
+		
 		if(listOfImprovements[16].hasBeenBuilt == true)
 		{
 			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
@@ -307,14 +352,14 @@ public class TechTreeScript : MasterScript
 					systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership = 33;
 				}
 			}
-
+			
 			improvementMessageArray.Add("Minimum Ownership of 33%");
 		}
-
+		
 		if(listOfImprovements[17].hasBeenBuilt == true)
 		{
 			tempCount = 0.0f;
-
+			
 			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
 			{
 				if(systemListConstructor.systemList[system].planetsInSystem[i].planetCategory == "Terran")
@@ -324,47 +369,47 @@ public class TechTreeScript : MasterScript
 					break;
 				}
 			}
-
+			
 			improvementMessageArray.Add("+" + tempCount + " Ambition from Terran Planet");
 		}
-
+		
 		if(listOfImprovements[18].hasBeenBuilt == true)
 		{
 			improvementMessageArray.Add("Ambition has no effect on planet Ownership");
 		}
-
+		
 		if(listOfImprovements[19].hasBeenBuilt == true)
 		{
 			tempCount = 0.0f;
-
+			
 			string tempString = null;
-
+			
 			if(racialTraitScript.ambitionCounter > 75)
 			{
 				tempCount = (racialTraitScript.ambitionCounter - 75) / 100.0f;
-
+				
 				tempString = ("+" + tempCount + "% SIM from Renaissance");
 			}
 			if(racialTraitScript.ambitionCounter < -75)
 			{
 				tempCount = (racialTraitScript.ambitionCounter + 75) / 100.0f;
-				 
+				
 				tempString = (tempCount + "% SIM from Depression");
 			}
-
+			
 			sciencePercentBonus += tempCount;
 			industryPercentBonus += tempCount;
 			moneyPercentBonus += tempCount;
-
+			
 			improvementMessageArray.Add(tempString);
 		}
 	}
 
-	private int CheckDiplomaticStateOfAllPlayers(TurnInfo selectedPlayer, string state)
+	private int CheckDiplomaticStateOfAllPlayers(TurnInfo thisPlayer, string state)
 	{
 		int noOfPlayersInState = 0;
 
-		if(selectedPlayer == playerTurnScript)
+		if(thisPlayer == playerTurnScript)
 		{
 			if(diplomacyScript.playerEnemyOneRelations.diplomaticState == state)
 			{
@@ -377,7 +422,7 @@ public class TechTreeScript : MasterScript
 			}
 		}
 		
-		if(selectedPlayer == enemyOneTurnScript)
+		if(thisPlayer == enemyOneTurnScript)
 		{
 			if(diplomacyScript.playerEnemyOneRelations.diplomaticState == state)
 			{
@@ -390,7 +435,7 @@ public class TechTreeScript : MasterScript
 			}
 		}
 		
-		if(selectedPlayer == enemyTwoTurnScript)
+		if(thisPlayer == enemyTwoTurnScript)
 		{
 			if(diplomacyScript.playerEnemyTwoRelations.diplomaticState == state)
 			{
@@ -406,13 +451,13 @@ public class TechTreeScript : MasterScript
 		return noOfPlayersInState;
 	}
 
-	private int HyperNet(TurnInfo selectedPlayer) //Tier 3 tech. Bonus SIM for each connected planet. This function is good.
+	private int HyperNet(TurnInfo thisPlayer) //Tier 3 tech. Bonus SIM for each connected planet. This function is good.
 	{		
 		currentPlanetsWithHyperNet = 0;
 		
 		for(int i = 0; i < 60; ++i)
 		{
-			if(systemListConstructor.systemList[i].systemOwnedBy == null || systemListConstructor.systemList[i].systemOwnedBy == selectedPlayer.playerRace)
+			if(systemListConstructor.systemList[i].systemOwnedBy == null || systemListConstructor.systemList[i].systemOwnedBy == thisPlayer.playerRace)
 			{
 				continue;
 			}

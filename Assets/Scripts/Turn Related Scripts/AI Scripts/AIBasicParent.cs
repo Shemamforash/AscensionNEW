@@ -72,9 +72,9 @@ public class AIBasicParent : TurnInfo
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy == thisPlayer.playerRace)
 			{
-				guiPlanScript = systemListConstructor.systemList [i].systemObject.GetComponent<GUISystemDataScript> ();
+				systemSIMData = systemListConstructor.systemList [i].systemObject.GetComponent<SystemSIMData> ();
 				
-				if(guiPlanScript.underInvasion == true)
+				if(systemSIMData.underInvasion == true)
 				{
 					continue;
 				}
@@ -176,24 +176,24 @@ public class AIBasicParent : TurnInfo
 	
 	public void ImprovePlanet(int planetPosition, int system)
 	{
-		guiPlanScript.improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
+		systemSIMData.improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 		
-		guiPlanScript.CheckImprovement(system, planetPosition);
+		systemSIMData.CheckImprovement(system, planetPosition);
 		
-		if(guiPlanScript.canImprove == true && guiPlanScript.underInvasion == false)
+		if(systemSIMData.canImprove == true && systemSIMData.underInvasion == false)
 		{
-			if(industry >= guiPlanScript.improvementCost)
+			if(industry >= systemSIMData.improvementCost)
 			{
 				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 				
-				industry -= (int)guiPlanScript.improvementCost;
+				industry -= (int)systemSIMData.improvementCost;
 			}
 			
-			else if(money >= guiPlanScript.improvementCost * 2)
+			else if(money >= systemSIMData.improvementCost * 2)
 			{
 				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 				
-				money -= ((int)guiPlanScript.improvementCost * 2);
+				money -= ((int)systemSIMData.improvementCost * 2);
 			}
 		}
 	}

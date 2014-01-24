@@ -31,7 +31,7 @@ public class RacialTraits : MasterScript
 			}
 		}
 
-		return 1f;
+		return 0f;
 	}
 
 	public void NereidesTrait(TurnInfo player)
@@ -40,43 +40,43 @@ public class RacialTraits : MasterScript
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy == "Nereides")
 			{
-				guiPlanScript = systemListConstructor.systemList[i].systemObject.GetComponent<GUISystemDataScript>();
+				systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
 
 				if(nereidesProgressionCounter < 2000 || (nereidesProgressionCounter >= 6000 && nereidesProgressionCounter < 8000))
 				{
-					nereidesProgressionCounter += (int)(0.2f * guiPlanScript.totalSystemScience);
-					player.science -= 0.2f * guiPlanScript.totalSystemScience;
-					nereidesScienceModifier = 0.8f;
-					nereidesIndustryModifier = 1f;
-					nereidesMoneyModifier = 1f;
+					nereidesProgressionCounter += (int)(0.2f * systemSIMData.totalSystemScience);
+					player.science -= 0.2f * systemSIMData.totalSystemScience;
+					nereidesScienceModifier = -0.2f;
+					nereidesIndustryModifier = 0f;
+					nereidesMoneyModifier = 0f;
 				}
 
 				if(nereidesProgressionCounter >= 2000 && nereidesProgressionCounter < 4000 || (nereidesProgressionCounter >= 6000 && nereidesProgressionCounter < 8000))
 				{
-					nereidesProgressionCounter += (int)(0.2f * guiPlanScript.totalSystemIndustry);
-					player.industry -= 0.2f * guiPlanScript.totalSystemIndustry;
-					nereidesScienceModifier = 1f;
-					nereidesIndustryModifier = 0.8f;
-					nereidesMoneyModifier = 1f;
+					nereidesProgressionCounter += (int)(0.2f * systemSIMData.totalSystemIndustry);
+					player.industry -= 0.2f * systemSIMData.totalSystemIndustry;
+					nereidesScienceModifier = 0f;
+					nereidesIndustryModifier = -0.2f;
+					nereidesMoneyModifier = 0f;
 				}
 
 				if(nereidesProgressionCounter >= 4000 && nereidesProgressionCounter < 6000 || (nereidesProgressionCounter >= 6000 && nereidesProgressionCounter < 8000))
 				{
-					nereidesProgressionCounter += (int)(0.2f * guiPlanScript.totalSystemMoney);
-					player.money -= 0.2f * guiPlanScript.totalSystemMoney;
-					nereidesScienceModifier = 1f;
-					nereidesIndustryModifier = 1f;
-					nereidesMoneyModifier = 0.8f;
+					nereidesProgressionCounter += (int)(0.2f * systemSIMData.totalSystemMoney);
+					player.money -= 0.2f * systemSIMData.totalSystemMoney;
+					nereidesScienceModifier = 0f;
+					nereidesIndustryModifier = 0f;
+					nereidesMoneyModifier = -0.2f;
 				}
 
 				if(nereidesProgressionCounter >= 8000)
 				{
-					player.money += guiPlanScript.totalSystemMoney;
-					player.industry += guiPlanScript.totalSystemIndustry;
-					player.science += guiPlanScript.totalSystemScience;
-					nereidesScienceModifier = 2f;
-					nereidesIndustryModifier = 2f;
-					nereidesMoneyModifier = 2f;
+					player.money += systemSIMData.totalSystemMoney;
+					player.industry += systemSIMData.totalSystemIndustry;
+					player.science += systemSIMData.totalSystemScience;
+					nereidesScienceModifier = 1f;
+					nereidesIndustryModifier = 1f;
+					nereidesMoneyModifier = 1f;
 				}
 			}
 		}
