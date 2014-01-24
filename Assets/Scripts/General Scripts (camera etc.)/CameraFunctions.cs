@@ -6,7 +6,7 @@ public class CameraFunctions : MasterScript
 	//This class contains all functions related to camera behaviour. This includes panning and zooming of the main camera, as well as using raycasts to update the current selected object.
 	//It also includes mouse functions (double click).
 	
-	public Transform cameraMain;
+	public Camera cameraMain;
 	public float zoomSpeed, minZoom, maxZoom, panSpeed, zPosition;
 	[HideInInspector]
 	public GameObject selectedSystem;
@@ -34,10 +34,10 @@ public class CameraFunctions : MasterScript
 			coloniseMenu = false;
 			openMenu = false;
 			doubleClick = false;
-			mainGUIScript.spendMenu = false;
-			mainGUIScript.openImprovementList = false;
+			systemGUI.spendMenu = false;
+			systemGUI.openImprovementList = false;
 			tier3HeroScript.openSystemLinkScreen = false;
-			heroGUIScript.openHeroLevellingScreen = false;
+			heroGUI.openHeroLevellingScreen = false;
 		}
 	}
 
@@ -149,7 +149,7 @@ public class CameraFunctions : MasterScript
 	
 	public void ZoomCamera() //Changes height of camera
 	{		
-		Vector3 cameraPositionNew = new Vector3(cameraMain.position.x, cameraMain.position.y, zPosition);
+		Vector3 cameraPositionNew = new Vector3(cameraMain.transform.position.x, cameraMain.transform.position.y, zPosition);
 		
 		if(Input.GetAxis ("Mouse ScrollWheel") < 0) //Zoom in
 		{
@@ -159,11 +159,11 @@ public class CameraFunctions : MasterScript
 			{
 				zPosition = maxZoom;
 				
-				cameraMain.position = cameraPositionNew;
+				cameraMain.transform.position = cameraPositionNew;
 			}
 			else
 			{
-				cameraMain.position = cameraPositionNew;
+				cameraMain.transform.position = cameraPositionNew;
 			}
 		}
 
@@ -175,18 +175,18 @@ public class CameraFunctions : MasterScript
 			{
 				zPosition = minZoom;
 				
-				cameraMain.position = cameraPositionNew;
+				cameraMain.transform.position = cameraPositionNew;
 			}
 			else
 			{
-				cameraMain.position = cameraPositionNew;
+				cameraMain.transform.position = cameraPositionNew;
 			}
 		}
 	}
 
 	public void CentreCamera() //Used to centre the camera over the last selected object, or the home planet if on first turn.
 	{
-		if(Input.GetKeyDown("f"))
+		if(Input.GetKeyDown("f") && selectedSystem != null)
 		{
 			moveCamera = true;
 			

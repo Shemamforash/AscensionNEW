@@ -40,9 +40,11 @@ public class MasterScript : MonoBehaviour
 	public RacialTraits racialTraitScript;
 
 	[HideInInspector]
-	public MainGUIScript mainGUIScript;
+	public SystemGUI systemGUI;
 	[HideInInspector]
-	public GUIHeroScreen heroGUIScript;
+	public HeroGUI heroGUI;
+	[HideInInspector]
+	public GalaxyGUI galaxyGUI;
 
 	private void Awake()
 	{
@@ -53,11 +55,12 @@ public class MasterScript : MonoBehaviour
 		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
 		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 		diplomacyScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<DiplomacyControlScript>();
-		mainGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<MainGUIScript>();
-		heroGUIScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GUIHeroScreen>();
+		systemGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SystemGUI>();
+		heroGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<HeroGUI>();
 		tier2HeroScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Tier2HeroScript> ();
 		tier3HeroScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Tier3HeroScript> ();
 		racialTraitScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<RacialTraits> ();
+		galaxyGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GalaxyGUI>();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem)

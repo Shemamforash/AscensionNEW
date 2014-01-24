@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GUIHeroScreen : MasterScript 
+public class HeroGUI : MasterScript 
 {
 	public bool openHeroLevellingScreen, heroIsMoving;
 	public GameObject heroObject, merchantQuad;
@@ -227,8 +227,8 @@ public class GUIHeroScreen : MasterScript
 			cameraFunctionsScript.coloniseMenu = false;
 			cameraFunctionsScript.openMenu = false;
 			cameraFunctionsScript.doubleClick = false;
-			mainGUIScript.spendMenu = false;
-			mainGUIScript.openImprovementList = false;
+			systemGUI.spendMenu = false;
+			systemGUI.openImprovementList = false;
 
 			if(GUI.Button (new Rect(Screen.width / 2 + 300.0f, Screen.height / 2 - 275.0f, 20.0f, 20.0f), "X"))
 			{
@@ -239,7 +239,7 @@ public class GUIHeroScreen : MasterScript
 
 			GUI.Label(new Rect(Screen.width / 2 -290.0f, Screen.height / 2 - 25.0f, 180.0f, 50.0f), "Hero");
 
-			heroScript = systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[selectedHero].GetComponent<HeroScriptParent>();
+			heroScript = systemListConstructor.systemList[systemGUI.selectedSystem].heroesInSystem[selectedHero].GetComponent<HeroScriptParent>();
 
 			if(heroScript.currentLevel == 1)
 			{
@@ -251,7 +251,7 @@ public class GUIHeroScreen : MasterScript
 
 						heroScript.heroTier2 = heroLevelTwoSpecs[i];
 
-						systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[selectedHero].name = heroLevelTwoSpecs[i];
+						systemListConstructor.systemList[systemGUI.selectedSystem].heroesInSystem[selectedHero].name = heroLevelTwoSpecs[i];
 
 						++heroScript.currentLevel;
 
@@ -283,7 +283,7 @@ public class GUIHeroScreen : MasterScript
 
 						heroScript.heroTier3 = heroLevelThreeSpecs[i];
 
-						systemListConstructor.systemList[mainGUIScript.selectedSystem].heroesInSystem[selectedHero].name = heroLevelThreeSpecs[i];
+						systemListConstructor.systemList[systemGUI.selectedSystem].heroesInSystem[selectedHero].name = heroLevelThreeSpecs[i];
 
 						++heroScript.currentLevel;
 					}

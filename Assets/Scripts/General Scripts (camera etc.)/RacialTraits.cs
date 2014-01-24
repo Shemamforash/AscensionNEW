@@ -155,7 +155,7 @@ public class RacialTraits : MasterScript
 
 	void OnGUI()
 	{
-		GUI.skin = mainGUIScript.mySkin;
+		GUI.skin = systemGUI.mySkin;
 
 		string labelText = CheckNereidesRacialMessage();
 

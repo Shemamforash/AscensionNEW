@@ -82,7 +82,7 @@ public class HeroScriptParent : MasterScript
 
 	public void CreateConnectionLine()
 	{
-		if(heroGUIScript.heroIsMoving == true && merchantLine != null)
+		if(heroGUI.heroIsMoving == true && merchantLine != null)
 		{
 			Destroy(merchantLine);
 		}
@@ -108,7 +108,7 @@ public class HeroScriptParent : MasterScript
 		
 		directQuat.eulerAngles = rotation;
 		
-		merchantLine = (GameObject)Instantiate (heroGUIScript.merchantQuad, midPoint, directQuat);
+		merchantLine = (GameObject)Instantiate (heroGUI.merchantQuad, midPoint, directQuat);
 		
 		merchantLine.transform.localScale = scale;
 	}
@@ -153,7 +153,7 @@ public class HeroScriptParent : MasterScript
 
 			if(heroTier3 != "")
 			{
-				heroGUIScript.selectedHero = thisHeroNumber;
+				heroGUI.selectedHero = thisHeroNumber;
 
 				tier3HeroScript.CheckTier3Heroes (gameObject);
 			}
@@ -167,8 +167,8 @@ public class HeroScriptParent : MasterScript
 
 	public void LevelUp()
 	{
-		heroGUIScript.selectedHero = thisHeroNumber;
-		heroGUIScript.openHeroLevellingScreen = true;
+		heroGUI.selectedHero = thisHeroNumber;
+		heroGUI.openHeroLevellingScreen = true;
 	}
 
 	public void StartSystemInvasion()

@@ -187,7 +187,7 @@ public class TurnInfo : MasterScript
 
 	void OnGUI()
 	{
-		GUI.skin = mainGUIScript.mySkin;
+		GUI.skin = systemGUI.mySkin;
 
 		if(playerHasWon == true)
 		{

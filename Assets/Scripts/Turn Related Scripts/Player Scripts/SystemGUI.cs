@@ -2,17 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class MainGUIScript : MasterScript 
+public class SystemGUI : MasterScript 
 {
 	private Rect[] allPlanetsGUI, allButtonsGUI, allImprovementButtonsGUI, allHeroLabels, allHeroButtons; 
 	public GUISkin mySkin;
 	public bool spendMenu = false, openImprovementList = false, systemOwnedByPlayer;
 	public string resourceToSpend;
-	private string cost, indSpend, monSpend, turnNumber, scienceStr, industryStr, moneyStr, GPString, dataSIMString, techBuildButtonText, tempRace, heroName, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
+	private string cost, indSpend, monSpend, dataSIMString, techBuildButtonText, heroName, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
 	public int selectedSystem, selectedPlanet;
 	private float xLoc, yLoc;
 	private Vector2 scrollPositionA = Vector2.zero, scrollPositionB = Vector2.zero;
-	public Texture2D industryTexture, scienceTexture;
+	public Texture2D industryTexture, scienceTexture, moneyTexture;
 
 	void Start()
 	{
@@ -80,34 +80,11 @@ public class MainGUIScript : MasterScript
 		allImprovementButtonsGUI = new Rect[6]{improveButtonFarLeft, improveButtonCloseLeft, improveButtonMiddleLeft, improveButtonMiddleRight, improveButtonCloseRight, improveButtonFarRight};
 	}
 
-	private void SelectRace(string thisRace)
-	{
-		playerTurnScript.playerRace = thisRace;
-		playerTurnScript.StartTurn();
-		enemyOneTurnScript.SetRace();
-		enemyTwoTurnScript.SetRace();
-	}
-
-	private void EndTurnFunction()
-	{
-		turnInfoScript.turn++;
-		playerTurnScript.TurnEnd (playerTurnScript);
-		enemyOneTurnScript.Expand(enemyOneTurnScript);
-		enemyTwoTurnScript.Expand(enemyTwoTurnScript);
-	}
-
 	private void UpdateVariables()
 	{
 		if(playerTurnScript.playerRace != null && cameraFunctionsScript.selectedSystem != null)
 		{
-			turnNumber = "Turn: " + turnInfoScript.turn.ToString();
-			scienceStr = ((int)playerTurnScript.science).ToString();
-			industryStr = ((int)playerTurnScript.industry).ToString ();
-			moneyStr = ((int)playerTurnScript.money).ToString ();
-			GPString = playerTurnScript.GP.ToString ();
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
-			playerEnemyOneDiplomacy = diplomacyScript.playerEnemyOneRelations.diplomaticState + " | " + diplomacyScript.playerEnemyOneRelations.peaceCounter;
-			playerEnemyTwoDiplomacy = diplomacyScript.playerEnemyTwoRelations.diplomaticState + " | " + diplomacyScript.playerEnemyTwoRelations.peaceCounter;
 			systemSIMData = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<SystemSIMData>();
 
 			if(selectedPlanet != -1)
@@ -156,95 +133,7 @@ public class MainGUIScript : MasterScript
 	{
 		GUI.skin = mySkin;
 
-		#region playerrace
-		if(playerTurnScript.playerRace == null)
-		{
-			GUI.Box (new Rect(Screen.width/2 - 150, Screen.height/2 - 40, 300, 80), "\nSelect Race");
-			
-			if(GUI.Button (new Rect(Screen.width/2 - 140, Screen.height/2, 90, 20), "Humans"))
-			{
-				tempRace = "Humans";
-			}
-			
-			if(GUI.Button (new Rect(Screen.width/2 -45, Screen.height/2, 90, 20), "Selkies"))
-			{
-				tempRace = "Selkies";
-			}
-
-			if(GUI.Button (new Rect(Screen.width/2 + 50, Screen.height/2, 90, 20), "Nereides"))
-			{
-				tempRace = "Nereides";
-			}
-
-			if(tempRace != null)
-			{
-				SelectRace(tempRace);
-				turnInfoScript.RefreshPlanetPower();
-			}
-		}
-		#endregion
-
 		UpdateVariables ();
-
-		#region turninfo				
-		
-		GUI.Label (new Rect(0.0f, Screen.height - 30.0f, Screen.width, 30.0f), ""); //Empire resources box
-		
-		GUI.Label (new Rect(10.0f, Screen.height - 25.0f, 90.0f, 20.0f), playerTurnScript.playerRace);
-				
-		GUI.Label (new Rect(110.0f, Screen.height - 25.0f, 50.0f, 20.0f), scienceStr);
-
-		GUI.Label (new Rect(155.0f, Screen.height - 30.0f, 30.0f, 30.0f), scienceTexture);
-				
-		GUI.Label (new Rect(190.0f, Screen.height - 25.0f, 50.0f, 20.0f), industryStr);
-
-		GUI.Label (new Rect(235.0f, Screen.height - 30.0f, 30.0f, 30.0f), industryTexture);
-				
-		GUI.Label (new Rect(270.0f, Screen.height - 25.0f, 50.0f, 20.0f), "M " + moneyStr);
-
-		GUI.Label (new Rect(330.0f, Screen.height - 25.0f, 50.0f, 20.0f), "GP " + GPString);
-
-		GUI.Label (new Rect(Screen.width - 160.0f, Screen.height - 22.5f, 70, 20), turnNumber);
-
-		if(GUI.Button (new Rect(Screen.width - 80.0f, Screen.height - 22.5f, 70, 20), "End turn") && playerTurnScript.playerRace != null) //Endturnbutton
-		{
-			EndTurnFunction();
-		}
-
-		#endregion
-		
-		#region colonisebutton
-		Rect coloniseButton = new Rect(10, Screen.height - 40, 75, 30); //Colonise button
-		
-		if(cameraFunctionsScript.coloniseMenu == true)
-		{
-			bool isConnected = false;
-
-			lineRenderScript = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<LineRenderScript>();
-
-			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].numberOfConnections; ++i)
-			{
-				int j = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[i]);
-
-				if(systemListConstructor.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
-				{
-					isConnected = true;
-					break;
-				}
-			}
-
-			if(isConnected == true)
-			{
-				if(GUI.Button (coloniseButton, "Colonise") && playerTurnScript.GP > 0)
-				{	
-					playerTurnScript.FindSystem (selectedSystem);
-				}
-			}
-		}
-		#endregion
-
-		GUI.Label (new Rect (10, Screen.height - 120.0f, 160.0f, 30.0f), playerEnemyOneDiplomacy);
-		GUI.Label (new Rect (10, Screen.height - 80.0f, 160.0f, 30.0f), playerEnemyTwoDiplomacy);
 		
 		#region planetinfomenu
 		if(cameraFunctionsScript.openMenu == true)
@@ -413,7 +302,7 @@ public class MainGUIScript : MasterScript
 			{
 				if(GUI.Button (new Rect(Screen.width / 2 - 610.0f, Screen.height / 2 + 300.0f, 150.0f, 50.0f), "Purchase Hero: 1GP"))
 				{
-					heroGUIScript.CheckIfCanHire(selectedSystem);
+					heroGUI.CheckIfCanHire(selectedSystem);
 				}
 			}
 
@@ -433,7 +322,7 @@ public class MainGUIScript : MasterScript
 					if(GUI.Button (allHeroLabels[i], heroName))
 					{
 						tier3HeroScript.openSystemLinkScreen = true;
-						heroGUIScript.selectedHero = i;
+						heroGUI.selectedHero = i;
 						tier3HeroScript.FillLinkableSystems();
 					}
 				}
@@ -452,9 +341,6 @@ public class MainGUIScript : MasterScript
 					}
 				}
 			}
-
-			GUI.Label (new Rect(Screen.width/2 - 700.0f, Screen.height / 2 + 400.0f, 100.0f, 40.0f), diplomacyScript.playerStates[1]);
-
 			#endregion
 		}
 		#endregion
