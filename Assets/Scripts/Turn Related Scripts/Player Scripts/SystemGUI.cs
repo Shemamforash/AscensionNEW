@@ -331,15 +331,6 @@ public class SystemGUI : MasterScript
 				{
 					GUI.Label (allHeroLabels[i], heroName);
 				}
-
-				if(systemOwnedByPlayer == true)
-				{
-					if(GUI.Button (allHeroButtons[i], "Level Up"))
-					{
-						heroScript =  systemListConstructor.systemList[selectedSystem].heroesInSystem[i].GetComponent<HeroScriptParent>();
-						heroScript.LevelUp ();
-					}
-				}
 			}
 			#endregion
 		}

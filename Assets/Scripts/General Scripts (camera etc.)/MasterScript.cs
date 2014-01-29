@@ -27,6 +27,8 @@ public class MasterScript : MonoBehaviour
 	public EnemyTwo enemyTwoTurnScript;
 
 	[HideInInspector]
+	public HeroTechTree heroTechTree;
+	[HideInInspector]
 	public TechTreeScript techTreeScript;
 	[HideInInspector]
 	public HeroScriptParent heroScript;
@@ -35,9 +37,13 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public Tier3HeroScript tier3HeroScript;
 	[HideInInspector]
+	public ShipFunctions shipFunctions;
+	[HideInInspector]
 	public DiplomacyControlScript diplomacyScript;
 	[HideInInspector]
 	public RacialTraits racialTraitScript;
+	[HideInInspector]
+	public OverlayGUI overlayGUI;
 
 	[HideInInspector]
 	public SystemGUI systemGUI;
@@ -48,19 +54,21 @@ public class MasterScript : MonoBehaviour
 
 	private void Awake()
 	{
-		systemListConstructor = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SystemListConstructor>();
+		systemListConstructor = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<SystemListConstructor>();
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
-		turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<TurnInfo>();
-		playerTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		enemyOneTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
-		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
-		diplomacyScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<DiplomacyControlScript>();
+		turnInfoScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<TurnInfo>();
+		playerTurnScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<PlayerTurn>();
+		enemyOneTurnScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<EnemyOne>();
+		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<EnemyTwo>();
+		diplomacyScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<DiplomacyControlScript>();
 		systemGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SystemGUI>();
 		heroGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<HeroGUI>();
-		tier2HeroScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Tier2HeroScript> ();
-		tier3HeroScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Tier3HeroScript> ();
-		racialTraitScript = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<RacialTraits> ();
+		tier2HeroScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<Tier2HeroScript> ();
+		tier3HeroScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<Tier3HeroScript> ();
+		racialTraitScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<RacialTraits> ();
 		galaxyGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GalaxyGUI>();
+		overlayGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<OverlayGUI> ();
+		heroTechTree = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<HeroTechTree> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem)

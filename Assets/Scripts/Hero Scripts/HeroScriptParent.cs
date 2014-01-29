@@ -7,16 +7,18 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
 	public DiplomaticPosition tempObject;
-	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets;
+	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets, heroAge;
 	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength;
-	public string heroTier2, heroTier3, heroOwnedBy;
+	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
 	private Vector3 position;
-	public bool isInvading = false, isInvisible = false, canSeeEnemySystem = false;
+	public bool isInvading = false, canSeeEnemySystem = false;
 
 	void Start()
 	{
 		offensivePower = 14.0f;
+		heroAge = 0;
 
+		shipFunctions = gameObject.GetComponent<ShipFunctions> ();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
@@ -162,6 +164,13 @@ public class HeroScriptParent : MasterScript
 		if(isInvading == true)
 		{
 			ContinueInvasion();
+		}
+
+		heroAge++;
+
+		if(heroAge == 10 || heroAge == 20)
+		{
+			LevelUp ();
 		}
 	}
 

@@ -257,7 +257,17 @@ public class HeroGUI : MasterScript
 
 						if(heroLevelTwoSpecs[i] == "Infiltrator")
 						{
-							heroScript.isInvisible = true;
+							heroScript.heroShipType = "Stealth Ship";
+						}
+
+						if(heroLevelTwoSpecs[i] == "Soldier")
+						{
+							heroScript.heroShipType = "War Ship";
+						}
+
+						if(heroLevelTwoSpecs[i] == "Diplomat")
+						{
+							heroScript.heroShipType = "Command Ship";
 						}
 					}
 				}
