@@ -8,7 +8,7 @@ public class SystemSIMData : MasterScript
 	//THIS IS A PROTOTYPE ONLY CLASS. THIS WILL BE USED TO STORE PLANET DATA AND DISPLAY IT IN A GUI UNTIL A TRUE UI AND PLANET SCREEN CAN BE CREATED
 
 	[HideInInspector]
-	public int numPlanets, improvementNumber;
+	public int numPlanets, improvementNumber, antiStealthPower;
 	[HideInInspector]
 	public float pScience, pIndustry, pMoney, improvementCost, ownershipBonus, adjacencyBonus;
 	[HideInInspector]

@@ -33,6 +33,8 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public HeroScriptParent heroScript;
 	[HideInInspector]
+	public HeroShip heroShip;
+	[HideInInspector]
 	public Tier2HeroScript tier2HeroScript;
 	[HideInInspector]
 	public Tier3HeroScript tier3HeroScript;
@@ -68,6 +70,7 @@ public class MasterScript : MonoBehaviour
 		racialTraitScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<RacialTraits> ();
 		galaxyGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GalaxyGUI>();
 		overlayGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<OverlayGUI> ();
+		shipFunctions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<ShipFunctions> ();
 		heroTechTree = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<HeroTechTree> ();
 	}
 

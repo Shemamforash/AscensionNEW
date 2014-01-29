@@ -45,7 +45,7 @@ public class TechTreeGUI : MasterScript
 		{
 			for(int i = 0; i < heroTechTree.heroTechList.Count; ++i)
 			{
-				if(techLabels[i].label.text == heroTechTree.heroTechList[i].techName)
+				if(techLabels[j].label.text == heroTechTree.heroTechList[i].techName)
 				{
 					if(heroTechTree.heroTechList[i].isActive == true)
 					{
@@ -56,7 +56,7 @@ public class TechTreeGUI : MasterScript
 					{
 						if(heroTechTree.heroTechList[i].prerequisite == null)
 						{
-							continue;
+							techLabels[j].button.enabled = true;
 						}
 
 						if(heroTechTree.heroTechList[k].techName == heroTechTree.heroTechList[i].prerequisite)
@@ -76,10 +76,11 @@ public class TechTreeGUI : MasterScript
 	{
 		for(int i = 0; i < heroTechTree.heroTechList.Count; ++i)
 		{
-			if(heroTechTree.heroTechList[i].techName == "bacon" && playerTurnScript.science >= heroTechTree.heroTechList[i].scienceCost)
+			if(heroTechTree.heroTechList[i].techName == UIButton.current.gameObject.name && playerTurnScript.science >= heroTechTree.heroTechList[i].scienceCost)
 			{
 				playerTurnScript.science -= heroTechTree.heroTechList[i].scienceCost;
 				heroTechTree.heroTechList[i].isActive = true;
+				shipFunctions.UpdateShips();
 				CheckActiveTech();
 			}
 		}
