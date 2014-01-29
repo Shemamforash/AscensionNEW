@@ -6,7 +6,7 @@ using System.IO;
 public class SystemListConstructor : MasterScript 
 {
 	[HideInInspector]
-	public List<SystemInfo> systemList = new List<SystemInfo>();
+	public List<StarSystem> systemList = new List<StarSystem>();
 	[HideInInspector]
 	public List<PlanetInfo> planetList = new List<PlanetInfo>();
 	[HideInInspector]
@@ -62,7 +62,7 @@ public class SystemListConstructor : MasterScript
 		{
 			for(int i = 0; i < 60; ++i)
 			{
-				SystemInfo system = new SystemInfo();
+				StarSystem system = new StarSystem();
 				
 				system.systemName = typeReader.ReadLine();
 				
@@ -467,7 +467,7 @@ public class PlanetInfo
 	public int science, industry, money, improvementSlots;
 }
 
-public class SystemInfo
+public class StarSystem
 {
 	public string systemName, systemOwnedBy;
 	public Vector3 systemPosition;

@@ -79,7 +79,7 @@ public class CameraFunctions : MasterScript
 
 						heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
 
-						if(heroScript.isInvisible == true && heroScript.heroOwnedBy == playerTurnScript.playerRace)
+						if(heroScript.heroTier2 == "Infiltrator" && heroScript.heroOwnedBy == playerTurnScript.playerRace)
 						{
 							canViewSystem = true;
 							break;

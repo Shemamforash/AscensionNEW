@@ -161,11 +161,11 @@ public class LineRenderScript : MasterScript
 		
 	void OnMouseEnter()
 	{
-		galaxyGUI.mouseOverSystem = gameObject;
+		overlayGUI.mouseOverSystem = gameObject;
 	}
 	
 	void OnMouseExit()
 	{
-		galaxyGUI.mouseOverSystem = null;
+		overlayGUI.mouseOverSystem = null;
 	}
 }
