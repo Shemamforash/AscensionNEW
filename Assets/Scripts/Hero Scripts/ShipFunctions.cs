@@ -4,45 +4,32 @@ using System.Collections.Generic;
 
 public class ShipFunctions : MasterScript
 {
-	int stealthValue, primaryWeaponPower, secondaryWeaponPower, collateralWeaponPower, engineValue, armourRating, logisticsRating;
-	bool canViewEnemySystem, canEmbargo, canPromote;
-	List<GameObject> tradeRoutes = new List<GameObject>();
-	HeroTech activePrimary, activeSecondary, activeEngine, activeArmour, activeStealth, activeLogistics;
+	public int stealthValue, primaryWeaponPower, secondaryWeaponPower, collateralWeaponPower, engineValue, armourRating, logisticsRating;
 
-	void Start()
+	public void UpdateShips()
 	{
-		heroScript = gameObject.GetComponent<HeroScriptParent> ();
-		heroScript.heroShipType = "Basic Ship";
-	}
+		stealthValue = 0;
+		primaryWeaponPower = 0;
+		secondaryWeaponPower = 0;
+		collateralWeaponPower = 0;
+		engineValue = 0;
+		armourRating = 0;
+		logisticsRating = 0;
 
-	void CheckShip()
-	{
-		if(heroScript.heroShipType == "Stealth Ship")
+		for(int i = 0; i < heroTechTree.heroTechList.Count; ++i)
 		{
-			canViewEnemySystem = true;
-
-			activeStealth = SearchForActiveTech("Stealth");
-		}
-
-		if(heroScript.heroShipType == "War Ship")
-		{
-			
-		}
-
-		if(heroScript.heroShipType == "Command Ship")
-		{
-			if(heroScript.heroTier3 == "Ambassador")
+			if(heroTechTree.heroTechList[i].isActive == true)
 			{
-				canEmbargo = true;
-				canPromote = true;
+				stealthValue += heroTechTree.heroTechList[i].stealthRating;
+				primaryWeaponPower += heroTechTree.heroTechList[i].primaryOffenceRating;
+				secondaryWeaponPower += heroTechTree.heroTechList[i].secondaryOffenceRating;
+				collateralWeaponPower += heroTechTree.heroTechList[i].collateralRating;
+				engineValue += heroTechTree.heroTechList[i].engineRating;
+				armourRating += heroTechTree.heroTechList[i].armourRating;
+				logisticsRating += heroTechTree.heroTechList[i].logisticsRating;
 			}
-
-			logisticsRating = 1;
 		}
-	}
 
-	private HeroTech SearchForActiveTech(string techType)
-	{
-		return null;
+		Debug.Log (primaryWeaponPower);
 	}
 }
