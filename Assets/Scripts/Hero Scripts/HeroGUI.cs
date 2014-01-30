@@ -41,12 +41,8 @@ public class HeroGUI : MasterScript
 				if(hit.collider.gameObject.tag == "StarSystem")
 				{					
 					heroMovement = tempHero.GetComponent<HeroMovement> ();
-
-					if(heroMovement.heroIsMoving == false)
-					{
-						heroMovement.pathfindTarget = hit.collider.gameObject;
-						heroMovement.FindPath();
-					}
+					heroMovement.pathfindTarget = hit.collider.gameObject;
+					heroMovement.FindPath();
 				}
 			}
 		}
