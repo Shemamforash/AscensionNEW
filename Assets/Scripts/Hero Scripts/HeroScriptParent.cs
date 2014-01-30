@@ -7,10 +7,9 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
 	public DiplomaticPosition tempObject;
-	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets, heroAge;
-	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength;
+	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets, heroAge, movementPoints;
+	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength, speed;
 	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
-	private Vector3 position;
 	public bool isInvading = false, canSeeEnemySystem = false;
 
 	void Start()
@@ -37,6 +36,10 @@ public class HeroScriptParent : MasterScript
 		{
 			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 		}
+
+		movementPoints = 1;
+
+		systemListConstructor.systemList [i].heroesInSystem.Add(gameObject);
 	}
 
 	public DiplomaticPosition FindDiplomaticConnection()
@@ -84,7 +87,7 @@ public class HeroScriptParent : MasterScript
 
 	public void CreateConnectionLine()
 	{
-		if(heroGUI.heroIsMoving == true && merchantLine != null)
+		if(heroMovement.heroIsMoving == true && merchantLine != null)
 		{
 			Destroy(merchantLine);
 		}
@@ -113,31 +116,6 @@ public class HeroScriptParent : MasterScript
 		merchantLine = (GameObject)Instantiate (heroGUI.merchantQuad, midPoint, directQuat);
 		
 		merchantLine.transform.localScale = scale;
-	}
-
-	public Vector3 HeroPositionAroundStar()
-	{
-		if(thisHeroNumber == 0)
-		{
-			position.x = heroLocation.transform.position.x;
-			position.y = heroLocation.transform.position.y + 1.5f;
-		}
-
-		if(thisHeroNumber == 1)
-		{
-			position.x = heroLocation.transform.position.x + 0.75f;
-			position.y = heroLocation.transform.position.y - 0.5f;
-		}
-
-		if(thisHeroNumber == 2)
-		{
-			position.x = heroLocation.transform.position.x - 0.75f;
-			position.y = heroLocation.transform.position.y - 0.5f;
-		}
-
-		position.z = heroLocation.transform.position.z;
-
-		return position;
 	}
 
 	public void HeroEndTurnFunctions()
@@ -172,6 +150,8 @@ public class HeroScriptParent : MasterScript
 		{
 			LevelUp ();
 		}
+
+		movementPoints += 4;
 	}
 
 	public void LevelUp()

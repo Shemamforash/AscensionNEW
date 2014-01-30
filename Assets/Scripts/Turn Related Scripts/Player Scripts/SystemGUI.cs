@@ -306,7 +306,7 @@ public class SystemGUI : MasterScript
 				}
 			}
 
-			for(int i = 0; i < 3; ++i)
+			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].heroesInSystem.Count; ++i)
 			{
 				if(systemListConstructor.systemList[selectedSystem].heroesInSystem[i] == null)
 				{

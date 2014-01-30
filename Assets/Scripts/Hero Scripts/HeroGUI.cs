@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class HeroGUI : MasterScript 
 {
-	public bool openHeroLevellingScreen, heroIsMoving;
+	public bool openHeroLevellingScreen;
 	public GameObject heroObject, merchantQuad;
-	public GameObject tempHero, targetSystem;
+	public GameObject tempHero;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
 	private string[] heroLevelThreeSpecs = new string[6] {"Ambassador", "Smuggler", "Vanguard", "Warlord", "Hacker", "Drone"};
 	public GUISkin mySkin;
@@ -23,7 +23,7 @@ public class HeroGUI : MasterScript
 	{
 		RaycastHit hit = new RaycastHit();
 		
-		if(Input.GetMouseButtonDown(0) && heroIsMoving == false) //Used to start double click events and to identify systems when clicked on. Throws up error if click on a connector object.
+		if(Input.GetMouseButtonDown(0)) //Used to start double click events and to identify systems when clicked on. Throws up error if click on a connector object.
 		{
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
@@ -33,104 +33,20 @@ public class HeroGUI : MasterScript
 				}
 			}
 		}
-
-		if(Input.GetMouseButtonDown (1) && tempHero != null && heroIsMoving == false)
+		
+		if(Input.GetMouseButtonDown (1) && tempHero != null)
 		{
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
 				if(hit.collider.gameObject.tag == "StarSystem")
-				{
-					targetSystem = hit.collider.gameObject;
+				{					
+					heroMovement = tempHero.GetComponent<HeroMovement> ();
 
-					int i = RefreshCurrentSystem (targetSystem);
-			
-					StartHeroMovement(tempHero, i);
-				}
-			}
-		}
-
-		if (heroIsMoving == true) 
-		{
-			MoveHero();
-		}
-	}
-
-	private void MoveHero()
-	{		
-		Vector3 targetPosition = heroScript.HeroPositionAroundStar();
-		Vector3 currentPosition = tempHero.transform.position;
-		
-		if(tempHero.transform.position == targetPosition || Time.time > timer + 1.0f) //If lerp exceeds timer, camera position will lock to point at object
-		{
-			tempHero.transform.position = targetPosition;
-			
-			timer = 0.0f; //Reset timer
-			
-			heroIsMoving = false;
-		}
-		
-		tempHero.transform.position = Vector3.Lerp (currentPosition, targetPosition, 0.1f);
-
-		heroScript = tempHero.GetComponent<HeroScriptParent> ();
-
-		if(heroScript.merchantLine != null)
-		{
-			Destroy(heroScript.merchantLine);
-			heroScript.CreateConnectionLine ();
-		}
-	}
-
-	private void StartHeroMovement(GameObject hero, int targetSystem)
-	{
-		if(heroIsMoving == false)
-		{
-			if(heroScript.merchantLine != null)
-			{
-				Destroy (heroScript.merchantLine);
-			}
-
-			heroScript = hero.GetComponent<HeroScriptParent> ();
-
-			Destroy (heroScript.invasionObject);
-
-			heroScript.isInvading = false;
-
-			systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData>();
-
-			systemSIMData.underInvasion = false;
-
-			int k = RefreshCurrentSystem(heroScript.heroLocation);
-
-			for(int i = 0; i < 3; ++i)
-			{
-				if(systemListConstructor.systemList[k].heroesInSystem[i] == null)
-				{
-					continue;
-				}
-
-				if(systemListConstructor.systemList[k].heroesInSystem[i] == hero)
-				{
-					systemListConstructor.systemList[k].heroesInSystem[i] = null;
-				}
-			}
-
-			heroScript.heroLocation = systemListConstructor.systemList[targetSystem].systemObject;
-
-			k = RefreshCurrentSystem(heroScript.heroLocation);
-
-			for(j = 0; j < 3; ++j)
-			{
-				if(systemListConstructor.systemList[targetSystem].heroesInSystem[j] == null)
-				{
-					timer = Time.time;
-
-					heroScript.thisHeroNumber = j;
-
-					systemListConstructor.systemList[k].heroesInSystem[j] = hero;
-
-					heroIsMoving = true;
-
-					break;
+					if(heroMovement.heroIsMoving == false)
+					{
+						heroMovement.pathfindTarget = hit.collider.gameObject;
+						heroMovement.FindPath();
+					}
 				}
 			}
 		}
@@ -158,36 +74,30 @@ public class HeroGUI : MasterScript
 	{
 		if(playerTurnScript.GP > 0)
 		{
-			for(int j = 0; j < 3; ++j)
-			{
-				if(systemListConstructor.systemList[system].heroesInSystem[j] == null)
-				{
-					GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[system].systemObject.transform.position, 
-					                                                       systemListConstructor.systemList[system].systemObject.transform.rotation);
+			GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[system].systemObject.transform.position, 
+			                                                       systemListConstructor.systemList[system].systemObject.transform.rotation);
 
-					string tempHero = "Basic Hero";
+			string tempHero = "Basic Hero";
 
-					instantiatedHero.name = tempHero;
-					
-					systemListConstructor.systemList[system].heroesInSystem[j] = instantiatedHero;
+			instantiatedHero.name = tempHero;
+			
+			systemListConstructor.systemList[system].heroesInSystem.Add(instantiatedHero);
 
-					heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
+			heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
 
-					heroScript.heroLocation = systemListConstructor.systemList[system].systemObject;
+			heroMovement = instantiatedHero.GetComponent<HeroMovement>();
 
-					heroScript.thisHeroNumber = j;
+			heroScript.heroLocation = systemListConstructor.systemList[system].systemObject;
 
-					heroScript.heroOwnedBy = playerTurnScript.playerRace;
+			heroScript.thisHeroNumber = j;
 
-					instantiatedHero.transform.position = heroScript.HeroPositionAroundStar();
+			heroScript.heroOwnedBy = playerTurnScript.playerRace;
 
-					++heroCounter;
+			instantiatedHero.transform.position = heroMovement.HeroPositionAroundStar(heroScript.heroLocation);
 
-					--playerTurnScript.GP;
+			++heroCounter;
 
-					break;
-				}
-			}
+			--playerTurnScript.GP;
 		}
 	}
 
