@@ -33,6 +33,8 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public HeroScriptParent heroScript;
 	[HideInInspector]
+	public HeroMovement heroMovement;
+	[HideInInspector]
 	public HeroShip heroShip;
 	[HideInInspector]
 	public Tier2HeroScript tier2HeroScript;

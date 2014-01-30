@@ -4,7 +4,7 @@ using System.Collections;
 public class HeroShip : ShipFunctions
 {
 	private bool canEmbargo, hasStealth = false, canPromote, canViewSystem;
-	private string invasionWeapon;
+	private string invasionWeapon, secondaryBonus;
 	private int system;
 
 	void Start()

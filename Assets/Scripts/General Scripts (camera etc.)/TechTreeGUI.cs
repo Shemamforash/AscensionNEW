@@ -6,6 +6,7 @@ public class TechTreeGUI : MasterScript
 {
 	public GameObject techTree;
 	public List<TechLabels> techLabels = new List<TechLabels>();
+	public UILabel openCloseTree;
 	
 	void Start()
 	{
@@ -34,9 +35,21 @@ public class TechTreeGUI : MasterScript
 
 	public void ShowTechTree ()
 	{
-		CheckActiveTech ();
+		if(techTree.activeInHierarchy == false)
+		{
+			CheckActiveTech ();
 
-		NGUITools.SetActive(techTree, true);
+			NGUITools.SetActive(techTree, true);
+
+			openCloseTree.text = "Close Window";
+		}
+
+		else if (techTree.activeInHierarchy == true) 
+		{
+			NGUITools.SetActive(techTree, false);
+
+			openCloseTree.text = "Tech Tree";
+		}	
 	}
 
 	private void CheckActiveTech()

@@ -92,10 +92,10 @@ public class SystemSIMData : MasterScript
 		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
 		totalSystemMoney = tempTotalMon + techTreeScript.moneyPointBonus;
 
-		for(int j = 0; j < 3; ++j)
+		int k = RefreshCurrentSystem(gameObject);
+
+		for(int j = 0; j < systemListConstructor.systemList[k].heroesInSystem.Count; ++j)
 		{
-			int k = RefreshCurrentSystem(gameObject);
-			
 			if(systemListConstructor.systemList[k].heroesInSystem[j] == null)
 			{
 				continue;
@@ -170,7 +170,7 @@ public class SystemSIMData : MasterScript
 		{
 			int j = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[i]);
 
-			for(int k = 0; k < 3; ++k)
+			for(int k = 0; k < systemListConstructor.systemList[j].heroesInSystem.Count; ++k)
 			{
 				if(systemListConstructor.systemList[j].heroesInSystem[k] == null)
 				{
