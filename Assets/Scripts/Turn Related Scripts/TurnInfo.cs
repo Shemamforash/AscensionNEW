@@ -93,7 +93,7 @@ public class TurnInfo : MasterScript
 				continue;
 			}
 
-			for(int j = 0; j < 3; ++j)
+			for(int j = 0; j < systemListConstructor.systemList[i].heroesInSystem.Count; ++j)
 			{
 				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
 				{

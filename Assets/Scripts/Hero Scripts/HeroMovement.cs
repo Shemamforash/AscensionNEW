@@ -7,7 +7,13 @@ public class HeroMovement : MasterScript
 	public bool heroIsMoving;
 	public GameObject pathfindTarget;
 	private int currentVertex;
+
+	private Queue<GameObject> queuedVertices = new Queue<GameObject> ();
+	private List<GameObject> visitedVertices = new List<GameObject> ();
+	private List<GameObject> tempRoute = new List<GameObject> ();
 	private List<GameObject> pathVertices = new List<GameObject>();
+	private List<PathFindingNodes> nodeTiers = new List<PathFindingNodes> ();
+
 	private Vector3 targetPosition, currentPosition;
 
 	void Start () 
@@ -20,83 +26,23 @@ public class HeroMovement : MasterScript
 		if(pathfindTarget != null && heroScript.movementPoints > 0)
 		{
 			heroIsMoving = true;
-			UpdatePosition();
+			RefreshHeroLocation();
 		}
+
 		if(pathfindTarget == null || heroScript.movementPoints == 0)
 		{
 			heroIsMoving = false;
 		}
 	}
 
-	/*
-	private void StartHeroMovement(GameObject hero, int targetSystem)
-	{
-		if(heroIsMoving == false)
-		{
-			if(heroScript.merchantLine != null)
-			{
-				Destroy (heroScript.merchantLine);
-			}
-			
-			heroScript = hero.GetComponent<HeroScriptParent> ();
-			
-			Destroy (heroScript.invasionObject);
-			
-			heroScript.isInvading = false;
-			
-			systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData>();
-			
-			systemSIMData.underInvasion = false;
-			
-			int k = RefreshCurrentSystem(heroScript.heroLocation);
-			
-			for(int i = 0; i < 3; ++i)
-			{
-				if(systemListConstructor.systemList[k].heroesInSystem[i] == null)
-				{
-					continue;
-				}
-				
-				if(systemListConstructor.systemList[k].heroesInSystem[i] == hero)
-				{
-					systemListConstructor.systemList[k].heroesInSystem[i] = null;
-				}
-			}
-			
-			heroScript.heroLocation = systemListConstructor.systemList[targetSystem].systemObject;
-			
-			k = RefreshCurrentSystem(heroScript.heroLocation);
-			
-			for(j = 0; j < 3; ++j)
-			{
-				if(systemListConstructor.systemList[targetSystem].heroesInSystem[j] == null)
-				{
-					timer = Time.time;
-					
-					heroScript.thisHeroNumber = j;
-					
-					systemListConstructor.systemList[k].heroesInSystem[j] = hero;
-					
-					heroIsMoving = true;
-					
-					break;
-				}
-			}
-		}
-	}
-	*/
-
 	public void FindPath()
 	{
-		currentVertex = 1;
-		
-		Queue<GameObject> queuedVertices = new Queue<GameObject> ();
-		List<GameObject> visitedVertices = new List<GameObject> ();
-		
-		List<GameObject> tempRoute = new List<GameObject> ();
-		
-		List<PathFindingNodes> nodeTiers = new List<PathFindingNodes> ();
-		
+		pathVertices.Clear ();
+		queuedVertices.Clear ();
+		visitedVertices.Clear ();
+		tempRoute.Clear ();
+		nodeTiers.Clear ();
+
 		queuedVertices.Enqueue (heroScript.heroLocation);
 		
 		while(queuedVertices.Count > 0)
@@ -154,44 +100,50 @@ public class HeroMovement : MasterScript
 
 	public void RefreshHeroLocation()
 	{
-		int system = RefreshCurrentSystem (heroScript.heroLocation);
-		
-		systemListConstructor.systemList [system].heroesInSystem.Remove (gameObject);
-
-		heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system
-
-		system = RefreshCurrentSystem (heroScript.heroLocation);
-
-		systemListConstructor.systemList [system].heroesInSystem.Add (gameObject);
-
 		if(pathVertices[currentVertex] != pathfindTarget) //If current system does not equal the destination system
 		{
-			if(gameObject.transform.position == pathVertices[currentVertex + 1].transform.position) //If current hero position is equal to the next system on route
-			{
-				++currentVertex; //Update current system
-
-				--heroScript.movementPoints;
-			}
-
 			currentPosition = gameObject.transform.position; //Current hero position is updated
 
 			targetPosition = HeroPositionAroundStar (pathVertices[currentVertex + 1]); //Target position is set
+
+			if(TestForProximity(currentPosition, targetPosition) == true) //If current hero position is equal to the next system on route
+			{
+				int system = RefreshCurrentSystem (heroScript.heroLocation); //Get old hero location system number
+				
+				systemListConstructor.systemList [system].heroesInSystem.Remove (gameObject); //Remove the hero from the systems heroes
+				
+				++currentVertex; //Update current system
+				
+				heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system
+				
+				system = RefreshCurrentSystem (heroScript.heroLocation); //Get new hero location system number
+				
+				systemListConstructor.systemList [system].heroesInSystem.Add (gameObject); //Add the hero to this system's heroes
+				
+				--heroScript.movementPoints;
+			}
+
+			gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, 20 * Time.deltaTime);
 		}
 
-		if(gameObject.transform.position == HeroPositionAroundStar(pathfindTarget))
+		if(TestForProximity(currentPosition, HeroPositionAroundStar(pathfindTarget)))
 		{
+			heroScript.heroLocation = pathfindTarget;
 			pathfindTarget = null;
 		}
 	}
 
-	public void UpdatePosition()
+	private bool TestForProximity(Vector3 current, Vector3 target)
 	{
-		gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, 20 * Time.deltaTime);
-
-		if(currentPosition == targetPosition)
+		if(current.x <= target.x + 0.01 && current.x >= target.x - 0.01)
 		{
-			RefreshHeroLocation();
+			if(current.y <= target.y + 0.01 && current.y >= target.y - 0.01)
+			{
+				return true;
+			}
 		}
+
+		return false;
 	}
 
 	public Vector3 HeroPositionAroundStar(GameObject location)
