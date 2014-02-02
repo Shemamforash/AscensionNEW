@@ -3,16 +3,49 @@ using System.Collections;
 
 public class HeroShip : ShipFunctions
 {
-	private bool canEmbargo, hasStealth = false, canPromote, canViewSystem;
-	private string invasionWeapon, secondaryBonus;
+	public bool canEmbargo, hasStealth = false, canPromote, canViewSystem;
+	private string invasionWeapon, auxiliaryWeapon;
 	private int system;
+	private GameObject invasionButtonObject;
+	private UILabel invasionButtonLabel;
 
 	void Start()
 	{
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
+		heroMovement = gameObject.GetComponent<HeroMovement> ();
+		invasionButtonObject = GameObject.Find ("Invasion Button");
+		invasionButtonLabel = invasionButtonObject.GetComponent<UILabel> ();
+		NGUITools.SetActive (invasionButtonObject, false);
 	}
 
-	void ShipAbilities()
+	void Update()
+	{
+		if(heroMovement.TestForProximity (gameObject.transform.position, heroMovement.HeroPositionAroundStar(heroScript.heroLocation)) == true)
+		{
+			system = RefreshCurrentSystem(heroScript.heroLocation);
+
+			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace || systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
+			{
+				NGUITools.SetActive(invasionButtonObject, true);
+
+				if(canViewSystem == true)
+				{
+					invasionButtonLabel.text = "Enter System";
+				}
+				else
+				{
+					invasionButtonLabel.text = "Invade System";
+				}
+			}
+		}
+
+		else
+		{
+			NGUITools.SetActive(invasionButtonObject, false);
+		}
+	}
+
+	public void ShipAbilities()
 	{
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 

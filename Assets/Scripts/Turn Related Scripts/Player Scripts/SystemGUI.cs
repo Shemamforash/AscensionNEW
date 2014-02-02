@@ -9,14 +9,26 @@ public class SystemGUI : MasterScript
 	public bool spendMenu = false, openImprovementList = false, systemOwnedByPlayer;
 	public string resourceToSpend;
 	private string cost, indSpend, monSpend, dataSIMString, techBuildButtonText, heroName, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
-	public int selectedSystem, selectedPlanet;
+	public int selectedSystem, selectedPlanet, numberOfGridChildren;
 	private float xLoc, yLoc;
 	private Vector2 scrollPositionA = Vector2.zero, scrollPositionB = Vector2.zero;
 	public Texture2D industryTexture, scienceTexture, moneyTexture;
+	public GameObject gridObject, playerSystemInfoScreen;
+	public UIGrid gridList;
+	private List<UILabel> planetLabels = new List<UILabel> ();
+	private List<Transform> planetSprites = new List<Transform> ();
 
 	void Start()
 	{
 		GUIRectBuilder();
+		foreach(Transform child in gridObject.GetComponentsInChildren<Transform>())
+		{
+			if(child == gridObject.transform)
+			{
+				continue;
+			}
+			planetSprites.Add(child);
+		}
 	}
 
 	void Update()
@@ -87,6 +99,8 @@ public class SystemGUI : MasterScript
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 			systemSIMData = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<SystemSIMData>();
 
+			numberOfGridChildren = 0;
+
 			if(selectedPlanet != -1)
 			{
 				systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
@@ -101,6 +115,17 @@ public class SystemGUI : MasterScript
 
 			if(cameraFunctionsScript.openMenu == true)
 			{
+				planetLabels.Clear();
+
+				Debug.Log (systemListConstructor.systemList[selectedSystem].systemSize);
+
+				for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
+				{
+					planetLabels.Add(planetSprites[i].gameObject.GetComponent<UILabel>());
+						
+					++numberOfGridChildren;
+				}
+
 				dataSIMString = "Total SIM: " + systemSIMData.totalSystemSIM.ToString() + "\n" + "Total Science: " + systemSIMData.totalSystemScience.ToString() + "\n" 
 					+ "Total Industry: " + systemSIMData.totalSystemIndustry.ToString() + "\n" + "Total Money: " + systemSIMData.totalSystemMoney.ToString(); 
 			}
@@ -134,10 +159,37 @@ public class SystemGUI : MasterScript
 		GUI.skin = mySkin;
 
 		UpdateVariables ();
-		
+
+		if(cameraFunctionsScript.openMenu == false)
+		{
+			NGUITools.SetActive(playerSystemInfoScreen, false);
+		}
+
 		#region planetinfomenu
 		if(cameraFunctionsScript.openMenu == true)
-		{
+		{		
+			NGUITools.SetActive(playerSystemInfoScreen, true);
+
+			float gridWidth = (numberOfGridChildren * gridList.cellWidth) / 2 - (gridList.cellWidth/2);
+			
+			gridObject.transform.localPosition = new Vector3(playerSystemInfoScreen.transform.localPosition.x - gridWidth, 
+			                                                     gridObject.transform.localPosition.y, gridObject.transform.localPosition.z);
+
+			gridList.repositionNow = true;
+
+			for(int i = 0; i < 6; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
+			{	
+				if(i < planetLabels.Count)
+				{
+					NGUITools.SetActive(planetSprites[i].gameObject, true);
+					planetLabels[i].text = systemSIMData.allPlanetsInfo[i];
+				}
+				if(i >= planetLabels.Count)
+				{
+					NGUITools.SetActive(planetSprites[i].gameObject, false);
+				}
+			}
+
 			#region planetdata			
 			GUI.Box (new Rect(0.5f, 0.5f, Screen.width, Screen.height), "Planets in System");
 			
@@ -322,7 +374,7 @@ public class SystemGUI : MasterScript
 					if(GUI.Button (allHeroLabels[i], heroName))
 					{
 						tier3HeroScript.openSystemLinkScreen = true;
-						heroGUI.selectedHero = i;
+						heroGUI.selectedHero.name = heroName;
 						tier3HeroScript.FillLinkableSystems();
 					}
 				}

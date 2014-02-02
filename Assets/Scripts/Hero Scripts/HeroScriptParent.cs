@@ -10,7 +10,7 @@ public class HeroScriptParent : MasterScript
 	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets, heroAge, movementPoints;
 	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength, speed;
 	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
-	public bool isInvading = false, canSeeEnemySystem = false;
+	public bool isInvading = false;
 
 	void Start()
 	{
@@ -21,6 +21,7 @@ public class HeroScriptParent : MasterScript
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
+		heroShip = gameObject.GetComponent<HeroShip> ();
 
 		int i = RefreshCurrentSystem (heroLocation);
 
@@ -133,7 +134,7 @@ public class HeroScriptParent : MasterScript
 
 			if(heroTier3 != "")
 			{
-				heroGUI.selectedHero = thisHeroNumber;
+				heroGUI.selectedHero = gameObject;
 
 				tier3HeroScript.CheckTier3Heroes (gameObject);
 			}
@@ -152,11 +153,13 @@ public class HeroScriptParent : MasterScript
 		}
 
 		movementPoints += 4;
+
+		heroShip.ShipAbilities ();
 	}
 
 	public void LevelUp()
 	{
-		heroGUI.selectedHero = thisHeroNumber;
+		heroGUI.selectedHero = gameObject;
 		heroGUI.openHeroLevellingScreen = true;
 	}
 
