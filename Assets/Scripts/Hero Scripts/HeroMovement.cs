@@ -126,18 +126,18 @@ public class HeroMovement : MasterScript
 			gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, 20 * Time.deltaTime);
 		}
 
-		if(TestForProximity(currentPosition, HeroPositionAroundStar(pathfindTarget)))
+		if(TestForProximity(currentPosition, HeroPositionAroundStar(pathfindTarget)) == true)
 		{
 			heroScript.heroLocation = pathfindTarget;
 			pathfindTarget = null;
 		}
 	}
 
-	private bool TestForProximity(Vector3 current, Vector3 target)
+	public bool TestForProximity(Vector3 current, Vector3 target)
 	{
-		if(current.x <= target.x + 0.01 && current.x >= target.x - 0.01)
+		if(current.x <= target.x + 0.1f && current.x >= target.x - 0.1f)
 		{
-			if(current.y <= target.y + 0.01 && current.y >= target.y - 0.01)
+			if(current.y <= target.y + 0.1f && current.y >= target.y - 0.1f)
 			{
 				return true;
 			}

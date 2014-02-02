@@ -68,32 +68,13 @@ public class CameraFunctions : MasterScript
 
 				if(doubleClick == true)
 				{
-					bool canViewSystem = false;
-
-					for(int j = 0; j < systemListConstructor.systemList[i].heroesInSystem.Count; ++j)
-					{
-						if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
-						{
-							continue;
-						}
-
-						heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
-
-						if(heroScript.heroTier2 == "Infiltrator" && heroScript.heroOwnedBy == playerTurnScript.playerRace)
-						{
-							canViewSystem = true;
-							break;
-						}
-					}
-
-					if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace || canViewSystem == true)
+					if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
 					{
 						openMenu = true; //Opens system menu on double click
 					}
 				}
 			}
 		}
-
 	}
 
 	public void PanCamera() //Used to pan camera

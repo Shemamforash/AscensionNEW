@@ -5,12 +5,11 @@ using System.Collections.Generic;
 public class HeroGUI : MasterScript 
 {
 	public bool openHeroLevellingScreen;
-	public GameObject heroObject, merchantQuad;
-	public GameObject tempHero;
+	public GameObject heroObject, merchantQuad, selectedHero;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
 	private string[] heroLevelThreeSpecs = new string[6] {"Ambassador", "Smuggler", "Vanguard", "Warlord", "Hacker", "Drone"};
 	public GUISkin mySkin;
-	public int heroCounter = 1, selectedHero, j;
+	public int heroCounter = 1, j;
 	private float timer;
 	private Rect[] tier1, tier2;
 
@@ -29,22 +28,35 @@ public class HeroGUI : MasterScript
 			{
 				if(hit.collider.gameObject.tag == "Hero")
 				{
-					tempHero = hit.collider.gameObject;
+					selectedHero = hit.collider.gameObject;
+					heroShip = selectedHero.GetComponent<HeroShip>();
 				}
 			}
 		}
 		
-		if(Input.GetMouseButtonDown (1) && tempHero != null)
+		if(Input.GetMouseButtonDown (1) && selectedHero != null)
 		{
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
 				if(hit.collider.gameObject.tag == "StarSystem")
 				{					
-					heroMovement = tempHero.GetComponent<HeroMovement> ();
+					heroMovement = selectedHero.GetComponent<HeroMovement> ();
 					heroMovement.pathfindTarget = hit.collider.gameObject;
 					heroMovement.FindPath();
 				}
 			}
+		}
+	}
+
+	public void InvasionButtonClick()
+	{
+		if(heroShip.canViewSystem == true)
+		{
+			cameraFunctionsScript.openMenu = true;
+		}
+		else
+		{
+			heroScript.StartSystemInvasion();
 		}
 	}
 
@@ -73,9 +85,7 @@ public class HeroGUI : MasterScript
 			GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[system].systemObject.transform.position, 
 			                                                       systemListConstructor.systemList[system].systemObject.transform.rotation);
 
-			string tempHero = "Basic Hero";
-
-			instantiatedHero.name = tempHero;
+			instantiatedHero.name = "Basic Hero";
 			
 			systemListConstructor.systemList[system].heroesInSystem.Add(instantiatedHero);
 
@@ -97,36 +107,9 @@ public class HeroGUI : MasterScript
 		}
 	}
 
-	private bool CheckIfCanInvade(HeroScriptParent heroScript)
-	{
-		int i = RefreshCurrentSystem (heroScript.heroLocation);
-
-		if(systemListConstructor.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace || systemListConstructor.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace && heroScript.isInvading == false)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
 	void OnGUI()
 	{
 		GUI.skin = mySkin;
-
-		if(tempHero != null)
-		{
-			heroScript = tempHero.GetComponent<HeroScriptParent> ();
-
-			bool canInvade = CheckIfCanInvade (heroScript);
-
-			if(canInvade == true)
-			{
-				if(GUI.Button (new Rect(Screen.width / 2 - 75.0f, Screen.height / 2 + 400.0f, 150.0f, 60.0f), "Start Invasion"))
-				{
-					heroScript.StartSystemInvasion();
-				}
-			}
-		}
 	
 		if(openHeroLevellingScreen == true)
 		{
@@ -145,7 +128,7 @@ public class HeroGUI : MasterScript
 
 			GUI.Label(new Rect(Screen.width / 2 -290.0f, Screen.height / 2 - 25.0f, 180.0f, 50.0f), "Hero");
 
-			heroScript = systemListConstructor.systemList[systemGUI.selectedSystem].heroesInSystem[selectedHero].GetComponent<HeroScriptParent>();
+			heroScript = selectedHero.GetComponent<HeroScriptParent>();
 
 			if(heroScript.currentLevel == 1)
 			{
@@ -157,7 +140,7 @@ public class HeroGUI : MasterScript
 
 						heroScript.heroTier2 = heroLevelTwoSpecs[i];
 
-						systemListConstructor.systemList[systemGUI.selectedSystem].heroesInSystem[selectedHero].name = heroLevelTwoSpecs[i];
+						selectedHero.name = heroLevelTwoSpecs[i];
 
 						++heroScript.currentLevel;
 
@@ -199,7 +182,7 @@ public class HeroGUI : MasterScript
 
 						heroScript.heroTier3 = heroLevelThreeSpecs[i];
 
-						systemListConstructor.systemList[systemGUI.selectedSystem].heroesInSystem[selectedHero].name = heroLevelThreeSpecs[i];
+						selectedHero.name = heroLevelThreeSpecs[i];
 
 						++heroScript.currentLevel;
 					}

@@ -135,7 +135,7 @@ public class Tier3HeroScript : HeroScriptParent
 
 		if(openSystemLinkScreen == true && linkableSystemsExist == true)
 		{
-			heroScript = systemListConstructor.systemList[systemGUI.selectedSystem].heroesInSystem[heroGUI.selectedHero].GetComponent<HeroScriptParent>();
+			heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent>();
 
 			if(GUI.Button (new Rect(Screen.width / 2 + 100.0f, Screen.height / 2 - 270.0f, 20.0f, 20.0f), "X"))
 			{
@@ -169,11 +169,11 @@ public class Tier3HeroScript : HeroScriptParent
 		}
 	}
 
-	void SetUpTradeRoute(int thisSystem, int thisHero, int targetSystem)
+	void SetUpTradeRoute(int thisSystem, GameObject thisHero, int targetSystem)
 	{
-		systemListConstructor.systemList [targetSystem].tradeRoute = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero];
+		systemListConstructor.systemList [targetSystem].tradeRoute = thisHero;
 
-		heroScript = systemListConstructor.systemList [thisSystem].heroesInSystem [thisHero].GetComponent<HeroScriptParent> ();
+		heroScript = thisHero.GetComponent<HeroScriptParent> ();
 
 		heroScript.linkedHeroObject = systemListConstructor.systemList [targetSystem].systemObject;
 
