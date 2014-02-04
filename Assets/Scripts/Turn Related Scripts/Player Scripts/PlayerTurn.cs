@@ -47,7 +47,7 @@ public class PlayerTurn : TurnInfo
 			}
 		}
 		
-		if(isOkToColonise == true && GP > 0)
+		if(isOkToColonise == true && capital > 10.0f)
 		{
 			systemListConstructor.systemList[system].systemOwnedBy = playerRace;
 
@@ -55,7 +55,7 @@ public class PlayerTurn : TurnInfo
 			
 			systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
 			
-			--GP;
+			capital -= 10.0f;
 			
 			++turnInfoScript.systemsInPlay;
 			
@@ -64,21 +64,6 @@ public class PlayerTurn : TurnInfo
 			isOkToColonise = false;
 
 			systemHasBeenColonised = true;
-		}
-	}
-
-	public void ImproveButtonClick(int i, int j)
-	{
-		++systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
-
-		if(systemGUI.resourceToSpend == "Industry")
-		{
-			industry -= (int)systemSIMData.improvementCost;
-		}
-		
-		if(systemGUI.resourceToSpend == "Money")
-		{
-			money -= (int)(systemSIMData.improvementCost * 2);
 		}
 	}
 
@@ -109,6 +94,6 @@ public class PlayerTurn : TurnInfo
 			}
 		}
 
-		GP = raceGP;
+		capital = 50.0f;
 	}
 }

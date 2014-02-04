@@ -29,7 +29,6 @@ public class Tier2HeroScript : HeroScriptParent
 	{				
 		heroScript.heroSciBonus += 0.05f * systemSIMData.tempTotalSci;
 		heroScript.heroIndBonus += 0.05f * systemSIMData.tempTotalInd;
-		heroScript.heroMonBonus += 0.10f * systemSIMData.tempTotalMon;
 
 		heroScript.offensivePower -= 7.0f;
 		heroScript.defensivePower -= 7.0f;
@@ -44,7 +43,6 @@ public class Tier2HeroScript : HeroScriptParent
 	{
 		heroScript.heroSciBonus += 0.10f * systemSIMData.tempTotalSci;
 		heroScript.heroIndBonus += 0.05f * systemSIMData.tempTotalInd;
-		heroScript.heroMonBonus += 0.05f * systemSIMData.tempTotalMon;
 
 		if(tempObject != null)
 		{
@@ -63,7 +61,6 @@ public class Tier2HeroScript : HeroScriptParent
 	{
 		heroScript.heroSciBonus += 0.05f * systemSIMData.tempTotalSci;
 		heroScript.heroIndBonus += 0.10f * systemSIMData.tempTotalInd;
-		heroScript.heroMonBonus += 0.05f * systemSIMData.tempTotalMon;
 
 		heroScript.offensivePower += 7.0f;
 		heroScript.defensivePower += 7.0f;

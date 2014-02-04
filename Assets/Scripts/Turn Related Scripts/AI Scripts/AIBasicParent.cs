@@ -9,7 +9,7 @@ public class AIBasicParent : TurnInfo
 	
 	public void Expand(AIBasicParent thisPlayer)
 	{
-		for(int i = GP; i > 0; --i)
+		for(float i = thisPlayer.capital; i > 0; --i)
 		{
 			AIExpansion(thisPlayer);
 		}
@@ -26,14 +26,16 @@ public class AIBasicParent : TurnInfo
 		
 		float systemSIM = CheckThroughSystems (thisPlayer);
 		
-		if(planetSIM > systemSIM)
+		if(planetSIM > systemSIM && thisPlayer.capital >= 5.0f)
 		{
 			currentPlanet = tempPlanet;
 			
 			currentSystem = tempSystem;
+
+			thisPlayer.capital -= 5.0f;
 		}
 		
-		if(systemSIM > planetSIM)
+		if(systemSIM > planetSIM && thisPlayer.capital >= 10.0f)
 		{
 			currentPlanet = tempPlanetB;
 			
@@ -50,6 +52,8 @@ public class AIBasicParent : TurnInfo
 			++systemsInPlay;
 
 			++thisPlayer.systemsColonisedThisTurn;
+
+			thisPlayer.capital -= 10.0f;
 		}
 
 		if(currentPlanet != -1 && currentSystem != -1)
@@ -57,8 +61,6 @@ public class AIBasicParent : TurnInfo
 			systemListConstructor.systemList[currentSystem].planetsInSystem[currentPlanet].planetColonised = true;
 			
 			++thisPlayer.planetsColonisedThisTurn;
-			
-			--GP;
 
 			CheckToImprovePlanet (thisPlayer);
 		}
@@ -86,7 +88,7 @@ public class AIBasicParent : TurnInfo
 						continue;
 					}
 
-					tempSIM = systemListConstructor.systemList[i].planetsInSystem[j].planetScience + systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry + systemListConstructor.systemList[i].planetsInSystem[j].planetMoney
+					tempSIM = (systemListConstructor.systemList[i].planetsInSystem[j].planetScience + systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry)
 						* (systemListConstructor.systemList[i].planetsInSystem[j].improvementSlots * 3.0f);
 
 					if(tempSIM > highestSIM)
@@ -123,18 +125,19 @@ public class AIBasicParent : TurnInfo
 					if(systemListConstructor.systemList[k].systemOwnedBy == null)
 					{
 						float tempPlanetSIM = 0.0f;
+						int tempPlanet = -1;
 						float tempHighestPlanetSIM = 0.0f;
 
 						for(int l = 0; l < systemListConstructor.systemList[k].systemSize; ++l)
 						{
-							tempPlanetSIM = systemListConstructor.systemList[k].planetsInSystem[l].planetScience + systemListConstructor.systemList[k].planetsInSystem[l].planetIndustry + systemListConstructor.systemList[k].planetsInSystem[l].planetMoney 
-								* (systemListConstructor.systemList[k].planetsInSystem[l].improvementSlots * 1.5f);
+							tempPlanetSIM = (systemListConstructor.systemList[k].planetsInSystem[l].planetScience + systemListConstructor.systemList[k].planetsInSystem[l].planetIndustry)  
+								* (systemListConstructor.systemList[k].planetsInSystem[l].improvementSlots * 1.0f);
 
 							if(tempPlanetSIM > tempHighestPlanetSIM)
 							{
 								tempHighestPlanetSIM = tempPlanetSIM;
 
-								tempPlanetB = l;
+								tempPlanet = l;
 							}
 
 							tempSIM += tempPlanetSIM;
@@ -147,6 +150,8 @@ public class AIBasicParent : TurnInfo
 							highestSIM = tempSIM;
 
 							tempSystemB = k;
+
+							tempPlanetB = tempPlanet;
 						}
 					}
 				}
@@ -160,7 +165,7 @@ public class AIBasicParent : TurnInfo
 	{
 		for(int i = 0; i < turnInfoScript.mostPowerfulPlanets.Count - 1; i++)
 		{
-			if(thisPlayer.industry < 10.0f && thisPlayer.money < 20.0f)
+			if(thisPlayer.industry < 10.0f && thisPlayer.capital < 1.0f)
 			{
 				break;
 			}
@@ -169,12 +174,12 @@ public class AIBasicParent : TurnInfo
 
 			if(systemListConstructor.systemList[j].systemOwnedBy == thisPlayer.playerRace)
 			{
-				ImprovePlanet(turnInfoScript.mostPowerfulPlanets[i].planetPosition, j);
+				ImprovePlanet(turnInfoScript.mostPowerfulPlanets[i].planetPosition, j, thisPlayer);
 			}
 		}
 	}
 	
-	public void ImprovePlanet(int planetPosition, int system)
+	public void ImprovePlanet(int planetPosition, int system, TurnInfo thisPlayer)
 	{
 		systemSIMData.improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 		
@@ -182,18 +187,13 @@ public class AIBasicParent : TurnInfo
 		
 		if(systemSIMData.canImprove == true && systemSIMData.underInvasion == false)
 		{
-			if(industry >= systemSIMData.improvementCost)
+			if(industry >= systemSIMData.improvementCost && thisPlayer.capital >= systemSIMData.improvementNumber + 1)
 			{
 				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 				
 				industry -= (int)systemSIMData.improvementCost;
-			}
-			
-			else if(money >= systemSIMData.improvementCost * 2)
-			{
-				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
-				
-				money -= ((int)systemSIMData.improvementCost * 2);
+
+				thisPlayer.capital -= systemSIMData.improvementNumber + 1;
 			}
 		}
 	}

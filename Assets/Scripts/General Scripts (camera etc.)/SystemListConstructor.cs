@@ -51,7 +51,6 @@ public class SystemListConstructor : MasterScript
 				planet.planetCategory = rimReader.ReadLine ();
 				planet.science = int.Parse (rimReader.ReadLine ());
 				planet.industry = int.Parse (rimReader.ReadLine ());
-				planet.money = int.Parse (rimReader.ReadLine ());
 				planet.improvementSlots = int.Parse (rimReader.ReadLine ());
 				
 				planetList.Add (planet);
@@ -86,7 +85,6 @@ public class SystemListConstructor : MasterScript
 					newPlanet.planetOwnership = 0;
 					newPlanet.planetScience = FindPlanetSIM(newPlanet.planetType, "Science");
 					newPlanet.planetIndustry = FindPlanetSIM(newPlanet.planetType, "Industry");
-					newPlanet.planetMoney = FindPlanetSIM(newPlanet.planetType, "Money");
 					newPlanet.maxOwnership = 0;
 					newPlanet.improvementSlots = (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots");
 
@@ -444,10 +442,6 @@ public class SystemListConstructor : MasterScript
 				{
 					return planetList[i].industry;
 				}
-				else if(resourceType == "Money")
-				{
-					return planetList[i].money;
-				}
 			}
 		}
 		
@@ -464,7 +458,7 @@ public class PlanetInfo
 {
 	public string planetType, planetCategory;
 	public bool colonised;
-	public int science, industry, money, improvementSlots;
+	public int science, industry, improvementSlots;
 }
 
 public class StarSystem
@@ -484,7 +478,7 @@ public class Planet
 {
 	public string planetName, planetType, planetCategory;
 	public List<string> improvementsBuilt = new List<string> ();
-	public float planetScience, planetIndustry, planetMoney;
+	public float planetScience, planetIndustry;
 	public bool planetColonised;
 	public int planetOwnership, planetImprovementLevel, improvementSlots, maxOwnership;
 }

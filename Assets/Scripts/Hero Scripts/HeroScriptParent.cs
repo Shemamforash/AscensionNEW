@@ -8,7 +8,7 @@ public class HeroScriptParent : MasterScript
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
 	public DiplomaticPosition tempObject;
 	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets, heroAge, movementPoints;
-	public float heroSciBonus = 0, heroIndBonus = 0, heroMonBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength, speed;
+	public float heroSciBonus = 0, heroIndBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength, speed;
 	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
 	public bool isInvading = false;
 
@@ -123,7 +123,6 @@ public class HeroScriptParent : MasterScript
 	{
 		heroSciBonus = 10.0f; 
 		heroIndBonus = 10.0f;
-		heroMonBonus = 10.0f;
 
 		offensivePower = 14.0f;
 		defensivePower = 7.0f;

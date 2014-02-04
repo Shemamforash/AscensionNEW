@@ -80,7 +80,7 @@ public class HeroGUI : MasterScript
 
 	public void CheckIfCanHire(int system)
 	{
-		if(playerTurnScript.GP > 0)
+		if(playerTurnScript.capital > 50)
 		{
 			GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[system].systemObject.transform.position, 
 			                                                       systemListConstructor.systemList[system].systemObject.transform.rotation);
@@ -103,7 +103,7 @@ public class HeroGUI : MasterScript
 
 			++heroCounter;
 
-			--playerTurnScript.GP;
+			playerTurnScript.capital -= 50;;
 		}
 	}
 
@@ -134,10 +134,8 @@ public class HeroGUI : MasterScript
 			{
 				for(int i = 0; i < 3; ++i)
 				{
-					if(GUI.Button (tier1[i], heroLevelTwoSpecs[i]) && playerTurnScript.GP > 1)
+					if(GUI.Button (tier1[i], heroLevelTwoSpecs[i]))
 					{
-						playerTurnScript.GP -= 2;
-
 						heroScript.heroTier2 = heroLevelTwoSpecs[i];
 
 						selectedHero.name = heroLevelTwoSpecs[i];
@@ -176,10 +174,8 @@ public class HeroGUI : MasterScript
 
 				for(int i = 0; i < 6; ++i)
 				{
-					if(GUI.Button (tier2[i], heroLevelThreeSpecs[i]) && playerTurnScript.GP > 2)
+					if(GUI.Button (tier2[i], heroLevelThreeSpecs[i]))
 					{
-						playerTurnScript.GP -= 3;
-
 						heroScript.heroTier3 = heroLevelThreeSpecs[i];
 
 						selectedHero.name = heroLevelThreeSpecs[i];
