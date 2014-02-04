@@ -18,7 +18,6 @@ public class Tier3HeroScript : HeroScriptParent
 		{
 			heroScript.heroSciBonus += 0.10f * systemSIMData.tempTotalSci;
 			heroScript.heroIndBonus += 0.10f * systemSIMData.tempTotalInd;
-			heroScript.heroMonBonus += 0.20f * systemSIMData.tempTotalMon;
 
 			heroScript.offensivePower = 0.0f;
 			heroScript.defensivePower = 0.0f;
@@ -36,7 +35,6 @@ public class Tier3HeroScript : HeroScriptParent
 		{
 			heroScript.heroSciBonus += 0.20f * systemSIMData.tempTotalSci;
 			heroScript.heroIndBonus += 0.10f * systemSIMData.tempTotalInd;
-			heroScript.heroMonBonus += 0.10f * systemSIMData.tempTotalMon;
 
 			if(heroScript.heroTier3 == "Hacker")
 			{
@@ -51,7 +49,6 @@ public class Tier3HeroScript : HeroScriptParent
 		{
 			heroScript.heroSciBonus += 0.10f * systemSIMData.tempTotalSci;
 			heroScript.heroIndBonus += 0.20f * systemSIMData.tempTotalInd;
-			heroScript.heroMonBonus += 0.10f * systemSIMData.tempTotalMon;
 
 			heroScript.offensivePower += 14.0f;
 			heroScript.defensivePower += 14.0f;
@@ -77,7 +74,6 @@ public class Tier3HeroScript : HeroScriptParent
 			
 			heroScript.heroSciBonus += systemSIMData.tempTotalSci / 2;
 			heroScript.heroIndBonus += systemSIMData.tempTotalInd / 2;
-			heroScript.heroMonBonus += systemSIMData.tempTotalMon / 2;
 		}
 	}
 
@@ -85,7 +81,6 @@ public class Tier3HeroScript : HeroScriptParent
 	{
 		heroScript.heroSciBonus += systemSIMData.tempTotalSci * 0.25f;
 		heroScript.heroIndBonus += systemSIMData.tempTotalInd * 0.25f;
-		heroScript.heroMonBonus += systemSIMData.tempTotalMon * 0.25f;
 	}
 
 	public void Hacker()

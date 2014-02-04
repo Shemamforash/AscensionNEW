@@ -6,7 +6,7 @@ public class OverlayGUI : MasterScript
 	public Camera mainCamera, uiCamera;
 	public GameObject mouseOverSystem, systemOverlay;
 	public UIWidget cornerAnchor;
-	public UILabel scienceOverlay, industryOverlay, moneyOverlay, colonisationOverlay, nameOverlay;
+	public UILabel scienceOverlay, industryOverlay, colonisationOverlay, nameOverlay;
 
 	private string UpdateVariables()
 	{
@@ -60,8 +60,6 @@ public class OverlayGUI : MasterScript
 			scienceOverlay.text = ((int)systemSIMData.totalSystemScience).ToString();
 
 			industryOverlay.text = ((int)systemSIMData.totalSystemIndustry).ToString();
-
-			moneyOverlay.text = ((int)systemSIMData.totalSystemMoney).ToString();
 
 			UpdatePosition();
 		}

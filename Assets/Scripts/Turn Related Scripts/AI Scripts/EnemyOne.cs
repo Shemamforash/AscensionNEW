@@ -23,7 +23,7 @@ public class EnemyOne : AIBasicParent
 
 		turnInfoScript.systemsInPlay++;
 		
-		GP = raceGP;
+		capital = 50;
 
 		for(int i = 0;  i < 60; ++i)
 		{

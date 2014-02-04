@@ -7,8 +7,8 @@ public class TechTreeScript : MasterScript
 {
 	public List<string> improvementMessageArray = new List<string>();
 
-	public float sciencePercentBonus, industryPercentBonus, moneyPercentBonus;
-	public float sciencePointBonus, industryPointBonus, moneyPointBonus, tempCount;
+	public float sciencePercentBonus, industryPercentBonus;
+	public float sciencePointBonus, industryPointBonus, tempCount;
 	public int techTier = 0;
 	private int currentPlanetsWithHyperNet = 0;
 
@@ -16,7 +16,7 @@ public class TechTreeScript : MasterScript
 
 	void Start()
 	{
-		sciencePercentBonus = 0; industryPercentBonus = 0; moneyPercentBonus = 0;
+		sciencePercentBonus = 0; industryPercentBonus = 0;
 
 		systemSIMData = gameObject.GetComponent<SystemSIMData>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
@@ -64,11 +64,9 @@ public class TechTreeScript : MasterScript
 
 		sciencePercentBonus = 0.0f; //Resets the percentage modifier for SIM. Is there an easier way?
 		industryPercentBonus = 0.0f;
-		moneyPercentBonus = 0.0f;
 
 		sciencePointBonus = 0.0f;
 		industryPointBonus = 0.0f;
-		moneyPointBonus = 0.0f;
 
 		tempCount = 0.0f;
 
@@ -145,7 +143,7 @@ public class TechTreeScript : MasterScript
 				
 				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
 				
-				moneyPercentBonus += (heroScript.currentLevel * 5.0f);
+				//moneyPercentBonus += (heroScript.currentLevel * 5.0f); //TODO
 				tempCount += (heroScript.currentLevel * 5.0f);
 			}
 			
@@ -261,7 +259,6 @@ public class TechTreeScript : MasterScript
 		{
 			tempCount = 0.0f;
 			float tempCountB = 0.0f;
-			float tempCountC = 0.0f;
 			
 			sciencePointBonus += systemSIMData.totalSystemScience;
 			tempCount = systemSIMData.totalSystemScience;
@@ -269,10 +266,7 @@ public class TechTreeScript : MasterScript
 			industryPointBonus -= (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			tempCountB = (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			
-			moneyPointBonus -= (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemMoney;
-			tempCountC = (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemMoney;
-			
-			improvementMessageArray.Add("+" + tempCount + " Science, -" + tempCountB + " Industry, -" + tempCountC + "Money on System");
+			improvementMessageArray.Add("+" + tempCount + " Science, -" + tempCountB + " Industry On System");
 		}
 		
 		if(listOfImprovements[11].hasBeenBuilt == true)
@@ -282,7 +276,6 @@ public class TechTreeScript : MasterScript
 			
 			sciencePercentBonus += (i * 0.05f);
 			industryPercentBonus += (i * 0.05f);
-			moneyPercentBonus += (i * 0.05f);
 			tempCount = (i * 0.05f);
 			
 			improvementMessageArray.Add ("+" + tempCount + "% SIM from systems with Hypernet");
@@ -331,16 +324,13 @@ public class TechTreeScript : MasterScript
 		}
 		
 		if(listOfImprovements[15].hasBeenBuilt == true)
-		{
-			thisPlayer.money -= systemSIMData.totalSystemSIM * 0.3f;
-			
+		{			
 			sciencePercentBonus -= 0.3f;
 			industryPercentBonus -= 0.3f;
-			moneyPercentBonus -= 0.3f;
 			
 			++racialTraitScript.ambitionCounter;
 			
-			improvementMessageArray.Add("30% Money Converted to Ambition");
+			improvementMessageArray.Add("-30% SIM Converted to Ambition");
 		}
 		
 		if(listOfImprovements[16].hasBeenBuilt == true)
@@ -399,7 +389,6 @@ public class TechTreeScript : MasterScript
 			
 			sciencePercentBonus += tempCount;
 			industryPercentBonus += tempCount;
-			moneyPercentBonus += tempCount;
 			
 			improvementMessageArray.Add(tempString);
 		}

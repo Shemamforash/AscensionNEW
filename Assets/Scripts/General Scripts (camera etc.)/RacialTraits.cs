@@ -5,7 +5,7 @@ public class RacialTraits : MasterScript
 {
 	public int ambitionCounter, ambitionOwnershipModifier;
 	private int nereidesProgressionCounter;
-	private float nereidesIndustryModifier, nereidesScienceModifier, nereidesMoneyModifier;
+	private float nereidesIndustryModifier, nereidesScienceModifier;
 	private string nereidesEmpireModifier;
 
 	void Start()
@@ -21,13 +21,9 @@ public class RacialTraits : MasterScript
 			{
 				return nereidesScienceModifier;
 			}
-			if(resource == "Science")
+			if(resource == "Industry")
 			{
 				return nereidesIndustryModifier;
-			}
-			if(resource == "Science")
-			{
-				return nereidesMoneyModifier;
 			}
 		}
 
@@ -42,48 +38,30 @@ public class RacialTraits : MasterScript
 			{
 				systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
 
-				if(nereidesProgressionCounter < 2000 || (nereidesProgressionCounter >= 6000 && nereidesProgressionCounter < 8000))
+				if(nereidesProgressionCounter < 2000 || (nereidesProgressionCounter >= 4000 && nereidesProgressionCounter < 6000))
 				{
 					nereidesProgressionCounter += (int)(0.2f * systemSIMData.totalSystemScience);
 					player.science -= 0.2f * systemSIMData.totalSystemScience;
 					nereidesScienceModifier = -0.2f;
 					nereidesIndustryModifier = 0f;
-					nereidesMoneyModifier = 0f;
 				}
 
-				if(nereidesProgressionCounter >= 2000 && nereidesProgressionCounter < 4000 || (nereidesProgressionCounter >= 6000 && nereidesProgressionCounter < 8000))
+				if(nereidesProgressionCounter >= 2000 && nereidesProgressionCounter < 4000 || (nereidesProgressionCounter >= 4000 && nereidesProgressionCounter < 6000))
 				{
 					nereidesProgressionCounter += (int)(0.2f * systemSIMData.totalSystemIndustry);
 					player.industry -= 0.2f * systemSIMData.totalSystemIndustry;
 					nereidesScienceModifier = 0f;
 					nereidesIndustryModifier = -0.2f;
-					nereidesMoneyModifier = 0f;
 				}
 
-				if(nereidesProgressionCounter >= 4000 && nereidesProgressionCounter < 6000 || (nereidesProgressionCounter >= 6000 && nereidesProgressionCounter < 8000))
+				if(nereidesProgressionCounter >= 6000)
 				{
-					nereidesProgressionCounter += (int)(0.2f * systemSIMData.totalSystemMoney);
-					player.money -= 0.2f * systemSIMData.totalSystemMoney;
-					nereidesScienceModifier = 0f;
-					nereidesIndustryModifier = 0f;
-					nereidesMoneyModifier = -0.2f;
-				}
-
-				if(nereidesProgressionCounter >= 8000)
-				{
-					player.money += systemSIMData.totalSystemMoney;
 					player.industry += systemSIMData.totalSystemIndustry;
 					player.science += systemSIMData.totalSystemScience;
 					nereidesScienceModifier = 1f;
 					nereidesIndustryModifier = 1f;
-					nereidesMoneyModifier = 1f;
 				}
 			}
-		}
-
-		if(nereidesProgressionCounter >= 8000)
-		{
-			player.GP += 2;
 		}
 	}
 
@@ -99,13 +77,9 @@ public class RacialTraits : MasterScript
 		}
 		if(nereidesProgressionCounter >= 4000 && nereidesProgressionCounter < 6000)
 		{
-			return "-20% Money from Stage 3";
+			return "-20% SIM from Stage 4";;
 		}
-		if(nereidesProgressionCounter >= 6000 && nereidesProgressionCounter < 8000)
-		{
-			return "-20% SIM from Stage 4";
-		}
-		if(nereidesProgressionCounter >= 8000)
+		if(nereidesProgressionCounter >= 6000)
 		{
 			return "+100% SIM from Stage 5";
 		}

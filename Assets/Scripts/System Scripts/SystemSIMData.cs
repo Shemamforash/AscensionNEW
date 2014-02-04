@@ -10,7 +10,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public int numPlanets, improvementNumber, antiStealthPower;
 	[HideInInspector]
-	public float pScience, pIndustry, pMoney, improvementCost, ownershipBonus, adjacencyBonus;
+	public float pScience, pIndustry, improvementCost, ownershipBonus, adjacencyBonus;
 	[HideInInspector]
 	public string improvementLevel;
 	[HideInInspector]
@@ -18,9 +18,9 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public bool canImprove, foundPlanetData, underInvasion;
 
-	public float totalSystemScience, totalSystemIndustry, totalSystemMoney, totalSystemSIM, tempTotalSci, tempTotalInd, tempTotalMon;
-	public float scienceModifier, industryModifier, moneyModifier;
-	public float tempSci = 0.0f, tempInd = 0.0f, tempMon = 0.0f;
+	public float totalSystemScience, totalSystemIndustry, totalSystemSIM, tempTotalSci, tempTotalInd;
+	public float scienceModifier, industryModifier;
+	public float tempSci = 0.0f, tempInd = 0.0f;
 
 	void Start()
 	{
@@ -34,7 +34,6 @@ public class SystemSIMData : MasterScript
 
 		scienceModifier = (ownershipBonus + thisPlayer.raceScience + techTreeScript.sciencePercentBonus + racialTraitScript.IncomeModifier(thisPlayer, "Science"));
 		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + techTreeScript.industryPercentBonus + racialTraitScript.IncomeModifier(thisPlayer, "Industry"));
-		moneyModifier = (ownershipBonus + thisPlayer.raceMoney + techTreeScript.moneyPercentBonus) + racialTraitScript.IncomeModifier(thisPlayer, "Money");
 	}
 
 	public void CheckPlanetValues(int system, int planet, TurnInfo thisPlayer)
@@ -49,27 +48,23 @@ public class SystemSIMData : MasterScript
 
 		tempSci = systemListConstructor.systemList [system].planetsInSystem [planet].planetScience * scienceModifier;
 		tempInd = systemListConstructor.systemList [system].planetsInSystem [planet].planetIndustry * industryModifier;
-		tempMon = systemListConstructor.systemList [system].planetsInSystem [planet].planetMoney * moneyModifier;
 
 		if(techTreeScript.listOfImprovements[8].hasBeenBuilt == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetType == thisPlayer.homePlanetType)
 		{
 			tempSci = tempSci * 2;
 			tempInd = tempInd * 2;
-			tempMon = tempMon * 2;
 		}
 
 		allPlanetsInfo[planet] = gameObject.name + " " + (planet+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
 			+ systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership + "% Owned\n"
 				+ ((int)tempSci).ToString() + "\n" 
-				+ ((int)tempInd).ToString() + "\n" 
-				+ ((int)tempMon).ToString();
+				+ ((int)tempInd).ToString() + "\n";
 	}
 
 	public void SystemSIMCounter(int i, TurnInfo thisPlayer) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{	
 		tempTotalSci = 0.0f;
 		tempTotalInd = 0.0f;
-		tempTotalMon = 0.0f;
 
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
@@ -79,18 +74,16 @@ public class SystemSIMData : MasterScript
 
 				tempTotalSci += tempSci;
 				tempTotalInd += tempInd;
-				tempTotalMon += tempMon;
 			}
 
 			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == false)
 			{
-				allPlanetsInfo[j] = null;
+				allPlanetsInfo[j] = "Uncolonised Planet\n Click to Colonise";
 			}
 		}
 
 		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus;
 		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
-		totalSystemMoney = tempTotalMon + techTreeScript.moneyPointBonus;
 
 		int k = RefreshCurrentSystem(gameObject);
 
@@ -105,14 +98,12 @@ public class SystemSIMData : MasterScript
 			
 			totalSystemScience += heroScript.heroSciBonus;
 			totalSystemIndustry += heroScript.heroIndBonus;
-			totalSystemMoney += heroScript.heroMonBonus;
 		}
 
 		adjacencyBonus = FindAdjacencyBonuses ();
 
 		totalSystemScience += totalSystemScience * adjacencyBonus;
 		totalSystemIndustry += totalSystemIndustry * adjacencyBonus;
-		totalSystemMoney += totalSystemMoney * adjacencyBonus;
 
 		turnInfoScript.RefreshPlanetPower();
 	}
@@ -189,7 +180,7 @@ public class SystemSIMData : MasterScript
 
 	public void CheckUnlockedTier()
 	{
-		totalSystemSIM += totalSystemScience + totalSystemIndustry + totalSystemMoney;
+		totalSystemSIM += totalSystemScience + totalSystemIndustry;
 			
 		if(totalSystemSIM >= 1600.0f && totalSystemSIM < 3200)
 		{
@@ -217,8 +208,8 @@ public class SystemSIMData : MasterScript
 			
 			CheckImprovement(system, i);
 
-			float tempSIM = (systemListConstructor.systemList[system].planetsInSystem[i].planetScience + systemListConstructor.systemList[system].planetsInSystem[i].planetIndustry 
-			                 + systemListConstructor.systemList[system].planetsInSystem[i].planetMoney) * systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership / 66.6666f;
+			float tempSIM = (systemListConstructor.systemList[system].planetsInSystem[i].planetScience + systemListConstructor.systemList[system].planetsInSystem[i].planetIndustry)
+							* systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership / 66.6666f;
 
 			planet.simOutput = tempSIM;
 

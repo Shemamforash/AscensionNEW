@@ -4,8 +4,8 @@ using System.Collections;
 public class GalaxyGUI : MasterScript 
 {
 	private int selectedSystem;
-	private string tempRace, scienceString, industryString, moneyString, gpString, turnNumber, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
-	public UILabel scienceLabel, industryLabel, moneyLabel, gpLabel, raceLabel, turnLabel;
+	private string tempRace, scienceString, industryString, capitalString, turnNumber, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
+	public UILabel scienceLabel, industryLabel, capitalLabel, raceLabel, turnLabel;
 
 	private void UpdateVariables()
 	{
@@ -13,8 +13,7 @@ public class GalaxyGUI : MasterScript
 		{
 			scienceString = ((int)playerTurnScript.science).ToString();
 			industryString = ((int)playerTurnScript.industry).ToString ();
-			moneyString = ((int)playerTurnScript.money).ToString ();
-			gpString = playerTurnScript.GP.ToString ();
+			capitalString = ((int)playerTurnScript.capital).ToString ();
 			turnNumber = "Year: " + (2200 + (turnInfoScript.turn * 4)).ToString();
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 			playerEnemyOneDiplomacy = diplomacyScript.playerEnemyOneRelations.diplomaticState + " | " + diplomacyScript.playerEnemyOneRelations.peaceCounter;
@@ -79,9 +78,7 @@ public class GalaxyGUI : MasterScript
 
 		industryLabel.text = industryString;
 
-		moneyLabel.text = moneyString;
-
-		gpLabel.text = "GP: " +gpString;
+		capitalLabel.text = capitalString;
 		
 		turnLabel.text = turnNumber;
 
@@ -107,7 +104,7 @@ public class GalaxyGUI : MasterScript
 			
 			if(isConnected == true)
 			{
-				if(GUI.Button (coloniseButton, "Colonise") && playerTurnScript.GP > 0)
+				if(GUI.Button (coloniseButton, "Colonise") && playerTurnScript.capital >= 10)
 				{	
 					playerTurnScript.FindSystem (selectedSystem);
 				}
@@ -125,8 +122,7 @@ public class GalaxyGUI : MasterScript
 			
 			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
 			{
-				float planetSIM = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetScience + systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetIndustry +
-					systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetMoney;
+				float planetSIM = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetScience + systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetIndustry;
 				
 				string planetInfo = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetType + " " + planetSIM.ToString() + " SIM";
 				
