@@ -3,21 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class SystemGUI : MasterScript 
-{
-	private Rect[] allPlanetsGUI, allButtonsGUI, allImprovementButtonsGUI, allHeroLabels, allHeroButtons; 
+{ 
 	public GUISkin mySkin;
-	public bool spendMenu = false, openImprovementList = false, systemOwnedByPlayer;
-	public string resourceToSpend;
-	private string cost, indSpend, dataSIMString, techBuildButtonText, heroName, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
+	private string dataSIMString;
 	public int selectedSystem, selectedPlanet, numberOfGridChildren;
-	private float xLoc, yLoc;
-	private Vector2 scrollPositionA = Vector2.zero, scrollPositionB = Vector2.zero;
 	public Texture2D industryTexture, scienceTexture;
-	public GameObject gridObject, playerSystemInfoScreen;
+	public GameObject gridObject, playerSystemInfoScreen, builtImprovementLabel, builtImprovementScrollview;
+	private List<GameObject> builtImprovementList = new List<GameObject>();
 	public UIGrid gridList;
 	private List<PlanetUIElements> planetElementList = new List<PlanetUIElements>();
-	private List<GameObject> unbuiltImprovements = new List<GameObject>();
+	private List<GameObject> improvementsList = new List<GameObject>();
 	public GameObject scrollviewButton, scrollviewWindow;
+	private Vector3 improvementListPosition = new Vector3();
 
 	void Start()
 	{
@@ -46,7 +43,40 @@ public class SystemGUI : MasterScript
 
 			planetElementList.Add (planet);
 		}
-		               
+
+		techTreeScript = systemListConstructor.systemList[0].systemObject.GetComponent<TechTreeScript>();
+
+		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
+		{			
+			GameObject message = NGUITools.AddChild(builtImprovementScrollview, builtImprovementLabel);
+
+			NGUITools.SetActive(message, false);
+
+			message.GetComponent<UIDragScrollView>().scrollView = builtImprovementScrollview.GetComponent<UIScrollView>();
+
+			builtImprovementList.Add (message);
+
+			GameObject improvement = NGUITools.AddChild(scrollviewWindow, scrollviewButton); //Scrollviewwindow is gameobject containing scrollview, scrollviewbutton is the button prefab
+
+			improvement.transform.Find ("Sprite").GetComponent<UISprite>().depth = 1; //Depth set to 20 to ensure I can see it, will be changed when scrollview actually works
+
+			improvement.transform.Find ("Label").GetComponent<UILabel>().depth = 2;
+
+			improvement.GetComponent<UIDragScrollView>().scrollView = scrollviewWindow.GetComponent<UIScrollView>(); //Assigning scrollview variable of prefab
+
+			improvement.name = techTreeScript.listOfImprovements[i].improvementName; //Just naming the object in the hierarchy
+
+			EventDelegate.Add(improvement.GetComponent<UIButton>().onClick, BuildImprovement);
+
+			improvement.transform.Find ("Label").GetComponent<UILabel>().text = techTreeScript.listOfImprovements[i].improvementName + "\n" + techTreeScript.listOfImprovements[i].improvementCost; //Add label text
+
+			improvementsList.Add (improvement); //Add improvement into a list so I can enable/disable improvements as needed
+
+			NGUITools.SetActive(improvement, false); //Default set improvement to false so it won't be shown in scrollview unless needed
+
+			scrollviewWindow.GetComponent<UIGrid> ().Reposition (); //Reposition in grid
+			scrollviewWindow.GetComponent<UIScrollView>().ResetPosition(); //Reset scrollview
+		}
 	}
 
 	void Update()
@@ -54,7 +84,7 @@ public class SystemGUI : MasterScript
 		if(playerTurnScript.tempObject != null)
 		{
 			int system = RefreshCurrentSystem(playerTurnScript.tempObject);
-
+			
 			if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace)
 			{
 				systemSIMData = playerTurnScript.tempObject.GetComponent<SystemSIMData>();
@@ -76,13 +106,6 @@ public class SystemGUI : MasterScript
 			if(selectedPlanet != -1)
 			{
 				systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
-			}
-
-			systemOwnedByPlayer = false;
-
-			if(systemListConstructor.systemList[selectedSystem].systemOwnedBy == playerTurnScript.playerRace)
-			{
-				systemOwnedByPlayer = true;
 			}
 
 			if(cameraFunctionsScript.openMenu == true)
@@ -125,6 +148,41 @@ public class SystemGUI : MasterScript
 		return null;
 	}
 
+	private void UpdateScrollviewContents()
+	{
+		NGUITools.SetActive(scrollviewWindow, true); //Display the scrollview
+		
+		scrollviewWindow.transform.position = planetElementList[selectedPlanet].spriteObject.transform.position;
+		
+		improvementListPosition = new Vector3(scrollviewWindow.transform.localPosition.x, 
+		                          scrollviewWindow.transform.localPosition.y + 240.0f, 
+		                          scrollviewWindow.transform.localPosition.z);
+		
+		scrollviewWindow.transform.localPosition = improvementListPosition;
+		
+		scrollviewWindow.GetComponent<UIScrollView> ().Scroll (Time.deltaTime); //How does this even work?
+		
+		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
+		{			
+			if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier 
+			   || techTreeScript.listOfImprovements[i].improvementCategory == enemyOneTurnScript.playerRace 
+			   || techTreeScript.listOfImprovements[i].improvementCategory == enemyTwoTurnScript.playerRace) 
+			{
+				if(improvementsList[i].activeInHierarchy == true)
+				{
+					NGUITools.SetActive(improvementsList[i], false); //If tech has been built it doesnt need to be shown in the scrollview
+				}
+				continue;
+			}
+			
+			NGUITools.SetActive(improvementsList[i], true); //If tech has not been built, set it to active so it can be shown in the scrollview
+			scrollviewWindow.GetComponent<UIGrid> ().Reposition (); //Reposition grid contents
+			scrollviewWindow.GetComponent<UIScrollView>().ResetPosition(); //Reset scrollview position
+
+			scrollviewWindow.GetComponent<UIGrid>().repositionNow = true;
+		}
+	}
+
 	public void PlanetInterfaceClick()
 	{
 		for(int i = 0; i < 6; ++i)
@@ -138,32 +196,7 @@ public class SystemGUI : MasterScript
 
 		if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
 		{
-			NGUITools.SetActive(scrollviewWindow, true);
-
-			scrollviewWindow.transform.position = planetElementList[selectedPlanet].spriteObject.transform.position;
-
-			scrollviewWindow.GetComponent<UIScrollView> ().Scroll (Time.deltaTime);
-
-			for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
-			{
-				scrollviewWindow.GetComponent<UIScrollView>().ResetPosition ();
-
-				if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier 
-				   || techTreeScript.listOfImprovements[i].improvementCategory == enemyOneTurnScript.playerRace 
-				   || techTreeScript.listOfImprovements[i].improvementCategory == enemyTwoTurnScript.playerRace)
-				{
-					continue;
-				}
-
-				GameObject improvement = NGUITools.AddChild(scrollviewWindow, scrollviewButton);
-				improvement.GetComponent<UISprite>().depth = 20;
-				improvement.GetComponent<UIDragScrollView>().scrollView = scrollviewWindow.GetComponent<UIScrollView>();
-				improvement.name = techTreeScript.listOfImprovements[i].improvementName;
-				improvement.GetComponent<UILabel>().text = techTreeScript.listOfImprovements[i].improvementName + "\n" + techTreeScript.listOfImprovements[i].improvementCost;
-				unbuiltImprovements.Add (improvement);
-
-				scrollviewWindow.GetComponent<UIScrollView>().ResetPosition ();
-			}
+			UpdateScrollviewContents();
 		}
 
 		if(playerTurnScript.capital >= 5)
@@ -223,7 +256,6 @@ public class SystemGUI : MasterScript
 		if(systemSIMData.improvementNumber == 3)
 		{
 			planetElementList[i].improveButton.isEnabled = false;
-			NGUITools.SetActiveChildren(planetElementList[i].spriteObject, false);
 		}
 		
 		planetElementList[i].improveButton.gameObject.GetComponent<UILabel>().text = CheckPlanetImprovement(i);
@@ -253,6 +285,43 @@ public class SystemGUI : MasterScript
 		}
 	}
 
+	public void BuildImprovement()
+	{
+		GameObject improvement = UIButton.current.gameObject;
+
+		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
+		{
+			if(techTreeScript.listOfImprovements[i].improvementName == improvement.name)
+			{
+				for(int j = 0; j < systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementSlots; ++j)
+				{
+					if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] == null)
+					{
+						if(techTreeScript.ImproveSystem(i) == true)
+						{
+							systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] = techTreeScript.listOfImprovements[i].improvementName;
+							UpdateScrollviewContents();
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	public void UpdateBuiltImprovements()
+	{
+		for(int i = 0; i < techTreeScript.improvementMessageArray.Count; ++i)
+		{
+			NGUITools.SetActive(builtImprovementList[i], true);
+			builtImprovementList[i].transform.Find("Sprite").GetComponent<UISprite>().depth = 1;
+			builtImprovementList[i].GetComponent<UILabel>().depth = 2;
+			builtImprovementList[i].GetComponent<UILabel>().text = techTreeScript.improvementMessageArray[i];
+			builtImprovementScrollview.GetComponent<UIScrollView>().ResetPosition();
+			builtImprovementScrollview.GetComponent<UIGrid>().Reposition();
+		}
+	}
+
 	void OnGUI()
 	{
 		GUI.skin = mySkin;
@@ -264,7 +333,6 @@ public class SystemGUI : MasterScript
 			NGUITools.SetActive(playerSystemInfoScreen, false);
 		}
 
-		#region planetinfomenu
 		if(cameraFunctionsScript.openMenu == true)
 		{		
 			NGUITools.SetActive(playerSystemInfoScreen, true);
@@ -299,203 +367,14 @@ public class SystemGUI : MasterScript
 				}
 			}
 
-			#region planetdata						
+			UpdateBuiltImprovements();
+								
 			if(systemSIMData.foundPlanetData == false)
 			{
 				systemSIMData.SystemSIMCounter(selectedSystem, playerTurnScript);
 				systemSIMData.foundPlanetData = true;
 			}
-			#endregion
-
-
-
-			/*
-			#region settingupbutton			
-			GUI.Label(new Rect (Screen.width/2 - 500.0f, Screen.height/2 - 350.0f, 100.0f, 100.0f), dataSIMString);
-
-			int tempInt = 0;
-
-			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
-			{	
-				CheckPlanetImprovement(i);
-
-				if(systemOwnedByPlayer == true)
-				{
-					if(GUI.Button(allButtonsGUI[i], cost) && systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel < 3)
-					{	
-						if(systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised == true)
-						{
-							spendMenu = true;
-							selectedPlanet = i;
-							indSpend = systemSIMData.improvementCost + " Industry";
-						}
-
-						if(systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised == false && playerTurnScript.GP > 0)
-						{
-							playerTurnScript.GP -= 1;
-							systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised = true;
-							++playerTurnScript.planetsColonisedThisTurn;
-							spendMenu = false;
-							systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
-						}
-					}
-
-					if(GUI.Button (allImprovementButtonsGUI[i], "Improvements"))
-					{
-						openImprovementList = true;
-						xLoc = allImprovementButtonsGUI[i].xMax;
-						yLoc = allImprovementButtonsGUI[i].yMax;
-						selectedPlanet = i;
-					}
-				}
-
-				GUI.Label (allPlanetsGUI[i], systemSIMData.allPlanetsInfo[i]);
-
-				GUILayout.BeginArea(new Rect(allImprovementButtonsGUI[i].x, Screen.height / 2 + 100.0f, 200.0f, 400.0f));
-
-				for(int j = tempInt; j < systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementSlots; ++j) //Display improvements on system
-				{
-					GUILayout.Label (systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementsBuilt[j], GUILayout.Height(50.0f));
-				}
-
-				GUILayout.EndArea();
-			}
-			#endregion
-
-			
-			#region spendmenu
-			if(spendMenu == true && cameraFunctionsScript.openMenu == true)
-			{
-				GUI.Box (new Rect(Screen.width/2 - 100.0f, Screen.height/2 - 50.0f, 200.0f, 75.0f), "Resource to Spend:");	
-
-				if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
-				{
-					systemSIMData.improvementNumber = systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetImprovementLevel;
-
-					systemSIMData.CheckImprovement(selectedSystem, selectedPlanet);
-
-					if(GUI.Button (new Rect(Screen.width/2 - 95.0f, Screen.height/2 - 15.0f, 92.5f, 35.0f), indSpend) && playerTurnScript.industry >= systemSIMData.improvementCost)
-					{
-						resourceToSpend = "Industry";
-						spendMenu = false;
-						playerTurnScript.ImproveButtonClick(selectedSystem, selectedPlanet);
-					}
-				}
-
-				if(GUI.Button(new Rect(Screen.width/2 + 77.5f, Screen.height/2 - 45.0f, 18.5f, 18.5f), "x"))
-				{
-					spendMenu = false;
-					selectedPlanet = -1;
-				}
-
-				systemSIMData.SystemSIMCounter(selectedSystem, playerTurnScript);
-			}
-			#endregion
-			*/
-			
-			#region techtreedata
-			if(openImprovementList == true)
-			{
-				if(GUI.Button (new Rect(xLoc + 200.0f, yLoc, 20.0f, 20.0f), "X"))
-				{
-					openImprovementList = false;
-					selectedPlanet = -1;
-				}
-
-				GUILayout.BeginArea(new Rect(xLoc, yLoc, 200.0f, 400.0f));
-
-				scrollPositionA = GUILayout.BeginScrollView(scrollPositionA);
-
-				for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
-				{
-					if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier 
-					   || techTreeScript.listOfImprovements[i].improvementCategory == enemyOneTurnScript.playerRace 
-					   || techTreeScript.listOfImprovements[i].improvementCategory == enemyTwoTurnScript.playerRace)
-					{
-						continue;
-					}
-
-					techBuildButtonText = techTreeScript.listOfImprovements[i].improvementName + "\n" + techTreeScript.listOfImprovements[i].improvementCost;
-
-					if(GUILayout.Button(techBuildButtonText, GUILayout.Height(40.0f)))
-					{
-						for(int j = 0; j < systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementSlots; ++j)
-						{
-							if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] == null)
-							{
-								if(techTreeScript.ImproveSystem(i) == true)
-								{
-									systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] = techTreeScript.listOfImprovements[i].improvementName;
-								}
-								break;
-							}
-						}
-					}
-				}
-				GUILayout.EndScrollView();
-
-				GUILayout.EndArea ();
-			}
-
-			#region systembenefits
-			
-			GUILayout.BeginArea (new Rect(Screen.width / 2 + 750.0f, Screen.height / 2 - 200.0f, 200.0f, 400.0f));
-
-			scrollPositionB = GUILayout.BeginScrollView(scrollPositionB);
-
-			for(int i = 0; i < techTreeScript.improvementMessageArray.Count; ++i)
-			{
-				GUILayout.Label(techTreeScript.improvementMessageArray[i], GUILayout.Height (40.0f));
-			}
-
-			GUILayout.EndScrollView();
-
-			GUILayout.EndArea();
-
-			#endregion
-
-			if(systemOwnedByPlayer == true)
-			{
-				if(GUI.Button (new Rect(Screen.width / 2 - 610.0f, Screen.height / 2 + 300.0f, 150.0f, 50.0f), "Purchase Hero: 50 Capital"))
-				{
-					heroGUI.CheckIfCanHire(selectedSystem);
-				}
-			}
-
-			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].heroesInSystem.Count; ++i)
-			{
-				if(systemListConstructor.systemList[selectedSystem].heroesInSystem[i] == null)
-				{
-					continue;
-				}
-
-				RefreshHeroInfo(i);
-			
-				tier3HeroScript.FillLinkableSystems();
-
-				if(heroName == "Merchant" && tier3HeroScript.linkableSystemsExist == true && systemOwnedByPlayer == true)
-				{
-					if(GUI.Button (allHeroLabels[i], heroName))
-					{
-						tier3HeroScript.openSystemLinkScreen = true;
-						heroGUI.selectedHero.name = heroName;
-						tier3HeroScript.FillLinkableSystems();
-					}
-				}
-
-				else
-				{
-					GUI.Label (allHeroLabels[i], heroName);
-				}
-			}
-			#endregion
 		}
-		#endregion
-	}
-
-	public void RefreshHeroInfo(int hero)
-	{
-		heroName = systemListConstructor.systemList[selectedSystem].heroesInSystem[hero].name;
 	}
 }
 

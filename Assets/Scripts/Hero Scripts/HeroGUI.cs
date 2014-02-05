@@ -86,7 +86,9 @@ public class HeroGUI : MasterScript
 			                                                       systemListConstructor.systemList[system].systemObject.transform.rotation);
 
 			instantiatedHero.name = "Basic Hero";
-			
+
+			Debug.Log ("addhero2");
+
 			systemListConstructor.systemList[system].heroesInSystem.Add(instantiatedHero);
 
 			heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
@@ -116,8 +118,6 @@ public class HeroGUI : MasterScript
 			cameraFunctionsScript.coloniseMenu = false;
 			cameraFunctionsScript.openMenu = false;
 			cameraFunctionsScript.doubleClick = false;
-			systemGUI.spendMenu = false;
-			systemGUI.openImprovementList = false;
 
 			if(GUI.Button (new Rect(Screen.width / 2 + 300.0f, Screen.height / 2 - 275.0f, 20.0f, 20.0f), "X"))
 			{

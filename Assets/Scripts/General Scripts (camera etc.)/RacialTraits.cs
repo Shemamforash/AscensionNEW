@@ -107,6 +107,8 @@ public class RacialTraits : MasterScript
 	{
 		if(player.playerRace == "Humans")
 		{
+			Debug.Log (player.systemsColonisedThisTurn);
+
 			if(player.systemsColonisedThisTurn > 0)
 			{
 				ambitionCounter += player.systemsColonisedThisTurn * 2;

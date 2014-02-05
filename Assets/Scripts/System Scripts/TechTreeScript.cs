@@ -21,6 +21,7 @@ public class TechTreeScript : MasterScript
 		systemSIMData = gameObject.GetComponent<SystemSIMData>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent>();
+		improvementMessageArray.Clear ();
 
 		LoadTechTree();
 	}
@@ -104,7 +105,7 @@ public class TechTreeScript : MasterScript
 					tempCount += 0.05f;
 				}
 			}
-			
+
 			improvementMessageArray.Add("+" + tempCount * 100 + "% Science from Improvements");
 		}
 		
@@ -134,7 +135,7 @@ public class TechTreeScript : MasterScript
 			
 			int i = RefreshCurrentSystem(gameObject);
 			
-			for(int j = 0; j < 3; ++j)
+			for(int j = 0; j < systemListConstructor.systemList[i].heroesInSystem.Count; ++j)
 			{
 				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
 				{
@@ -290,7 +291,10 @@ public class TechTreeScript : MasterScript
 			{
 				if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == true)
 				{
-					++systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
+					if(systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership < systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership)
+					{
+						++systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
+					}
 				}
 			}
 			
@@ -303,7 +307,15 @@ public class TechTreeScript : MasterScript
 			{
 				if(systemListConstructor.systemList[system].planetsInSystem[i].planetCategory == "Terran")
 				{
-					systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership += 5;
+					if(5 > systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership - systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership)
+					{
+						systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership += systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership - 
+							systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
+					}
+					else
+					{
+						systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership += 5;
+					}
 				}
 			}
 			

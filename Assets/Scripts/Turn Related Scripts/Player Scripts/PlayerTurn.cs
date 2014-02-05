@@ -58,6 +58,8 @@ public class PlayerTurn : TurnInfo
 			capital -= 10.0f;
 			
 			++turnInfoScript.systemsInPlay;
+
+			++systemsColonisedThisTurn;
 			
 			cameraFunctionsScript.coloniseMenu = false;
 			

@@ -117,6 +117,8 @@ public class HeroMovement : MasterScript
 				heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system
 				
 				system = RefreshCurrentSystem (heroScript.heroLocation); //Get new hero location system number
+
+				Debug.Log ("addhero3");
 				
 				systemListConstructor.systemList [system].heroesInSystem.Add (gameObject); //Add the hero to this system's heroes
 				
