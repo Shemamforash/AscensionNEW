@@ -129,7 +129,14 @@ public class SystemSIMData : MasterScript
 						additionalOwnership = 0;
 					}
 
-					systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership += (1 + additionalOwnership);
+					int ownershipToAdd = additionalOwnership + 1;
+
+					if(ownershipToAdd > systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership - systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership)
+					{
+						ownershipToAdd = systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership - systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership;
+					}
+
+					systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership += ownershipToAdd;
 
 					if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < 0)
 					{

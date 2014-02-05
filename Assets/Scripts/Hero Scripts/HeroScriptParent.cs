@@ -39,8 +39,6 @@ public class HeroScriptParent : MasterScript
 		}
 
 		movementPoints = 1;
-
-		systemListConstructor.systemList [i].heroesInSystem.Add(gameObject);
 	}
 
 	public DiplomaticPosition FindDiplomaticConnection()

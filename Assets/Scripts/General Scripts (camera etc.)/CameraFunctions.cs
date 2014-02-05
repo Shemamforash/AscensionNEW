@@ -34,8 +34,6 @@ public class CameraFunctions : MasterScript
 			coloniseMenu = false;
 			openMenu = false;
 			doubleClick = false;
-			systemGUI.spendMenu = false;
-			systemGUI.openImprovementList = false;
 			tier3HeroScript.openSystemLinkScreen = false;
 			heroGUI.openHeroLevellingScreen = false;
 		}
