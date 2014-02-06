@@ -5,8 +5,6 @@ using System.IO;
 
 public class TechTreeScript : MasterScript 
 {
-	public List<string> improvementMessageArray = new List<string>();
-
 	public float sciencePercentBonus, industryPercentBonus;
 	public float sciencePointBonus, industryPointBonus, tempCount;
 	public int techTier = 0;
@@ -21,7 +19,6 @@ public class TechTreeScript : MasterScript
 		systemSIMData = gameObject.GetComponent<SystemSIMData>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent>();
-		improvementMessageArray.Clear ();
 
 		LoadTechTree();
 	}
@@ -53,6 +50,7 @@ public class TechTreeScript : MasterScript
 				improvement.improvementLevel = int.Parse (reader.ReadLine ());
 				improvement.improvementCost = float.Parse(reader.ReadLine ());
 				improvement.hasBeenBuilt = false;
+				improvement.improvementMessage = "";
 
 				listOfImprovements.Add (improvement);
 			}
@@ -61,8 +59,6 @@ public class TechTreeScript : MasterScript
 
 	public void ActiveTechnologies(int system, TurnInfo thisPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
-		improvementMessageArray.Clear ();
-
 		sciencePercentBonus = 0.0f; //Resets the percentage modifier for SIM. Is there an easier way?
 		industryPercentBonus = 0.0f;
 
@@ -106,7 +102,7 @@ public class TechTreeScript : MasterScript
 				}
 			}
 
-			improvementMessageArray.Add("+" + tempCount * 100 + "% Science from Improvements");
+			listOfImprovements[0].improvementMessage = ("+" + tempCount * 100 + "% Science from Improvements");
 		}
 		
 		if(listOfImprovements[1].hasBeenBuilt == true) //Synergy
@@ -126,29 +122,25 @@ public class TechTreeScript : MasterScript
 				}
 			}
 			
-			improvementMessageArray.Add("+" + tempCount * 100 + "% Industry from nearby systems");
+			listOfImprovements[1].improvementMessage = ("+" + tempCount * 100 + "% Industry from nearby systems");
 		}
 		
 		if(listOfImprovements[2].hasBeenBuilt == true) //Morale
 		{
 			tempCount = 0.0f;
 			
-			int i = RefreshCurrentSystem(gameObject);
-			
-			for(int j = 0; j < systemListConstructor.systemList[i].heroesInSystem.Count; ++j)
-			{
-				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
+			for(int j = 0; j < thisPlayer.playerOwnedHeroes.Count; ++j)
+			{				
+				heroScript = thisPlayer.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
+
+				if(heroScript.heroLocation == gameObject)
 				{
-					continue;
+					//moneyPercentBonus += (heroScript.currentLevel * 5.0f); //TODO
+					tempCount += (heroScript.currentLevel * 5.0f);
 				}
-				
-				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
-				
-				//moneyPercentBonus += (heroScript.currentLevel * 5.0f); //TODO
-				tempCount += (heroScript.currentLevel * 5.0f);
 			}
 			
-			improvementMessageArray.Add("+" + tempCount * 100 + "% from Hero levels");
+			listOfImprovements[2].improvementMessage = ("+" + tempCount + "% from Hero levels");
 		}
 	}
 	
@@ -163,7 +155,7 @@ public class TechTreeScript : MasterScript
 			sciencePointBonus += (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 			tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 			
-			improvementMessageArray.Add("+" + tempCount + " Science from Peace");
+			listOfImprovements[3].improvementMessage = ("+" + tempCount + " Science from Peace");
 		}
 		
 		if(listOfImprovements[4].hasBeenBuilt == true) //Leadership
@@ -187,7 +179,7 @@ public class TechTreeScript : MasterScript
 				}
 			}
 			
-			improvementMessageArray.Add("+" + tempCount + " Industry from colonisation");
+			listOfImprovements[4].improvementMessage = ("+" + tempCount + " Industry from colonisation");
 		}
 		
 		if(listOfImprovements[5].hasBeenBuilt == true) //Quick Starters
@@ -198,7 +190,7 @@ public class TechTreeScript : MasterScript
 			
 			industryPercentBonus += (j * 0.25f);
 			tempCount += (j * 0.25f);
-			improvementMessageArray.Add("+" + tempCount * 100 + "% Industry from War");
+			listOfImprovements[5].improvementMessage = ("+" + tempCount * 100 + "% Industry from War");
 		}
 	}
 	
@@ -219,7 +211,7 @@ public class TechTreeScript : MasterScript
 				}
 			}
 			
-			improvementMessageArray.Add("+" + tempCount * 100 + "% Science from uncolonised planets");
+			listOfImprovements[6].improvementMessage = ("+" + tempCount * 100 + "% Science from uncolonised planets");
 		}
 		
 		if(listOfImprovements[7].hasBeenBuilt == true) //Unionisation
@@ -245,12 +237,12 @@ public class TechTreeScript : MasterScript
 			industryPercentBonus += 0.1f;
 			tempCount += 0.1f;
 			
-			improvementMessageArray.Add("+" + tempCount * 100 + "% Industry on System");
+			listOfImprovements[7].improvementMessage = ("+" + tempCount * 100 + "% Industry on System");
 		}
 		
 		if(listOfImprovements[8].hasBeenBuilt == true) //Familiarity
 		{
-			improvementMessageArray.Add("2x SIM production on Home-Type Planets");
+			listOfImprovements[8].improvementMessage = ("2x SIM production on Home-Type Planets");
 		}
 	}
 	
@@ -267,7 +259,7 @@ public class TechTreeScript : MasterScript
 			industryPointBonus -= (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			tempCountB = (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			
-			improvementMessageArray.Add("+" + tempCount + " Science, -" + tempCountB + " Industry On System");
+			listOfImprovements[9].improvementMessage = ("+" + tempCount + " Science, -" + tempCountB + " Industry On System");
 		}
 		
 		if(listOfImprovements[11].hasBeenBuilt == true)
@@ -279,7 +271,7 @@ public class TechTreeScript : MasterScript
 			industryPercentBonus += (i * 0.05f);
 			tempCount = (i * 0.05f);
 			
-			improvementMessageArray.Add ("+" + tempCount + "% SIM from systems with Hypernet");
+			listOfImprovements[11].improvementMessage = ("+" + tempCount + "% SIM from systems with Hypernet");
 		}
 	}
 
@@ -298,7 +290,7 @@ public class TechTreeScript : MasterScript
 				}
 			}
 			
-			improvementMessageArray.Add("+1 Ownership per turn");
+			listOfImprovements[12].improvementMessage = ("+1 Ownership per turn");
 		}
 		
 		if(listOfImprovements[13].hasBeenBuilt == true)
@@ -319,7 +311,7 @@ public class TechTreeScript : MasterScript
 				}
 			}
 			
-			improvementMessageArray.Add("+5 Ownership on Terran");
+			listOfImprovements[13].improvementMessage = ("+5 Ownership on Terran");
 		}
 		
 		if(listOfImprovements[14].hasBeenBuilt == true)
@@ -332,7 +324,7 @@ public class TechTreeScript : MasterScript
 				}
 			}
 			
-			improvementMessageArray.Add("+20% Max Ownership on Fully Improved Systems");
+			listOfImprovements[14].improvementMessage = ("+20% Max Ownership on Fully Improved Systems");
 		}
 		
 		if(listOfImprovements[15].hasBeenBuilt == true)
@@ -342,7 +334,7 @@ public class TechTreeScript : MasterScript
 			
 			++racialTraitScript.ambitionCounter;
 			
-			improvementMessageArray.Add("-30% SIM Converted to Ambition");
+			listOfImprovements[15].improvementMessage = ("-30% SIM Converted to Ambition");
 		}
 		
 		if(listOfImprovements[16].hasBeenBuilt == true)
@@ -355,7 +347,7 @@ public class TechTreeScript : MasterScript
 				}
 			}
 			
-			improvementMessageArray.Add("Minimum Ownership of 33%");
+			listOfImprovements[16].improvementMessage = ("Minimum Ownership of 33%");
 		}
 		
 		if(listOfImprovements[17].hasBeenBuilt == true)
@@ -372,12 +364,12 @@ public class TechTreeScript : MasterScript
 				}
 			}
 			
-			improvementMessageArray.Add("+" + tempCount + " Ambition from Terran Planet");
+			listOfImprovements[17].improvementMessage = ("+" + tempCount + " Ambition from Terran Planet");
 		}
 		
 		if(listOfImprovements[18].hasBeenBuilt == true)
 		{
-			improvementMessageArray.Add("Ambition has no effect on planet Ownership");
+			listOfImprovements[18].improvementMessage = ("Ambition has no effect on planet Ownership");
 		}
 		
 		if(listOfImprovements[19].hasBeenBuilt == true)
@@ -402,7 +394,7 @@ public class TechTreeScript : MasterScript
 			sciencePercentBonus += tempCount;
 			industryPercentBonus += tempCount;
 			
-			improvementMessageArray.Add(tempString);
+			listOfImprovements[19].improvementMessage = (tempString);
 		}
 	}
 
@@ -480,6 +472,7 @@ public class ImprovementClass
 	public string improvementName, improvementCategory;
 	public float improvementCost;
 	public int improvementLevel;
+	public string improvementMessage;
 	public bool hasBeenBuilt;
 }
 

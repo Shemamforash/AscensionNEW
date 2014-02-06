@@ -15,9 +15,9 @@ public class TurnInfo : MasterScript
 	public bool endTurn, playerHasWon;
 	public Camera mainCamera;
 	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse;
-
-	public string playerRace, homeSystem, homePlanetType, playerHasWonRace;
+	public string playerRace, homePlanetType, playerHasWonRace, homeSystem;
 	public int turn = 0, systemsInPlay = 0;
+	public List<GameObject> playerOwnedHeroes = new List<GameObject> ();
 
 	public void RefreshPlanetPower()
 	{
@@ -91,14 +91,9 @@ public class TurnInfo : MasterScript
 				continue;
 			}
 
-			for(int j = 0; j < systemListConstructor.systemList[i].heroesInSystem.Count; ++j)
-			{
-				if(systemListConstructor.systemList[i].heroesInSystem[j] == null)
-				{
-					continue;
-				}
-				
-				heroScript = systemListConstructor.systemList[i].heroesInSystem[j].GetComponent<HeroScriptParent>();
+			for(int j = 0; j < selectedPlayer.playerOwnedHeroes.Count; ++j)
+			{				
+				heroScript = selectedPlayer.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
 				heroScript.HeroEndTurnFunctions();
 			}
 

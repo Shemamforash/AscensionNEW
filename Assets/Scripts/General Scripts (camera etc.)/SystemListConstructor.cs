@@ -468,7 +468,6 @@ public class StarSystem
 	public GameObject systemObject;
 	public GameObject tradeRoute;
 	public int systemSize, numberOfConnections;
-	public List<GameObject> heroesInSystem = new List<GameObject>();
 	public List<Planet> planetsInSystem = new List<Planet> ();
 	public List<Node> tempConnections = new List<Node>();
 	public List<GameObject> permanentConnections = new List<GameObject>();

@@ -7,7 +7,7 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
 	public DiplomaticPosition tempObject;
-	public int currentLevel = 1, thisHeroNumber, noOfColonisedPlanets, heroAge, movementPoints;
+	public int currentLevel = 1, noOfColonisedPlanets, heroAge, movementPoints;
 	public float heroSciBonus = 0, heroIndBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength, speed;
 	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
 	public bool isInvading = false;

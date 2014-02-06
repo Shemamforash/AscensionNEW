@@ -16,7 +16,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public string[] allPlanetsInfo = new string[6];	//Unique to object
 	[HideInInspector]
-	public bool canImprove, foundPlanetData, underInvasion;
+	public bool canImprove, foundPlanetData, underInvasion, isEmbargoed;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemSIM, tempTotalSci, tempTotalInd;
 	public float scienceModifier, industryModifier;
@@ -31,7 +31,6 @@ public class SystemSIMData : MasterScript
 	private void GetModifierValues(TurnInfo thisPlayer, int system, int planet)
 	{
 		ownershipBonus = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership / 66.6666f;
-
 		scienceModifier = (ownershipBonus + thisPlayer.raceScience + techTreeScript.sciencePercentBonus + racialTraitScript.IncomeModifier(thisPlayer, "Science"));
 		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + techTreeScript.industryPercentBonus + racialTraitScript.IncomeModifier(thisPlayer, "Industry"));
 	}
@@ -55,10 +54,18 @@ public class SystemSIMData : MasterScript
 			tempInd = tempInd * 2;
 		}
 
-		allPlanetsInfo[planet] = gameObject.name + " " + (planet+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-			+ systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership + "% Owned\n"
-				+ ((int)tempSci).ToString() + "\n" 
-				+ ((int)tempInd).ToString() + "\n";
+		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == true)
+		{
+			allPlanetsInfo[planet] = gameObject.name + " " + (planet+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
+				+ systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership + "% Owned\n"
+					+ ((int)tempSci).ToString() + "\n" 
+					+ ((int)tempInd).ToString() + "\n";
+		}
+
+		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == false)
+		{
+			allPlanetsInfo[planet] = "Uncolonised Planet\n Click to Colonise";
+		}
 	}
 
 	public void SystemSIMCounter(int i, TurnInfo thisPlayer) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
@@ -66,41 +73,32 @@ public class SystemSIMData : MasterScript
 		tempTotalSci = 0.0f;
 		tempTotalInd = 0.0f;
 
-		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
+		if(isEmbargoed == false)
 		{
-			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
+			for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 			{
-				CheckPlanetValues(i, j, thisPlayer);
+				if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
+				{
+					CheckPlanetValues(i, j, thisPlayer);
 
-				tempTotalSci += tempSci;
-				tempTotalInd += tempInd;
+					tempTotalSci += tempSci;
+					tempTotalInd += tempInd;
+				}
 			}
 
-			if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == false)
+			totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus;
+			totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
+
+			for(int j = 0; j < thisPlayer.playerOwnedHeroes.Count; ++j)
 			{
-				allPlanetsInfo[j] = "Uncolonised Planet\n Click to Colonise";
+				heroScript = thisPlayer.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
+				
+				totalSystemScience += heroScript.heroSciBonus;
+				totalSystemIndustry += heroScript.heroIndBonus;
 			}
+
+			adjacencyBonus = FindAdjacencyBonuses (thisPlayer);
 		}
-
-		totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus;
-		totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
-
-		int k = RefreshCurrentSystem(gameObject);
-
-		for(int j = 0; j < systemListConstructor.systemList[k].heroesInSystem.Count; ++j)
-		{
-			if(systemListConstructor.systemList[k].heroesInSystem[j] == null)
-			{
-				continue;
-			}
-			
-			heroScript = systemListConstructor.systemList[k].heroesInSystem[j].GetComponent<HeroScriptParent>();
-			
-			totalSystemScience += heroScript.heroSciBonus;
-			totalSystemIndustry += heroScript.heroIndBonus;
-		}
-
-		adjacencyBonus = FindAdjacencyBonuses ();
 
 		totalSystemScience += totalSystemScience * adjacencyBonus;
 		totalSystemIndustry += totalSystemIndustry * adjacencyBonus;
@@ -158,7 +156,7 @@ public class SystemSIMData : MasterScript
 		return 0;
 	}
 
-	private float FindAdjacencyBonuses()
+	private float FindAdjacencyBonuses(TurnInfo thisPlayer)
 	{
 		float totalAdjacencyBonus = 0.0f;
 
@@ -168,16 +166,16 @@ public class SystemSIMData : MasterScript
 		{
 			int j = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[i]);
 
-			for(int k = 0; k < systemListConstructor.systemList[j].heroesInSystem.Count; ++k)
+			for(int k = 0; k < thisPlayer.playerOwnedHeroes.Count; ++k)
 			{
-				if(systemListConstructor.systemList[j].heroesInSystem[k] == null)
-				{
-					continue;
-				}
+				heroScript = thisPlayer.playerOwnedHeroes[k].GetComponent<HeroScriptParent>();
 
-				if(systemListConstructor.systemList[j].heroesInSystem[k].name == "President")
+				if(heroScript.heroLocation == systemListConstructor.systemList[j].systemObject)
 				{
-					totalAdjacencyBonus += 0.1f;
+					if(heroScript.heroTier3 == "Ambassador")
+					{
+						totalAdjacencyBonus += 0.1f;
+					}
 				}
 			}
 		}

@@ -107,22 +107,16 @@ public class HeroMovement : MasterScript
 			targetPosition = HeroPositionAroundStar (pathVertices[currentVertex + 1]); //Target position is set
 
 			if(TestForProximity(currentPosition, targetPosition) == true) //If current hero position is equal to the next system on route
-			{
-				int system = RefreshCurrentSystem (heroScript.heroLocation); //Get old hero location system number
-				
-				systemListConstructor.systemList [system].heroesInSystem.Remove (gameObject); //Remove the hero from the systems heroes
-				
+			{				
 				++currentVertex; //Update current system
 				
 				heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system
 				
-				system = RefreshCurrentSystem (heroScript.heroLocation); //Get new hero location system number
-
-				Debug.Log ("addhero3");
-				
-				systemListConstructor.systemList [system].heroesInSystem.Add (gameObject); //Add the hero to this system's heroes
-				
 				--heroScript.movementPoints;
+
+				heroShip = gameObject.GetComponent<HeroShip>();
+
+				heroShip.ShipAbilities();
 			}
 
 			gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, 20 * Time.deltaTime);
@@ -152,28 +146,26 @@ public class HeroMovement : MasterScript
 	{
 		Vector3 position = new Vector3 ();
 
-		/*
-		if(heroScript.thisHeroNumber == 0)
+		heroScript = gameObject.GetComponent<HeroScriptParent> ();
+
+		if(heroScript.heroOwnedBy == playerTurnScript.playerRace)
 		{
 			position.x = location.transform.position.x;
 			position.y = location.transform.position.y + 1.5f;
 		}
 		
-		if(heroScript.thisHeroNumber == 1)
+		if(heroScript.heroOwnedBy == enemyOneTurnScript.playerRace)
 		{
 			position.x = location.transform.position.x + 0.75f;
 			position.y = location.transform.position.y - 0.5f;
 		}
 		
-		if(heroScript.thisHeroNumber == 2)
+		if(heroScript.heroOwnedBy == enemyTwoTurnScript.playerRace)
 		{
 			position.x = location.transform.position.x - 0.75f;
 			position.y = location.transform.position.y - 0.5f;
 		}
-		*/
 
-		position.x = location.transform.position.x;
-		position.y = location.transform.position.y + 1.5f;
 		position.z = location.transform.position.z;
 		
 		return position;
