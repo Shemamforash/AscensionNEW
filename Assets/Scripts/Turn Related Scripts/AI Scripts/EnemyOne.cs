@@ -27,7 +27,7 @@ public class EnemyOne : AIBasicParent
 
 		for(int i = 0;  i < 60; ++i)
 		{
-			if(systemListConstructor.systemList[i].systemName == homeSystem)
+			if(systemListConstructor.systemList[i].systemObject== GameObject.Find (homeSystem))
 			{
 				systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 

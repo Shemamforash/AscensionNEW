@@ -47,7 +47,7 @@ public class PlayerTurn : TurnInfo
 			}
 		}
 		
-		if(isOkToColonise == true && capital > 10.0f)
+		if(isOkToColonise == true && capital >= 10.0f)
 		{
 			systemListConstructor.systemList[system].systemOwnedBy = playerRace;
 
@@ -77,7 +77,7 @@ public class PlayerTurn : TurnInfo
 
 		turnInfoScript.systemsInPlay++;
 		
-		int i = RefreshCurrentSystem(GameObject.Find(homeSystem));
+		int i = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 
 		systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 

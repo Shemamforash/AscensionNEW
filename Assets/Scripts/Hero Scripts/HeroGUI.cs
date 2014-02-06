@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class HeroGUI : MasterScript 
 {
 	public bool openHeroLevellingScreen;
-	public GameObject heroObject, merchantQuad, selectedHero;
+	public GameObject heroObject, merchantQuad, selectedHero, invasionButton, embargoButton;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
 	private string[] heroLevelThreeSpecs = new string[6] {"Ambassador", "Smuggler", "Vanguard", "Warlord", "Hacker", "Drone"};
 	public GUISkin mySkin;
@@ -16,6 +16,10 @@ public class HeroGUI : MasterScript
 	void Start()
 	{
 		LevellingTreeBuilder();
+		invasionButton = GameObject.Find ("Invasion Button");
+		embargoButton = GameObject.Find ("Embargo Button");
+		NGUITools.SetActive (invasionButton, false);
+		NGUITools.SetActive (embargoButton, false);
 	}
 
 	void Update()
@@ -60,6 +64,13 @@ public class HeroGUI : MasterScript
 		}
 	}
 
+	public void Embargo()
+	{
+		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData> ();
+		
+		systemSIMData.isEmbargoed = true;
+	}
+
 	private void LevellingTreeBuilder()
 	{
 		Rect tier1Box1 = new Rect(Screen.width / 2 - 90.0f, Screen.height / 2 - 205.0f, 180.0f, 50.0f);
@@ -78,26 +89,24 @@ public class HeroGUI : MasterScript
 		tier2 = new Rect[6]{tier2Box1, tier2Box2, tier2Box3, tier2Box4, tier2Box5, tier2Box6};
 	}
 
-	public void CheckIfCanHire(int system)
+	public void CheckIfCanHire()
 	{
-		if(playerTurnScript.capital > 50)
+		if(playerTurnScript.capital >= 50)
 		{
-			GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[system].systemObject.transform.position, 
-			                                                       systemListConstructor.systemList[system].systemObject.transform.rotation);
+			int i = RefreshCurrentSystem(GameObject.Find(playerTurnScript.homeSystem));
+
+			GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[i].systemObject.transform.position, 
+			                                                       systemListConstructor.systemList[i].systemObject.transform.rotation);
 
 			instantiatedHero.name = "Basic Hero";
 
-			Debug.Log ("addhero2");
-
-			systemListConstructor.systemList[system].heroesInSystem.Add(instantiatedHero);
+			playerTurnScript.playerOwnedHeroes.Add (instantiatedHero);
 
 			heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
 
 			heroMovement = instantiatedHero.GetComponent<HeroMovement>();
 
-			heroScript.heroLocation = systemListConstructor.systemList[system].systemObject;
-
-			heroScript.thisHeroNumber = j;
+			heroScript.heroLocation = systemListConstructor.systemList[i].systemObject;
 
 			heroScript.heroOwnedBy = playerTurnScript.playerRace;
 
