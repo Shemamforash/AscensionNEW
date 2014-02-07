@@ -107,7 +107,12 @@ public class HeroMovement : MasterScript
 			targetPosition = HeroPositionAroundStar (pathVertices[currentVertex + 1]); //Target position is set
 
 			if(TestForProximity(currentPosition, targetPosition) == true) //If current hero position is equal to the next system on route
-			{				
+			{	
+				systemSIMData = pathVertices[currentVertex].GetComponent<SystemSIMData>();
+
+				systemSIMData.isEmbargoed = false;
+				systemSIMData.isPromoted = false;
+
 				++currentVertex; //Update current system
 				
 				heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system

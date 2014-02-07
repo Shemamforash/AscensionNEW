@@ -6,11 +6,12 @@ public class HeroScriptParent : MasterScript
 {
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
-	public DiplomaticPosition tempObject;
+	public HeroDetailsWindow heroDetails;
 	public int currentLevel = 1, noOfColonisedPlanets, heroAge, movementPoints;
 	public float heroSciBonus = 0, heroIndBonus = 0, offensivePower = 14.0f, defensivePower = 14.0f, invasionStrength, speed;
 	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
-	public bool isInvading = false;
+	public bool isInvading = false, canLevelUp;
+	private GameObject levelUpLabel;
 
 	void Start()
 	{
@@ -39,6 +40,35 @@ public class HeroScriptParent : MasterScript
 		}
 
 		movementPoints = 1;
+
+		heroGUI.heroDetailsContainer.GetComponent<UIGrid> ().enabled = true;
+
+		heroDetails = new HeroDetailsWindow ();
+
+		heroDetails.window = NGUITools.AddChild (heroGUI.heroDetailsContainer, heroGUI.heroDetailsPrefab);
+
+		heroDetails.dropDownOne = heroDetails.window.transform.Find ("First Specialisation").gameObject.GetComponent<UIPopupList>();
+		EventDelegate.Add (heroDetails.dropDownOne.gameObject.GetComponent<UIPopupList> ().onChange, heroGUI.SetSpecialisation);
+		heroDetails.dropDownTwo = heroDetails.window.transform.Find ("Second Specialisation").gameObject.GetComponent<UIPopupList>();
+		EventDelegate.Add (heroDetails.dropDownTwo.gameObject.GetComponent<UIPopupList> ().onChange, heroGUI.SetSpecialisation);
+
+		heroGUI.heroDetailsContainer.GetComponent<UIGrid>().repositionNow = true;
+
+		NGUITools.SetActive (heroDetails.window, false);
+	}
+
+	void Update()
+	{
+		if(levelUpLabel != null)
+		{
+			Vector3 position = cameraFunctionsScript.cameraMain.WorldToViewportPoint (gameObject.transform.position);
+			
+			position = overlayGUI.uiCamera.ViewportToWorldPoint (position);
+			
+			Vector3 newPosition = new Vector3(position.x, position.y, -37.0f);
+			
+			levelUpLabel.transform.position = newPosition;
+		}
 	}
 
 	public DiplomaticPosition FindDiplomaticConnection()
@@ -146,7 +176,11 @@ public class HeroScriptParent : MasterScript
 
 		if(heroAge == 10 || heroAge == 20)
 		{
-			LevelUp ();
+			levelUpLabel = NGUITools.AddChild(heroGUI.buttonContainer, heroGUI.levelUpPrefab);
+
+			levelUpLabel.transform.Find ("Label").GetComponent<UILabel>().depth = 1;
+
+			EventDelegate.Add(levelUpLabel.GetComponent<UIButton>().onClick, LevelUp);
 		}
 
 		movementPoints += 4;
@@ -156,8 +190,11 @@ public class HeroScriptParent : MasterScript
 
 	public void LevelUp()
 	{
+		NGUITools.Destroy (UIButton.current.gameObject);
 		heroGUI.selectedHero = gameObject;
-		heroGUI.openHeroLevellingScreen = true;
+		++heroScript.currentLevel;
+		canLevelUp = true;
+		heroGUI.OpenHeroDetails();
 	}
 
 	public void StartSystemInvasion()

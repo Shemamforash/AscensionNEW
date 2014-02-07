@@ -16,7 +16,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public string[] allPlanetsInfo = new string[6];	//Unique to object
 	[HideInInspector]
-	public bool canImprove, foundPlanetData, underInvasion, isEmbargoed;
+	public bool canImprove, foundPlanetData, underInvasion, isEmbargoed, isPromoted;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemSIM, tempTotalSci, tempTotalInd;
 	public float scienceModifier, industryModifier;
@@ -97,11 +97,25 @@ public class SystemSIMData : MasterScript
 				totalSystemIndustry += heroScript.heroIndBonus;
 			}
 
-			adjacencyBonus = FindAdjacencyBonuses (thisPlayer);
+			if(isPromoted == false)
+			{
+				adjacencyBonus = FindAdjacencyBonuses (thisPlayer);
+			}
+
+			if(isPromoted == true)
+			{
+				adjacencyBonus = 1.5f;
+			}
+
+			totalSystemScience += totalSystemScience * adjacencyBonus;
+			totalSystemIndustry += totalSystemIndustry * adjacencyBonus;
 		}
 
-		totalSystemScience += totalSystemScience * adjacencyBonus;
-		totalSystemIndustry += totalSystemIndustry * adjacencyBonus;
+		if(isEmbargoed == true)
+		{
+			totalSystemScience = 0;
+			totalSystemIndustry = 0;
+		}
 
 		turnInfoScript.RefreshPlanetPower();
 	}

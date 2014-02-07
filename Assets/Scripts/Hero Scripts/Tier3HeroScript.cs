@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Tier3HeroScript : HeroScriptParent 
+public class Tier3HeroScript : MasterScript
 {
+	public DiplomaticPosition tempObject;
+
 	public GameObject[] linkableSystems = new GameObject[60];
 	private Vector2 scrollPosition = Vector2.zero;
 	public bool openSystemLinkScreen, linkableSystemsExist;
