@@ -5,7 +5,7 @@ public class HeroShip : ShipFunctions
 {
 	public bool canEmbargo, hasStealth = false, canPromote, canViewSystem;
 	private string invasionWeapon, auxiliaryWeapon;
-	private int system;
+	private int system, gridChildren;
 
 	void Start()
 	{
@@ -15,6 +15,8 @@ public class HeroShip : ShipFunctions
 
 	void Update()
 	{
+		int tempChildren = 0;
+
 		if(heroMovement.TestForProximity (gameObject.transform.position, heroMovement.HeroPositionAroundStar(heroScript.heroLocation)) == true)
 		{
 			system = RefreshCurrentSystem(heroScript.heroLocation);
@@ -22,6 +24,8 @@ public class HeroShip : ShipFunctions
 			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace || systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
 			{
 				NGUITools.SetActive(heroGUI.invasionButton, true);
+
+				++tempChildren;
 
 				if(canViewSystem == true)
 				{
@@ -36,6 +40,14 @@ public class HeroShip : ShipFunctions
 			if(canEmbargo == true)
 			{
 				NGUITools.SetActive(heroGUI.embargoButton, true);
+
+				++tempChildren;
+			}
+			if(canPromote == true)
+			{
+				NGUITools.SetActive(heroGUI.promoteButton, true);
+
+				++tempChildren;
 			}
 		}
 
@@ -43,6 +55,20 @@ public class HeroShip : ShipFunctions
 		{
 			NGUITools.SetActive(heroGUI.invasionButton, false);
 			NGUITools.SetActive(heroGUI.embargoButton, false);
+			NGUITools.SetActive(heroGUI.promoteButton, false);
+		}
+
+		if(tempChildren != gridChildren)
+		{
+			gridChildren = tempChildren;
+
+			float gridWidth = (gridChildren * heroGUI.buttonContainer.GetComponent<UIGrid>().cellWidth) / 2 - (heroGUI.buttonContainer.GetComponent<UIGrid>().cellWidth/2);
+			
+			heroGUI.buttonContainer.transform.localPosition = new Vector3(systemGUI.playerSystemInfoScreen.transform.localPosition.x - gridWidth, 
+			                                                         heroGUI.turnInfoBar.transform.localPosition.y + 50.0f, 
+			                                                         systemGUI.planetListGrid.transform.localPosition.z);
+			
+			heroGUI.buttonContainer.GetComponent<UIGrid>().repositionNow = true;
 		}
 	}
 

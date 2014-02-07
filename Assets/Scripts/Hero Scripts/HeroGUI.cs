@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class HeroGUI : MasterScript 
 {
 	public bool openHeroLevellingScreen;
-	public GameObject heroObject, merchantQuad, selectedHero, invasionButton, embargoButton;
+	public GameObject heroObject, merchantQuad, selectedHero, invasionButton, embargoButton, promoteButton, buttonContainer, turnInfoBar, levelUpPrefab, heroDetailsPrefab, heroDetailsContainer;
 	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
 	private string[] heroLevelThreeSpecs = new string[6] {"Ambassador", "Smuggler", "Vanguard", "Warlord", "Hacker", "Drone"};
 	public GUISkin mySkin;
@@ -15,11 +15,9 @@ public class HeroGUI : MasterScript
 
 	void Start()
 	{
-		LevellingTreeBuilder();
-		invasionButton = GameObject.Find ("Invasion Button");
-		embargoButton = GameObject.Find ("Embargo Button");
 		NGUITools.SetActive (invasionButton, false);
 		NGUITools.SetActive (embargoButton, false);
+		NGUITools.SetActive (promoteButton, false);
 	}
 
 	void Update()
@@ -67,26 +65,17 @@ public class HeroGUI : MasterScript
 	public void Embargo()
 	{
 		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData> ();
-		
+		systemSIMData.isPromoted = false;
 		systemSIMData.isEmbargoed = true;
+		systemSIMData.SystemSIMCounter(RefreshCurrentSystem(heroScript.heroLocation), playerTurnScript);
 	}
 
-	private void LevellingTreeBuilder()
+	public void Promote()
 	{
-		Rect tier1Box1 = new Rect(Screen.width / 2 - 90.0f, Screen.height / 2 - 205.0f, 180.0f, 50.0f);
-		Rect tier1Box2 = new Rect(Screen.width / 2 - 90.0f, Screen.height /2 - 25.0f, 180.0f, 50.0f);
-		Rect tier1Box3 = new Rect(Screen.width / 2 - 90.0f, Screen.height / 2 + 155.0f, 180.0f, 50.0f);
-
-		tier1 = new Rect[3]{tier1Box1, tier1Box2, tier1Box3};
-
-		Rect tier2Box1 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 - 265.0f, 180.0f, 50.0f);
-		Rect tier2Box2 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 - 205.0f, 180.0f, 50.0f);
-		Rect tier2Box3 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 - 145.0f, 180.0f, 50.0f);
-		Rect tier2Box4 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 - 85.0f, 180.0f, 50.0f);
-		Rect tier2Box5 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 - 25.0f, 180.0f, 50.0f);
-		Rect tier2Box6 = new Rect(Screen.width / 2 + 110.0f, Screen.height / 2 + 35.0f, 180.0f, 50.0f);
-
-		tier2 = new Rect[6]{tier2Box1, tier2Box2, tier2Box3, tier2Box4, tier2Box5, tier2Box6};
+		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData> ();
+		systemSIMData.isEmbargoed = false;
+		systemSIMData.isPromoted = true;
+		systemSIMData.SystemSIMCounter(RefreshCurrentSystem(heroScript.heroLocation), playerTurnScript);
 	}
 
 	public void CheckIfCanHire()
@@ -118,94 +107,122 @@ public class HeroGUI : MasterScript
 		}
 	}
 
-	void OnGUI()
+	public void OpenHeroDetails()
 	{
-		GUI.skin = mySkin;
-	
-		if(openHeroLevellingScreen == true)
+		if(heroDetailsContainer.activeInHierarchy == false)
 		{
-			cameraFunctionsScript.coloniseMenu = false;
-			cameraFunctionsScript.openMenu = false;
-			cameraFunctionsScript.doubleClick = false;
+			NGUITools.SetActive (heroDetailsContainer, true);
 
-			if(GUI.Button (new Rect(Screen.width / 2 + 300.0f, Screen.height / 2 - 275.0f, 20.0f, 20.0f), "X"))
+			for (int i = 0; i < playerTurnScript.playerOwnedHeroes.Count; ++i)
 			{
-				openHeroLevellingScreen = false;
-			}
+				heroScript = playerTurnScript.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
 
-			GUI.Box (new Rect(Screen.width / 2 - 300.0f, Screen.height / 2 - 275.0f, 600.0f, 550.0f), "");
+				NGUITools.SetActive(heroScript.heroDetails.window, true);
 
-			GUI.Label(new Rect(Screen.width / 2 -290.0f, Screen.height / 2 - 25.0f, 180.0f, 50.0f), "Hero");
+				heroScript.heroDetails.dropDownOne.enabled = false;
+				heroScript.heroDetails.dropDownTwo.enabled = false;
+				heroScript.heroDetails.dropDownOne.gameObject.GetComponent<UIButton>().enabled = false;
+				heroScript.heroDetails.dropDownTwo.gameObject.GetComponent<UIButton>().enabled = false;
 
-			heroScript = selectedHero.GetComponent<HeroScriptParent>();
-
-			if(heroScript.currentLevel == 1)
-			{
-				for(int i = 0; i < 3; ++i)
+				if(heroScript.canLevelUp == true)
 				{
-					if(GUI.Button (tier1[i], heroLevelTwoSpecs[i]))
+					if(heroScript.currentLevel == 2 && heroScript.heroTier2 == "")
 					{
-						heroScript.heroTier2 = heroLevelTwoSpecs[i];
-
-						selectedHero.name = heroLevelTwoSpecs[i];
-
-						++heroScript.currentLevel;
-
-						if(heroLevelTwoSpecs[i] == "Infiltrator")
-						{
-							heroScript.heroShipType = "Stealth Ship";
-						}
-
-						if(heroLevelTwoSpecs[i] == "Soldier")
-						{
-							heroScript.heroShipType = "War Ship";
-						}
-
-						if(heroLevelTwoSpecs[i] == "Diplomat")
-						{
-							heroScript.heroShipType = "Command Ship";
-						}
+						FillList(heroScript.heroDetails.dropDownOne, heroScript);
+						heroScript.heroDetails.dropDownOne.gameObject.GetComponent<UIButton>().enabled = true;
+						heroScript.heroDetails.dropDownOne.enabled = true;
 					}
-				}
 
-				for(int i = 0; i < 6; ++i)
-				{
-					GUI.Label (tier2[i], heroLevelThreeSpecs[i]);
-				}
-			}
-
-			if(heroScript.currentLevel == 2)
-			{
-				for(int i = 0; i < 3; ++i)
-				{
-					GUI.Label (tier1[i], heroLevelTwoSpecs[i]);
-				}
-
-				for(int i = 0; i < 6; ++i)
-				{
-					if(GUI.Button (tier2[i], heroLevelThreeSpecs[i]))
+					if(heroScript.currentLevel == 3 && heroScript.heroTier3 == "")
 					{
-						heroScript.heroTier3 = heroLevelThreeSpecs[i];
-
-						selectedHero.name = heroLevelThreeSpecs[i];
-
-						++heroScript.currentLevel;
+						FillList(heroScript.heroDetails.dropDownTwo, heroScript);
+						heroScript.heroDetails.dropDownTwo.gameObject.GetComponent<UIButton>().enabled = true;
+						heroScript.heroDetails.dropDownTwo.enabled = true;
 					}
 				}
 			}
+		}
 
-			if(heroScript.currentLevel == 3)
+		else if(heroDetailsContainer.activeInHierarchy == true)
+		{
+			NGUITools.SetActive (heroDetailsContainer, false);
+		}
+	}
+
+	public void FillList(UIPopupList popup, HeroScriptParent hero)
+	{
+		if(hero.currentLevel == 2)
+		{
+			popup.items.Add("");
+			popup.items.Add("Infiltrator");
+			popup.items.Add("Soldier");
+			popup.items.Add("Diplomat");
+		}
+
+		if(hero.currentLevel == 3)
+		{
+			popup.items.Add("");
+
+			if(hero.heroTier2 == "Infiltrator")
 			{
-				for(int i = 0; i < 3; ++i)
-				{
-					GUI.Label (tier1[i], heroLevelTwoSpecs[i]);
-				}
+				popup.items.Add("Drone");
+				popup.items.Add("Hacker");
+			}
+			if(hero.heroTier2 == "Soldier")
+			{
+				Debug.Log ("bacon");
+				popup.items.Add("Warlord");
+				popup.items.Add("Vanguard");
+			}
+			if(hero.heroTier2 == "Diplomat")
+			{
+				popup.items.Add("Ambassador");
+				popup.items.Add("Smuggler");
+			}
+		}
+	}
 
-				for(int i = 0; i < 6; ++i)
+	public void SetSpecialisation()
+	{
+		for(int i = 0; i < playerTurnScript.playerOwnedHeroes.Count; ++i)
+		{
+			heroScript = playerTurnScript.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
+
+			if(heroScript.canLevelUp == true)
+			{
+				if(heroScript.heroDetails.window = UIPopupList.current.transform.parent.gameObject)
 				{
-					GUI.Label (tier2[i], heroLevelThreeSpecs[i]);
+					string tempString = UIPopupList.current.gameObject.GetComponent<UIPopupList>().value;
+
+					if(tempString != "")
+					{
+						if(UIPopupList.current.gameObject.name == "First Specialisation")
+						{
+							heroScript.heroTier2 = tempString;
+						}
+
+						if(UIPopupList.current.gameObject.name == "Second Specialisation")
+						{					
+							heroScript.heroTier3 = tempString;
+						}
+
+						heroScript.canLevelUp = false;
+
+						UIPopupList.current.gameObject.GetComponent<UILabel>().text = tempString;
+
+						UIPopupList.current.enabled = false;
+
+						UIPopupList.current.gameObject.GetComponent<UIButton>().enabled = false;
+					}
 				}
 			}
 		}
 	}
+}
+
+public class HeroDetailsWindow
+{
+	public GameObject window;
+	public UIPopupList dropDownOne, dropDownTwo;
+	public UILabel movementPoints;
 }

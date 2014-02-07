@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Tier2HeroScript : HeroScriptParent 
+public class Tier2HeroScript : MasterScript 
 {
+	public DiplomaticPosition tempObject;
+
 	public void CheckTier2Heroes(GameObject selectedHero)
 	{
 		heroScript = selectedHero.GetComponent<HeroScriptParent> ();
