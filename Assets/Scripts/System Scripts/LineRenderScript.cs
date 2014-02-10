@@ -17,13 +17,11 @@ public class LineRenderScript : MasterScript
 	public int thisSystem;
 	[HideInInspector]
 	private GameObject objectB;
-	private Light thisLight;
 	public Material opaqueMaterial;
 
 	void Start()
 	{	
 		systemSIMData = gameObject.GetComponent<SystemSIMData>();
-		thisLight = gameObject.GetComponent<Light> ();
 		thisSystem = RefreshCurrentSystem (gameObject);
 
 		//Debug.Log (systemListConstructor.systemList [thisSystem].numberOfConnections + " | " + gameObject);
@@ -38,18 +36,6 @@ public class LineRenderScript : MasterScript
 		BuildLine(quadA);
 
 		thisSystem = RefreshCurrentSystem(gameObject);
-	}
-
-	void Update()
-	{
-		if(cameraFunctionsScript.selectedSystem == gameObject)
-		{
-			thisLight.intensity = 10.0f;
-		}
-		if(cameraFunctionsScript.selectedSystem != gameObject)
-		{
-			thisLight.intensity = 0.0f;
-		}
 	}
 
 	public void SetRaceLineColour(string thisRace)

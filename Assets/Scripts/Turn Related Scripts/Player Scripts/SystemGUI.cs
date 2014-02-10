@@ -177,20 +177,34 @@ public class SystemGUI : MasterScript
 			}
 		}
 
-		if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
+		if(systemListConstructor.systemList[selectedSystem].systemOwnedBy == playerTurnScript.playerRace)
 		{
-			NGUITools.SetActive(systemScrollviews.improvementsToBuildScrollView, true);
-			systemScrollviews.UpdateScrollviewContents();
+			if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
+			{
+				NGUITools.SetActive(systemScrollviews.improvementsToBuildScrollView, true);
+				systemScrollviews.UpdateScrollviewContents();
+			}
+
+			if(playerTurnScript.capital >= 5)
+			{
+				if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
+				{
+					systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
+					++playerTurnScript.planetsColonisedThisTurn;
+					systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
+					playerTurnScript.capital -= 5;
+				}
+			}
 		}
 
-		if(playerTurnScript.capital >= 5)
+		else if(systemListConstructor.systemList[selectedSystem].systemOwnedBy != playerTurnScript.playerRace)
 		{
-			if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
+			systemDefence = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<SystemDefence>();
+			heroScript.planetInvade = selectedPlanet;
+
+			if(systemListConstructor.systemList [selectedSystem].planetsInSystem [selectedPlanet].underEnemyControl == false)
 			{
-				systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
-				++playerTurnScript.planetsColonisedThisTurn;
-				systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
-				playerTurnScript.capital -= 5;
+				heroScript.PlanetInvasion();
 			}
 		}
 	}

@@ -6,13 +6,14 @@ public class OverlayGUI : MasterScript
 	public Camera mainCamera, uiCamera;
 	public GameObject mouseOverSystem, systemOverlay;
 	public UIWidget cornerAnchor;
-	public UILabel scienceOverlay, industryOverlay, colonisationOverlay, nameOverlay;
+	public UILabel scienceOverlay, industryOverlay, colonisationOverlay, nameOverlay, defenceOverlay;
+	private int system;
 
 	private string UpdateVariables()
 	{
 		systemSIMData = mouseOverSystem.GetComponent<SystemSIMData>();
 
-		int system = RefreshCurrentSystem(mouseOverSystem);
+		system = RefreshCurrentSystem(mouseOverSystem);
 
 		int colonisedPlanets = 0;
 		
@@ -60,6 +61,8 @@ public class OverlayGUI : MasterScript
 			scienceOverlay.text = ((int)systemSIMData.totalSystemScience).ToString();
 
 			industryOverlay.text = ((int)systemSIMData.totalSystemIndustry).ToString();
+
+			defenceOverlay.text = systemListConstructor.systemList [system].systemDefence.ToString();
 
 			UpdatePosition();
 		}

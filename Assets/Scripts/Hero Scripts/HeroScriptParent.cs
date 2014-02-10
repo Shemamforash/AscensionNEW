@@ -7,7 +7,7 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
 	public HeroDetailsWindow heroDetails;
-	public int currentLevel = 1, noOfColonisedPlanets, heroAge, movementPoints;
+	public int currentLevel = 1, noOfColonisedPlanets, heroAge, movementPoints, planetInvade = -1, system;
 	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength, speed, armour, tradeRoutes;
 	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
 	public bool isInvading = false, canLevelUp;
@@ -23,17 +23,17 @@ public class HeroScriptParent : MasterScript
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
 		heroShip = gameObject.GetComponent<HeroShip> ();
 
-		int i = RefreshCurrentSystem (heroLocation);
+		system = RefreshCurrentSystem (heroLocation);
 
-		if (systemListConstructor.systemList [i].systemOwnedBy == playerTurnScript.playerRace) 
+		if (systemListConstructor.systemList [system].systemOwnedBy == playerTurnScript.playerRace) 
 		{
 			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
 		}
-		if (systemListConstructor.systemList [i].systemOwnedBy == enemyOneTurnScript.playerRace) 
+		if (systemListConstructor.systemList [system].systemOwnedBy == enemyOneTurnScript.playerRace) 
 		{
 			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
 		}
-		if (systemListConstructor.systemList [i].systemOwnedBy == enemyTwoTurnScript.playerRace) 
+		if (systemListConstructor.systemList [system].systemOwnedBy == enemyTwoTurnScript.playerRace) 
 		{
 			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 		}
@@ -58,6 +58,8 @@ public class HeroScriptParent : MasterScript
 
 	void Update()
 	{
+		system = RefreshCurrentSystem (heroLocation);
+
 		if(levelUpLabel != null)
 		{
 			Vector3 position = cameraFunctionsScript.cameraMain.WorldToViewportPoint (gameObject.transform.position);
@@ -72,15 +74,13 @@ public class HeroScriptParent : MasterScript
 
 	public DiplomaticPosition FindDiplomaticConnection()
 	{
-		int i = RefreshCurrentSystem (heroLocation);
-
 		if(heroOwnedBy == playerTurnScript.playerRace)
 		{
-			if(systemListConstructor.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace)
 			{
 				return diplomacyScript.playerEnemyOneRelations;
 			}
-			if(systemListConstructor.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
 			{
 				return diplomacyScript.playerEnemyTwoRelations;
 			}
@@ -88,11 +88,11 @@ public class HeroScriptParent : MasterScript
 
 		if(heroOwnedBy == enemyOneTurnScript.playerRace)
 		{
-			if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace)
 			{
 				return diplomacyScript.playerEnemyOneRelations;
 			}
-			if(systemListConstructor.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
 			{
 				return diplomacyScript.enemyOneEnemyTwoRelations;
 			}
@@ -100,11 +100,11 @@ public class HeroScriptParent : MasterScript
 
 		if(heroOwnedBy == enemyTwoTurnScript.playerRace)
 		{
-			if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace)
 			{
 				return diplomacyScript.playerEnemyTwoRelations;
 			}
-			if(systemListConstructor.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace)
 			{
 				return diplomacyScript.enemyOneEnemyTwoRelations;
 			}
@@ -151,6 +151,10 @@ public class HeroScriptParent : MasterScript
 		if(isInvading == true)
 		{
 			ContinueInvasion();
+			if(systemDefence.canEnter == true && planetInvade != -1)
+			{
+				PlanetInvasion();
+			}
 		}
 
 		heroAge++;
@@ -176,30 +180,124 @@ public class HeroScriptParent : MasterScript
 		heroGUI.OpenHeroDetails();
 	}
 
+	public void PlanetInvasion()
+	{
+		if(systemListConstructor.systemList [system].planetsInSystem [planetInvade].underEnemyControl == false)
+		{
+			systemListConstructor.systemList [system].planetsInSystem [planetInvade].planetDefence -= secondaryPower;
+			systemListConstructor.systemList [system].planetsInSystem [planetInvade].planetOwnership -= secondaryCollateral;
+
+			if(systemListConstructor.systemList [system].planetsInSystem [planetInvade].planetOwnership <= 0)
+			{
+				systemListConstructor.systemList [system].planetsInSystem [planetInvade].planetColonised = false;
+				systemListConstructor.systemList [system].planetsInSystem [planetInvade].improvementsBuilt.Clear ();
+				systemListConstructor.systemList [system].planetsInSystem [planetInvade].planetImprovementLevel = 0;
+				systemListConstructor.systemList [system].planetsInSystem [planetInvade].planetOwnership = 0;
+				planetInvade = -1;
+			}
+			else if(systemListConstructor.systemList [system].planetsInSystem [planetInvade].planetDefence <= 0)
+			{
+				systemListConstructor.systemList [system].planetsInSystem [planetInvade].underEnemyControl = true;
+				planetInvade = -1;
+			}
+		}
+
+		CheckSystemStatus ();
+	}
+
+	private void CheckSystemStatus()
+	{
+		bool systemDestroyed = true;
+		bool systemEnemyControlled = true;
+
+		for(int i = 0; i < systemListConstructor.systemList [system].systemSize; ++i)
+		{
+			if(systemListConstructor.systemList [system].planetsInSystem [i].planetColonised == false)
+			{
+				continue;
+			}
+
+			if(systemListConstructor.systemList [system].planetsInSystem [i].underEnemyControl == false)
+			{
+				systemEnemyControlled = false;
+			}
+
+			if(systemListConstructor.systemList [system].planetsInSystem [i].planetColonised == true)
+			{
+				systemDestroyed = false;
+			}
+
+			if(systemDestroyed == true)
+			{
+				DestroySystem();
+			}
+			else if(systemEnemyControlled == true)
+			{
+				OwnSystem();
+			}
+		}
+	}
+
+	private void DestroySystem()
+	{
+		systemListConstructor.systemList [system].systemDefence = 0;
+		systemListConstructor.systemList [system].systemOwnedBy = null;
+		systemListConstructor.systemList [system].systemObject.renderer.material = null;
+
+		lineRenderScript = systemListConstructor.systemList [system].systemObject.GetComponent<LineRenderScript> ();
+
+		lineRenderScript.SetRaceLineColour ("None");
+	}
+
+	private void OwnSystem()
+	{
+		systemListConstructor.systemList [system].systemOwnedBy = playerTurnScript.playerRace;
+		systemListConstructor.systemList [system].systemObject.renderer.material = playerTurnScript.materialInUse;
+
+		lineRenderScript = systemListConstructor.systemList [system].systemObject.GetComponent<LineRenderScript> ();
+		techTreeScript = systemListConstructor.systemList [system].systemObject.GetComponent<TechTreeScript> ();
+		
+		lineRenderScript.SetRaceLineColour (playerTurnScript.playerRace);
+
+		for(int i = 0; i < systemListConstructor.systemList [system].systemSize; ++i)
+		{
+			for(int j = 0; j < systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt.Count; ++j)
+			{
+				for(int k = 0; k < techTreeScript.listOfImprovements.Count; ++k)
+				{
+					if(systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt[j] == techTreeScript.listOfImprovements[k].improvementName)
+					{
+						if(techTreeScript.listOfImprovements[k].improvementCategory != "Generic" || techTreeScript.listOfImprovements[k].improvementCategory != playerTurnScript.playerRace)
+						{
+							systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt.RemoveAt(j);
+							techTreeScript.listOfImprovements[k].hasBeenBuilt = false;
+						}
+					}
+				}
+			}
+		}
+
+	}
+
 	public void StartSystemInvasion()
 	{
-		int i = RefreshCurrentSystem (heroLocation);
-		
 		isInvading = true;
 		
-		invasionObject = (GameObject)Instantiate (diplomacyScript.invasionQuad, systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[i].systemObject.transform.rotation);
+		invasionObject = (GameObject)Instantiate (diplomacyScript.invasionQuad, systemListConstructor.systemList[system].systemObject.transform.position, 
+		                                          systemListConstructor.systemList[system].systemObject.transform.rotation);
 		
-		systemDefence = systemListConstructor.systemList [i].systemObject.GetComponent<SystemDefence> ();
-
-		systemDefence.CalculateSystemDefence ();
+		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
 		
 		systemDefence.underInvasion = true;
 	}
 	
 	public void ContinueInvasion()
-	{
-		int i = RefreshCurrentSystem (heroScript.heroLocation);
-		
-		systemListConstructor.systemList [i].systemDefence -= primaryPower;
+	{		
+		systemListConstructor.systemList [system].systemDefence -= primaryPower;
 
-		if(systemListConstructor.systemList [i].systemDefence <= 0)
+		if(systemListConstructor.systemList [system].systemDefence <= 0)
 		{
-			systemListConstructor.systemList [i].systemDefence = 0;
+			systemListConstructor.systemList [system].systemDefence = 0;
 			systemDefence.canEnter = true;
 		}
 	}

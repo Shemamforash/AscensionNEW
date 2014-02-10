@@ -110,11 +110,11 @@ public class RacialTraits : MasterScript
 		{
 			if(player.systemsColonisedThisTurn > 0)
 			{
-				ambitionCounter += player.systemsColonisedThisTurn * 2;
+				ambitionCounter += player.systemsColonisedThisTurn * 4;
 			}
 			if(player.planetsColonisedThisTurn > 0)
 			{
-				ambitionCounter += (player.planetsColonisedThisTurn - player.systemsColonisedThisTurn);
+				ambitionCounter += (player.planetsColonisedThisTurn - player.systemsColonisedThisTurn) * 2;
 			}
 			if(player.systemsColonisedThisTurn == 0 && player.planetsColonisedThisTurn == 0)
 			{
