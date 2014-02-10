@@ -7,6 +7,7 @@ public class RacialTraits : MasterScript
 	private int nereidesProgressionCounter;
 	private float nereidesIndustryModifier, nereidesScienceModifier;
 	private string nereidesEmpireModifier;
+	public UILabel racialLabel;
 
 	void Start()
 	{
@@ -127,22 +128,21 @@ public class RacialTraits : MasterScript
 		}
 	}
 
-	void OnGUI()
+	void Update()
 	{
-		GUI.skin = systemGUI.mySkin;
-
-		string labelText = CheckNereidesRacialMessage();
-
-		Rect racialMessage = new Rect (10.0f, Screen.height - 190.0f, 160.0f, 60.0f);
-
 		if(playerTurnScript.playerRace == "Humans")
 		{
-			GUI.Label (racialMessage, ambitionCounter.ToString());
+			racialLabel.text = ("Ambition: " + ambitionCounter.ToString());
 		}
 
 		if(playerTurnScript.playerRace == "Nereides")
 		{
-			GUI.Label(racialMessage, labelText + "\n" + nereidesProgressionCounter);
+			racialLabel.text = CheckNereidesRacialMessage();
+		}
+
+		if(playerTurnScript.playerRace == "Selkies")
+		{
+			racialLabel.text = "Not implemented";
 		}
 	}
 }

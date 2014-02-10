@@ -55,7 +55,7 @@ public class PlayerTurn : TurnInfo
 			
 			systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
 			
-			capital -= 10.0f;
+			playerTurnScript.capital -= 10.0f;
 			
 			++turnInfoScript.systemsInPlay;
 

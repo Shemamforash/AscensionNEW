@@ -1,11 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GalaxyGUI : MasterScript 
 {
+	public GameObject coloniseButton, planetSelectionWindow;
+	private List<GameObject> planetSelectionList = new List<GameObject>();
 	private int selectedSystem;
 	private string tempRace, scienceString, industryString, capitalString, turnNumber, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
-	public UILabel scienceLabel, industryLabel, capitalLabel, raceLabel, turnLabel;
+	public UILabel scienceLabel, industryLabel, capitalLabel, raceLabel, turnLabel, diplomacyLabelOne, diplomacyLabelTwo;
+
+	void Start()
+	{
+		foreach(Transform child in planetSelectionWindow.transform)
+		{
+			planetSelectionList.Add (child.gameObject);
+		}
+	}
+
+	void Update()
+	{
+		UpdateVariables();
+		UpdateLabels ();
+	}
 
 	private void UpdateVariables()
 	{
@@ -16,6 +33,12 @@ public class GalaxyGUI : MasterScript
 			capitalString = ((int)playerTurnScript.capital).ToString ();
 			turnNumber = "Year: " + (2200 + (turnInfoScript.turn * 4)).ToString();
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
+
+			if(systemListConstructor.systemList[selectedSystem].systemOwnedBy == null)
+			{
+				NGUITools.SetActive(coloniseButton, true);
+			}
+
 			playerEnemyOneDiplomacy = diplomacyScript.playerEnemyOneRelations.diplomaticState + " | " + diplomacyScript.playerEnemyOneRelations.peaceCounter;
 			playerEnemyTwoDiplomacy = diplomacyScript.playerEnemyTwoRelations.diplomaticState + " | " + diplomacyScript.playerEnemyTwoRelations.peaceCounter;
 		}
@@ -27,6 +50,17 @@ public class GalaxyGUI : MasterScript
 		playerTurnScript.StartTurn();
 		enemyOneTurnScript.SetRace();
 		enemyTwoTurnScript.SetRace();
+		raceLabel.text = playerTurnScript.playerRace;
+	}
+
+	private void UpdateLabels()
+	{
+		scienceLabel.text = scienceString;
+		industryLabel.text = industryString;
+		capitalLabel.text = capitalString;
+		turnLabel.text = turnNumber;
+		diplomacyLabelOne.text = playerEnemyOneDiplomacy;
+		diplomacyLabelTwo.text = playerEnemyTwoDiplomacy;
 	}
 
 	public void EndTurnFunction()
@@ -37,14 +71,61 @@ public class GalaxyGUI : MasterScript
 		enemyTwoTurnScript.Expand(enemyTwoTurnScript);
 	}
 
+	public void CheckToColoniseSystem()
+	{
+		if(playerTurnScript.capital >= 10)
+		{
+			playerTurnScript.FindSystem (selectedSystem);
+			SelectFirstPlanet();
+			NGUITools.SetActive(coloniseButton, false);
+		}
+	}
+
+	public void ColonisePlanet()
+	{
+		int planet = planetSelectionList.IndexOf (UIButton.current.gameObject);
+
+		systemListConstructor.systemList[selectedSystem].planetsInSystem[planet].planetColonised = true;
+		
+		++playerTurnScript.planetsColonisedThisTurn;
+		
+		++playerTurnScript.systemsColonisedThisTurn;
+		
+		playerTurnScript.systemHasBeenColonised = false;
+
+		NGUITools.SetActive (planetSelectionWindow, false);
+	}
+
+	private void SelectFirstPlanet()
+	{
+		NGUITools.SetActive (planetSelectionWindow, true);
+
+		for(int i = 0; i < planetSelectionList.Count; ++i)
+		{
+			if(i < systemListConstructor.systemList[selectedSystem].systemSize)
+			{
+				float planetSIM = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetScience + systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetIndustry;
+				
+				string planetInfo = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetType + " " + planetSIM.ToString() + " SIM";
+
+				planetSelectionList[i].transform.Find ("Label").gameObject.GetComponent<UILabel>().text = planetInfo;
+
+				NGUITools.SetActive(planetSelectionList[i], true);
+			}
+
+			if(i >= systemListConstructor.systemList[selectedSystem].systemSize)
+			{
+				NGUITools.SetActive(planetSelectionList[i], false);
+			}
+		}
+
+		planetSelectionWindow.GetComponent<UIScrollView> ().ResetPosition ();
+		planetSelectionWindow.GetComponent<UIGrid> ().repositionNow = true;
+	}
+
 	void OnGUI()
 	{
 		GUI.skin = systemGUI.mySkin;
-
-		UpdateVariables ();
-
-		GUI.Label (new Rect (10, Screen.height - 120.0f, 160.0f, 30.0f), playerEnemyOneDiplomacy);
-		GUI.Label (new Rect (10, Screen.height - 80.0f, 160.0f, 30.0f), playerEnemyTwoDiplomacy);
 
 		if(playerTurnScript.playerRace == null)
 		{
@@ -70,75 +151,6 @@ public class GalaxyGUI : MasterScript
 				SelectRace(tempRace);
 				turnInfoScript.RefreshPlanetPower();
 			}
-		}
-				
-		raceLabel.text = playerTurnScript.playerRace;
-
-		scienceLabel.text = scienceString;
-
-		industryLabel.text = industryString;
-
-		capitalLabel.text = capitalString;
-		
-		turnLabel.text = turnNumber;
-
-		#region colonisebutton
-		Rect coloniseButton = new Rect(Screen.width - 85, Screen.height - 70, 75, 30); //Colonise button
-		
-		if(cameraFunctionsScript.coloniseMenu == true)
-		{
-			bool isConnected = false;
-			
-			lineRenderScript = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<LineRenderScript>();
-			
-			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].numberOfConnections; ++i)
-			{
-				int j = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[i]);
-				
-				if(systemListConstructor.systemList[j].systemOwnedBy == playerTurnScript.playerRace)
-				{
-					isConnected = true;
-					break;
-				}
-			}
-			
-			if(isConnected == true)
-			{
-				if(GUI.Button (coloniseButton, "Colonise") && playerTurnScript.capital >= 10)
-				{	
-					playerTurnScript.FindSystem (selectedSystem);
-				}
-			}
-		}
-		#endregion
-
-		if(playerTurnScript.systemHasBeenColonised == true)
-		{
-			int selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
-			
-			GUILayout.BeginArea(new Rect(Screen.width / 2 - 185.0f, Screen.height / 2 - 60.0f, 120.0f, 370.0f));
-			
-			GUILayout.Box("Select Planet");
-			
-			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
-			{
-				float planetSIM = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetScience + systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetIndustry;
-				
-				string planetInfo = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetType + " " + planetSIM.ToString() + " SIM";
-				
-				if(GUILayout.Button(planetInfo, GUILayout.Height (50.0f)))
-				{
-					systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised = true;
-					
-					++playerTurnScript.planetsColonisedThisTurn;
-					
-					++playerTurnScript.systemsColonisedThisTurn;
-					
-					playerTurnScript.systemHasBeenColonised = false;
-				}
-			}
-			
-			GUILayout.EndArea();
 		}
 	}
 }

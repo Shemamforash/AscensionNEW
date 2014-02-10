@@ -109,7 +109,11 @@ public class HeroMovement : MasterScript
 			if(TestForProximity(currentPosition, targetPosition) == true) //If current hero position is equal to the next system on route
 			{	
 				systemSIMData = pathVertices[currentVertex].GetComponent<SystemSIMData>();
+				systemDefence = pathVertices[currentVertex].GetComponent<SystemDefence>();
 
+				systemDefence.underInvasion = false;
+				systemDefence.regenerateTimer = 3;
+				heroScript.isInvading = false;
 				systemSIMData.isEmbargoed = false;
 				systemSIMData.isPromoted = false;
 

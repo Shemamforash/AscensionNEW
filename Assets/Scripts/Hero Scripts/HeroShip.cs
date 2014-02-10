@@ -3,8 +3,8 @@ using System.Collections;
 
 public class HeroShip : ShipFunctions
 {
-	public bool canEmbargo, hasStealth = false, canPromote, canViewSystem;
-	private string invasionWeapon, auxiliaryWeapon;
+	public bool canEmbargo, hasStealth = false, canPromote, canViewSystem, canTeleport;
+	private string invasionWeapon;
 	private int system, gridChildren;
 
 	void Start()
@@ -76,9 +76,21 @@ public class HeroShip : ShipFunctions
 	{
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
+		heroScript.primaryPower = shipFunctions.primaryWeaponPower;
+		heroScript.armour = shipFunctions.armourRating;
+		heroScript.movementPoints = shipFunctions.engineValue;
+
 		if(heroScript.heroTier2 == "Diplomat")
 		{
 			invasionWeapon = "Dropships";
+
+			heroScript.secondaryPower = shipFunctions.dropshipPower;
+			heroScript.secondaryCollateral = shipFunctions.dropshipCollateral;
+
+			if(heroScript.heroTier3 == "Smuggler")
+			{
+				heroScript.tradeRoutes = shipFunctions.logisticsRating;
+			}
 
 			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace)
 			{
@@ -94,6 +106,9 @@ public class HeroShip : ShipFunctions
 		if(heroScript.heroTier2 == "Infiltrator")
 		{
 			invasionWeapon = "Bombs";
+
+			heroScript.secondaryPower = shipFunctions.bombPower;
+			heroScript.secondaryCollateral = shipFunctions.bombCollateral;
 
 			canViewSystem = true;
 
@@ -111,11 +126,24 @@ public class HeroShip : ShipFunctions
 					hasStealth = false;
 				}
 			}
+
+			if(shipFunctions.infiltratorEngine == true)
+			{
+				canTeleport = true;
+			}
 		}
 
 		if(heroScript.heroTier2 == "Soldier")
 		{
 			invasionWeapon = "Artillery";
+
+			heroScript.secondaryPower = shipFunctions.artilleryPower;
+			heroScript.secondaryCollateral = shipFunctions.artilleryCollateral;
+
+			if(shipFunctions.soldierPrimary == true)
+			{
+				heroScript.primaryPower = heroScript.primaryPower * 2;
+			}
 		}
 	}
 
