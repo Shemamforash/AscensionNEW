@@ -125,7 +125,10 @@ public class HeroMovement : MasterScript
 
 				heroShip = gameObject.GetComponent<HeroShip>();
 
-				heroShip.ShipAbilities();
+				if(heroScript.heroTier2 == "Diplomat")
+				{
+					heroShip.DiplomatAbilities(currentVertex);
+				}
 			}
 
 			gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, 20 * Time.deltaTime);

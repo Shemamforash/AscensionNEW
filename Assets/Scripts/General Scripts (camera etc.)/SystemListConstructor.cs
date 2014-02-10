@@ -87,6 +87,7 @@ public class SystemListConstructor : MasterScript
 					newPlanet.planetIndustry = FindPlanetSIM(newPlanet.planetType, "Industry");
 					newPlanet.maxOwnership = 0;
 					newPlanet.improvementSlots = (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots");
+					newPlanet.underEnemyControl = false;
 
 					for(int k = 0; k < (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots"); ++k)
 					{
@@ -478,8 +479,8 @@ public class Planet
 	public string planetName, planetType, planetCategory;
 	public List<string> improvementsBuilt = new List<string> ();
 	public float planetScience, planetIndustry;
-	public bool planetColonised;
-	public int planetOwnership, planetImprovementLevel, improvementSlots, maxOwnership;
+	public bool planetColonised, underEnemyControl;
+	public int planetOwnership, planetDefence, planetImprovementLevel, improvementSlots, maxOwnership;
 }
 
 public class Node

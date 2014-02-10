@@ -11,7 +11,7 @@ public class ShipFunctions : MasterScript
 	public void UpdateShips()
 	{
 		stealthValue = 0;
-		primaryWeaponPower = 0;
+		primaryWeaponPower = 20;
 		soldierPrimary = false;
 		artilleryPower = 0;
 		artilleryCollateral = 0;
@@ -19,7 +19,7 @@ public class ShipFunctions : MasterScript
 		bombCollateral = 0;
 		dropshipPower = 0;
 		dropshipCollateral = 0;
-		engineValue = 0;
+		engineValue = 1;
 		infiltratorEngine = false;
 		armourRating = 0;
 		logisticsRating = 0;

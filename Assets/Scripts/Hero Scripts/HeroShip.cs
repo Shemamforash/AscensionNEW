@@ -76,6 +76,7 @@ public class HeroShip : ShipFunctions
 	{
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
+		shipFunctions.UpdateShips ();
 		heroScript.primaryPower = shipFunctions.primaryWeaponPower;
 		heroScript.armour = shipFunctions.armourRating;
 		heroScript.movementPoints = shipFunctions.engineValue;
@@ -92,15 +93,7 @@ public class HeroShip : ShipFunctions
 				heroScript.tradeRoutes = shipFunctions.logisticsRating;
 			}
 
-			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace)
-			{
-				DiplomatAbilities(diplomacyScript.playerEnemyOneRelations);
-			}
-
-			if(systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
-			{
-				DiplomatAbilities(diplomacyScript.playerEnemyTwoRelations);
-			}
+			DiplomatAbilities(system);
 		}
 
 		if(heroScript.heroTier2 == "Infiltrator")
@@ -147,8 +140,20 @@ public class HeroShip : ShipFunctions
 		}
 	}
 
-	void DiplomatAbilities(DiplomaticPosition position)
+	public void DiplomatAbilities(int system)
 	{
+		DiplomaticPosition position = null;
+
+		if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace)
+		{
+			position = diplomacyScript.playerEnemyOneRelations;
+		}
+		
+		if(systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
+		{
+			position = diplomacyScript.playerEnemyTwoRelations;
+		}
+
 		if(position.diplomaticState == "War")
 		{
 			canPromote = false;
