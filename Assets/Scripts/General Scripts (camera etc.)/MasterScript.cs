@@ -14,6 +14,8 @@ public class MasterScript : MonoBehaviour
 	public CameraFunctions cameraFunctionsScript;
 	[HideInInspector]
 	public LineRenderScript lineRenderScript;
+	[HideInInspector]
+	public SystemDefence systemDefence;
 
 	[HideInInspector]
 	public TurnInfo turnInfoScript;
@@ -36,8 +38,6 @@ public class MasterScript : MonoBehaviour
 	public HeroMovement heroMovement;
 	[HideInInspector]
 	public HeroShip heroShip;
-	[HideInInspector]
-	public Tier2HeroScript tier2HeroScript;
 	[HideInInspector]
 	public Tier3HeroScript tier3HeroScript;
 	[HideInInspector]
@@ -67,7 +67,6 @@ public class MasterScript : MonoBehaviour
 		diplomacyScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<DiplomacyControlScript>();
 		systemGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SystemGUI>();
 		heroGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<HeroGUI>();
-		tier2HeroScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<Tier2HeroScript> ();
 		tier3HeroScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<Tier3HeroScript> ();
 		racialTraitScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<RacialTraits> ();
 		galaxyGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GalaxyGUI>();

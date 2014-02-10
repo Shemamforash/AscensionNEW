@@ -24,6 +24,7 @@ public class SystemSIMData : MasterScript
 
 	void Start()
 	{
+		systemDefence = gameObject.GetComponent<SystemDefence> ();
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
 	}
@@ -88,15 +89,7 @@ public class SystemSIMData : MasterScript
 
 			totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus;
 			totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
-
-			for(int j = 0; j < thisPlayer.playerOwnedHeroes.Count; ++j)
-			{
-				heroScript = thisPlayer.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
-				
-				totalSystemScience += heroScript.heroSciBonus;
-				totalSystemIndustry += heroScript.heroIndBonus;
-			}
-
+		
 			if(isPromoted == false)
 			{
 				adjacencyBonus = FindAdjacencyBonuses (thisPlayer);
@@ -132,7 +125,7 @@ public class SystemSIMData : MasterScript
 				
 				CheckImprovement(i, j);
 
-				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership && underInvasion == false)
+				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership && systemDefence.underInvasion == false)
 				{
 					int additionalOwnership = CheckOwnershipBonus(systemListConstructor.systemList[i].systemOwnedBy);
 
@@ -266,12 +259,7 @@ public class SystemSIMData : MasterScript
 		if(improvementNumber == 3)
 		{
 			improvementLevel = "Superb";
-
-			if(systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership <= 100)
-			{
-				systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 100;
-			}
-
+			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 100;
 			canImprove = false;
 		}
 	}
