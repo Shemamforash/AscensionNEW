@@ -69,6 +69,7 @@ public class GalaxyGUI : MasterScript
 		playerTurnScript.TurnEnd (playerTurnScript);
 		enemyOneTurnScript.Expand(enemyOneTurnScript);
 		enemyTwoTurnScript.Expand(enemyTwoTurnScript);
+		diplomacyScript.PeaceTimer ();
 	}
 
 	public void CheckToColoniseSystem()

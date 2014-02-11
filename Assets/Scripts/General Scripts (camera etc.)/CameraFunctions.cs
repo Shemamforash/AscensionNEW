@@ -70,6 +70,15 @@ public class CameraFunctions : MasterScript
 					{
 						openMenu = true; //Opens system menu on double click
 					}
+					if(systemListConstructor.systemList[i].systemOwnedBy != playerTurnScript.playerRace)
+					{
+						systemDefence = selectedSystem.GetComponent<SystemDefence>();
+
+						if(systemDefence.canEnter == true)
+						{
+							invasionGUI.OpenPlanetInvasionScreen();
+						}
+					}
 				}
 			}
 		}

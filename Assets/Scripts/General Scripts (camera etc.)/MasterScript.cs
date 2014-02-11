@@ -55,6 +55,8 @@ public class MasterScript : MonoBehaviour
 	public HeroGUI heroGUI;
 	[HideInInspector]
 	public GalaxyGUI galaxyGUI;
+	[HideInInspector]
+	public InvasionGUI invasionGUI;
 
 	private void Awake()
 	{
@@ -73,6 +75,7 @@ public class MasterScript : MonoBehaviour
 		overlayGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<OverlayGUI> ();
 		shipFunctions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<ShipFunctions> ();
 		heroTechTree = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<HeroTechTree> ();
+		invasionGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<InvasionGUI> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem)

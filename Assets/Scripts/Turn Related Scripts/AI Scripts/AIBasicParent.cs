@@ -74,9 +74,9 @@ public class AIBasicParent : TurnInfo
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy == thisPlayer.playerRace)
 			{
-				systemSIMData = systemListConstructor.systemList [i].systemObject.GetComponent<SystemSIMData> ();
+				systemDefence = systemListConstructor.systemList [i].systemObject.GetComponent<SystemDefence> ();
 				
-				if(systemSIMData.underInvasion == true)
+				if(systemDefence.underInvasion == true)
 				{
 					continue;
 				}
@@ -181,11 +181,15 @@ public class AIBasicParent : TurnInfo
 	
 	public void ImprovePlanet(int planetPosition, int system, TurnInfo thisPlayer)
 	{
+		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
+
+		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
+
 		systemSIMData.improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 		
 		systemSIMData.CheckImprovement(system, planetPosition);
 		
-		if(systemSIMData.canImprove == true && systemSIMData.underInvasion == false)
+		if(systemSIMData.canImprove == true && systemDefence.underInvasion == false)
 		{
 			if(industry >= systemSIMData.improvementCost && thisPlayer.capital >= systemSIMData.improvementNumber + 1)
 			{

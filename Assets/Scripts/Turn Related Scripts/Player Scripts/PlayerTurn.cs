@@ -21,7 +21,6 @@ public class PlayerTurn : TurnInfo
 			{
 				systemSIMData = tempObject.GetComponent<SystemSIMData>();
 				techTreeScript = tempObject.GetComponent<TechTreeScript>();
-				heroScript = tempObject.GetComponent<HeroScriptParent>();
 			}
 		}
 		
@@ -49,6 +48,27 @@ public class PlayerTurn : TurnInfo
 		
 		if(isOkToColonise == true && capital >= 10.0f)
 		{
+			for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
+			{
+				int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
+
+				if(systemListConstructor.systemList[j].systemOwnedBy == enemyOneTurnScript.playerRace)
+				{
+					if(diplomacyScript.playerEnemyOneRelations.hasMadeContact == false)
+					{
+						diplomacyScript.playerEnemyOneRelations.hasMadeContact = true;
+					}
+				}
+
+				if(systemListConstructor.systemList[j].systemOwnedBy == enemyTwoTurnScript.playerRace)
+				{
+					if(diplomacyScript.playerEnemyTwoRelations.hasMadeContact == false)
+					{
+						diplomacyScript.playerEnemyTwoRelations.hasMadeContact = true;
+					}
+				}
+			}
+
 			systemListConstructor.systemList[system].systemOwnedBy = playerRace;
 
 			lineRenderScript.SetRaceLineColour(playerRace);
