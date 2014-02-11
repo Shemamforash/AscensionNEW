@@ -8,7 +8,7 @@ public class SystemGUI : MasterScript
 
 	public GUISkin mySkin;
 	private string dataSIMString;
-	public int selectedSystem, selectedPlanet, numberOfGridChildren, numberOfHeroes;
+	public int selectedSystem, selectedPlanet, numberOfHeroes;
 	public List<PlanetUIElements> planetElementList = new List<PlanetUIElements>();
 	public GameObject planetListGrid, playerSystemInfoScreen;
 
@@ -23,13 +23,9 @@ public class SystemGUI : MasterScript
 		if(playerTurnScript.tempObject != null)
 		{
 			int system = RefreshCurrentSystem(playerTurnScript.tempObject);
-			
-			if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace)
-			{
-				systemSIMData = playerTurnScript.tempObject.GetComponent<SystemSIMData>();
-				techTreeScript = playerTurnScript.tempObject.GetComponent<TechTreeScript>();
-				heroScript = playerTurnScript.tempObject.GetComponent<HeroScriptParent>();
-			}
+
+			systemSIMData = playerTurnScript.tempObject.GetComponent<SystemSIMData>();
+			techTreeScript = playerTurnScript.tempObject.GetComponent<TechTreeScript>();
 		}
 
 		UpdateVariables ();
@@ -42,13 +38,8 @@ public class SystemGUI : MasterScript
 		if(cameraFunctionsScript.openMenu == true)
 		{		
 			NGUITools.SetActive(playerSystemInfoScreen, true);
-			
-			float gridWidth = (numberOfGridChildren * planetListGrid.GetComponent<UIGrid>().cellWidth) / 2 - (planetListGrid.GetComponent<UIGrid>().cellWidth/2);
-			
-			planetListGrid.transform.localPosition = new Vector3(playerSystemInfoScreen.transform.localPosition.x - gridWidth, 
-			                                                     planetListGrid.transform.localPosition.y, planetListGrid.transform.localPosition.z);
-			
-			planetListGrid.GetComponent<UIGrid>().repositionNow = true;
+
+			PositionGrid(planetListGrid, systemListConstructor.systemList[selectedSystem].systemSize);
 			
 			for(int i = 0; i < 6; i++) //This sections of the function evaluates the improvement level of each system, and improves it if the button is clicked
 			{	
@@ -75,6 +66,16 @@ public class SystemGUI : MasterScript
 		}
 	}
 
+	public void PositionGrid(GameObject grid, int size)
+	{
+		float gridWidth = (size * grid.GetComponent<UIGrid>().cellWidth) / 2 - (grid.GetComponent<UIGrid>().cellWidth/2);
+		
+		grid.transform.localPosition = new Vector3(playerSystemInfoScreen.transform.localPosition.x - gridWidth, 
+		                                                     grid.transform.localPosition.y, grid.transform.localPosition.z);
+		
+		grid.GetComponent<UIGrid>().repositionNow = true;
+	}
+
 	public void HireHero()
 	{
 		if(numberOfHeroes <= 6)
@@ -90,8 +91,6 @@ public class SystemGUI : MasterScript
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 			systemSIMData = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<SystemSIMData>();
 			
-			numberOfGridChildren = 0;
-			
 			if(selectedPlanet != -1)
 			{
 				systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
@@ -104,7 +103,6 @@ public class SystemGUI : MasterScript
 					if(i < systemListConstructor.systemList[selectedSystem].systemSize)
 					{
 						NGUITools.SetActive(planetElementList[i].spriteObject, true);
-						++numberOfGridChildren;
 					}
 					if(i >= systemListConstructor.systemList[selectedSystem].systemSize)
 					{
@@ -194,17 +192,6 @@ public class SystemGUI : MasterScript
 					systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
 					playerTurnScript.capital -= 5;
 				}
-			}
-		}
-
-		else if(systemListConstructor.systemList[selectedSystem].systemOwnedBy != playerTurnScript.playerRace)
-		{
-			systemDefence = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<SystemDefence>();
-			heroScript.planetInvade = selectedPlanet;
-
-			if(systemListConstructor.systemList [selectedSystem].planetsInSystem [selectedPlanet].underEnemyControl == false)
-			{
-				heroScript.PlanetInvasion();
 			}
 		}
 	}

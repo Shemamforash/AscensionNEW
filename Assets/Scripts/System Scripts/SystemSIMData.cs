@@ -16,7 +16,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public string[] allPlanetsInfo = new string[6];	//Unique to object
 	[HideInInspector]
-	public bool canImprove, foundPlanetData, underInvasion, isEmbargoed, isPromoted;
+	public bool canImprove, foundPlanetData, isEmbargoed, isPromoted;
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemSIM, tempTotalSci, tempTotalInd;
 	public float scienceModifier, industryModifier;

@@ -60,7 +60,7 @@ public class SystemDefence : MasterScript
 
 	public void CalculatePlanetDefence(int planet)
 	{
-		int maxDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership/systemListConstructor.systemList[system].planetsInSystem[planet].improvementsBuilt.Count;
+		int maxDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership * systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel;
 		
 		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
 		{

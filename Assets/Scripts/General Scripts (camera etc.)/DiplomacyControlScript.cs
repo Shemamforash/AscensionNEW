@@ -47,6 +47,31 @@ public class DiplomacyControlScript : MasterScript
 		}
 	}
 
+	public void PeaceTimer()
+	{
+		if(playerEnemyOneRelations.hasMadeContact == true)
+		{
+			if(playerEnemyOneRelations.firstContactCounter > 0)
+			{
+				--playerEnemyOneRelations.firstContactCounter;
+			}
+		}
+		if(playerEnemyTwoRelations.hasMadeContact == true)
+		{
+			if(playerEnemyTwoRelations.firstContactCounter > 0)
+			{
+				--playerEnemyTwoRelations.firstContactCounter;
+			}
+		}
+		if(enemyOneEnemyTwoRelations.hasMadeContact == true)
+		{
+			if(enemyOneEnemyTwoRelations.firstContactCounter > 0)
+			{
+				--enemyOneEnemyTwoRelations.firstContactCounter;
+			}
+		}
+	}
+
 	public void CheckForDiplomaticStateChange(DiplomaticPosition tempObject)
 	{
 		RefreshNumbers (tempObject);

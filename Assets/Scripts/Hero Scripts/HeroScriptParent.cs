@@ -151,6 +151,7 @@ public class HeroScriptParent : MasterScript
 		if(isInvading == true)
 		{
 			ContinueInvasion();
+
 			if(systemDefence.canEnter == true && planetInvade != -1)
 			{
 				PlanetInvasion();
@@ -256,6 +257,9 @@ public class HeroScriptParent : MasterScript
 
 		lineRenderScript = systemListConstructor.systemList [system].systemObject.GetComponent<LineRenderScript> ();
 		techTreeScript = systemListConstructor.systemList [system].systemObject.GetComponent<TechTreeScript> ();
+		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
+
+		systemDefence.underInvasion = false;
 		
 		lineRenderScript.SetRaceLineColour (playerTurnScript.playerRace);
 
