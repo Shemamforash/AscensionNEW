@@ -13,8 +13,8 @@ public class ShipFunctions : MasterScript
 		stealthValue = 0;
 		primaryWeaponPower = 20;
 		soldierPrimary = false;
-		artilleryPower = 0;
-		artilleryCollateral = 0;
+		artilleryPower = 10;
+		artilleryCollateral = 10;
 		bombPower = 0;
 		bombCollateral = 0;
 		dropshipPower = 0;

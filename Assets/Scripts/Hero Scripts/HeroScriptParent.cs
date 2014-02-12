@@ -227,15 +227,15 @@ public class HeroScriptParent : MasterScript
 			{
 				systemDestroyed = false;
 			}
+		}
 
-			if(systemDestroyed == true)
-			{
-				DestroySystem();
-			}
-			else if(systemEnemyControlled == true)
-			{
-				OwnSystem();
-			}
+		if(systemDestroyed == true)
+		{
+			DestroySystem();
+		}
+		else if(systemEnemyControlled == true)
+		{
+			OwnSystem();
 		}
 	}
 
@@ -243,11 +243,17 @@ public class HeroScriptParent : MasterScript
 	{
 		systemListConstructor.systemList [system].systemDefence = 0;
 		systemListConstructor.systemList [system].systemOwnedBy = null;
-		systemListConstructor.systemList [system].systemObject.renderer.material = null;
+
+		turnInfoScript = GameObject.Find ("ScriptsContainer").GetComponent<TurnInfo> ();
+
+		systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
 
 		lineRenderScript = systemListConstructor.systemList [system].systemObject.GetComponent<LineRenderScript> ();
 
 		lineRenderScript.SetRaceLineColour ("None");
+
+		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
+		systemDefence.underInvasion = false;
 	}
 
 	private void OwnSystem()
@@ -280,7 +286,6 @@ public class HeroScriptParent : MasterScript
 				}
 			}
 		}
-
 	}
 
 	public void StartSystemInvasion()
@@ -289,7 +294,9 @@ public class HeroScriptParent : MasterScript
 		
 		invasionObject = (GameObject)Instantiate (diplomacyScript.invasionQuad, systemListConstructor.systemList[system].systemObject.transform.position, 
 		                                          systemListConstructor.systemList[system].systemObject.transform.rotation);
-		
+
+		systemListConstructor.systemList [system].enemyHero = gameObject;
+
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
 		
 		systemDefence.underInvasion = true;
@@ -303,6 +310,7 @@ public class HeroScriptParent : MasterScript
 		{
 			systemListConstructor.systemList [system].systemDefence = 0;
 			systemDefence.canEnter = true;
+			Destroy(invasionObject);
 		}
 	}
 }
