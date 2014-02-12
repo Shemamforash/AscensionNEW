@@ -3,9 +3,9 @@ using System.Collections;
 
 public class RacialTraits : MasterScript 
 {
-	public int ambitionCounter, ambitionOwnershipModifier;
+	public float ambitionCounter, ambitionOwnershipModifier;
 	private int nereidesProgressionCounter;
-	private float nereidesIndustryModifier, nereidesScienceModifier;
+	private float nereidesIndustryModifier, nereidesScienceModifier; 
 	private string nereidesEmpireModifier;
 	public UILabel racialLabel;
 
@@ -88,18 +88,9 @@ public class RacialTraits : MasterScript
 		return "";
 	}
 
-	public int HumanTrait()
+	public float HumanTrait()
 	{
-		if(ambitionCounter < -100)
-		{
-			ambitionCounter = -100;
-		}
-		if(ambitionCounter > 100)
-		{
-			ambitionCounter = 100;
-		}
-
-		ambitionOwnershipModifier = ambitionCounter / 25;
+		ambitionOwnershipModifier = ambitionCounter / 25.0f;
 
 		return ambitionOwnershipModifier;
 	}
@@ -108,17 +99,26 @@ public class RacialTraits : MasterScript
 	{
 		if(player.playerRace == "Humans")
 		{
-			if(player.systemsColonisedThisTurn > 0)
+			if(player.systemsColonisedThisTurn > 0f)
 			{
-				ambitionCounter += player.systemsColonisedThisTurn * 4;
+				ambitionCounter += player.systemsColonisedThisTurn * 4f;
 			}
-			if(player.planetsColonisedThisTurn > 0)
+			if(player.planetsColonisedThisTurn > 0f)
 			{
-				ambitionCounter += (player.planetsColonisedThisTurn - player.systemsColonisedThisTurn) * 2;
+				ambitionCounter += (player.planetsColonisedThisTurn - player.systemsColonisedThisTurn) * 2f;
 			}
 			if(player.systemsColonisedThisTurn == 0 && player.planetsColonisedThisTurn == 0)
 			{
-				ambitionCounter -= 2;
+				ambitionCounter -= 0.5f;
+			}
+
+			if(ambitionCounter < -100f)
+			{
+				ambitionCounter = -100f;
+			}
+			if(ambitionCounter > 100f)
+			{
+				ambitionCounter = 100f;
 			}
 		}
 
@@ -132,7 +132,7 @@ public class RacialTraits : MasterScript
 	{
 		if(playerTurnScript.playerRace == "Humans")
 		{
-			racialLabel.text = ("Ambition: " + ambitionCounter.ToString());
+			racialLabel.text = ("Ambition: " + ((int)ambitionCounter).ToString());
 		}
 
 		if(playerTurnScript.playerRace == "Nereides")

@@ -28,20 +28,23 @@ public class SystemDefence : MasterScript
 
 		if(underInvasion == false)
 		{
-			--regenerateTimer;
-
-			if(regenerateTimer <= 0)
+			if(regenerateTimer > 0)
 			{
-				for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
-				{
-					CalculatePlanetDefence(i);
-				}
+				--regenerateTimer;
+			}
 
+			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			{
+				CalculatePlanetDefence(i);
+			}
+
+			if(regenerateTimer <= 0 && systemListConstructor.systemList [system].systemDefence != tempDefence)
+			{
 				regenerateTimer = 0;
 
 				systemListConstructor.systemList [system].systemDefence += defenceRegenerator;
 
-				if(systemListConstructor.systemList [system].systemDefence == tempDefence)
+				if(systemListConstructor.systemList [system].systemDefence >= tempDefence)
 				{
 					regenerated = true;
 				}
@@ -62,13 +65,13 @@ public class SystemDefence : MasterScript
 	{
 		int maxDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership * systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel;
 		
-		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence != maxDefence)
 		{
-			systemListConstructor.systemList[system].planetsInSystem[i].planetDefence += defenceRegenerator;
+			systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence += defenceRegenerator;
 
-			if(systemListConstructor.systemList[system].planetsInSystem[i].planetDefence > maxDefence)
+			if(systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence > maxDefence)
 			{
-				systemListConstructor.systemList[system].planetsInSystem[i].planetDefence = maxDefence;
+				systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence = maxDefence;
 			}
 		}
 	}

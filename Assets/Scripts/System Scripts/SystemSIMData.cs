@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 public class SystemSIMData : MasterScript
 {
@@ -31,6 +32,7 @@ public class SystemSIMData : MasterScript
 
 	private void GetModifierValues(TurnInfo thisPlayer, int system, int planet)
 	{
+		//Debug.Log (gameObject.name + " | " + planet);
 		ownershipBonus = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership / 66.6666f;
 		scienceModifier = (ownershipBonus + thisPlayer.raceScience + techTreeScript.sciencePercentBonus + racialTraitScript.IncomeModifier(thisPlayer, "Science"));
 		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + techTreeScript.industryPercentBonus + racialTraitScript.IncomeModifier(thisPlayer, "Industry"));
@@ -59,7 +61,7 @@ public class SystemSIMData : MasterScript
 		{
 			allPlanetsInfo[planet] = gameObject.name + " " + (planet+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
 				+ systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership + "% Owned\n"
-					+ ((int)tempSci).ToString() + "\n" + ((int)tempInd).ToString() + "\n";
+					+ Math.Round(tempSci, 1).ToString() + "\n" + Math.Round (tempInd,1).ToString() + "\n";
 		}
 
 		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == false)
@@ -108,8 +110,6 @@ public class SystemSIMData : MasterScript
 			totalSystemScience = 0;
 			totalSystemIndustry = 0;
 		}
-
-		turnInfoScript.RefreshPlanetPower();
 	}
 
 	public void IncreaseOwnership()
@@ -156,7 +156,7 @@ public class SystemSIMData : MasterScript
 	{
 		if(owner == "Humans")
 		{
-			return racialTraitScript.HumanTrait();
+			return (int)racialTraitScript.HumanTrait();
 		}
 
 		return 0;

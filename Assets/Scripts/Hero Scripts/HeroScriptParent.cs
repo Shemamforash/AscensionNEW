@@ -7,15 +7,16 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
 	public HeroDetailsWindow heroDetails;
-	public int currentLevel = 1, noOfColonisedPlanets, heroAge, movementPoints, planetInvade = -1, system;
+	public int currentLevel = 1, noOfColonisedPlanets, movementSpeed, planetInvade = -1, system;
 	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength, speed, armour, tradeRoutes;
 	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
 	public bool isInvading = false, canLevelUp;
+	private float heroAge;
 	private GameObject levelUpLabel;
 
 	void Start()
 	{
-		heroAge = 0;
+		heroAge = Time.time;
 
 		shipFunctions = gameObject.GetComponent<ShipFunctions> ();
 		techTreeScript = gameObject.GetComponent<TechTreeScript>();
@@ -38,7 +39,7 @@ public class HeroScriptParent : MasterScript
 			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
 		}
 
-		movementPoints = 1;
+		movementSpeed = 1;
 
 		heroGUI.heroDetailsContainer.GetComponent<UIGrid> ().enabled = true;
 
@@ -158,9 +159,7 @@ public class HeroScriptParent : MasterScript
 			}
 		}
 
-		heroAge++;
-
-		if(heroAge == 10 || heroAge == 20)
+		if(heroAge + 60 == Time.time || heroAge + 270 == Time.time)
 		{
 			levelUpLabel = NGUITools.AddChild(heroGUI.buttonContainer, heroGUI.levelUpPrefab);
 

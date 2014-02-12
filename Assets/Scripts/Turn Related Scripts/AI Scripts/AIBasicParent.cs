@@ -1,66 +1,75 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AIBasicParent : TurnInfo 
+public class AIBasicParent : TurnInfo
 {
 	public string selkiesHomeSystem, nereidesHomeSystem, humansHomeSystem;
 	private float tempSIM, highestSIM, systemRatio;
 	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem;
 	
-	public void Expand(AIBasicParent thisPlayer)
+	public void Expand(TurnInfo thisPlayer)
 	{
 		for(float i = thisPlayer.capital; i > 0; --i)
 		{
 			AIExpansion(thisPlayer);
 		}
 
-		TurnEnd(thisPlayer);
+		turnInfoScript.TurnEnd(thisPlayer);
 	}
 
 	public void AIExpansion(TurnInfo thisPlayer)
 	{
-		currentPlanet = -1;
-		currentSystem = -1;
-
-		float planetSIM = CheckThroughPlanets (thisPlayer);
-		
-		float systemSIM = CheckThroughSystems (thisPlayer);
-		
-		if(planetSIM > systemSIM && thisPlayer.capital >= 5.0f)
+		if(thisPlayer.capital > 1)
 		{
-			currentPlanet = tempPlanet;
-			
-			currentSystem = tempSystem;
+			turnInfoScript.RefreshPlanetPower();
 
-			thisPlayer.capital -= 5.0f;
-		}
-		
-		if(systemSIM > planetSIM && thisPlayer.capital >= 10.0f)
-		{
-			currentPlanet = tempPlanetB;
-			
-			currentSystem = tempSystemB;
-			
-			systemListConstructor.systemList[currentSystem].systemOwnedBy = thisPlayer.playerRace;
-			
-			lineRenderScript = systemListConstructor.systemList[currentSystem].systemObject.GetComponent<LineRenderScript>();
-			
-			lineRenderScript.SetRaceLineColour(thisPlayer.playerRace);
-			
-			systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
-			
-			++systemsInPlay;
+			currentPlanet = -1;
+			currentSystem = -1;
 
-			++thisPlayer.systemsColonisedThisTurn;
-
-			thisPlayer.capital -= 10.0f;
-		}
-
-		if(currentPlanet != -1 && currentSystem != -1)
-		{
-			systemListConstructor.systemList[currentSystem].planetsInSystem[currentPlanet].planetColonised = true;
+			float planetSIM = CheckThroughPlanets (thisPlayer);
 			
-			++thisPlayer.planetsColonisedThisTurn;
+			float systemSIM = CheckThroughSystems (thisPlayer);
+			
+			if(planetSIM > systemSIM && thisPlayer.capital >= 5.0f)
+			{
+				currentPlanet = tempPlanet;
+				
+				currentSystem = tempSystem;
+
+				thisPlayer.capital -= 5.0f;
+
+				thisPlayer.capitalModifier += 0.05f;
+			}
+			
+			if(systemSIM > planetSIM && thisPlayer.capital >= 10.0f)
+			{
+				currentPlanet = tempPlanetB;
+				
+				currentSystem = tempSystemB;
+				
+				systemListConstructor.systemList[currentSystem].systemOwnedBy = thisPlayer.playerRace;
+				
+				lineRenderScript = systemListConstructor.systemList[currentSystem].systemObject.GetComponent<LineRenderScript>();
+				
+				lineRenderScript.SetRaceLineColour(thisPlayer.playerRace);
+				
+				systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
+				
+				++systemsInPlay;
+
+				++thisPlayer.systemsColonisedThisTurn;
+
+				thisPlayer.capital -= 10.0f;
+
+				thisPlayer.capitalModifier += 0.1f;
+			}
+
+			if(currentPlanet != -1 && currentSystem != -1)
+			{
+				systemListConstructor.systemList[currentSystem].planetsInSystem[currentPlanet].planetColonised = true;
+				
+				++thisPlayer.planetsColonisedThisTurn;
+			}
 
 			CheckToImprovePlanet (thisPlayer);
 		}
@@ -89,7 +98,7 @@ public class AIBasicParent : TurnInfo
 					}
 
 					tempSIM = (systemListConstructor.systemList[i].planetsInSystem[j].planetScience + systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry)
-						* (systemListConstructor.systemList[i].planetsInSystem[j].improvementSlots * 3.0f);
+						* (systemListConstructor.systemList[i].planetsInSystem[j].improvementSlots * 1.5f);
 
 					if(tempSIM > highestSIM)
 					{
@@ -131,7 +140,7 @@ public class AIBasicParent : TurnInfo
 						for(int l = 0; l < systemListConstructor.systemList[k].systemSize; ++l)
 						{
 							tempPlanetSIM = (systemListConstructor.systemList[k].planetsInSystem[l].planetScience + systemListConstructor.systemList[k].planetsInSystem[l].planetIndustry)  
-								* (systemListConstructor.systemList[k].planetsInSystem[l].improvementSlots * 1.0f);
+								* (systemListConstructor.systemList[k].planetsInSystem[l].improvementSlots);
 
 							if(tempPlanetSIM > tempHighestPlanetSIM)
 							{
@@ -191,11 +200,11 @@ public class AIBasicParent : TurnInfo
 		
 		if(systemSIMData.canImprove == true && systemDefence.underInvasion == false)
 		{
-			if(industry >= systemSIMData.improvementCost && thisPlayer.capital >= systemSIMData.improvementNumber + 1)
+			if(thisPlayer.industry >= systemSIMData.improvementCost && thisPlayer.capital >= systemSIMData.improvementNumber + 1)
 			{
 				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 				
-				industry -= (int)systemSIMData.improvementCost;
+				thisPlayer.industry -= (int)systemSIMData.improvementCost;
 
 				thisPlayer.capital -= systemSIMData.improvementNumber + 1;
 			}

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class OverlayGUI : MasterScript 
 {
@@ -58,9 +59,9 @@ public class OverlayGUI : MasterScript
 			
 			nameOverlay.text = mouseOverSystem.name;
 
-			scienceOverlay.text = ((int)systemSIMData.totalSystemScience).ToString();
+			scienceOverlay.text = (Math.Round(systemSIMData.totalSystemScience,1)).ToString();
 
-			industryOverlay.text = ((int)systemSIMData.totalSystemIndustry).ToString();
+			industryOverlay.text = (Math.Round(systemSIMData.totalSystemIndustry,1)).ToString();
 
 			defenceOverlay.text = systemListConstructor.systemList [system].systemDefence.ToString();
 

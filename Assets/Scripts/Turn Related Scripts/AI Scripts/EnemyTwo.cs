@@ -23,8 +23,6 @@ public class EnemyTwo : AIBasicParent
 
 		turnInfoScript.systemsInPlay++;
 		
-		capital = 50;
-		
 		for(int i = 0;  i < 60; ++i)
 		{
 			if(systemListConstructor.systemList[i].systemObject == GameObject.Find (homeSystem))
