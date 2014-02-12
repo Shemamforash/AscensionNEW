@@ -31,7 +31,7 @@ public class GalaxyGUI : MasterScript
 			scienceString = ((int)playerTurnScript.science).ToString();
 			industryString = ((int)playerTurnScript.industry).ToString ();
 			capitalString = ((int)playerTurnScript.capital).ToString ();
-			turnNumber = "Year: " + (2200 + (turnInfoScript.turn * 4)).ToString();
+			turnNumber = "Year: " + (2200 + (int)(turnInfoScript.turn / 2f)).ToString();
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 
 			if(systemListConstructor.systemList[selectedSystem].systemOwnedBy == null)
@@ -61,15 +61,6 @@ public class GalaxyGUI : MasterScript
 		turnLabel.text = turnNumber;
 		diplomacyLabelOne.text = playerEnemyOneDiplomacy;
 		diplomacyLabelTwo.text = playerEnemyTwoDiplomacy;
-	}
-
-	public void EndTurnFunction()
-	{
-		turnInfoScript.turn++;
-		playerTurnScript.TurnEnd (playerTurnScript);
-		enemyOneTurnScript.Expand(enemyOneTurnScript);
-		enemyTwoTurnScript.Expand(enemyTwoTurnScript);
-		diplomacyScript.PeaceTimer ();
 	}
 
 	public void CheckToColoniseSystem()
@@ -150,7 +141,6 @@ public class GalaxyGUI : MasterScript
 			if(tempRace != null)
 			{
 				SelectRace(tempRace);
-				turnInfoScript.RefreshPlanetPower();
 			}
 		}
 	}

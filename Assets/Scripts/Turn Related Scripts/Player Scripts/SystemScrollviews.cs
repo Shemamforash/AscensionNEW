@@ -8,6 +8,7 @@ public class SystemScrollviews : MasterScript
 	private List<GameObject> builtImprovementList = new List<GameObject>();
 	private Vector3 improvementListPosition = new Vector3();
 	private List<GameObject> improvementsList = new List<GameObject>();
+	public int selectedPlanet;
 
 	void Start()
 	{		
@@ -83,14 +84,14 @@ public class SystemScrollviews : MasterScript
 		{
 			if(techTreeScript.listOfImprovements[i].improvementName == improvement.name)
 			{
-				for(int j = 0; j < systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[systemGUI.selectedPlanet].improvementSlots; ++j)
+				for(int j = 0; j < systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[selectedPlanet].improvementSlots; ++j)
 				{
-					if(systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[systemGUI.selectedPlanet].improvementsBuilt[j] == null)
+					if(systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] == null)
 					{
 						if(techTreeScript.ImproveSystem(i) == true)
 						{
 							NGUITools.SetActive (improvement, false);
-							systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[systemGUI.selectedPlanet].improvementsBuilt[j] = techTreeScript.listOfImprovements[i].improvementName;
+							systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] = techTreeScript.listOfImprovements[i].improvementName;
 							UpdateScrollviewContents();
 							UpdateBuiltImprovements();
 							techTreeScript.ActiveTechnologies(systemGUI.selectedSystem, playerTurnScript);
@@ -124,7 +125,7 @@ public class SystemScrollviews : MasterScript
 	{
 		techTreeScript = systemListConstructor.systemList[systemGUI.selectedSystem].systemObject.GetComponent<TechTreeScript>();
 				
-		improvementsToBuildScrollView.transform.position = systemGUI.planetElementList[systemGUI.selectedPlanet].spriteObject.transform.position;
+		improvementsToBuildScrollView.transform.position = systemGUI.planetElementList[selectedPlanet].spriteObject.transform.position;
 		
 		improvementListPosition = new Vector3(improvementsToBuildScrollView.transform.localPosition.x, 
 		                                      improvementsToBuildScrollView.transform.localPosition.y + 240.0f, 

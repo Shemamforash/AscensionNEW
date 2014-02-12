@@ -23,13 +23,13 @@ public class HeroMovement : MasterScript
 
 	void Update()
 	{
-		if(pathfindTarget != null && heroScript.movementPoints > 0)
+		if(pathfindTarget != null)
 		{
 			heroIsMoving = true;
 			RefreshHeroLocation();
 		}
 
-		if(pathfindTarget == null || heroScript.movementPoints == 0)
+		if(pathfindTarget == null)
 		{
 			heroIsMoving = false;
 		}
@@ -121,8 +121,6 @@ public class HeroMovement : MasterScript
 				++currentVertex; //Update current system
 				
 				heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system
-				
-				--heroScript.movementPoints;
 
 				heroShip = gameObject.GetComponent<HeroShip>();
 
@@ -132,7 +130,7 @@ public class HeroMovement : MasterScript
 				}
 			}
 
-			gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, 20 * Time.deltaTime);
+			gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, (10 * heroScript.movementSpeed) * Time.deltaTime);
 		}
 
 		if(TestForProximity(currentPosition, HeroPositionAroundStar(pathfindTarget)) == true)

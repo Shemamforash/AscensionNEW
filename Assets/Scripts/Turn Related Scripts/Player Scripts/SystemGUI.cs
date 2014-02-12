@@ -180,6 +180,7 @@ public class SystemGUI : MasterScript
 			if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
 			{
 				NGUITools.SetActive(systemScrollviews.improvementsToBuildScrollView, true);
+				systemScrollviews.selectedPlanet = selectedPlanet;
 				systemScrollviews.UpdateScrollviewContents();
 			}
 
@@ -191,9 +192,12 @@ public class SystemGUI : MasterScript
 					++playerTurnScript.planetsColonisedThisTurn;
 					systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
 					playerTurnScript.capital -= 5;
+					playerTurnScript.capitalModifier += 0.1f;
 				}
 			}
 		}
+
+		selectedPlanet = -1;
 	}
 
 	public void ImprovePlanet()
@@ -219,6 +223,8 @@ public class SystemGUI : MasterScript
 		}
 
 		systemSIMData.SystemSIMCounter(selectedSystem, playerTurnScript);
+
+		selectedPlanet = -1;
 	}
 
 	private void UpdateColonisedPlanetDetails(int i)

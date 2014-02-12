@@ -49,8 +49,8 @@ public class SystemListConstructor : MasterScript
 				
 				planet.planetType = rimReader.ReadLine ();
 				planet.planetCategory = rimReader.ReadLine ();
-				planet.science = int.Parse (rimReader.ReadLine ());
-				planet.industry = int.Parse (rimReader.ReadLine ());
+				planet.science = float.Parse (rimReader.ReadLine ());
+				planet.industry = float.Parse (rimReader.ReadLine ());
 				planet.improvementSlots = int.Parse (rimReader.ReadLine ());
 				
 				planetList.Add (planet);
@@ -459,7 +459,8 @@ public class PlanetInfo
 {
 	public string planetType, planetCategory;
 	public bool colonised;
-	public int science, industry, improvementSlots;
+	public float science, industry;
+	public int improvementSlots;
 }
 
 public class StarSystem

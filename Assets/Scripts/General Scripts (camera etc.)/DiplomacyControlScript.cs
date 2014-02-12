@@ -24,9 +24,9 @@ public class DiplomacyControlScript : MasterScript
 	{
 		thisObject.diplomaticState = "";
 		thisObject.peaceCounter = 0;
-		thisObject.firstContactCounter = 10;
-		thisObject.turnsAtColdWar = 0;
-		thisObject.turnsAtPeace = 0;
+		thisObject.firstContactTimer = Time.time;
+		thisObject.timeAtColdWar = Time.time;
+		thisObject.timeAtPeace = Time.time;
 		thisObject.warBonus = 0.0f;
 		thisObject.peaceBonus = 0.0f;
 		thisObject.canDeclareWar = false;
@@ -36,12 +36,12 @@ public class DiplomacyControlScript : MasterScript
 
 	public void CheckForWarDeclarationAndPeaceExpiration(DiplomaticPosition tempObject)
 	{
-		if(tempObject.turnsAtColdWar > 10)
+		if(tempObject.timeAtColdWar > tempObject.timeAtColdWar + 40.0f)
 		{
 			tempObject.canDeclareWar = true;
 		}
 
-		if(tempObject.turnsAtPeace > 10)
+		if(tempObject.timeAtPeace > tempObject.timeAtPeace + 40.0f)
 		{
 			tempObject.ceaseFirePeriodExpired = true;
 		}
@@ -51,23 +51,23 @@ public class DiplomacyControlScript : MasterScript
 	{
 		if(playerEnemyOneRelations.hasMadeContact == true)
 		{
-			if(playerEnemyOneRelations.firstContactCounter > 0)
+			if(Time.time > playerEnemyOneRelations.firstContactTimer + 30.0f)
 			{
-				--playerEnemyOneRelations.firstContactCounter;
+				playerEnemyOneRelations.ceaseFirePeriodExpired = true;
 			}
 		}
 		if(playerEnemyTwoRelations.hasMadeContact == true)
 		{
-			if(playerEnemyTwoRelations.firstContactCounter > 0)
+			if(Time.time > playerEnemyTwoRelations.firstContactTimer + 30.0f)
 			{
-				--playerEnemyTwoRelations.firstContactCounter;
+				playerEnemyTwoRelations.ceaseFirePeriodExpired = true;
 			}
 		}
 		if(enemyOneEnemyTwoRelations.hasMadeContact == true)
 		{
-			if(enemyOneEnemyTwoRelations.firstContactCounter > 0)
+			if(Time.time > enemyOneEnemyTwoRelations.firstContactTimer + 30.0f)
 			{
-				--enemyOneEnemyTwoRelations.firstContactCounter;
+				enemyOneEnemyTwoRelations.ceaseFirePeriodExpired = true;
 			}
 		}
 	}
@@ -158,7 +158,7 @@ public class DiplomacyControlScript : MasterScript
 public class DiplomaticPosition
 {
 	public string diplomaticState;
-	public int firstContactCounter, peaceCounter, turnsAtPeace, turnsAtColdWar;
-	public float warBonus, peaceBonus;
+	public int peaceCounter;
+	public float warBonus, peaceBonus, firstContactTimer, timeAtPeace, timeAtColdWar;
 	public bool canDeclareWar, ceaseFirePeriodExpired, hasMadeContact;
 }

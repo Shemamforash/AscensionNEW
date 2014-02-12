@@ -79,7 +79,7 @@ public class HeroShip : ShipFunctions
 		shipFunctions.UpdateShips ();
 		heroScript.primaryPower = shipFunctions.primaryWeaponPower;
 		heroScript.armour = shipFunctions.armourRating;
-		heroScript.movementPoints = shipFunctions.engineValue;
+		heroScript.movementSpeed = shipFunctions.engineValue;
 
 		if(heroScript.heroTier2 == "Diplomat")
 		{
