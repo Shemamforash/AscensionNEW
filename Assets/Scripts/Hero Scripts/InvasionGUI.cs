@@ -7,6 +7,8 @@ public class InvasionGUI : MasterScript
 	public GameObject invasionScreen, grid;
 	private List<GameObject> planetList = new List<GameObject>();
 	private int system;
+	private string invasionInfo;
+	public bool openInvasionMenu = false;
 
 	void Start () 
 	{
@@ -31,24 +33,39 @@ public class InvasionGUI : MasterScript
 			systemSIMData = cameraFunctionsScript.selectedSystem.GetComponent<SystemSIMData> ();
 			systemDefence = cameraFunctionsScript.selectedSystem.GetComponent<SystemDefence> ();
 
-			if(systemDefence.underInvasion == true)
+			if(systemDefence.underInvasion == true && openInvasionMenu == true)
 			{
 				system = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
+				heroScript = systemListConstructor.systemList[system].enemyHero.GetComponent<HeroScriptParent>();
 
 				for(int i = 0; i < systemListConstructor.systemList[system].systemSize; i++)
 				{	
-					string invasionInfo = systemListConstructor.systemList[system].planetsInSystem[i].planetName + "\n"
-						+ systemListConstructor.systemList[system].planetsInSystem[i].planetType + "\n"
+					if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == true)
+					{
+						invasionInfo = systemListConstructor.systemList[system].planetsInSystem[i].planetName + "\n"
+							+ systemListConstructor.systemList[system].planetsInSystem[i].planetType + "\n"
 							+ systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership + "\n"
 							+ systemListConstructor.systemList[system].planetsInSystem[i].planetDefence;
+					}
+					else if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == false)
+					{
+						invasionInfo = "Uncolonised";
+					}
 					
 					planetList[i].GetComponent<UILabel>().text = invasionInfo;
 					
 					if(i < systemListConstructor.systemList[system].systemSize)
 					{
 						NGUITools.SetActive(planetList[i], true);
-						
-						planetList[i].GetComponent<UIButton>().enabled = true;
+
+						if(i == heroScript.planetInvade || invasionInfo == "Uncolonised")
+						{
+							planetList[i].GetComponent<UIButton>().enabled = false;
+						}
+						else
+						{
+							planetList[i].GetComponent<UIButton>().enabled = true;
+						}
 					}
 					
 					else if(i >= systemListConstructor.systemList[system].systemSize)
@@ -92,7 +109,5 @@ public class InvasionGUI : MasterScript
 				break;
 			}
 		}
-		
-
 	}
 }

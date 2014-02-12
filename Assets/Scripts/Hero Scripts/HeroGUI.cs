@@ -170,7 +170,6 @@ public class HeroGUI : MasterScript
 			}
 			if(hero.heroTier2 == "Soldier")
 			{
-				Debug.Log ("bacon");
 				popup.items.Add("Warlord");
 				popup.items.Add("Vanguard");
 			}

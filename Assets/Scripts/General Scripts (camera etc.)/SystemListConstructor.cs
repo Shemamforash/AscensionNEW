@@ -466,7 +466,7 @@ public class StarSystem
 {
 	public string systemName, systemOwnedBy;
 	public Vector3 systemPosition;
-	public GameObject systemObject;
+	public GameObject systemObject, allyHero, enemyHero;
 	public GameObject tradeRoute;
 	public int systemSize, numberOfConnections, systemDefence;
 	public List<Planet> planetsInSystem = new List<Planet> ();

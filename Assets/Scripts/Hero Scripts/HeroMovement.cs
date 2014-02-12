@@ -116,6 +116,7 @@ public class HeroMovement : MasterScript
 				heroScript.isInvading = false;
 				systemSIMData.isEmbargoed = false;
 				systemSIMData.isPromoted = false;
+				systemListConstructor.systemList[currentVertex].enemyHero = null;
 
 				++currentVertex; //Update current system
 				

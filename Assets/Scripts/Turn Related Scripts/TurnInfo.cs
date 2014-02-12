@@ -14,7 +14,7 @@ public class TurnInfo : MasterScript
 	[HideInInspector]
 	public bool endTurn, playerHasWon;
 	public Camera mainCamera;
-	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse;
+	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse, emptyMaterial;
 	public string playerRace, homePlanetType, playerHasWonRace, homeSystem;
 	public int turn = 0, systemsInPlay = 0;
 	public List<GameObject> playerOwnedHeroes = new List<GameObject> ();

@@ -36,6 +36,7 @@ public class CameraFunctions : MasterScript
 			doubleClick = false;
 			tier3HeroScript.openSystemLinkScreen = false;
 			heroGUI.openHeroLevellingScreen = false;
+			invasionGUI.openInvasionMenu = false;
 		}
 	}
 
@@ -76,6 +77,7 @@ public class CameraFunctions : MasterScript
 
 						if(systemDefence.canEnter == true)
 						{
+							invasionGUI.openInvasionMenu = true;
 							invasionGUI.OpenPlanetInvasionScreen();
 						}
 					}
