@@ -46,6 +46,40 @@ public class MapConstructor : MasterScript
 		return true;
 	}
 
+	public bool TestForAngle(GameObject thisSystem, GameObject targetSystem)
+	{
+		int current = RefreshCurrentSystem (thisSystem);
+		int target = RefreshCurrentSystem (targetSystem);
+
+		Vector3 directionVector1 = targetSystem.transform.position - thisSystem.transform.position;
+
+		for(int i = 0; i < systemListConstructor.systemList[current].permanentConnections.Count; ++i)
+		{
+			Vector3 directionVector2 = systemListConstructor.systemList[current].permanentConnections[i].transform.position - thisSystem.transform.position;
+
+			float angle = Vector3.Angle(directionVector1, directionVector2);
+
+			if(angle <= 10.0f)
+			{
+				return false;
+			}
+		}
+
+		for(int i = 0; i < systemListConstructor.systemList[target].permanentConnections.Count; ++i)
+		{
+			Vector3 directionVector2 = systemListConstructor.systemList[target].permanentConnections[i].transform.position - targetSystem.transform.position;
+			
+			float angle = Vector3.Angle(directionVector1, directionVector2);
+			
+			if(angle <= 10.0f)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private bool PointLiesOnLine(Vector3 systemA, Vector3 systemB, Vector2 intersection)
 	{
 		Vector2 point1 = new Vector2(systemA.x, systemA.y);
@@ -91,7 +125,7 @@ public class MapConstructor : MasterScript
 				
 				for(int k = 0; k < unlinkedSystems.Count; ++k) //For all unlinked systems
 				{
-					if(TestForIntersection(linkedSystems[j], unlinkedSystems[k]) == false)
+					if(TestForIntersection(linkedSystems[j], unlinkedSystems[k]) == false && TestForAngle(linkedSystems[j], unlinkedSystems[k]) == false)
 					{
 						continue;
 					}
@@ -127,8 +161,6 @@ public class MapConstructor : MasterScript
 	
 	private void AddPermanentSystem(int thisSystem, int nearestSystem)
 	{
-		Debug.Log (coordinateList.Count);
-
 		systemListConstructor.systemList[thisSystem].permanentConnections.Add (systemListConstructor.systemList[nearestSystem].systemObject); //Add target system to current systems permanent connections
 		systemListConstructor.systemList [nearestSystem].permanentConnections.Add (systemListConstructor.systemList [thisSystem].systemObject);
 		
@@ -234,12 +266,15 @@ public class MapConstructor : MasterScript
 					continue;
 				}
 
-				Node nearbySystem = new Node();
-					
-				nearbySystem.targetSystem = systemListConstructor.systemList[j].systemObject;
-				nearbySystem.targetDistance = distance;
-					
-				systemListConstructor.systemList[i].tempConnections.Add (nearbySystem);
+				if(distance < distanceMax)
+				{
+					Node nearbySystem = new Node();
+						
+					nearbySystem.targetSystem = systemListConstructor.systemList[j].systemObject;
+					nearbySystem.targetDistance = distance;
+						
+					systemListConstructor.systemList[i].tempConnections.Add (nearbySystem);
+				}
 
 			}
 		}
@@ -302,11 +337,12 @@ public class MapConstructor : MasterScript
 					continue;
 				}
 
-				Debug.Log (TestForIntersection(systemListConstructor.systemList[j].systemObject, systemListConstructor.systemList[targetSystem].systemObject));
-
 				if(TestForIntersection(systemListConstructor.systemList[j].systemObject, systemListConstructor.systemList[targetSystem].systemObject) == true)
 				{
-					AddPermanentSystem(j, targetSystem);
+					if(TestForAngle(systemListConstructor.systemList[j].systemObject, systemListConstructor.systemList[targetSystem].systemObject) == true)
+					{
+						AddPermanentSystem(j, targetSystem);
+					}
 				}
 			}
 		}

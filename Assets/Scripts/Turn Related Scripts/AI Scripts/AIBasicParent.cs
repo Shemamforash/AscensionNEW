@@ -79,7 +79,7 @@ public class AIBasicParent : TurnInfo
 	{
 		highestSIM = 0;
 
-		for(int i = 0; i < 60; ++i)
+		for(int i = 0; i < systemListConstructor.mapSize; ++i)
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy == thisPlayer.playerRace)
 			{
@@ -119,7 +119,7 @@ public class AIBasicParent : TurnInfo
 	{
 		highestSIM = 0;
 
-		for(int i = 0; i < 60; ++i)
+		for(int i = 0; i < systemListConstructor.mapSize; ++i)
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy == thisPlayer.playerRace)
 			{
