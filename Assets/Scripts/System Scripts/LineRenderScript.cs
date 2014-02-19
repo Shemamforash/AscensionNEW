@@ -93,8 +93,6 @@ public class LineRenderScript : MasterScript
 
 		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 		{
-			//Debug.Log (connectorLines.Count + " | " + connectorLines[i].rotation + " | " + gameObject);
-
 			GameObject clone = (GameObject)Instantiate (aQuad, connectorLines[i].midPoint, connectorLines[i].rotation);
 
 			clone.transform.localScale = connectorLines[i].scale;
