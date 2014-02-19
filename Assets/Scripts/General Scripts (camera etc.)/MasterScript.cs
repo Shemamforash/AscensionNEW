@@ -7,6 +7,8 @@ public class MasterScript : MonoBehaviour
 	public MasterScript masterScript;
 	[HideInInspector]
 	public SystemListConstructor systemListConstructor;
+	[HideInInspector]
+	public MapConstructor mapConstructor;
 
 	[HideInInspector]
 	public SystemSIMData systemSIMData;
@@ -76,6 +78,7 @@ public class MasterScript : MonoBehaviour
 		shipFunctions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<ShipFunctions> ();
 		heroTechTree = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<HeroTechTree> ();
 		invasionGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<InvasionGUI> ();
+		mapConstructor = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<MapConstructor> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem)

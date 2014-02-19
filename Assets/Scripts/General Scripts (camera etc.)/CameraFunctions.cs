@@ -13,7 +13,7 @@ public class CameraFunctions : MasterScript
 	[HideInInspector]
 	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false, lightFading;
 	
-	private float leftBound = -40, rightBound = 40, upperBound = 40, lowerBound = -40;
+	private float leftBound = -10, rightBound = 100, upperBound = 100, lowerBound = -10;
 	private float timer = 0.0f;
 	private float updatedX, updatedY;
 	private GameObject thisObject;
