@@ -24,8 +24,6 @@ public class LineRenderScript : MasterScript
 		systemSIMData = gameObject.GetComponent<SystemSIMData>();
 		thisSystem = RefreshCurrentSystem (gameObject);
 
-		//Debug.Log (systemListConstructor.systemList [thisSystem].numberOfConnections + " | " + gameObject);
-
 		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
 		{
 			objectB = systemListConstructor.systemList[thisSystem].permanentConnections[i];

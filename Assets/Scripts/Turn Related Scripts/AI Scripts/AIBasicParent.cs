@@ -4,7 +4,7 @@ using System.Collections;
 public class AIBasicParent : TurnInfo
 {
 	public string selkiesHomeSystem, nereidesHomeSystem, humansHomeSystem;
-	private float tempSIM, highestSIM, systemRatio;
+	private float tempSIM, highestSIM;
 	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem;
 	
 	public void Expand(TurnInfo thisPlayer)

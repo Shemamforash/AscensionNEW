@@ -56,7 +56,7 @@ public class TurnInfo : MasterScript
 			raceScience = 1;
 			raceIndustry = 1;
 			raceCapital = 0.6f;
-			homeSystem = "Sol";
+			homeSystem = "Midgard";
 			homePlanetType = "Ocean";
 			materialInUse = turnInfoScript.humansMaterial;
 		}
@@ -65,7 +65,7 @@ public class TurnInfo : MasterScript
 			raceScience = 1;
 			raceIndustry = 2;
 			raceCapital = 0.5f;
-			homeSystem = "Heracles";
+			homeSystem = "Samael";
 			homePlanetType = "Plains";
 			materialInUse = turnInfoScript.selkiesMaterial;
 		}
