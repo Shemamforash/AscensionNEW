@@ -22,10 +22,17 @@ public class EnemyTwo : AIBasicParent
 		PickRace ();
 
 		turnInfoScript.systemsInPlay++;
+
+		GameObject home = GameObject.Find (homeSystem);
 		
-		for(int i = 0;  i < 60; ++i)
+		for(int i = 0;  i < systemListConstructor.mapSize; ++i)
 		{
-			if(systemListConstructor.systemList[i].systemObject == GameObject.Find (homeSystem))
+			if(homeSystem == "Samael")
+			{
+				Debug.Log (systemListConstructor.systemList[i].systemName);
+			}
+
+			if(systemListConstructor.systemList[i].systemObject == home)
 			{
 				systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml;
 
 public class TechTreeScript : MasterScript 
 {
@@ -39,20 +40,23 @@ public class TechTreeScript : MasterScript
 
 	private void LoadTechTree() //Loads tech tree into two arrays (whether tech has been built, and the cost of each tech)
 	{		
-		using(StreamReader reader =  new StreamReader("ImprovementList.txt"))
+		using(XmlReader reader = XmlReader.Create ("ImprovementList.xml"))
 		{
-			for(int i = 0; i < 20; ++i)
+			while(reader.Read ())
 			{
-				ImprovementClass improvement = new ImprovementClass();
+				if(reader.Name == "Row")
+				{
+					ImprovementClass improvement = new ImprovementClass();
 
-				improvement.improvementName = reader.ReadLine();
-				improvement.improvementCategory = reader.ReadLine ();
-				improvement.improvementLevel = int.Parse (reader.ReadLine ());
-				improvement.improvementCost = float.Parse(reader.ReadLine ());
-				improvement.hasBeenBuilt = false;
-				improvement.improvementMessage = "";
+					improvement.improvementName = reader.GetAttribute("A");
+					improvement.improvementCategory = reader.GetAttribute("B");
+					improvement.improvementLevel = int.Parse (reader.GetAttribute("C"));
+					improvement.improvementCost = float.Parse(reader.GetAttribute("D"));
+					improvement.hasBeenBuilt = false;
+					improvement.improvementMessage = "";
 
-				listOfImprovements.Add (improvement);
+					listOfImprovements.Add (improvement);
+				}
 			}
 		}
 	}
@@ -162,7 +166,7 @@ public class TechTreeScript : MasterScript
 		{
 			tempCount = 0.0f;
 			
-			for(int i = 0; i < 60; ++i)
+			for(int i = 0; i < systemListConstructor.mapSize; ++i)
 			{
 				if(systemListConstructor.systemList[i].systemOwnedBy != thisPlayer.playerRace)
 				{
@@ -448,7 +452,7 @@ public class TechTreeScript : MasterScript
 	{		
 		currentPlanetsWithHyperNet = 0;
 		
-		for(int i = 0; i < 60; ++i)
+		for(int i = 0; i < systemListConstructor.mapSize; ++i)
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy == null || systemListConstructor.systemList[i].systemOwnedBy == thisPlayer.playerRace)
 			{

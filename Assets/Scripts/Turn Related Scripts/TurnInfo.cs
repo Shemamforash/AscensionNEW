@@ -34,7 +34,7 @@ public class TurnInfo : MasterScript
 
 		turnInfoScript.savedIterator = 0;
 
-		for(int i = 0; i < 60; i++)
+		for(int i = 0; i < systemListConstructor.mapSize; i++)
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy == null)
 			{
@@ -53,8 +53,8 @@ public class TurnInfo : MasterScript
 	{
 		if(playerRace == "Humans")
 		{
-			raceScience = 1;
-			raceIndustry = 1;
+			raceScience = 1 * (60 / systemListConstructor.mapSize);
+			raceIndustry = 1 * (60 / systemListConstructor.mapSize);
 			raceCapital = 0.6f;
 			homeSystem = "Midgard";
 			homePlanetType = "Ocean";
@@ -62,8 +62,8 @@ public class TurnInfo : MasterScript
 		}
 		if(playerRace == "Selkies")
 		{
-			raceScience = 1;
-			raceIndustry = 2;
+			raceScience = 1 * (60 / systemListConstructor.mapSize);
+			raceIndustry = 2 * (60 / systemListConstructor.mapSize);
 			raceCapital = 0.5f;
 			homeSystem = "Samael";
 			homePlanetType = "Plains";
@@ -71,8 +71,8 @@ public class TurnInfo : MasterScript
 		}
 		if(playerRace == "Nereides")
 		{
-			raceScience = 2;
-			raceIndustry = 1;
+			raceScience = 2 * (60 / systemListConstructor.mapSize);
+			raceIndustry = 1 * (60 / systemListConstructor.mapSize);
 			raceCapital = 0.4f;
 			homeSystem = "Nepthys";
 			homePlanetType = "Icy";
@@ -96,7 +96,7 @@ public class TurnInfo : MasterScript
 	{		
 		endTurn = true;
 
-		for(int i = 0; i < 60; ++i)
+		for(int i = 0; i < systemListConstructor.mapSize; ++i)
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy == selectedPlayer.playerRace || systemListConstructor.systemList[i].systemOwnedBy == null)
 			{

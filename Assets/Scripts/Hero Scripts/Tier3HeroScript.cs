@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Tier3HeroScript : MasterScript
 {
 	public DiplomaticPosition tempObject;
 
-	public GameObject[] linkableSystems = new GameObject[60];
+	public List<GameObject> linkableSystems = new List<GameObject>();
 	private Vector2 scrollPosition = Vector2.zero;
 	public bool openSystemLinkScreen, linkableSystemsExist;
 	private int availableSystems;
 
 	public void FillLinkableSystems()
 	{
-		for(int i = 0; i < 60; ++i)
+		for(int i = 0; i < systemListConstructor.mapSize; ++i)
 		{
 			linkableSystems[i] = null;
 
@@ -51,7 +52,7 @@ public class Tier3HeroScript : MasterScript
 
 			scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 
-			for(int i = 0; i < 60; ++i)
+			for(int i = 0; i < systemListConstructor.mapSize; ++i)
 			{
 				if(linkableSystems[i] == null || linkableSystems[i] == heroScript.heroLocation)
 				{

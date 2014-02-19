@@ -18,6 +18,8 @@ public class SystemListConstructor : MasterScript
 	private int connections;
 	public GameObject systemClone, originalSystem;
 	private float xPos, yPos, distanceXY;
+	public int mapSize;
+	public float systemScale = 0.0f;
 
 	private void Start()
 	{
@@ -46,19 +48,22 @@ public class SystemListConstructor : MasterScript
 	{
 		int randomInt = -1;
 		string system = null;
+		mapConstructor.distanceMax = (mapSize - 260) / -8f;
 
-		for(int i = 0; i < 57; ++i)
+		systemScale = (mapSize - 300.0f) / -160.0f;
+
+		for(int i = 0; i < 30; ++i)
 		{
-			for(int j = 0; j < 3; ++j)
+			for(int j = 0; j < 6; ++j)
 			{
-				if(uncheckedSystems.Count == 0)
+				if(uncheckedSystems.Count == 0 || firmSystems.Count == mapSize)
 				{
 					break;
 				}
 
 				randomInt = Random.Range (0, uncheckedSystems.Count);
 
-				if(j == 0)
+				if(j < mapSize / 30)
 				{
 					firmSystems.Add(uncheckedSystems[randomInt]);
 				}
@@ -88,6 +93,8 @@ public class SystemListConstructor : MasterScript
 		{
 			systemClone = (GameObject)Instantiate(originalSystem, systemList[i].systemPosition, Quaternion.identity);
 		
+			systemClone.transform.localScale = new Vector3(systemScale, systemScale, systemScale);
+
 			systemClone.name = systemList[i].systemName;
 		
 			systemList[i].systemObject = systemClone;
