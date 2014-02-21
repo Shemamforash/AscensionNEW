@@ -7,7 +7,6 @@ public class SystemScrollviews : MasterScript
 {
 	public GameObject builtImprovementLabel, improvementsToBuildScrollView, improvementMessageLabel, improvementMessageScrollview;
 	private List<GameObject> builtImprovementList = new List<GameObject>();
-	private Vector3 improvementListPosition = new Vector3();
 	private List<GameObject> improvementsList = new List<GameObject>();
 	public int selectedPlanet;
 
@@ -41,39 +40,35 @@ public class SystemScrollviews : MasterScript
 
 	private void SetUpImprovementLabels()
 	{		
-		using(XmlReader reader = XmlReader.Create ("ImprovementList.xml"))
+		for(int i = 0; i < systemListConstructor.basicImprovementsList.Count; ++i)
 		{
-			while(reader.Read ())
-			{
-				if(reader.Name == "Row")
-				{
-					GameObject message = NGUITools.AddChild(improvementMessageScrollview, improvementMessageLabel);
-					
-					NGUITools.SetActive(message, false);
-					
-					message.GetComponent<UIDragScrollView>().scrollView = improvementMessageScrollview.GetComponent<UIScrollView>();
-					
-					builtImprovementList.Add (message);
-					
-					GameObject improvement = NGUITools.AddChild(improvementsToBuildScrollView, builtImprovementLabel); //Scrollviewwindow is gameobject containing scrollview, scrollviewbutton is the button prefab
-					
-					improvement.transform.Find ("Sprite").GetComponent<UISprite>().depth = 1; //Depth set to 20 to ensure I can see it, will be changed when scrollview actually works
-					
-					improvement.transform.Find ("Label").GetComponent<UILabel>().depth = 2;
-					
-					improvement.GetComponent<UIDragScrollView>().scrollView = improvementsToBuildScrollView.GetComponent<UIScrollView>(); //Assigning scrollview variable of prefab
-					
-					improvement.name = reader.GetAttribute("A"); //Just naming the object in the hierarchy
-					
-					EventDelegate.Add(improvement.GetComponent<UIButton>().onClick, BuildImprovement);
-					
-					improvement.transform.Find ("Label").GetComponent<UILabel>().text = improvement.name + "\n" + reader.GetAttribute("D"); //Add label text
-					
-					improvementsList.Add (improvement); //Add improvement into a list so I can enable/disable improvements as needed
-					
-					NGUITools.SetActive(improvement, false); //Default set improvement to false so it won't be shown in scrollview unless needed
-				}
-			}
+			GameObject message = NGUITools.AddChild(improvementMessageScrollview, improvementMessageLabel);
+			
+			NGUITools.SetActive(message, false);
+			
+			message.GetComponent<UIDragScrollView>().scrollView = improvementMessageScrollview.GetComponent<UIScrollView>();
+			
+			builtImprovementList.Add (message);
+			
+			GameObject improvement = NGUITools.AddChild(improvementsToBuildScrollView, builtImprovementLabel); //Scrollviewwindow is gameobject containing scrollview, scrollviewbutton is the button prefab
+			
+			improvement.transform.Find ("Sprite").GetComponent<UISprite>().depth = 1; //Depth set to 20 to ensure I can see it, will be changed when scrollview actually works
+			
+			improvement.transform.Find ("Label").GetComponent<UILabel>().depth = 2;
+			
+			improvement.GetComponent<UIDragScrollView>().scrollView = improvementsToBuildScrollView.GetComponent<UIScrollView>(); //Assigning scrollview variable of prefab
+			
+			improvement.name = systemListConstructor.basicImprovementsList[i].name; //Just naming the object in the hierarchy
+			
+			EventDelegate.Add(improvement.GetComponent<UIButton>().onClick, BuildImprovement);
+			
+			improvement.transform.Find ("Label").GetComponent<UILabel>().text = improvement.name + "\n" + systemListConstructor.basicImprovementsList[i].cost; //Add label text
+
+			improvement.tag = "Improvement";
+			
+			improvementsList.Add (improvement); //Add improvement into a list so I can enable/disable improvements as needed
+			
+			NGUITools.SetActive(improvement, false); //Default set improvement to false so it won't be shown in scrollview unless needed
 		}
 	}
 
@@ -95,8 +90,9 @@ public class SystemScrollviews : MasterScript
 						{
 							NGUITools.SetActive (improvement, false);
 							systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] = techTreeScript.listOfImprovements[i].improvementName;
-							UpdateScrollviewContents();
 							UpdateBuiltImprovements();
+							UpdateScrollviewContents();
+							UpdateScrollViewPosition();
 							techTreeScript.ActiveTechnologies(systemGUI.selectedSystem, playerTurnScript);
 							break;
 						}
@@ -127,20 +123,9 @@ public class SystemScrollviews : MasterScript
 	public void UpdateScrollviewContents()
 	{
 		techTreeScript = systemListConstructor.systemList[systemGUI.selectedSystem].systemObject.GetComponent<TechTreeScript>();
-				
-		improvementsToBuildScrollView.transform.position = systemGUI.planetElementList[selectedPlanet].spriteObject.transform.position;
-		
-		improvementListPosition = new Vector3(improvementsToBuildScrollView.transform.localPosition.x, 
-		                                      improvementsToBuildScrollView.transform.localPosition.y + 240.0f, 
-		                                      improvementsToBuildScrollView.transform.localPosition.z);
-		
-		improvementsToBuildScrollView.transform.localPosition = improvementListPosition;
-		
+						
 		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
-		{			
-			improvementsToBuildScrollView.GetComponent<UIScrollView>().ResetPosition(); //Reset scrollview position
-			improvementsToBuildScrollView.GetComponent<UIGrid> ().Reposition (); //Reposition grid contents
-
+		{		
 			if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier 
 			   || techTreeScript.listOfImprovements[i].improvementCategory == enemyOneTurnScript.playerRace 
 			   || techTreeScript.listOfImprovements[i].improvementCategory == enemyTwoTurnScript.playerRace) 
@@ -154,6 +139,17 @@ public class SystemScrollviews : MasterScript
 
 		improvementsToBuildScrollView.GetComponent<UIScrollView>().ResetPosition(); //Reset scrollview position
 		improvementsToBuildScrollView.GetComponent<UIGrid> ().Reposition (); //Reposition grid contents
+	}
+
+	public void UpdateScrollViewPosition()
+	{
+		improvementsToBuildScrollView.transform.position = systemGUI.planetElementList [selectedPlanet].spriteObject.transform.position;
+		
+		Vector3 position = new Vector3(improvementsToBuildScrollView.transform.localPosition.x, 
+		                               improvementsToBuildScrollView.transform.localPosition.y + 240.0f, 
+		                               improvementsToBuildScrollView.transform.localPosition.z);
+		
+		improvementsToBuildScrollView.transform.localPosition = position;
 	}
 
 }

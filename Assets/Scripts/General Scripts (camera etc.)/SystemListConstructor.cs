@@ -14,6 +14,7 @@ public class SystemListConstructor : MasterScript
 	private List<string> uncheckedSystems = new List<string> ();
 	[HideInInspector]
 	private List<string> firmSystems = new List<string> ();
+	public List<BasicImprovement> basicImprovementsList = new List<BasicImprovement> ();
 
 	private int connections;
 	public GameObject systemClone, originalSystem;
@@ -29,6 +30,7 @@ public class SystemListConstructor : MasterScript
 		CheckSystem ();
 		CreateObjects ();
 		mapConstructor.DrawMinimumSpanningTree ();
+		LoadBasicTechTree ();
 	}
 
 	public int RefreshCurrentSystemA(GameObject thisSystem)
@@ -72,7 +74,7 @@ public class SystemListConstructor : MasterScript
 			}
 		}
 	}
-
+	
 	private void CheckSystem()
 	{
 		bool found = false;
@@ -224,8 +226,29 @@ public class SystemListConstructor : MasterScript
 		
 		return 0.0f;
 	}
-}
 
+	public void LoadBasicTechTree()
+	{
+		using(XmlReader reader = XmlReader.Create ("ImprovementList.xml"))
+		{
+			while(reader.Read ())
+			{
+				if(reader.Name == "Row")
+				{
+					BasicImprovement improvement = new BasicImprovement();
+					
+					improvement.name = reader.GetAttribute("A");
+					improvement.category = reader.GetAttribute("B");
+					improvement.level = int.Parse (reader.GetAttribute("C"));
+					improvement.cost = float.Parse(reader.GetAttribute("D"));
+					improvement.details = reader.GetAttribute("E");
+					
+					basicImprovementsList.Add (improvement);
+				}
+			}
+		}
+	}
+}
 
 public class PlanetInfo
 {
@@ -254,5 +277,12 @@ public class Planet
 	public float planetScience, planetIndustry;
 	public bool planetColonised, underEnemyControl;
 	public int planetOwnership, planetDefence, planetImprovementLevel, improvementSlots, maxOwnership;
+}
+
+public class BasicImprovement
+{
+	public string name, category, details;
+	public float cost;
+	public int level;
 }
 

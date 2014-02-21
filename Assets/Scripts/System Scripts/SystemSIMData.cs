@@ -34,8 +34,8 @@ public class SystemSIMData : MasterScript
 	{
 		//Debug.Log (gameObject.name + " | " + planet);
 		ownershipBonus = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership / 66.6666f;
-		scienceModifier = (ownershipBonus + thisPlayer.raceScience + techTreeScript.sciencePercentBonus + racialTraitScript.IncomeModifier(thisPlayer, "Science"));
-		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + techTreeScript.industryPercentBonus + racialTraitScript.IncomeModifier(thisPlayer, "Industry"));
+		scienceModifier = (ownershipBonus + thisPlayer.raceScience + techTreeScript.sciencePercentBonus);
+		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + techTreeScript.industryPercentBonus + racialTraitScript.NereidesIndustryModifer(thisPlayer));
 	}
 
 	public void CheckPlanetValues(int system, int planet, TurnInfo thisPlayer)

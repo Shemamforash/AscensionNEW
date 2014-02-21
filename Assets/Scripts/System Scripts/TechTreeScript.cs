@@ -8,6 +8,7 @@ public class TechTreeScript : MasterScript
 {
 	public float sciencePercentBonus, industryPercentBonus;
 	public float sciencePointBonus, industryPointBonus, tempCount;
+	public GameObject tooltip;
 	public int techTier = 0;
 	private int currentPlanetsWithHyperNet = 0;
 
@@ -21,7 +22,7 @@ public class TechTreeScript : MasterScript
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent>();
 
-		LoadTechTree();
+		LoadNewTechTree();
 	}
 
 	public bool ImproveSystem(int improvement) //Occurs if button of tech is clicked.
@@ -38,26 +39,20 @@ public class TechTreeScript : MasterScript
 		}
 	}
 
-	private void LoadTechTree() //Loads tech tree into two arrays (whether tech has been built, and the cost of each tech)
+	private void LoadNewTechTree() //Loads tech tree into two arrays (whether tech has been built, and the cost of each tech)
 	{		
-		using(XmlReader reader = XmlReader.Create ("ImprovementList.xml"))
+		for(int i = 0; i < systemListConstructor.basicImprovementsList.Count; ++i)
 		{
-			while(reader.Read ())
-			{
-				if(reader.Name == "Row")
-				{
-					ImprovementClass improvement = new ImprovementClass();
+			ImprovementClass newImprovement = new ImprovementClass();
 
-					improvement.improvementName = reader.GetAttribute("A");
-					improvement.improvementCategory = reader.GetAttribute("B");
-					improvement.improvementLevel = int.Parse (reader.GetAttribute("C"));
-					improvement.improvementCost = float.Parse(reader.GetAttribute("D"));
-					improvement.hasBeenBuilt = false;
-					improvement.improvementMessage = "";
+			newImprovement.improvementName = systemListConstructor.basicImprovementsList[i].name;
+			newImprovement.improvementCategory = systemListConstructor.basicImprovementsList[i].category;
+			newImprovement.improvementCost = systemListConstructor.basicImprovementsList[i].cost;
+			newImprovement.improvementLevel = systemListConstructor.basicImprovementsList[i].level;
+			newImprovement.improvementMessage = "";
+			newImprovement.hasBeenBuilt = false;
 
-					listOfImprovements.Add (improvement);
-				}
-			}
+			listOfImprovements.Add(newImprovement);
 		}
 	}
 
@@ -155,9 +150,12 @@ public class TechTreeScript : MasterScript
 			tempCount = 0.0f;
 			
 			int j = CheckDiplomaticStateOfAllPlayers(thisPlayer, "Peace");
-			
-			sciencePointBonus += (turnInfoScript.turn * Mathf.Pow (2.0f, j));
-			tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
+
+			if(j != 0)
+			{
+				sciencePointBonus += (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
+				tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
+			}
 			
 			listOfImprovements[3].improvementMessage = ("+" + tempCount + " Science from Peace");
 		}
@@ -257,11 +255,11 @@ public class TechTreeScript : MasterScript
 			tempCount = 0.0f;
 			float tempCountB = 0.0f;
 			
-			sciencePointBonus += systemSIMData.totalSystemScience;
-			tempCount = systemSIMData.totalSystemScience;
+			sciencePointBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
+			tempCount = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
 			
-			industryPointBonus -= (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
-			tempCountB = (0.5f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
+			industryPointBonus -= (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
+			tempCountB = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			
 			listOfImprovements[9].improvementMessage = ("+" + tempCount + " Science, -" + tempCountB + " Industry On System");
 		}
