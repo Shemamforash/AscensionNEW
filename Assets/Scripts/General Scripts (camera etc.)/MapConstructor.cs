@@ -7,6 +7,7 @@ public class MapConstructor : MasterScript
 {
 	private List<ConnectionCoordinates> coordinateList = new List<ConnectionCoordinates>();
 	public float distanceMax;
+	public bool connected = false;
 
 	public bool TestForIntersection(GameObject thisSystem, GameObject targetSystem)
 	{
@@ -59,7 +60,7 @@ public class MapConstructor : MasterScript
 
 			float angle = Vector3.Angle(directionVector1, directionVector2);
 
-			if(angle <= 10.0f)
+			if(angle <= 15.0f)
 			{
 				return false;
 			}
@@ -71,7 +72,7 @@ public class MapConstructor : MasterScript
 			
 			float angle = Vector3.Angle(directionVector1, directionVector2);
 			
-			if(angle <= 10.0f)
+			if(angle <= 15.0f)
 			{
 				return false;
 			}
@@ -354,6 +355,8 @@ public class MapConstructor : MasterScript
 				systemListConstructor.systemList[i].numberOfConnections = systemListConstructor.systemList[i].permanentConnections.Count;
 			}
 		}
+
+		connected = true;
 	}
 }
 

@@ -90,6 +90,8 @@ public class CameraFunctions : MasterScript
 	{		
 		if(Input.GetAxis ("Horizontal") > 0)
 		{
+			moveCamera = false;
+
 			updatedX += panSpeed;
 			
 			if(updatedX > rightBound) //Prevent scrolling over screen edge
@@ -102,6 +104,8 @@ public class CameraFunctions : MasterScript
 
 		if(Input.GetAxis ("Horizontal") < 0)
 		{
+			moveCamera = false;
+
 			updatedX -= panSpeed;
 			
 			if(updatedX < leftBound) //Prevent scrolling over screen edge	
@@ -114,6 +118,8 @@ public class CameraFunctions : MasterScript
 
 		if(Input.GetAxis ("Vertical") > 0)
 		{
+			moveCamera = false;
+
 			updatedY += panSpeed;
 			
 			if(updatedY > upperBound) //Prevent scrolling over screen edge	
@@ -126,6 +132,8 @@ public class CameraFunctions : MasterScript
 
 		if(Input.GetAxis ("Vertical") < 0)
 		{
+			moveCamera = false;
+
 			updatedY -= panSpeed;
 			
 			if(updatedY < lowerBound) //Prevent scrolling over screen edge	
@@ -139,38 +147,32 @@ public class CameraFunctions : MasterScript
 	
 	public void ZoomCamera() //Changes height of camera
 	{		
-		Vector3 cameraPositionNew = new Vector3(cameraMain.transform.position.x, cameraMain.transform.position.y, zPosition);
-		
 		if(Input.GetAxis ("Mouse ScrollWheel") < 0) //Zoom in
 		{
+			moveCamera = false;
+
 			zPosition -= zoomSpeed * Time.deltaTime;
 		
 			if(zPosition < maxZoom)
 			{
 				zPosition = maxZoom;
-				
-				cameraMain.transform.position = cameraPositionNew;
 			}
-			else
-			{
-				cameraMain.transform.position = cameraPositionNew;
-			}
+
+			cameraMain.transform.position = new Vector3(cameraMain.transform.position.x, cameraMain.transform.position.y, zPosition);
 		}
 
 		if(Input.GetAxis ("Mouse ScrollWheel") > 0) //Zoom out
 		{
+			moveCamera = false;
+
 			zPosition += zoomSpeed * Time.deltaTime;
 			
 			if(zPosition > minZoom)
 			{
 				zPosition = minZoom;
-				
-				cameraMain.transform.position = cameraPositionNew;
 			}
-			else
-			{
-				cameraMain.transform.position = cameraPositionNew;
-			}
+
+			cameraMain.transform.position = new Vector3(cameraMain.transform.position.x, cameraMain.transform.position.y, zPosition);
 		}
 	}
 
@@ -194,15 +196,17 @@ public class CameraFunctions : MasterScript
 			if(cameraMain.transform.position == homingPlanetPosition || Time.time > timer + 1.0f) //If lerp exceeds timer, camera position will lock to point at object
 			{
 				homingPlanetPosition = cameraMain.transform.position;
-
-				updatedX = cameraMain.transform.position.x;
-
-				updatedY = cameraMain.transform.position.y;
 				
 				moveCamera = false; //Stop moving camera
 				
 				timer = 0.0f; //Reset timer
 			}
+
+			updatedX = cameraMain.transform.position.x;
+			
+			updatedY = cameraMain.transform.position.y;
+			
+			zPosition = cameraMain.transform.position.z;
 			
 			cameraMain.transform.position = Vector3.Lerp (currentPosition, homingPlanetPosition, 0.1f);
 		}

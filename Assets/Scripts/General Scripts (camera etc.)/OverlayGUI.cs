@@ -34,11 +34,11 @@ public class OverlayGUI : MasterScript
 	private void UpdatePosition()
 	{
 		Vector3 position = mainCamera.WorldToViewportPoint (mouseOverSystem.transform.position);
-
+		
 		position = uiCamera.ViewportToWorldPoint (position);
-
+		
 		Vector3 newPosition = new Vector3(position.x, position.y, -37.0f);
-
+		
 		systemOverlay.transform.position = newPosition;
 	}
 

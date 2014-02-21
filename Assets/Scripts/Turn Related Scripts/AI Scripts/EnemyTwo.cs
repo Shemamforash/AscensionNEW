@@ -25,13 +25,8 @@ public class EnemyTwo : AIBasicParent
 
 		GameObject home = GameObject.Find (homeSystem);
 		
-		for(int i = 0;  i < systemListConstructor.mapSize; ++i)
+		for(int i = 0;  i < systemListConstructor.systemList.Count; ++i)
 		{
-			if(homeSystem == "Samael")
-			{
-				Debug.Log (systemListConstructor.systemList[i].systemName);
-			}
-
 			if(systemListConstructor.systemList[i].systemObject == home)
 			{
 				systemListConstructor.systemList[i].systemOwnedBy = playerRace;

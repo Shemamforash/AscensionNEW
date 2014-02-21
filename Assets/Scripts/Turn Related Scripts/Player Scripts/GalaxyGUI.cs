@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class GalaxyGUI : MasterScript 
 {
-	public GameObject coloniseButton, planetSelectionWindow;
+	public GameObject coloniseButton, planetSelectionWindow, purgeButton;
 	private List<GameObject> planetSelectionList = new List<GameObject>();
 	private int selectedSystem;
 	private string tempRace, scienceString, industryString, capitalString, turnNumber, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
@@ -51,6 +51,11 @@ public class GalaxyGUI : MasterScript
 		enemyOneTurnScript.SetRace();
 		enemyTwoTurnScript.SetRace();
 		raceLabel.text = playerTurnScript.playerRace;
+
+		if(playerTurnScript.playerRace == "Nereides")
+		{
+			NGUITools.SetActive(purgeButton, true);
+		}
 	}
 
 	private void UpdateLabels()
@@ -119,7 +124,7 @@ public class GalaxyGUI : MasterScript
 	{
 		GUI.skin = systemGUI.mySkin;
 
-		if(playerTurnScript.playerRace == null)
+		if(playerTurnScript.playerRace == null && mapConstructor.connected == true)
 		{
 			GUI.Box (new Rect(Screen.width/2 - 150, Screen.height/2 - 40, 300, 80), "\nSelect Race");
 			

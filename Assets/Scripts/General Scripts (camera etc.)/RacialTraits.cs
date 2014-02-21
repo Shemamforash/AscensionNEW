@@ -4,9 +4,7 @@ using System.Collections;
 public class RacialTraits : MasterScript 
 {
 	public float ambitionCounter, ambitionOwnershipModifier;
-	private int nereidesProgressionCounter;
-	private float nereidesIndustryModifier, nereidesScienceModifier; 
-	private string nereidesEmpireModifier;
+	public int nereidesStacks;
 	public UILabel racialLabel;
 
 	void Start()
@@ -14,78 +12,24 @@ public class RacialTraits : MasterScript
 		ambitionCounter = 0;
 	}
 
-	public float IncomeModifier(TurnInfo player, string resource)
+	public void Purge()
 	{
-		if(player.playerRace == "Nereides")
+		while(playerTurnScript.science >= 100 && playerTurnScript.industry >= 100)
 		{
-			if(resource == "Science")
-			{
-				return nereidesScienceModifier;
-			}
-			if(resource == "Industry")
-			{
-				return nereidesIndustryModifier;
-			}
-		}
-
-		return 0f;
-	}
-
-	public void NereidesTrait(TurnInfo player)
-	{
-		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
-		{
-			if(systemListConstructor.systemList[i].systemOwnedBy == "Nereides")
-			{
-				systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
-
-				if(nereidesProgressionCounter < 2000 || (nereidesProgressionCounter >= 4000 && nereidesProgressionCounter < 6000))
-				{
-					nereidesProgressionCounter += (int)(0.2f * systemSIMData.totalSystemScience);
-					player.science -= 0.2f * systemSIMData.totalSystemScience;
-					nereidesScienceModifier = -0.2f;
-					nereidesIndustryModifier = 0f;
-				}
-
-				if(nereidesProgressionCounter >= 2000 && nereidesProgressionCounter < 4000 || (nereidesProgressionCounter >= 4000 && nereidesProgressionCounter < 6000))
-				{
-					nereidesProgressionCounter += (int)(0.2f * systemSIMData.totalSystemIndustry);
-					player.industry -= 0.2f * systemSIMData.totalSystemIndustry;
-					nereidesScienceModifier = 0f;
-					nereidesIndustryModifier = -0.2f;
-				}
-
-				if(nereidesProgressionCounter >= 6000)
-				{
-					player.industry += systemSIMData.totalSystemIndustry;
-					player.science += systemSIMData.totalSystemScience;
-					nereidesScienceModifier = 1f;
-					nereidesIndustryModifier = 1f;
-				}
-			}
+			playerTurnScript.science -= 100;
+			playerTurnScript.industry -= 100;
+			++nereidesStacks;
 		}
 	}
 
-	public string CheckNereidesRacialMessage()
+	public float NereidesIndustryModifer (TurnInfo thisPlayer)
 	{
-		if(nereidesProgressionCounter < 2000)
+		if(thisPlayer.playerRace == "Nereides")
 		{
-			return "-20% Science from Stage 1";
-		}
-		if(nereidesProgressionCounter >= 2000 && nereidesProgressionCounter < 4000)
-		{
-			return "-20% Industry from Stage 2";
-		}
-		if(nereidesProgressionCounter >= 4000 && nereidesProgressionCounter < 6000)
-		{
-			return "-20% SIM from Stage 4";;
-		}
-		if(nereidesProgressionCounter >= 6000)
-		{
-			return "+100% SIM from Stage 5";
+			return nereidesStacks / 10;
 		}
 
-		return "";
+		return 0;
 	}
 
 	public float HumanTrait()
@@ -101,11 +45,11 @@ public class RacialTraits : MasterScript
 		{
 			if(player.systemsColonisedThisTurn > 0f)
 			{
-				ambitionCounter += player.systemsColonisedThisTurn * 4f;
+				ambitionCounter += player.systemsColonisedThisTurn * 4f * (60 / systemListConstructor.mapSize);
 			}
 			if(player.planetsColonisedThisTurn > 0f)
 			{
-				ambitionCounter += (player.planetsColonisedThisTurn - player.systemsColonisedThisTurn) * 2f;
+				ambitionCounter += (player.planetsColonisedThisTurn - player.systemsColonisedThisTurn) * 2f * (60 / systemListConstructor.mapSize);
 			}
 			if(player.systemsColonisedThisTurn == 0 && player.planetsColonisedThisTurn == 0)
 			{
@@ -121,11 +65,6 @@ public class RacialTraits : MasterScript
 				ambitionCounter = 100f;
 			}
 		}
-
-		if(player.playerRace == "Nereides")
-		{
-			NereidesTrait(player);
-		}
 	}
 
 	void Update()
@@ -137,7 +76,7 @@ public class RacialTraits : MasterScript
 
 		if(playerTurnScript.playerRace == "Nereides")
 		{
-			racialLabel.text = CheckNereidesRacialMessage();
+			racialLabel.text = nereidesStacks + " stacks";
 		}
 
 		if(playerTurnScript.playerRace == "Selkies")

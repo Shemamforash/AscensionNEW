@@ -179,9 +179,10 @@ public class SystemGUI : MasterScript
 		{
 			if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
 			{
-				NGUITools.SetActive(systemScrollviews.improvementsToBuildScrollView, true);
 				systemScrollviews.selectedPlanet = selectedPlanet;
+				NGUITools.SetActive(systemScrollviews.improvementsToBuildScrollView, true);
 				systemScrollviews.UpdateScrollviewContents();
+				systemScrollviews.UpdateScrollViewPosition();
 			}
 
 			if(playerTurnScript.capital >= 5)
@@ -269,6 +270,7 @@ public class SystemGUI : MasterScript
 			{
 				NGUITools.SetActive(planetElementList[i].improvementSlots[j], true);
 				planetElementList[i].improvementSlots[j].gameObject.GetComponent<UILabel>().text = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementsBuilt[j];
+				planetElementList[i].improvementSlots[j].gameObject.name = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementsBuilt[j];
 			}
 			if(j >= systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementSlots)
 			{
