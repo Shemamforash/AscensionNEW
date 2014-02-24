@@ -3,19 +3,7 @@ using System.Collections;
 
 public class EnemyOne : AIBasicParent
 {	
-	public void SetRace()
-	{
-		if(playerTurnScript.playerRace == "Humans" || playerTurnScript.playerRace == "Selkies")
-		{
-			RaceStart ("Nereides");
-		}
-		if(playerTurnScript.playerRace == "Nereides")
-		{
-			RaceStart ("Humans");
-		}
-	}
-	
-	void RaceStart(string thisRace)
+	public void RaceStart(string thisRace)
 	{		
 		playerRace = thisRace;
 

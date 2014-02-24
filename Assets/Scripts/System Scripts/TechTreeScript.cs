@@ -417,7 +417,7 @@ public class TechTreeScript : MasterScript
 			}
 		}
 		
-		if(thisPlayer == enemyOneTurnScript)
+		if(thisPlayer == turnInfoScript.allPlayers[0])
 		{
 			if(diplomacyScript.playerEnemyOneRelations.diplomaticState == state)
 			{
@@ -430,7 +430,7 @@ public class TechTreeScript : MasterScript
 			}
 		}
 		
-		if(thisPlayer == enemyTwoTurnScript)
+		if(thisPlayer == turnInfoScript.allPlayers[1])
 		{
 			if(diplomacyScript.playerEnemyTwoRelations.diplomaticState == state)
 			{

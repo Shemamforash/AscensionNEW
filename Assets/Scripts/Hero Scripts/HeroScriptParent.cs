@@ -30,13 +30,15 @@ public class HeroScriptParent : MasterScript
 		{
 			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
 		}
-		if (systemListConstructor.systemList [system].systemOwnedBy == enemyOneTurnScript.playerRace) 
+
+		if (systemListConstructor.systemList [system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace) 
 		{
-			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyOne>();
+			turnInfoScript = turnInfoScript.allPlayers[0];
 		}
-		if (systemListConstructor.systemList [system].systemOwnedBy == enemyTwoTurnScript.playerRace) 
+
+		if (systemListConstructor.systemList [system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace) 
 		{
-			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<EnemyTwo>();
+			turnInfoScript = turnInfoScript.allPlayers[1];
 		}
 
 		movementSpeed = 1;
@@ -77,35 +79,35 @@ public class HeroScriptParent : MasterScript
 	{
 		if(heroOwnedBy == playerTurnScript.playerRace)
 		{
-			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
 			{
 				return diplomacyScript.playerEnemyOneRelations;
 			}
-			if(systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 			{
 				return diplomacyScript.playerEnemyTwoRelations;
 			}
 		}
 
-		if(heroOwnedBy == enemyOneTurnScript.playerRace)
+		if(heroOwnedBy == turnInfoScript.allPlayers[0].playerRace)
 		{
 			if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace)
 			{
 				return diplomacyScript.playerEnemyOneRelations;
 			}
-			if(systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 			{
 				return diplomacyScript.enemyOneEnemyTwoRelations;
 			}
 		}
 
-		if(heroOwnedBy == enemyTwoTurnScript.playerRace)
+		if(heroOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 		{
 			if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace)
 			{
 				return diplomacyScript.playerEnemyTwoRelations;
 			}
-			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
 			{
 				return diplomacyScript.enemyOneEnemyTwoRelations;
 			}
