@@ -48,8 +48,13 @@ public class GalaxyGUI : MasterScript
 	{
 		playerTurnScript.playerRace = thisRace;
 		playerTurnScript.StartTurn();
-		enemyOneTurnScript.SetRace();
-		enemyTwoTurnScript.SetRace();
+		turnInfoScript.CreateEnemyAI (2);
+
+		for(int i = 0; i < turnInfoScript.allPlayers.Count; ++i)
+		{
+			turnInfoScript.allPlayers[i].RaceStart(turnInfoScript.allPlayers[i].playerRace);
+		}
+
 		raceLabel.text = playerTurnScript.playerRace;
 
 		if(playerTurnScript.playerRace == "Nereides")

@@ -17,7 +17,8 @@ public class Tier3HeroScript : MasterScript
 		{
 			linkableSystems[i] = null;
 
-			if(systemListConstructor.systemList[i].systemOwnedBy == enemyOneTurnScript.playerRace || systemListConstructor.systemList[i].systemOwnedBy == enemyTwoTurnScript.playerRace && systemListConstructor.systemList[i].tradeRoute == null)
+			if(systemListConstructor.systemList[i].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace || 
+			   systemListConstructor.systemList[i].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace && systemListConstructor.systemList[i].tradeRoute == null)
 			{
 				if(systemListConstructor.systemList[i].systemObject != heroScript.heroLocation && heroScript.linkedHeroObject == null)
 				{

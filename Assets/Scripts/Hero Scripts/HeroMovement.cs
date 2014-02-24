@@ -164,17 +164,20 @@ public class HeroMovement : MasterScript
 			position.x = location.transform.position.x;
 			position.y = location.transform.position.y + 1.5f;
 		}
-		
-		if(heroScript.heroOwnedBy == enemyOneTurnScript.playerRace)
+
+		if(heroScript.heroOwnedBy == turnInfoScript.allPlayers[0].name)
 		{
 			position.x = location.transform.position.x + 0.75f;
 			position.y = location.transform.position.y - 0.5f;
 		}
-		
-		if(heroScript.heroOwnedBy == enemyTwoTurnScript.playerRace)
+
+		if(turnInfoScript.allPlayers.Count > 1)
 		{
-			position.x = location.transform.position.x - 0.75f;
-			position.y = location.transform.position.y - 0.5f;
+			if(heroScript.heroOwnedBy == turnInfoScript.allPlayers[1].name)
+			{
+				position.x = location.transform.position.x - 0.75f;
+				position.y = location.transform.position.y - 0.5f;
+			}
 		}
 
 		position.z = location.transform.position.z;

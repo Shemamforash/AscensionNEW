@@ -21,7 +21,8 @@ public class HeroShip : ShipFunctions
 		{
 			system = RefreshCurrentSystem(heroScript.heroLocation);
 
-			if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace || systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace || 
+			   systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 			{
 				NGUITools.SetActive(heroGUI.invasionButton, true);
 
@@ -144,12 +145,12 @@ public class HeroShip : ShipFunctions
 	{
 		DiplomaticPosition position = null;
 
-		if(systemListConstructor.systemList[system].systemOwnedBy == enemyOneTurnScript.playerRace)
+		if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
 		{
 			position = diplomacyScript.playerEnemyOneRelations;
 		}
 		
-		if(systemListConstructor.systemList[system].systemOwnedBy == enemyTwoTurnScript.playerRace)
+		if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 		{
 			position = diplomacyScript.playerEnemyTwoRelations;
 		}

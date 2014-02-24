@@ -54,12 +54,20 @@ public class SystemListConstructor : MasterScript
 
 		systemScale = (mapSize - 300.0f) / -160.0f;
 
+		bool filledSystem = false;
+
 		for(int i = 0; i < 30; ++i)
 		{
+			if(filledSystem == true)
+			{
+				break;
+			}
+
 			for(int j = 0; j < 6; ++j)
 			{
-				if(uncheckedSystems.Count == 0 || firmSystems.Count == mapSize)
+				if(firmSystems.Count == mapSize)
 				{
+					filledSystem = true;
 					break;
 				}
 
@@ -84,7 +92,7 @@ public class SystemListConstructor : MasterScript
 			if(firmSystems.Contains (systemList[i].systemName) == false)
 			{
 				systemList.RemoveAt(i);
-				i = 0;
+				--i;
 			}
 		}
 	}

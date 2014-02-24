@@ -52,7 +52,7 @@ public class PlayerTurn : TurnInfo
 			{
 				int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
 
-				if(systemListConstructor.systemList[j].systemOwnedBy == enemyOneTurnScript.playerRace)
+				if(systemListConstructor.systemList[j].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
 				{
 					if(diplomacyScript.playerEnemyOneRelations.hasMadeContact == false)
 					{
@@ -60,7 +60,7 @@ public class PlayerTurn : TurnInfo
 					}
 				}
 
-				if(systemListConstructor.systemList[j].systemOwnedBy == enemyTwoTurnScript.playerRace)
+				if(systemListConstructor.systemList[j].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 				{
 					if(diplomacyScript.playerEnemyTwoRelations.hasMadeContact == false)
 					{

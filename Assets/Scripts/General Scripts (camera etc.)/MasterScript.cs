@@ -26,9 +26,7 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public AIBasicParent baseAIScript;
 	[HideInInspector]
-	public EnemyOne enemyOneTurnScript;
-	[HideInInspector]
-	public EnemyTwo enemyTwoTurnScript;
+	public WinConditions winConditions;
 
 	[HideInInspector]
 	public HeroTechTree heroTechTree;
@@ -66,8 +64,6 @@ public class MasterScript : MonoBehaviour
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
 		turnInfoScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<TurnInfo>();
 		playerTurnScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<PlayerTurn>();
-		enemyOneTurnScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<EnemyOne>();
-		enemyTwoTurnScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<EnemyTwo>();
 		diplomacyScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<DiplomacyControlScript>();
 		systemGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SystemGUI>();
 		heroGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<HeroGUI>();
@@ -79,6 +75,7 @@ public class MasterScript : MonoBehaviour
 		heroTechTree = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<HeroTechTree> ();
 		invasionGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<InvasionGUI> ();
 		mapConstructor = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<MapConstructor> ();
+		winConditions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<WinConditions> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem)

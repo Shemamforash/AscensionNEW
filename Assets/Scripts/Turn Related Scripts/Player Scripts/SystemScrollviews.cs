@@ -127,8 +127,8 @@ public class SystemScrollviews : MasterScript
 		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
 		{		
 			if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier 
-			   || techTreeScript.listOfImprovements[i].improvementCategory == enemyOneTurnScript.playerRace 
-			   || techTreeScript.listOfImprovements[i].improvementCategory == enemyTwoTurnScript.playerRace) 
+			   || techTreeScript.listOfImprovements[i].improvementCategory == turnInfoScript.allPlayers[0].playerRace 
+			   || techTreeScript.listOfImprovements[i].improvementCategory == turnInfoScript.allPlayers[1].playerRace) 
 			{
 				NGUITools.SetActive(improvementsList[i], false);
 				continue;

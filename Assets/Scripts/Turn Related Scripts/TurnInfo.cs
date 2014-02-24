@@ -18,10 +18,11 @@ public class TurnInfo : MasterScript
 	public string playerRace, homePlanetType, playerHasWonRace, homeSystem;
 	public int systemsInPlay = 0;
 	public List<GameObject> playerOwnedHeroes = new List<GameObject> ();
+	public List<EnemyOne> allPlayers = new List<EnemyOne>();
 
 	void Start()
 	{
-		if(turnInfoScript.startSteps == false)
+		if(turnInfoScript.startSteps == false && playerTurnScript.playerRace != null)
 		{
 			InvokeRepeating("EndTurnFunction", 0.0001f, 0.5f);
 			turnInfoScript.startSteps = true;
@@ -47,6 +48,45 @@ public class TurnInfo : MasterScript
 		}
 
 		SortSystemPower ();
+	}
+
+	public void CreateEnemyAI(int noOfOpponents)
+	{
+		List<string> enemyRaces = new List<string> ();
+
+		if(playerTurnScript.playerRace == "Humans")
+		{
+			enemyRaces.Add("Selkies");
+			enemyRaces.Add("Nereides");
+		}
+		else if(playerTurnScript.playerRace == "Nereides")
+		{
+			enemyRaces.Add("Selkies");
+			enemyRaces.Add("Humans");
+		}
+		else if(playerTurnScript.playerRace == "Selkies")
+		{
+			enemyRaces.Add("Humans");
+			enemyRaces.Add("Nereides");
+		}
+
+		for(int i = 0; i < noOfOpponents; ++i)
+		{
+			if(allPlayers.Count == noOfOpponents)
+			{
+				break;
+			}
+
+			int j = Random.Range(0, enemyRaces.Count - 1);
+
+			EnemyOne enemy = gameObject.AddComponent("EnemyOne") as EnemyOne;
+
+			enemy.playerRace = enemyRaces[j];
+
+			allPlayers.Add (enemy);
+
+			enemyRaces.RemoveAt(j);
+		}
 	}
 
 	public void PickRace() //Start of turn function. Race choice dictates starting planet and inherent bonuses as well as racial technologies.
@@ -88,8 +128,12 @@ public class TurnInfo : MasterScript
 		{
 			turnInfoScript.turn += 1.0f;
 			turnInfoScript.TurnEnd (playerTurnScript);
-			enemyOneTurnScript.Expand(enemyOneTurnScript);
-			enemyTwoTurnScript.Expand(enemyTwoTurnScript);
+			winConditions.CheckWin(playerTurnScript);
+			for(int i = 0; i < allPlayers.Count; ++i)
+			{
+				allPlayers[i].Expand(allPlayers[i]);
+				winConditions.CheckWin(allPlayers[i]);
+			}
 			diplomacyScript.PeaceTimer ();
 		}
 	}
@@ -98,23 +142,9 @@ public class TurnInfo : MasterScript
 	{		
 		for(int i = 0; i < systemListConstructor.mapSize; ++i)
 		{
-			if(systemListConstructor.systemList[i].systemOwnedBy == selectedPlayer.playerRace || systemListConstructor.systemList[i].systemOwnedBy == null)
-			{
-				playerHasWon = true;
-				playerHasWonRace = selectedPlayer.playerRace;
-			}
-
-			playerHasWon = false;
-
 			if(systemListConstructor.systemList[i].systemOwnedBy != selectedPlayer.playerRace)
 			{
 				continue;
-			}
-
-			for(int j = 0; j < selectedPlayer.playerOwnedHeroes.Count; ++j)
-			{				
-				heroScript = selectedPlayer.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
-				heroScript.HeroEndTurnFunctions();
 			}
 
 			systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
@@ -133,6 +163,12 @@ public class TurnInfo : MasterScript
 
 		}
 
+		for(int j = 0; j < selectedPlayer.playerOwnedHeroes.Count; ++j)
+		{				
+			heroScript = selectedPlayer.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
+			heroScript.HeroEndTurnFunctions();
+		}
+		
 		racialTraitScript.RacialBonus (selectedPlayer);
 
 		SelectedPlayerDiplomacyChangeCheck (selectedPlayer);
@@ -153,15 +189,15 @@ public class TurnInfo : MasterScript
 
 	private void SelectedPlayerDiplomacyChangeCheck(TurnInfo selectedPlayer)
 	{
-		if(selectedPlayer == playerTurnScript || selectedPlayer == enemyOneTurnScript)
+		if(selectedPlayer == playerTurnScript || selectedPlayer == turnInfoScript.allPlayers[0])
 		{
 			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyOneRelations);
 		}
-		if(selectedPlayer == playerTurnScript || selectedPlayer == enemyTwoTurnScript)
+		if(selectedPlayer == playerTurnScript || selectedPlayer == turnInfoScript.allPlayers[1])
 		{
 			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyTwoRelations);
 		}
-		if(selectedPlayer == enemyOneTurnScript || selectedPlayer == enemyTwoTurnScript)
+		if(selectedPlayer == turnInfoScript.allPlayers[0] || selectedPlayer == turnInfoScript.allPlayers[1])
 		{
 			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.enemyOneEnemyTwoRelations);
 		}
