@@ -22,7 +22,7 @@ public class SystemGUI : MasterScript
 	{
 		if(playerTurnScript.tempObject != null)
 		{
-			int system = RefreshCurrentSystem(playerTurnScript.tempObject);
+			selectedSystem = RefreshCurrentSystem(playerTurnScript.tempObject);
 
 			systemSIMData = playerTurnScript.tempObject.GetComponent<SystemSIMData>();
 			techTreeScript = playerTurnScript.tempObject.GetComponent<TechTreeScript>();

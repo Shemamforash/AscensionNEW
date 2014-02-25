@@ -50,29 +50,20 @@ public class TurnInfo : MasterScript
 		SortSystemPower ();
 	}
 
-	public void CreateEnemyAI(int noOfOpponents)
+	public void CreateEnemyAI()
 	{
 		List<string> enemyRaces = new List<string> ();
 
-		if(playerTurnScript.playerRace == "Humans")
+		enemyRaces.Add (PlayerPrefs.GetString ("AI One"));
+
+		if(PlayerPrefs.GetString ("AI Two") != "None")
 		{
-			enemyRaces.Add("Selkies");
-			enemyRaces.Add("Nereides");
-		}
-		else if(playerTurnScript.playerRace == "Nereides")
-		{
-			enemyRaces.Add("Selkies");
-			enemyRaces.Add("Humans");
-		}
-		else if(playerTurnScript.playerRace == "Selkies")
-		{
-			enemyRaces.Add("Humans");
-			enemyRaces.Add("Nereides");
+			enemyRaces.Add (PlayerPrefs.GetString("AI Two"));
 		}
 
-		for(int i = 0; i < noOfOpponents; ++i)
+		for(int i = 0; i < enemyRaces.Count; ++i)
 		{
-			if(allPlayers.Count == noOfOpponents)
+			if(allPlayers.Count == enemyRaces.Count)
 			{
 				break;
 			}
@@ -193,13 +184,16 @@ public class TurnInfo : MasterScript
 		{
 			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyOneRelations);
 		}
-		if(selectedPlayer == playerTurnScript || selectedPlayer == turnInfoScript.allPlayers[1])
+		if(turnInfoScript.allPlayers.Count > 1)
 		{
-			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyTwoRelations);
-		}
-		if(selectedPlayer == turnInfoScript.allPlayers[0] || selectedPlayer == turnInfoScript.allPlayers[1])
-		{
-			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.enemyOneEnemyTwoRelations);
+			if(selectedPlayer == playerTurnScript || selectedPlayer == turnInfoScript.allPlayers[1])
+			{
+				diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyTwoRelations);
+			}
+			if(selectedPlayer == turnInfoScript.allPlayers[0] || selectedPlayer == turnInfoScript.allPlayers[1])
+			{
+				diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.enemyOneEnemyTwoRelations);
+			}
 		}
 	}
 
