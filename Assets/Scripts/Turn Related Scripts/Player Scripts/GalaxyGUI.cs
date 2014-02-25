@@ -44,11 +44,11 @@ public class GalaxyGUI : MasterScript
 		}
 	}
 
-	private void SelectRace(string thisRace)
+	public void SelectRace(string thisRace)
 	{
 		playerTurnScript.playerRace = thisRace;
 		playerTurnScript.StartTurn();
-		turnInfoScript.CreateEnemyAI (2);
+		turnInfoScript.CreateEnemyAI ();
 
 		for(int i = 0; i < turnInfoScript.allPlayers.Count; ++i)
 		{
@@ -123,35 +123,5 @@ public class GalaxyGUI : MasterScript
 
 		planetSelectionWindow.GetComponent<UIScrollView> ().ResetPosition ();
 		planetSelectionWindow.GetComponent<UIGrid> ().repositionNow = true;
-	}
-
-	void OnGUI()
-	{
-		GUI.skin = systemGUI.mySkin;
-
-		if(playerTurnScript.playerRace == null && mapConstructor.connected == true)
-		{
-			GUI.Box (new Rect(Screen.width/2 - 150, Screen.height/2 - 40, 300, 80), "\nSelect Race");
-			
-			if(GUI.Button (new Rect(Screen.width/2 - 140, Screen.height/2, 90, 20), "Humans"))
-			{
-				tempRace = "Humans";
-			}
-			
-			if(GUI.Button (new Rect(Screen.width/2 -45, Screen.height/2, 90, 20), "Selkies"))
-			{
-				tempRace = "Selkies";
-			}
-			
-			if(GUI.Button (new Rect(Screen.width/2 + 50, Screen.height/2, 90, 20), "Nereides"))
-			{
-				tempRace = "Nereides";
-			}
-			
-			if(tempRace != null)
-			{
-				SelectRace(tempRace);
-			}
-		}
 	}
 }

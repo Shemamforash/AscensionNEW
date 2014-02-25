@@ -11,8 +11,6 @@ public class MapConstructor : MasterScript
 
 	public bool TestForIntersection(GameObject thisSystem, GameObject targetSystem)
 	{
-		bool intersects = false;
-
 		float A1 = targetSystem.transform.position.y - thisSystem.transform.position.y;
 		float B1 = thisSystem.transform.position.x - targetSystem.transform.position.x;
 		float C1 = (A1 * thisSystem.transform.position.x) + (B1 * thisSystem.transform.position.y);

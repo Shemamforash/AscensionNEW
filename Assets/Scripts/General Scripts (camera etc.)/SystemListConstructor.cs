@@ -24,6 +24,8 @@ public class SystemListConstructor : MasterScript
 
 	private void Start()
 	{
+		mapSize = PlayerPrefs.GetInt ("Map Size");
+
 		PlanetRead ();
 		SystemRead ();
 		SelectSystemsForMap ();
@@ -31,6 +33,17 @@ public class SystemListConstructor : MasterScript
 		CreateObjects ();
 		mapConstructor.DrawMinimumSpanningTree ();
 		LoadBasicTechTree ();
+
+		for(int i = 0; i < systemList.Count; ++i)
+		{
+			lineRenderScript = systemList[i].systemObject.GetComponent<LineRenderScript>();
+
+			lineRenderScript.StartUp();
+		}
+
+		Debug.Log (systemList.Count);
+
+		galaxyGUI.SelectRace(PlayerPrefs.GetString ("Player Race"));
 	}
 
 	public int RefreshCurrentSystemA(GameObject thisSystem)
@@ -46,10 +59,9 @@ public class SystemListConstructor : MasterScript
 		return 0;
 	}
 
-	public void SelectSystemsForMap()
+	private void SelectSystemsForMap()
 	{
 		int randomInt = -1;
-		string system = null;
 		mapConstructor.distanceMax = (mapSize - 260) / -8f;
 
 		systemScale = (mapSize - 300.0f) / -160.0f;
@@ -85,8 +97,6 @@ public class SystemListConstructor : MasterScript
 	
 	private void CheckSystem()
 	{
-		bool found = false;
-
 		for(int i = 0; i < systemList.Count; ++i)
 		{
 			if(firmSystems.Contains (systemList[i].systemName) == false)
@@ -178,9 +188,7 @@ public class SystemListConstructor : MasterScript
 	}
 
 	public void PlanetRead()
-	{
-		string planetName;
-		
+	{		
 		using(StreamReader rimReader =  new StreamReader("PlanetRIMData.txt"))
 		{
 			for(int i = 0; i < 12; ++i)

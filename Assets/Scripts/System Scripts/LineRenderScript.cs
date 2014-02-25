@@ -19,7 +19,7 @@ public class LineRenderScript : MasterScript
 	private GameObject objectB;
 	public Material opaqueMaterial;
 
-	void Start()
+	public void StartUp()
 	{	
 		systemSIMData = gameObject.GetComponent<SystemSIMData>();
 		thisSystem = RefreshCurrentSystem (gameObject);

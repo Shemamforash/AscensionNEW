@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class WinConditions : MasterScript 
 {
-	bool hasWon;
-	string winCondition, winPlayer;
+	private bool hasWon;
+	private string winCondition, winPlayer;
 	private string[] homeSystems = new string[3] {"Midgard", "Nepthys", "Samael"};
 	private int expansionPercentage;
 	private TurnInfo player;
