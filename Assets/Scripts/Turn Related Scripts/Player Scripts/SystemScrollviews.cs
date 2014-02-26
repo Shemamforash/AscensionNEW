@@ -126,12 +126,16 @@ public class SystemScrollviews : MasterScript
 						
 		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
 		{		
-			if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier 
-			   || techTreeScript.listOfImprovements[i].improvementCategory == turnInfoScript.allPlayers[0].playerRace 
-			   || techTreeScript.listOfImprovements[i].improvementCategory == turnInfoScript.allPlayers[1].playerRace) 
+			if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier) 
 			{
-				NGUITools.SetActive(improvementsList[i], false);
-				continue;
+				for(int j = 0; j < turnInfoScript.allPlayers.Count; ++j)
+				{
+					if(techTreeScript.listOfImprovements[i].improvementCategory == turnInfoScript.allPlayers[j].playerRace)
+					{
+						NGUITools.SetActive(improvementsList[i], false);
+						continue;
+					}
+				}
 			}
 
 			NGUITools.SetActive(improvementsList[i], true); //If tech has not been built, set it to active so it can be shown in the scrollview

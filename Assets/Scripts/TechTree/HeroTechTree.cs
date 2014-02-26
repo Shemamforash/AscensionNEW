@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
+using System.Xml;
+using System;
 
 public class HeroTechTree : MasterScript 
 {
@@ -14,64 +15,70 @@ public class HeroTechTree : MasterScript
 
 	private void ReadTechFile()
 	{
-		using(StreamReader reader = new StreamReader("HeroTechTreeData.txt"))
+		using(XmlReader reader = XmlReader.Create ("GearList.xml"))
 		{
-			int counter = 0;
-
-			while (counter != 24)
+			while(reader.Read ())
 			{
-				bool nextTech = false;
-
-				HeroTech tech = new HeroTech();
-
-				tech.techName = reader.ReadLine();
-				tech.techType = reader.ReadLine();
-				tech.heroType = reader.ReadLine();
-				tech.scienceCost = int.Parse (reader.ReadLine());
-
-				while(nextTech == false)
+				if(reader.Name == "Row")
 				{
-					string text = reader.ReadLine();
+					HeroTech tech = new HeroTech();
 
-					switch (text)
+					tech.techName = reader.GetAttribute("A");
+
+					if(tech.techName == "Basic Components")
 					{
-						case "Armour":
-							tech.armourRating = int.Parse (reader.ReadLine());
-							break;
-						case "Engine":
-							tech.engineRating = int.Parse (reader.ReadLine());
-							break;
-						case "Primary":
-							tech.primaryOffenceRating = int.Parse (reader.ReadLine());
-							break;
-						case "Secondary":
-							tech.secondaryOffenceRating = int.Parse (reader.ReadLine());
-							break;
-						case "Collateral":
-							tech.collateralRating  = int.Parse (reader.ReadLine());
-							break;
-						case "Stealth":
-							tech.stealthRating = int.Parse (reader.ReadLine());
-							break;
-						case "Trade":
-							tech.logisticsRating = int.Parse (reader.ReadLine());
-							break;
-						case "Prerequisite":
-							tech.prerequisite = reader.ReadLine();
-							break;
-						default:
-							nextTech = true;
-							break;
+						tech.isActive = true;
 					}
-				}
 
-				if(tech.prerequisite == null)
-				{
-					tech.canPurchase = true;
-				}
+					tech.primaryOffenceRating = Convert.ToInt32 (reader.GetAttribute("B"));
+					tech.secondaryOffenceRating = Convert.ToInt32 (reader.GetAttribute("C"));
+					tech.collateralRating = Convert.ToInt32 (reader.GetAttribute("D"));
+					tech.engineRating = Convert.ToInt32 (reader.GetAttribute("E"));
+					tech.armourRating = Convert.ToInt32 (reader.GetAttribute("F"));
+					tech.stealthRating = Convert.ToInt32 (reader.GetAttribute("G"));
+					tech.logisticsRating = Convert.ToInt32 (reader.GetAttribute("H"));
+					tech.heroType = reader.GetAttribute("I");
+					tech.techType = reader.GetAttribute("J");
+					tech.scienceCost = Convert.ToInt32 (reader.GetAttribute("K"));
+					tech.prerequisite = reader.GetAttribute("L");
 
-				heroTechList.Add (tech);
-				++counter;
+					tech.techDetails = tech.techName + "\nResearch Cost: " + tech.scienceCost;
+
+					if(tech.primaryOffenceRating != 0)
+					{
+						tech.techDetails += "\nPrimary Weapon Power: " + tech.primaryOffenceRating;
+					}
+					if(tech.secondaryOffenceRating != 0)
+					{
+						tech.techDetails += "\nInvasion Weapon Power: " + tech.secondaryOffenceRating;
+					}
+					if(tech.collateralRating != 0)
+					{
+						tech.techDetails += "\nCollateral Damage: " + tech.collateralRating;
+					}
+					if(tech.engineRating != 0)
+					{
+						tech.techDetails += "\nCollateral Damage: " + tech.engineRating;
+					}
+					if(tech.armourRating != 0)
+					{
+						tech.techDetails += "\nArmour rating: " + tech.armourRating;
+					}
+					if(tech.stealthRating != 0)
+					{
+						tech.techDetails += "\nInfiltrator cloaks are now level " + tech.stealthRating;
+					}
+					if(tech.logisticsRating != 0)
+					{
+						tech.techDetails += "\nTraders now support " + tech.logisticsRating + "Trade Routes";
+					}
+					if(tech.heroType != "All")
+					{
+						tech.techDetails += "\nOnly for " + tech.heroType + "s";
+					}
+
+					heroTechList.Add (tech);
+				}
 			}
 		}
 	}
@@ -80,6 +87,6 @@ public class HeroTechTree : MasterScript
 public class HeroTech
 {
 	public int scienceCost = 0, armourRating = 0, primaryOffenceRating = 0, secondaryOffenceRating = 0, engineRating = 0, collateralRating = 0, stealthRating = 0, logisticsRating = 0;
-	public string heroType, techType, techName, prerequisite = null;
+	public string heroType, techType, techName, prerequisite = null, techDetails;
 	public bool canPurchase = false ,isActive = false;
 }

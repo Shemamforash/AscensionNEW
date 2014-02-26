@@ -17,9 +17,9 @@ public class SystemListConstructor : MasterScript
 	public List<BasicImprovement> basicImprovementsList = new List<BasicImprovement> ();
 
 	private int connections;
+	public int mapSize;
 	public GameObject systemClone, originalSystem;
 	private float xPos, yPos, distanceXY;
-	public int mapSize;
 	public float systemScale = 0.0f;
 
 	private void Start()
@@ -40,8 +40,6 @@ public class SystemListConstructor : MasterScript
 
 			lineRenderScript.StartUp();
 		}
-
-		Debug.Log (systemList.Count);
 
 		galaxyGUI.SelectRace(PlayerPrefs.GetString ("Player Race"));
 	}

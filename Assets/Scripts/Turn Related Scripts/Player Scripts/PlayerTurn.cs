@@ -6,11 +6,6 @@ public class PlayerTurn : TurnInfo
 	public GameObject tempObject;
 	public bool isOkToColonise, systemHasBeenColonised;
 
-	void Start()
-	{
-		playerRace = null;
-	}
-
 	void Update()
 	{
 		if(Input.GetMouseButtonDown(0) && cameraFunctionsScript.selectedSystem != null) //Assigns scripts to selected system.
@@ -60,11 +55,14 @@ public class PlayerTurn : TurnInfo
 					}
 				}
 
-				if(systemListConstructor.systemList[j].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
+				if(turnInfoScript.allPlayers.Count > 1)
 				{
-					if(diplomacyScript.playerEnemyTwoRelations.hasMadeContact == false)
+					if(systemListConstructor.systemList[j].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 					{
-						diplomacyScript.playerEnemyTwoRelations.hasMadeContact = true;
+						if(diplomacyScript.playerEnemyTwoRelations.hasMadeContact == false)
+						{
+							diplomacyScript.playerEnemyTwoRelations.hasMadeContact = true;
+						}
 					}
 				}
 			}

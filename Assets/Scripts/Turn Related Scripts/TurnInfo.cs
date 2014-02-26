@@ -20,7 +20,7 @@ public class TurnInfo : MasterScript
 	public List<GameObject> playerOwnedHeroes = new List<GameObject> ();
 	public List<EnemyOne> allPlayers = new List<EnemyOne>();
 
-	void Start()
+	public void StartGame()
 	{
 		if(turnInfoScript.startSteps == false && playerTurnScript.playerRace != null)
 		{
@@ -63,20 +63,11 @@ public class TurnInfo : MasterScript
 
 		for(int i = 0; i < enemyRaces.Count; ++i)
 		{
-			if(allPlayers.Count == enemyRaces.Count)
-			{
-				break;
-			}
-
-			int j = Random.Range(0, enemyRaces.Count - 1);
-
 			EnemyOne enemy = gameObject.AddComponent("EnemyOne") as EnemyOne;
 
-			enemy.playerRace = enemyRaces[j];
+			enemy.playerRace = enemyRaces[i];
 
 			allPlayers.Add (enemy);
-
-			enemyRaces.RemoveAt(j);
 		}
 	}
 
@@ -96,7 +87,7 @@ public class TurnInfo : MasterScript
 		if(playerRace == "Selkies")
 		{
 			raceScience = 1 * gameSpeedModifer;
-			raceIndustry = 2 * gameSpeedModifer;
+			raceIndustry = 1.4f * gameSpeedModifer;
 			raceCapital = 0.5f;
 			homeSystem = "Samael";
 			homePlanetType = "Plains";
@@ -104,7 +95,7 @@ public class TurnInfo : MasterScript
 		}
 		if(playerRace == "Nereides")
 		{
-			raceScience = 2 * gameSpeedModifer;
+			raceScience = 200 * gameSpeedModifer;
 			raceIndustry = 1 * gameSpeedModifer;
 			raceCapital = 0.4f;
 			homeSystem = "Nepthys";
@@ -120,11 +111,13 @@ public class TurnInfo : MasterScript
 			turnInfoScript.turn += 1.0f;
 			turnInfoScript.TurnEnd (playerTurnScript);
 			winConditions.CheckWin(playerTurnScript);
+
 			for(int i = 0; i < allPlayers.Count; ++i)
 			{
 				allPlayers[i].Expand(allPlayers[i]);
 				winConditions.CheckWin(allPlayers[i]);
 			}
+
 			diplomacyScript.PeaceTimer ();
 		}
 	}
@@ -231,17 +224,6 @@ public class TurnInfo : MasterScript
 			{
 				break;
 			}
-		}
-	}
-
-	void OnGUI()
-	{
-		GUI.skin = systemGUI.mySkin;
-
-		if(playerHasWon == true)
-		{
-			GUI.Label (new Rect(Screen.width / 2 - 100.0f, Screen.height / 2 - 100.0f, 200.0f, 200.0f), playerHasWonRace);
-			Time.timeScale = 0;
 		}
 	}
 }

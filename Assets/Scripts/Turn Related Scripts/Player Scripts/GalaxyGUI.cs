@@ -61,6 +61,8 @@ public class GalaxyGUI : MasterScript
 		{
 			NGUITools.SetActive(purgeButton, true);
 		}
+
+		turnInfoScript.StartGame ();
 	}
 
 	private void UpdateLabels()

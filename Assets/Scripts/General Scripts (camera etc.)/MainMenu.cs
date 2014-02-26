@@ -98,27 +98,26 @@ public class MainMenu : MonoBehaviour
 
 		if(size.text != "-" && objectList[0].currentRace.text != "None" && objectList[1].currentRace.text != "None")
 		{
+			PlayerPrefs.DeleteAll ();
+
 			switch(size.text)
 			{
 			case "Very Small (30 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 30);
 				break;
-			case "Small (45 Systems)":
-				PlayerPrefs.SetInt ("Map Size", 45);
-				break;
-			case "Medium (60 Systems)":
+			case "Small (60 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 60);
 				break;
-			case "Large(90 Systems)":
+			case "Medium (90 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 90);
 				break;
-			case "Very Large (120 Systems)":
+			case "Large (120 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 120);
 				break;
-			case "Massive (150 Systems)":
+			case "Very Large (150 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 150);
 				break;
-			case "All of Creation (180 Systems)":
+			case "Massive (180 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 180);
 				break;
 			default:
