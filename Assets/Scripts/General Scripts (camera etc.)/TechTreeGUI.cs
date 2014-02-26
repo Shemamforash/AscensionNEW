@@ -52,33 +52,57 @@ public class TechTreeGUI : MasterScript
 		}	
 	}
 
+	private int FindTechInTree(string tech)
+	{
+		for(int i = 0; i < heroTechTree.heroTechList.Count; ++i)
+		{
+			if(heroTechTree.heroTechList[i].techName == tech)
+			{
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
 	private void CheckActiveTech()
 	{
 		for(int j = 0; j < techLabels.Count; ++j)
 		{
-			for(int i = 0; i < heroTechTree.heroTechList.Count; ++i)
+			int techNo = FindTechInTree(techLabels[j].label.gameObject.name);
+
+			if(techNo != -1)
 			{
-				if(techLabels[j].label.text == heroTechTree.heroTechList[i].techName)
+				if(heroTechTree.heroTechList[techNo].isActive == true)
 				{
-					if(heroTechTree.heroTechList[i].isActive == true)
+					techLabels[j].label.text = heroTechTree.heroTechList[techNo].techName;
+					techLabels[j].label.gameObject.GetComponent<UISprite>().spriteName = "Blank Text Box";
+					techLabels[j].button.enabled = false;
+				}
+
+				if(heroTechTree.heroTechList[techNo].prerequisite == null && heroTechTree.heroTechList[techNo].isActive == false)
+				{
+					techLabels[j].button.enabled = true;
+					continue;
+				}
+
+				int preTech = FindTechInTree(heroTechTree.heroTechList[techNo].prerequisite);
+
+				if(preTech != -1)
+				{
+					if(heroTechTree.heroTechList[preTech].isActive == false)
 					{
-						techLabels[i].button.enabled = false;
+						techLabels[j].label.text = "Requires Previous Upgrades";
+						techLabels[j].label.gameObject.GetComponent<UISprite>().spriteName = "Label";
+						continue;
 					}
 
-					for(int k = 0; k < heroTechTree.heroTechList.Count; ++k)
+					if(heroTechTree.heroTechList[preTech].isActive == true && heroTechTree.heroTechList[techNo].isActive == false)
 					{
-						if(heroTechTree.heroTechList[i].prerequisite == null)
-						{
-							techLabels[j].button.enabled = true;
-						}
-
-						if(heroTechTree.heroTechList[k].techName == heroTechTree.heroTechList[i].prerequisite)
-						{
-							if(heroTechTree.heroTechList[k].isActive == true)
-							{
-								techLabels[j].button.enabled = true;
-							}
-						}
+						techLabels[j].button.enabled = true;
+						techLabels[j].label.text = heroTechTree.heroTechList[techNo].techName;
+						techLabels[j].label.gameObject.GetComponent<UISprite>().spriteName = "Blank Text Box";
+						continue;
 					}
 				}
 			}

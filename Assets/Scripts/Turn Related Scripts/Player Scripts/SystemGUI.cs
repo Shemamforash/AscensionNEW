@@ -27,8 +27,6 @@ public class SystemGUI : MasterScript
 			systemSIMData = playerTurnScript.tempObject.GetComponent<SystemSIMData>();
 			techTreeScript = playerTurnScript.tempObject.GetComponent<TechTreeScript>();
 		}
-
-		UpdateVariables ();
 		
 		if(cameraFunctionsScript.openMenu == false)
 		{
@@ -37,6 +35,8 @@ public class SystemGUI : MasterScript
 		
 		if(cameraFunctionsScript.openMenu == true)
 		{		
+			UpdateVariables ();
+
 			NGUITools.SetActive(playerSystemInfoScreen, true);
 
 			PositionGrid(planetListGrid, systemListConstructor.systemList[selectedSystem].systemSize);
