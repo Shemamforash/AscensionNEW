@@ -11,7 +11,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public int numPlanets, improvementNumber, antiStealthPower;
 	[HideInInspector]
-	public float pScience, pIndustry, improvementCost, ownershipBonus, adjacencyBonus;
+	public float scienceBonus, industryBonus, improvementCost, ownershipBonus, adjacencyBonus;
 	[HideInInspector]
 	public string improvementLevel;
 	[HideInInspector]
@@ -87,8 +87,11 @@ public class SystemSIMData : MasterScript
 				}
 			}
 
-			totalSystemScience = tempTotalSci + techTreeScript.sciencePointBonus;
-			totalSystemIndustry = tempTotalInd + techTreeScript.industryPointBonus;
+			totalSystemScience = tempTotalSci + scienceBonus;
+			totalSystemIndustry = tempTotalInd + industryBonus;
+
+			scienceBonus = 0f;
+			industryBonus = 0f;
 		
 			if(isPromoted == false)
 			{
@@ -97,11 +100,11 @@ public class SystemSIMData : MasterScript
 
 			if(isPromoted == true)
 			{
-				adjacencyBonus = 1.5f;
+				adjacencyBonus = adjacencyBonus + 1.5f;
 			}
 
-			totalSystemScience += totalSystemScience * adjacencyBonus;
-			totalSystemIndustry += totalSystemIndustry * adjacencyBonus;
+			totalSystemScience = totalSystemScience * adjacencyBonus;
+			totalSystemIndustry = totalSystemIndustry * adjacencyBonus;
 		}
 
 		if(isEmbargoed == true)
@@ -163,7 +166,7 @@ public class SystemSIMData : MasterScript
 
 	private float FindAdjacencyBonuses(TurnInfo thisPlayer)
 	{
-		float totalAdjacencyBonus = 0.0f;
+		float totalAdjacencyBonus = 1f;
 
 		int thisSystem = RefreshCurrentSystem (gameObject);
 

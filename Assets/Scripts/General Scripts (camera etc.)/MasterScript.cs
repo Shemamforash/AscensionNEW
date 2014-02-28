@@ -27,9 +27,7 @@ public class MasterScript : MonoBehaviour
 	public AIBasicParent baseAIScript;
 	[HideInInspector]
 	public WinConditions winConditions;
-
-	[HideInInspector]
-	public HeroTechTree heroTechTree;
+	
 	[HideInInspector]
 	public TechTreeScript techTreeScript;
 	[HideInInspector]
@@ -38,10 +36,6 @@ public class MasterScript : MonoBehaviour
 	public HeroMovement heroMovement;
 	[HideInInspector]
 	public HeroShip heroShip;
-	[HideInInspector]
-	public Tier3HeroScript tier3HeroScript;
-	[HideInInspector]
-	public ShipFunctions shipFunctions;
 	[HideInInspector]
 	public DiplomacyControlScript diplomacyScript;
 	[HideInInspector]
@@ -67,12 +61,9 @@ public class MasterScript : MonoBehaviour
 		diplomacyScript = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<DiplomacyControlScript>();
 		systemGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<SystemGUI>();
 		heroGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<HeroGUI>();
-		tier3HeroScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<Tier3HeroScript> ();
 		racialTraitScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<RacialTraits> ();
 		galaxyGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GalaxyGUI>();
 		overlayGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<OverlayGUI> ();
-		shipFunctions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<ShipFunctions> ();
-		heroTechTree = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<HeroTechTree> ();
 		invasionGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<InvasionGUI> ();
 		mapConstructor = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<MapConstructor> ();
 		winConditions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<WinConditions> ();

@@ -7,7 +7,7 @@ using System.Xml;
 public class TechTreeScript : MasterScript 
 {
 	public float sciencePercentBonus, industryPercentBonus;
-	public float sciencePointBonus, industryPointBonus, tempCount;
+	public float tempCount;
 	public GameObject tooltip;
 	public int techTier = 0;
 	private int currentPlanetsWithHyperNet = 0;
@@ -60,9 +60,6 @@ public class TechTreeScript : MasterScript
 	{
 		sciencePercentBonus = 0.0f; //Resets the percentage modifier for SIM. Is there an easier way?
 		industryPercentBonus = 0.0f;
-
-		sciencePointBonus = 0.0f;
-		industryPointBonus = 0.0f;
 
 		tempCount = 0.0f;
 
@@ -153,7 +150,7 @@ public class TechTreeScript : MasterScript
 
 			if(j != 0)
 			{
-				sciencePointBonus += (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
+				systemSIMData.scienceBonus += (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
 				tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 			}
 			
@@ -175,7 +172,7 @@ public class TechTreeScript : MasterScript
 				{
 					if(systemListConstructor.systemList[i].planetsInSystem[j].planetColonised == true)
 					{
-						industryPointBonus += 1;
+						systemSIMData.industryBonus += 1;
 						tempCount += 1;
 					}
 				}
@@ -255,10 +252,10 @@ public class TechTreeScript : MasterScript
 			tempCount = 0.0f;
 			float tempCountB = 0.0f;
 			
-			sciencePointBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
+			systemSIMData.scienceBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
 			tempCount = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
 			
-			industryPointBonus -= (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
+			systemSIMData.industryBonus -= (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			tempCountB = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			
 			listOfImprovements[9].improvementMessage = ("+" + tempCount + " Science, -" + tempCountB + " Industry On System");

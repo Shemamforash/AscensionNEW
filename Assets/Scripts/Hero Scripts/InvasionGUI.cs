@@ -43,8 +43,8 @@ public class InvasionGUI : MasterScript
 					if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == true)
 					{
 						invasionInfo = systemListConstructor.systemList[system].planetsInSystem[i].planetName + "\n"
-							+ systemListConstructor.systemList[system].planetsInSystem[i].planetType + "\n"
-							+ systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership + "\n"
+							+ systemListConstructor.systemList[system].planetsInSystem[i].planetType + "\nOwnership: "
+							+ systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership + "\nDefence: "
 							+ systemListConstructor.systemList[system].planetsInSystem[i].planetDefence;
 					}
 					else if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == false)
@@ -58,7 +58,8 @@ public class InvasionGUI : MasterScript
 					{
 						NGUITools.SetActive(planetList[i], true);
 
-						if(i == heroScript.planetInvade || invasionInfo == "Uncolonised")
+						if(i == heroScript.planetInvade || invasionInfo == "Uncolonised" || systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership == 0 ||
+						   systemListConstructor.systemList[system].planetsInSystem[i].planetDefence == 0)
 						{
 							planetList[i].GetComponent<UIButton>().enabled = false;
 						}

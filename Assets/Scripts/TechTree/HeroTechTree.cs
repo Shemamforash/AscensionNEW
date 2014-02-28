@@ -4,16 +4,11 @@ using System.Collections.Generic;
 using System.Xml;
 using System;
 
-public class HeroTechTree : MasterScript 
+public static class HeroTechTree
 {
-	public List<HeroTech> heroTechList = new List<HeroTech>();
+	public static List<HeroTech> heroTechList = new List<HeroTech>();
 
-	private void Start () 
-	{
-		ReadTechFile ();
-	}
-
-	private void ReadTechFile()
+	public static void ReadTechFile()
 	{
 		using(XmlReader reader = XmlReader.Create ("GearList.xml"))
 		{
@@ -58,7 +53,7 @@ public class HeroTechTree : MasterScript
 					}
 					if(tech.engineRating != 0)
 					{
-						tech.techDetails += "\nCollateral Damage: " + tech.engineRating;
+						tech.techDetails += "\nEngine Power: " + tech.engineRating;
 					}
 					if(tech.armourRating != 0)
 					{

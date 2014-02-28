@@ -80,7 +80,7 @@ public class HeroGUI : MasterScript
 
 	public void CheckIfCanHire()
 	{
-		if(playerTurnScript.capital >= 50)
+		if(playerTurnScript.capital >= 50 && playerTurnScript.playerOwnedHeroes.Count < 7)
 		{
 			int i = RefreshCurrentSystem(GameObject.Find(playerTurnScript.homeSystem));
 
@@ -176,7 +176,7 @@ public class HeroGUI : MasterScript
 			if(hero.heroTier2 == "Diplomat")
 			{
 				popup.items.Add("Ambassador");
-				popup.items.Add("Smuggler");
+				popup.items.Add("Merchant");
 			}
 		}
 	}

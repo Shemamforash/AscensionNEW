@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ShipFunctions : MasterScript
+public static class ShipFunctions
 {
-	public int stealthValue, primaryWeaponPower, artilleryPower, artilleryCollateral, bombPower, bombCollateral, dropshipPower, 
+	public static int stealthValue, primaryWeaponPower, artilleryPower, artilleryCollateral, bombPower, bombCollateral, dropshipPower, 
 			   dropshipCollateral, engineValue, armourRating, logisticsRating;
-	public bool infiltratorEngine, soldierPrimary;
+	public static bool infiltratorEngine, soldierPrimary;
 
-	public void UpdateShips()
+	public static void UpdateShips()
 	{
 		stealthValue = 0;
 		primaryWeaponPower = 20;
@@ -24,44 +24,44 @@ public class ShipFunctions : MasterScript
 		armourRating = 0;
 		logisticsRating = 0;
 
-		for(int i = 0; i < heroTechTree.heroTechList.Count; ++i)
+		for(int i = 0; i < HeroTechTree.heroTechList.Count; ++i)
 		{
-			if(heroTechTree.heroTechList[i].isActive == true)
+			if(HeroTechTree.heroTechList[i].isActive == true)
 			{
-				if(heroTechTree.heroTechList[i].techName == "Miniature Warp Sphere")
+				if(HeroTechTree.heroTechList[i].techName == "Miniature Warp Sphere")
 				{
 					infiltratorEngine = true;
 					continue;
 				}
 
-				if(heroTechTree.heroTechList[i].techName == "Full Broadside")
+				if(HeroTechTree.heroTechList[i].techName == "Full Broadside")
 				{
 					soldierPrimary = true;
 					continue;
 				}
 
-				stealthValue += heroTechTree.heroTechList[i].stealthRating;
-				primaryWeaponPower += heroTechTree.heroTechList[i].primaryOffenceRating;
+				stealthValue += HeroTechTree.heroTechList[i].stealthRating;
+				primaryWeaponPower += HeroTechTree.heroTechList[i].primaryOffenceRating;
 
-				if(heroTechTree.heroTechList[i].heroType == "Soldier")
+				if(HeroTechTree.heroTechList[i].heroType == "Soldier")
 				{
-					artilleryPower += heroTechTree.heroTechList[i].secondaryOffenceRating;
-					artilleryCollateral += heroTechTree.heroTechList[i].collateralRating;
+					artilleryPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					artilleryCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
-				if(heroTechTree.heroTechList[i].heroType == "Infiltrator")
+				if(HeroTechTree.heroTechList[i].heroType == "Infiltrator")
 				{
-					bombPower += heroTechTree.heroTechList[i].secondaryOffenceRating;
-					bombCollateral += heroTechTree.heroTechList[i].collateralRating;
+					bombPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					bombCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
-				if(heroTechTree.heroTechList[i].heroType == "Soldier")
+				if(HeroTechTree.heroTechList[i].heroType == "Soldier")
 				{
-					dropshipPower += heroTechTree.heroTechList[i].secondaryOffenceRating;
-					dropshipCollateral += heroTechTree.heroTechList[i].collateralRating;
+					dropshipPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					dropshipCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
 
-				engineValue += heroTechTree.heroTechList[i].engineRating;
-				armourRating += heroTechTree.heroTechList[i].armourRating;
-				logisticsRating += heroTechTree.heroTechList[i].logisticsRating;
+				engineValue += HeroTechTree.heroTechList[i].engineRating;
+				armourRating += HeroTechTree.heroTechList[i].armourRating;
+				logisticsRating += HeroTechTree.heroTechList[i].logisticsRating;
 			}
 		}
 	}

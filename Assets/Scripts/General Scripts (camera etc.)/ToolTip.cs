@@ -57,18 +57,17 @@ public class ToolTip : MasterScript
 
 				if(UICamera.hoveredObject.tag == "TechLabel")
 				{
-					for(int i = 0; i < heroTechTree.heroTechList.Count; ++i)
+					for(int i = 0; i < HeroTechTree.heroTechList.Count; ++i)
 					{
-						if(UICamera.hoveredObject.name == heroTechTree.heroTechList[i].techName)
+						if(UICamera.hoveredObject.name == HeroTechTree.heroTechList[i].techName)
 						{
 							for(int j = 0; j < techTreeGUI.techLabels.Count; ++j)
 							{
-								if(techTreeGUI.techLabels[j].label.gameObject.name == heroTechTree.heroTechList[i].techName)
+								if(techTreeGUI.techLabels[j].label.gameObject.name == HeroTechTree.heroTechList[i].techName)
 								{
 									if(techTreeGUI.techLabels[j].label.text == techTreeGUI.techLabels[j].label.gameObject.name)
 									{
-										tooltipText = heroTechTree.heroTechList[i].techDetails;
-										Debug.Log (tooltipText);
+										tooltipText = HeroTechTree.heroTechList[i].techDetails;
 									}
 								}
 							}
