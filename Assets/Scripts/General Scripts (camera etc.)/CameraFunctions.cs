@@ -17,6 +17,12 @@ public class CameraFunctions : MasterScript
 	private float timer = 0.0f;
 	private float updatedX, updatedY;
 	private GameObject thisObject;
+	private TechTreeGUI techTreeGUI;
+
+	void Start()
+	{
+		techTreeGUI = GameObject.Find ("GUIContainer").GetComponent<TechTreeGUI> ();
+	}
 
 	void Update()
 	{
@@ -34,9 +40,15 @@ public class CameraFunctions : MasterScript
 			coloniseMenu = false;
 			openMenu = false;
 			doubleClick = false;
-			tier3HeroScript.openSystemLinkScreen = false;
 			heroGUI.openHeroLevellingScreen = false;
 			invasionGUI.openInvasionMenu = false;
+
+			NGUITools.SetActive (heroGUI.heroDetailsContainer, false);
+
+			if(techTreeGUI.techTree.activeInHierarchy == true)
+			{
+				techTreeGUI.ShowTechTree();
+			}
 		}
 	}
 

@@ -95,9 +95,9 @@ public class TurnInfo : MasterScript
 		}
 		if(playerRace == "Nereides")
 		{
-			raceScience = 200 * gameSpeedModifer;
+			raceScience = 2 * gameSpeedModifer;
 			raceIndustry = 1 * gameSpeedModifer;
-			raceCapital = 0.4f;
+			raceCapital = 10.4f;
 			homeSystem = "Nepthys";
 			homePlanetType = "Icy";
 			materialInUse = turnInfoScript.nereidesMaterial;

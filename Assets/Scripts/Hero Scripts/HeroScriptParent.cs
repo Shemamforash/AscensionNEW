@@ -7,39 +7,21 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, linkedHeroObject = null, merchantLine, invasionObject;
 	public HeroDetailsWindow heroDetails;
-	public int currentLevel = 1, noOfColonisedPlanets, movementSpeed, planetInvade = -1, system;
-	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength, speed, armour, tradeRoutes;
+	public int currentLevel = 1, movementSpeed, planetInvade = -1, system;
+	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength, armour;
 	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
-	public bool isInvading = false, canLevelUp;
+	public bool isInvading = false, canLevelUp, reachedLevel2, reachedLevel3;
 	private float heroAge;
 	private GameObject levelUpLabel;
 
 	void Start()
 	{
 		heroAge = Time.time;
-
-		shipFunctions = gameObject.GetComponent<ShipFunctions> ();
-		techTreeScript = gameObject.GetComponent<TechTreeScript>();
-		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
+	
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
 		heroShip = gameObject.GetComponent<HeroShip> ();
 
 		system = RefreshCurrentSystem (heroLocation);
-
-		if (systemListConstructor.systemList [system].systemOwnedBy == playerTurnScript.playerRace) 
-		{
-			turnInfoScript = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<PlayerTurn>();
-		}
-
-		if (systemListConstructor.systemList [system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace) 
-		{
-			turnInfoScript = turnInfoScript.allPlayers[0];
-		}
-
-		if (systemListConstructor.systemList [system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace) 
-		{
-			turnInfoScript = turnInfoScript.allPlayers[1];
-		}
 
 		movementSpeed = 1;
 
@@ -83,9 +65,13 @@ public class HeroScriptParent : MasterScript
 			{
 				return diplomacyScript.playerEnemyOneRelations;
 			}
-			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
+
+			if(turnInfoScript.allPlayers.Count > 1)
 			{
-				return diplomacyScript.playerEnemyTwoRelations;
+				if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
+				{
+					return diplomacyScript.playerEnemyTwoRelations;
+				}
 			}
 		}
 
@@ -95,48 +81,49 @@ public class HeroScriptParent : MasterScript
 			{
 				return diplomacyScript.playerEnemyOneRelations;
 			}
-			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
+			if(turnInfoScript.allPlayers.Count > 1)
 			{
-				return diplomacyScript.enemyOneEnemyTwoRelations;
+				if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
+				{
+					return diplomacyScript.enemyOneEnemyTwoRelations;
+				}
 			}
 		}
 
-		if(heroOwnedBy == turnInfoScript.allPlayers[1].playerRace)
+		if(turnInfoScript.allPlayers.Count > 1)
 		{
-			if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace)
+			if(heroOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 			{
-				return diplomacyScript.playerEnemyTwoRelations;
-			}
-			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
-			{
-				return diplomacyScript.enemyOneEnemyTwoRelations;
+				if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace)
+				{
+					return diplomacyScript.playerEnemyTwoRelations;
+				}
+				if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
+				{
+					return diplomacyScript.enemyOneEnemyTwoRelations;
+				}
 			}
 		}
 
 		return null;
 	}
 
-	public void CreateConnectionLine()
+	public void CreateConnectionLine(GameObject playerSys, GameObject enemySys)
 	{
-		if(heroMovement.heroIsMoving == true && merchantLine != null)
-		{
-			Destroy(merchantLine);
-		}
-
-		float distance = Vector3.Distance(gameObject.transform.position, linkedHeroObject.transform.position);
+		float distance = Vector3.Distance(playerSys.transform.position, enemySys.transform.position);
 		
-		float rotationZRad = Mathf.Acos ((linkedHeroObject.transform.position.y - gameObject.transform.position.y) / distance);
+		float rotationZRad = Mathf.Acos ((enemySys.transform.position.y - playerSys.transform.position.y) / distance);
 		
 		float rotationZ = rotationZRad * Mathf.Rad2Deg;
 		
-		if(gameObject.transform.position.x < linkedHeroObject.transform.position.x)
+		if(playerSys.transform.position.x < enemySys.transform.position.x)
 		{
 			rotationZ = -rotationZ;
 		}
 		
 		Vector3 rotation = new Vector3(0.0f, 0.0f, rotationZ);
 		
-		Vector3 midPoint = (gameObject.transform.position + linkedHeroObject.transform.position)/2;
+		Vector3 midPoint = (playerSys.transform.position + enemySys.transform.position)/2;
 		
 		Vector3 scale = new Vector3(0.2f, distance, 0.0f);
 		
@@ -161,16 +148,28 @@ public class HeroScriptParent : MasterScript
 			}
 		}
 
-		if(heroAge + 60 == Time.time || heroAge + 270 == Time.time)
+		if(heroAge + 6 <= Time.time && reachedLevel2 == false) 
 		{
-			levelUpLabel = NGUITools.AddChild(heroGUI.buttonContainer, heroGUI.levelUpPrefab);
+			reachedLevel2 = true;
+			AddLevelUpDelegate();
+		}
 
-			levelUpLabel.transform.Find ("Label").GetComponent<UILabel>().depth = 1;
-
-			EventDelegate.Add(levelUpLabel.GetComponent<UIButton>().onClick, LevelUp);
+		if(heroAge + 7 <= Time.time && reachedLevel3 == false)
+		{
+			reachedLevel3 = true;
+			AddLevelUpDelegate();
 		}
 
 		heroShip.ShipAbilities ();
+	}
+
+	private void AddLevelUpDelegate()
+	{
+		levelUpLabel = NGUITools.AddChild(heroGUI.buttonContainer, heroGUI.levelUpPrefab);
+		
+		levelUpLabel.transform.Find ("Label").GetComponent<UILabel>().depth = 1;
+		
+		EventDelegate.Add(levelUpLabel.GetComponent<UIButton>().onClick, LevelUp);
 	}
 
 	public void LevelUp()
@@ -179,6 +178,7 @@ public class HeroScriptParent : MasterScript
 		heroGUI.selectedHero = gameObject;
 		++heroScript.currentLevel;
 		canLevelUp = true;
+		NGUITools.SetActive (heroGUI.heroDetailsContainer, false);
 		heroGUI.OpenHeroDetails();
 	}
 

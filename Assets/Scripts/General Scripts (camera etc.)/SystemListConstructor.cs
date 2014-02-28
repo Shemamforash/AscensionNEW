@@ -28,6 +28,7 @@ public class SystemListConstructor : MasterScript
 
 		PlanetRead ();
 		SystemRead ();
+		HeroTechTree.ReadTechFile ();
 		SelectSystemsForMap ();
 		CheckSystem ();
 		CreateObjects ();
