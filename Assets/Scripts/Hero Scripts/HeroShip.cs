@@ -25,7 +25,14 @@ public class HeroShip : MasterScript
 
 			if(systemListConstructor.systemList[system].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[system].systemOwnedBy != null)
 			{
-				NGUITools.SetActive(heroGUI.invasionButton, true);
+				if(heroScript.heroTier2 == "Infiltrator")
+				{
+					NGUITools.SetActive(heroGUI.invasionButton, false);
+				}
+				else
+				{
+					NGUITools.SetActive(heroGUI.invasionButton, true);
+				}
 
 				++tempChildren;
 
@@ -35,29 +42,43 @@ public class HeroShip : MasterScript
 				}
 				else
 				{
+					NGUITools.SetActive(heroGUI.invasionButton, true);
 					heroGUI.invasionButton.GetComponent<UILabel>().text = "Invade System";
 				}
 			}
 
-			if(canEmbargo == true)
+			switch (canEmbargo)
 			{
+			case true:
 				NGUITools.SetActive(heroGUI.embargoButton, true);
-
 				++tempChildren;
+				break;
+			case false:
+				NGUITools.SetActive(heroGUI.embargoButton, false);
+				break;
+			default:
+				break;
 			}
-			if(canPromote == true)
-			{
-				NGUITools.SetActive(heroGUI.promoteButton, true);
 
+			switch (canPromote)
+			{
+			case true:
+				NGUITools.SetActive(heroGUI.promoteButton, true);
 				++tempChildren;
+				break;
+			case false:
+				NGUITools.SetActive(heroGUI.promoteButton, false);
+				break;
+			default:
+				break;
 			}
 		}
 
 		else
 		{
-			NGUITools.SetActive(heroGUI.invasionButton, false);
 			NGUITools.SetActive(heroGUI.embargoButton, false);
 			NGUITools.SetActive(heroGUI.promoteButton, false);
+			NGUITools.SetActive(heroGUI.invasionButton, false);
 		}
 
 		if(tempChildren != gridChildren)

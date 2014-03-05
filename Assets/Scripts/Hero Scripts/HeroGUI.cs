@@ -13,13 +13,6 @@ public class HeroGUI : MasterScript
 	private float timer;
 	private Rect[] tier1, tier2;
 
-	void Start()
-	{
-		NGUITools.SetActive (invasionButton, false);
-		NGUITools.SetActive (embargoButton, false);
-		NGUITools.SetActive (promoteButton, false);
-	}
-
 	void Update()
 	{
 		RaycastHit hit = new RaycastHit();
@@ -32,6 +25,7 @@ public class HeroGUI : MasterScript
 				{
 					selectedHero = hit.collider.gameObject;
 					heroShip = selectedHero.GetComponent<HeroShip>();
+					heroScript = selectedHero.GetComponent<HeroScriptParent>();
 				}
 			}
 		}
@@ -52,14 +46,7 @@ public class HeroGUI : MasterScript
 
 	public void InvasionButtonClick()
 	{
-		if(heroShip.canViewSystem == true)
-		{
-			cameraFunctionsScript.openMenu = true;
-		}
-		else
-		{
-			heroScript.StartSystemInvasion();
-		}
+		heroScript.StartSystemInvasion();
 	}
 
 	public void Embargo()
@@ -99,7 +86,11 @@ public class HeroGUI : MasterScript
 
 			heroScript.heroOwnedBy = playerTurnScript.playerRace;
 
+			heroShip = instantiatedHero.GetComponent<HeroShip>();
+
 			instantiatedHero.transform.position = heroMovement.HeroPositionAroundStar(heroScript.heroLocation);
+
+			heroShip.ShipAbilities();
 
 			++heroCounter;
 

@@ -87,7 +87,27 @@ public class CameraFunctions : MasterScript
 					{
 						systemDefence = selectedSystem.GetComponent<SystemDefence>();
 
+						bool openInvMenu = false;
+
+						for(int j = 0; j < playerTurnScript.playerOwnedHeroes.Count; ++j)
+						{
+							heroScript = playerTurnScript.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
+
+							if(heroScript.heroLocation == systemListConstructor.systemList[i].systemObject)
+							{
+								if(heroScript.heroTier2 == "Infiltrator")
+								{
+									openInvMenu = true;
+								}
+							}
+						}
+
 						if(systemDefence.canEnter == true)
+						{
+							openInvMenu = true;
+						}
+
+						if(openInvMenu == true)
 						{
 							invasionGUI.openInvasionMenu = true;
 							invasionGUI.OpenPlanetInvasionScreen();
