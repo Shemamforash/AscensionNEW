@@ -90,8 +90,6 @@ public class HeroGUI : MasterScript
 
 			instantiatedHero.transform.position = heroMovement.HeroPositionAroundStar(heroScript.heroLocation);
 
-			heroShip.ShipAbilities();
-
 			++heroCounter;
 
 			playerTurnScript.capital -= 50;;

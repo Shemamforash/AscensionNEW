@@ -165,7 +165,7 @@ public class HeroScriptParent : MasterScript
 
 	private void AddLevelUpDelegate()
 	{
-		levelUpLabel = NGUITools.AddChild(heroGUI.buttonContainer, heroGUI.levelUpPrefab);
+		levelUpLabel = NGUITools.AddChild(GameObject.Find ("UI Root"), heroGUI.levelUpPrefab);
 		
 		levelUpLabel.transform.Find ("Label").GetComponent<UILabel>().depth = 1;
 		
@@ -233,10 +233,13 @@ public class HeroScriptParent : MasterScript
 		if(systemDestroyed == true)
 		{
 			DestroySystem();
+			invasionGUI.openInvasionMenu = false;
 		}
+
 		else if(systemEnemyControlled == true)
 		{
 			OwnSystem();
+			invasionGUI.openInvasionMenu = false;
 		}
 	}
 

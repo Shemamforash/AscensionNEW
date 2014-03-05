@@ -37,18 +37,23 @@ public class CameraFunctions : MasterScript
 		
 		if(Input.GetKeyDown ("escape")) //Used to close all open menus, and to reset doubleclick
 		{
-			coloniseMenu = false;
-			openMenu = false;
-			doubleClick = false;
-			heroGUI.openHeroLevellingScreen = false;
-			invasionGUI.openInvasionMenu = false;
+			CloseAllWindows();
+		}
+	}
 
-			NGUITools.SetActive (heroGUI.heroDetailsContainer, false);
-
-			if(techTreeGUI.techTree.activeInHierarchy == true)
-			{
-				techTreeGUI.ShowTechTree();
-			}
+	private void CloseAllWindows()
+	{
+		coloniseMenu = false;
+		openMenu = false;
+		doubleClick = false;
+		heroGUI.openHeroLevellingScreen = false;
+		invasionGUI.openInvasionMenu = false;
+		
+		NGUITools.SetActive (heroGUI.heroDetailsContainer, false);
+		
+		if(techTreeGUI.techTree.activeInHierarchy == true)
+		{
+			techTreeGUI.ShowTechTree();
 		}
 	}
 
@@ -109,6 +114,7 @@ public class CameraFunctions : MasterScript
 
 						if(openInvMenu == true)
 						{
+							CloseAllWindows();
 							invasionGUI.openInvasionMenu = true;
 							invasionGUI.OpenPlanetInvasionScreen();
 						}

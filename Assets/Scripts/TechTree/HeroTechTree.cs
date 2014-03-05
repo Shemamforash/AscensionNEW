@@ -83,5 +83,5 @@ public class HeroTech
 {
 	public int scienceCost = 0, armourRating = 0, primaryOffenceRating = 0, secondaryOffenceRating = 0, engineRating = 0, collateralRating = 0, stealthRating = 0, logisticsRating = 0;
 	public string heroType, techType, techName, prerequisite = null, techDetails;
-	public bool canPurchase = false ,isActive = false;
+	public bool canPurchase = false, isActive = false;
 }
