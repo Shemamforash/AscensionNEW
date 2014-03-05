@@ -6,7 +6,7 @@ public class HeroShip : MasterScript
 {
 	public bool canEmbargo, hasStealth = false, canPromote, canViewSystem;
 	private string invasionWeapon;
-	private int system, gridChildren;
+	private int system, gridChildren, tempChildren;
 	private List<TradeRoute> allTradeRoutes = new List<TradeRoute>();
 
 	void Start()
@@ -15,9 +15,41 @@ public class HeroShip : MasterScript
 		heroMovement = gameObject.GetComponent<HeroMovement> ();
 	}
 
+	private void CheckEmbargoButton()
+	{
+		switch (canEmbargo)
+		{
+		case true:
+			NGUITools.SetActive(heroGUI.embargoButton, true);
+			++tempChildren;
+			break;
+		case false:
+			NGUITools.SetActive(heroGUI.embargoButton, false);
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void CheckPromoteButton()
+	{
+		switch (canPromote)
+		{
+		case true:
+			NGUITools.SetActive(heroGUI.promoteButton, true);
+			++tempChildren;
+			break;
+		case false:
+			NGUITools.SetActive(heroGUI.promoteButton, false);
+			break;
+		default:
+			break;
+		}
+	}
+
 	void Update()
 	{
-		int tempChildren = 0;
+		tempChildren = 0;
 
 		if(heroMovement.TestForProximity (gameObject.transform.position, heroMovement.HeroPositionAroundStar(heroScript.heroLocation)) == true)
 		{
@@ -25,52 +57,21 @@ public class HeroShip : MasterScript
 
 			if(systemListConstructor.systemList[system].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[system].systemOwnedBy != null)
 			{
-				if(heroScript.heroTier2 == "Infiltrator")
-				{
-					NGUITools.SetActive(heroGUI.invasionButton, false);
-				}
-				else
-				{
-					NGUITools.SetActive(heroGUI.invasionButton, true);
-				}
-
 				++tempChildren;
+
+				CheckEmbargoButton();
+				CheckPromoteButton();
 
 				if(canViewSystem == true)
 				{
 					heroGUI.invasionButton.GetComponent<UILabel>().text = "Enter System";
+					NGUITools.SetActive(heroGUI.invasionButton, false);
 				}
 				else
 				{
 					NGUITools.SetActive(heroGUI.invasionButton, true);
 					heroGUI.invasionButton.GetComponent<UILabel>().text = "Invade System";
 				}
-			}
-
-			switch (canEmbargo)
-			{
-			case true:
-				NGUITools.SetActive(heroGUI.embargoButton, true);
-				++tempChildren;
-				break;
-			case false:
-				NGUITools.SetActive(heroGUI.embargoButton, false);
-				break;
-			default:
-				break;
-			}
-
-			switch (canPromote)
-			{
-			case true:
-				NGUITools.SetActive(heroGUI.promoteButton, true);
-				++tempChildren;
-				break;
-			case false:
-				NGUITools.SetActive(heroGUI.promoteButton, false);
-				break;
-			default:
-				break;
 			}
 		}
 
@@ -81,15 +82,20 @@ public class HeroShip : MasterScript
 			NGUITools.SetActive(heroGUI.invasionButton, false);
 		}
 
-		if(tempChildren != gridChildren)
+		RepositionAllPlanets();
+	}
+
+	private void RepositionAllPlanets()
+	{
+		if(gridChildren != tempChildren)
 		{
 			gridChildren = tempChildren;
-
+			
 			float gridWidth = (gridChildren * heroGUI.buttonContainer.GetComponent<UIGrid>().cellWidth) / 2 - (heroGUI.buttonContainer.GetComponent<UIGrid>().cellWidth/2);
 			
 			heroGUI.buttonContainer.transform.localPosition = new Vector3(systemGUI.playerSystemInfoScreen.transform.localPosition.x - gridWidth, 
-			                                                         heroGUI.turnInfoBar.transform.localPosition.y + 50.0f, 
-			                                                         systemGUI.planetListGrid.transform.localPosition.z);
+			                                                              heroGUI.turnInfoBar.transform.localPosition.y + 50.0f, 
+			                                                              systemGUI.planetListGrid.transform.localPosition.z);
 			
 			heroGUI.buttonContainer.GetComponent<UIGrid>().repositionNow = true;
 		}
@@ -276,8 +282,6 @@ public class HeroShip : MasterScript
 						}
 					}
 
-					Debug.Log (chosenEnemySystem);
-
 					if(skip == false)
 					{
 						systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
@@ -345,8 +349,6 @@ public class HeroShip : MasterScript
 
 				float pIndTransfer = pSysData.totalSystemIndustry / 2;
 				float pSciTransfer = pSysData.totalSystemScience / 2;
-
-				Debug.Log (pIndTransfer);
 
 				float eIndTransfer = eSysData.totalSystemIndustry / 2;
 				float eSciTransfer = eSysData.totalSystemScience / 2;

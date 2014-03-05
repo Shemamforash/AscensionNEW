@@ -4,13 +4,14 @@ using System.Collections.Generic;
 
 public class InvasionGUI : MasterScript
 {
-	public GameObject invasionScreen, grid, bombButton;
+	public GameObject invasionScreen, grid, fissionBombButton, fusionBombButton, antimatterBombButton;
 	private List<GameObject> planetList = new List<GameObject>();
-	private int system;
-	private string invasionInfo;
+	private int system, activeButtons;
+	private string invasionInfo, bombSelected;
 	public bool openInvasionMenu = false;
-	private bool bombSelected = false;
-	private float bombTimer;
+	private float fissionBombTimer, fusionBombTimer, antimatterBombTimer;
+	private List<GameObject> bombButtons = new List<GameObject> ();
+	private List<float> bombTimers = new List<float>();
 
 	void Start () 
 	{
@@ -25,7 +26,18 @@ public class InvasionGUI : MasterScript
 			planetList.Add (temp);
 		}
 
-		NGUITools.SetActive (invasionScreen, false);
+		bombButtons.Add (fissionBombButton);
+		bombButtons.Add (fusionBombButton);
+		bombButtons.Add (antimatterBombButton);
+
+		bombTimers.Add (fissionBombTimer);
+		bombTimers.Add (fusionBombTimer);
+		bombTimers.Add (antimatterBombTimer);
+
+		for(int i = 0; i < planetList.Count; ++i)
+		{
+			NGUITools.SetActive (planetList[i], false);
+		}
 	}
 
 	void Update()
@@ -33,95 +45,158 @@ public class InvasionGUI : MasterScript
 		if(heroGUI.selectedHero != null)
 		{
 			heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
-
+			
+			heroShip = heroGUI.selectedHero.GetComponent<HeroShip>();
+			
 			systemDefence = heroScript.heroLocation.GetComponent<SystemDefence> ();
-
+			
 			if(systemDefence.underInvasion == true && openInvasionMenu == true)
 			{
-				if(heroScript.heroTier2 == "Infiltrator")
+				if(bombSelected != null)
 				{
-					NGUITools.SetActive(bombButton, true);
-
-					if((bombTimer + (heroScript.secondaryPower / 8)) < Time.time || bombTimer == 0.0f)
+					for(int i = 0; i < bombButtons.Count; ++i)
 					{
-						bombButton.GetComponent<UIButton>().isEnabled = true;
-						bombTimer = 0.0f;
-					}
-					
-					if(heroScript.secondaryPower == 0)
-					{
-						bombButton.GetComponent<UIButton>().isEnabled = false;
-					}
-
-					if(bombTimer != 0.0f)
-					{
-						bombButton.GetComponent<UISprite>().fillAmount = heroScript.secondaryPower / ((Time.time - bombTimer) * 8);
-						Debug.Log (bombButton.GetComponent<UISprite>().fillAmount);
+						bombButtons[i].GetComponent<UIButton> ().isEnabled = false;
 					}
 				}
 
-				else
+				switch(heroShip.canViewSystem)
 				{
-					NGUITools.SetActive(bombButton, false);
+				case true:
+					UpdateBombButton();
+					break;
+				case false:
+					for(int i = 0; i < bombButtons.Count; ++i)
+					{
+						NGUITools.SetActive(bombButtons[i], false);
+					}
+					break;
+				default:
+					break;
 				}
-
+				
 				for(int i = 0; i < systemListConstructor.systemList[system].systemSize; i++)
 				{	
-					if(i < systemListConstructor.systemList[system].systemSize)
-					{
-						NGUITools.SetActive(planetList[i], true);
-
-						if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == false || 
-						   systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership == 0 ||
-						   systemListConstructor.systemList[system].planetsInSystem[i].planetDefence == 0)
-						{
-							planetList[i].GetComponent<UIButton>().enabled = false;
-
-							if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == false)
-							{
-								invasionInfo = "Uncolonised";
-							}
-						}
-
-						else
-						{
-
-							if(i == heroScript.planetInvade || bombTimer != 0.0f)
-							{
-								planetList[i].GetComponent<UIButton>().enabled = false;
-							}
-
-							if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == true)
-							{
-								invasionInfo = systemListConstructor.systemList[system].planetsInSystem[i].planetName + "\n"
-									+ systemListConstructor.systemList[system].planetsInSystem[i].planetType + "\nOwnership: "
-									+ systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership + "\nDefence: "
-									+ systemListConstructor.systemList[system].planetsInSystem[i].planetDefence;
-							}
-						}
-					}
-					
-					else if(i >= systemListConstructor.systemList[system].systemSize)
-					{
-						NGUITools.SetActive(planetList[i], false);
-						
-						planetList[i].GetComponent<UIButton>().enabled = false;
-					}
-
-					planetList[i].GetComponent<UILabel>().text = invasionInfo;
+					UpdatePlanetInvasionValues(i);
 				}
 			}
-
+			
 			if(systemDefence.underInvasion == false)
 			{
-				NGUITools.SetActive(invasionScreen, false);
+				for(int i = 0; i < planetList.Count; ++i)
+				{
+					NGUITools.SetActive (planetList[i], false);
+				}
 			}
 		}
-
+		
 		if(openInvasionMenu == false)
 		{
-			NGUITools.SetActive(bombButton, false);
-			NGUITools.SetActive(invasionScreen, false);
+			for(int i = 0; i < bombButtons.Count; ++i)
+			{
+				NGUITools.SetActive(bombButtons[i], false);
+			}
+
+			for(int i = 0; i < planetList.Count; ++i)
+			{
+				NGUITools.SetActive (planetList[i], false);
+			}
+		}
+	}
+
+	private void UpdatePlanetInvasionValues(int i)
+	{
+		if(i < systemListConstructor.systemList[system].systemSize)
+		{
+			NGUITools.SetActive(planetList[i], true);
+			
+			if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == false || 
+			   systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership == 0 ||
+			   systemListConstructor.systemList[system].planetsInSystem[i].planetDefence == 0)
+			{
+				planetList[i].GetComponent<UIButton>().isEnabled = false;
+				
+				if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == false)
+				{
+					invasionInfo = "Uncolonised";
+				}
+			}
+			
+			else
+			{
+				if(heroScript.heroTier2 == "Infiltrator" && bombSelected == null)
+				{
+					planetList[i].GetComponent<UIButton>().isEnabled = false;
+				}
+
+				else if(i == heroScript.planetInvade)
+				{
+					planetList[i].GetComponent<UIButton>().isEnabled = false;
+				}
+
+				else if(i != heroScript.planetInvade)
+				{
+					planetList[i].GetComponent<UIButton>().isEnabled = true;
+				}
+
+				if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == true)
+				{
+					invasionInfo = systemListConstructor.systemList[system].planetsInSystem[i].planetName + "\n"
+						+ systemListConstructor.systemList[system].planetsInSystem[i].planetType + "\nOwnership: "
+							+ systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership + "\nDefence: "
+							+ systemListConstructor.systemList[system].planetsInSystem[i].planetDefence;
+				}
+			}
+		}
+		
+		if(i >= systemListConstructor.systemList[system].systemSize)
+		{
+			NGUITools.SetActive(planetList[i], false);
+			
+			planetList[i].GetComponent<UIButton>().enabled = false;
+		}
+		
+		planetList[i].GetComponent<UILabel>().text = invasionInfo;
+	}
+
+	private void UpdateBombButton()
+	{
+		for(int i = 0; i < bombButtons.Count; ++i)
+		{
+			for(int j = 0; j < HeroTechTree.heroTechList.Count; ++j)
+			{
+				if(bombButtons[i].name == HeroTechTree.heroTechList[j].techName)
+				{
+					if(bombButtons[i].activeInHierarchy == false)
+					{
+						NGUITools.SetActive(bombButtons[i], true);
+						bombButtons[i].GetComponent<UIButton>().isEnabled = false;
+					}
+
+					if(HeroTechTree.heroTechList[i].isActive == true)
+					{
+						float power = HeroTechTree.heroTechList[i].secondaryOffenceRating;
+
+						if((bombTimers[i] + (power / 4f)) <= Time.time || bombTimers[i] == 0.0f)
+						{
+							bombButtons[i].GetComponent<UIButton>().isEnabled = true;
+							bombButtons[i].GetComponent<UISprite>().fillAmount = 1;
+							bombTimers[i] = 0.0f;
+						}
+						
+						if(power == 0 || (bombTimers[i] + (power / 4f)) > Time.time)
+						{
+							bombButtons[i].GetComponent<UIButton>().isEnabled = false;
+						}
+
+						if(bombTimers[i] != 0.0f)
+						{
+							bombButtons[i].GetComponent<UISprite>().fillAmount = ((Time.time - bombTimers[i]) * 4) / power;
+							Debug.Log (bombTimers[i] + " bacon");
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -144,43 +219,62 @@ public class InvasionGUI : MasterScript
 
 	public void SelectBomb()
 	{
-		bombSelected = true;
+		string tempButton = UIButton.current.gameObject.name;
+
+		switch(tempButton)
+		{
+		case "Fission Bomb":
+			bombSelected = "Fission";
+			break;
+		case "Fusion Bomb":
+			bombSelected = "Fusion";
+			break;
+		case "Antimatter Bomb":
+			bombSelected = "Antimatter";
+			break;
+		default:
+			break;
+		}
 	}
 
-	public void BombSystem()
+	private void BombPlanet(int i)
 	{
+		switch(bombSelected)
+		{
+		case "Fission":
+			bombTimers[0] = Time.time;
+			break;
+		case "Fusion":
+			bombTimers[1] = Time.time;
+			break;
+		case "Antimatter":
+			bombTimers[2] = Time.time;
+			break;
+		default:
+			break;
+		}
+
+		heroScript.planetInvade = -1;
+		bombSelected = null;
+	}
+
+	public void PlanetInvasionClick()
+	{
+		heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
+
 		for(int i = 0; i < 6; ++i)
 		{			
 			if(planetList[i] == UIButton.current.gameObject)
 			{
-				heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
 				heroScript.planetInvade = i;
 				heroScript.PlanetInvasion();
-				heroScript.planetInvade = -1;
-				bombSelected = false;
-				bombTimer = Time.time;
-			}
-		}
-	}
-	
-	public void PlanetInvasionClick()
-	{
-		if(bombSelected == true)
-		{
-			BombSystem();
-		}
 
-		else
-		{
-			for(int i = 0; i < 6; ++i)
-			{			
-				if(planetList[i] == UIButton.current.gameObject)
+				if(bombSelected != null)
 				{
-					heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
-					heroScript.planetInvade = i;
-					heroScript.PlanetInvasion();
-					break;
+					BombPlanet(i);
 				}
+
+				break;
 			}
 		}
 	}
