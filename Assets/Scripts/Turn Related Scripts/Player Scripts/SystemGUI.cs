@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class SystemGUI : MasterScript 
 { 
 	private SystemScrollviews systemScrollviews;
 
 	public GUISkin mySkin;
-	private string dataSIMString;
+	public UILabel systemIndustry, systemScience;
+	public GameObject planetPrefab;
 	public int selectedSystem, selectedPlanet, numberOfHeroes;
 	public List<PlanetUIElements> planetElementList = new List<PlanetUIElements>();
 	public GameObject planetListGrid, playerSystemInfoScreen;
@@ -109,9 +111,9 @@ public class SystemGUI : MasterScript
 						NGUITools.SetActive(planetElementList[i].spriteObject, false);
 					}
 				}
-				
-				dataSIMString = "Total SIM: " + systemSIMData.totalSystemSIM.ToString() + "\n" + "Total Science: " + systemSIMData.totalSystemScience.ToString() + "\n" 
-					+ "Total Industry: " + systemSIMData.totalSystemIndustry.ToString(); 
+
+				systemIndustry.text = Math.Round (systemSIMData.totalSystemIndustry, 1).ToString();
+				systemScience.text = Math.Round (systemSIMData.totalSystemScience, 1).ToString();  
 			}
 		}
 	}
@@ -124,8 +126,15 @@ public class SystemGUI : MasterScript
 		{
 			PlanetUIElements planet = new PlanetUIElements();
 			
-			planet.spriteObject = GameObject.Find (tempString[i]);
-			planet.infoLabel = planet.spriteObject.GetComponent<UILabel>();
+			planet.spriteObject = NGUITools.AddChild(planetListGrid, planetPrefab);
+			planet.spriteObject.name = tempString[i];
+			EventDelegate.Add (planet.spriteObject.GetComponent<UIButton>().onClick, PlanetInterfaceClick);
+			planet.infoLabel = planet.spriteObject.transform.Find ("General Output Label").gameObject.GetComponent<UILabel>();
+			EventDelegate.Add (planet.spriteObject.transform.Find ("Improve Button").gameObject.GetComponent<UIButton>().onClick, ImprovePlanet);
+			planet.scienceProductionSprite = planet.spriteObject.transform.Find ("Science Output").gameObject;
+			planet.scienceProduction = planet.scienceProductionSprite.transform.Find("Science Label").gameObject.GetComponent<UILabel>();
+			planet.industryProductionSprite = planet.spriteObject.transform.Find("Industry Output").gameObject;
+			planet.industryProduction = planet.industryProductionSprite.transform.Find("Industry Label").gameObject.GetComponent<UILabel>();
 			planet.improveButton = planet.spriteObject.transform.Find("Improve Button").gameObject.GetComponent<UIButton>();
 			planet.capitalCost = planet.improveButton.transform.Find("Capital Cost").gameObject.GetComponent<UILabel>();
 			planet.industryCost = planet.improveButton.transform.Find("Industry Cost").gameObject.GetComponent<UILabel>();
@@ -230,7 +239,19 @@ public class SystemGUI : MasterScript
 
 	private void UpdateColonisedPlanetDetails(int i)
 	{
-		planetElementList[i].infoLabel.text = systemSIMData.allPlanetsInfo[i];
+		if(planetElementList[i].scienceProductionSprite.activeInHierarchy == false)
+		{
+			NGUITools.SetActive (planetElementList [i].scienceProductionSprite, true);
+		}
+
+		if(planetElementList[i].industryProductionSprite.activeInHierarchy == false)
+		{
+			NGUITools.SetActive (planetElementList [i].industryProductionSprite, true);
+		}
+
+		planetElementList[i].infoLabel.text = systemSIMData.allPlanetsInfo[i].generalInfo;
+		planetElementList [i].industryProduction.text = systemSIMData.allPlanetsInfo [i].industryOutput;
+		planetElementList [i].scienceProduction.text = systemSIMData.allPlanetsInfo [i].scienceOutput;
 		
 		systemSIMData.improvementNumber = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel;
 		systemSIMData.CheckImprovement(selectedSystem, i);
@@ -258,7 +279,9 @@ public class SystemGUI : MasterScript
 	private void UpdateUncolonisedPlanetDetails(int i)
 	{
 		systemSIMData.CheckPlanetValues (selectedSystem, i, playerTurnScript);
-		planetElementList[i].infoLabel.text = systemSIMData.allPlanetsInfo[i];
+		NGUITools.SetActive (planetElementList [i].scienceProductionSprite, false);
+		NGUITools.SetActive (planetElementList [i].industryProductionSprite, false);
+		planetElementList[i].infoLabel.text = "Uncolonised\nClick to Colonise";
 		NGUITools.SetActive(planetElementList[i].improveButton.gameObject, false);
 	}
 
@@ -282,8 +305,8 @@ public class SystemGUI : MasterScript
 
 public class PlanetUIElements
 {
-	public GameObject spriteObject;
-	public UILabel infoLabel, industryCost, capitalCost;
+	public GameObject spriteObject, scienceProductionSprite, industryProductionSprite;
+	public UILabel infoLabel, industryProduction, scienceProduction, industryCost, capitalCost;
 	public UIButton improveButton;
 	public List<GameObject> improvementSlots = new List<GameObject>();
 }

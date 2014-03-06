@@ -15,7 +15,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public string improvementLevel;
 	[HideInInspector]
-	public string[] allPlanetsInfo = new string[6];	//Unique to object
+	public List<PlanetUIInfo> allPlanetsInfo = new List<PlanetUIInfo>();	//Unique to object
 	[HideInInspector]
 	public bool canImprove, foundPlanetData, isEmbargoed, isPromoted;
 
@@ -56,21 +56,23 @@ public class SystemSIMData : MasterScript
 			tempInd = tempInd * 2;
 		}
 
+		PlanetUIInfo planetInfo = new PlanetUIInfo();
+
 		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == true)
 		{
-			allPlanetsInfo[planet] = gameObject.name + " " + (planet+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-				+ systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership + "% Owned\n"
-					+ Math.Round(tempSci, 1).ToString() + "\n" + Math.Round (tempInd,1).ToString() + "\n";
+			planetInfo.generalInfo = gameObject.name + " " + (planet+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
+				+ systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership + "% Owned\n";
+			planetInfo.scienceOutput = Math.Round(tempSci, 1).ToString();
+			planetInfo.industryOutput = Math.Round (tempInd,1).ToString();
 		}
 
-		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == false)
-		{
-			allPlanetsInfo[planet] = "Uncolonised Planet\n Click to Colonise";
-		}
+		allPlanetsInfo.Add (planetInfo);
 	}
 
 	public void SystemSIMCounter(int i, TurnInfo thisPlayer) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{	
+		allPlanetsInfo.Clear ();
+
 		tempTotalSci = 0.0f;
 		tempTotalInd = 0.0f;
 
@@ -264,4 +266,9 @@ public class SystemSIMData : MasterScript
 			canImprove = false;
 		}
 	}
+}
+
+public class PlanetUIInfo
+{
+	public string generalInfo, scienceOutput, industryOutput;
 }
