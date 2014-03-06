@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class HeroShip : MasterScript
 {
 	public bool canEmbargo, hasStealth = false, canPromote, canViewSystem;
-	private string invasionWeapon;
 	private int system, gridChildren, tempChildren;
 	private List<TradeRoute> allTradeRoutes = new List<TradeRoute>();
 
@@ -112,8 +111,6 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroTier2 == "Diplomat")
 		{
-			invasionWeapon = "Dropships";
-
 			heroScript.secondaryPower = ShipFunctions.dropshipPower;
 			heroScript.secondaryCollateral = ShipFunctions.dropshipCollateral;
 
@@ -139,8 +136,6 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroTier2 == "Infiltrator")
 		{
-			invasionWeapon = "Bombs";
-
 			heroScript.secondaryPower = ShipFunctions.bombPower;
 			heroScript.secondaryCollateral = ShipFunctions.bombCollateral;
 
@@ -169,8 +164,6 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroTier2 == "Soldier")
 		{
-			invasionWeapon = "Artillery";
-
 			heroScript.secondaryPower = ShipFunctions.artilleryPower;
 			heroScript.secondaryCollateral = ShipFunctions.artilleryCollateral;
 

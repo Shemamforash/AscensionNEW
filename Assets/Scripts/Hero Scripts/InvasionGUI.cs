@@ -9,7 +9,7 @@ public class InvasionGUI : MasterScript
 	private int system, activeButtons;
 	private string invasionInfo, bombSelected;
 	public bool openInvasionMenu = false;
-	private float fissionBombTimer, fusionBombTimer, antimatterBombTimer;
+	private float fissionBombTimer = 0, fusionBombTimer = 0, antimatterBombTimer = 0;
 	private List<GameObject> bombButtons = new List<GameObject> ();
 	private List<float> bombTimers = new List<float>();
 
@@ -192,7 +192,6 @@ public class InvasionGUI : MasterScript
 						if(bombTimers[i] != 0.0f)
 						{
 							bombButtons[i].GetComponent<UISprite>().fillAmount = ((Time.time - bombTimers[i]) * 4) / power;
-							Debug.Log (bombTimers[i] + " bacon");
 						}
 					}
 				}
