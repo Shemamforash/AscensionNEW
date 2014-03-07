@@ -29,7 +29,7 @@ public class MasterScript : MonoBehaviour
 	public WinConditions winConditions;
 	
 	[HideInInspector]
-	public TechTreeScript techTreeScript;
+	public ImprovementsBasic improvementsBasic;
 	[HideInInspector]
 	public HeroScriptParent heroScript;
 	[HideInInspector]
@@ -89,13 +89,13 @@ public class MasterScript : MonoBehaviour
 
 		for(int i = 0; i < systemListConstructor.systemList [system].planetsInSystem [planet].improvementSlots; ++i)
 		{
-			techTreeScript = systemListConstructor.systemList[system].systemObject.GetComponent<TechTreeScript>();
+			improvementsBasic = systemListConstructor.systemList[system].systemObject.GetComponent<ImprovementsBasic>();
 
-			for(int j = 0; j < techTreeScript.listOfImprovements.Count; ++j)
+			for(int j = 0; j < improvementsBasic.listOfImprovements.Count; ++j)
 			{
-				if(techTreeScript.listOfImprovements[j].improvementName == systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt [i])
+				if(improvementsBasic.listOfImprovements[j].improvementName == systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt [i])
 				{
-					techTreeScript.listOfImprovements[j].hasBeenBuilt = false;
+					improvementsBasic.listOfImprovements[j].hasBeenBuilt = false;
 					systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt [i] = null;
 				}
 			}
