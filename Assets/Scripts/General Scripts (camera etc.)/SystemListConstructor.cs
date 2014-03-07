@@ -289,9 +289,9 @@ public class Planet
 {
 	public string planetName, planetType, planetCategory;
 	public List<string> improvementsBuilt = new List<string> ();
-	public float planetScience, planetIndustry;
+	public float planetScience, planetIndustry, planetOwnership, planetDefence;
 	public bool planetColonised, underEnemyControl;
-	public int planetOwnership, planetDefence, planetImprovementLevel, improvementSlots, maxOwnership;
+	public int planetImprovementLevel, improvementSlots, maxOwnership;
 }
 
 public class BasicImprovement
