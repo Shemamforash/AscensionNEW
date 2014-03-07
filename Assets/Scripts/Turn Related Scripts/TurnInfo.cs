@@ -132,12 +132,12 @@ public class TurnInfo : MasterScript
 			}
 
 			systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
-			techTreeScript = systemListConstructor.systemList[i].systemObject.GetComponent<TechTreeScript>();
+			improvementsBasic = systemListConstructor.systemList[i].systemObject.GetComponent<ImprovementsBasic>();
 			systemDefence = systemListConstructor.systemList[i].systemObject.GetComponent<SystemDefence>();
 
 			systemDefence.CalculateSystemDefence();
 
-			techTreeScript.ActiveTechnologies(i, selectedPlayer);
+			improvementsBasic.ActiveTechnologies(i, selectedPlayer);
 			systemSIMData.SystemSIMCounter(i, selectedPlayer);
 			systemSIMData.CheckUnlockedTier();
 			systemSIMData.IncreaseOwnership();

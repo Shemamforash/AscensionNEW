@@ -27,16 +27,16 @@ public class SystemSIMData : MasterScript
 	{
 		systemDefence = gameObject.GetComponent<SystemDefence> ();
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
-		techTreeScript = gameObject.GetComponent<TechTreeScript>();
+		improvementsBasic = gameObject.GetComponent<ImprovementsBasic>();
 	}
 
 	private void GetModifierValues(TurnInfo thisPlayer, int system, int planet)
 	{
 		ownershipBonus = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership / 66.6666f;
-		scienceModifier = (ownershipBonus + thisPlayer.raceScience + techTreeScript.sciencePercentBonus);
-		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + techTreeScript.industryPercentBonus + racialTraitScript.NereidesIndustryModifer(thisPlayer));
+		scienceModifier = (ownershipBonus + thisPlayer.raceScience + improvementsBasic.sciencePercentBonus);
+		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + improvementsBasic.industryPercentBonus + racialTraitScript.NereidesIndustryModifer(thisPlayer));
 
-		if(techTreeScript.listOfImprovements[24].hasBeenBuilt == true)
+		if(improvementsBasic.listOfImprovements[24].hasBeenBuilt == true)
 		{
 			string tempString = systemListConstructor.systemList[system].planetsInSystem[planet].planetType;
 			
@@ -61,7 +61,7 @@ public class SystemSIMData : MasterScript
 		tempSci = systemListConstructor.systemList [system].planetsInSystem [planet].planetScience * scienceModifier;
 		tempInd = systemListConstructor.systemList [system].planetsInSystem [planet].planetIndustry * industryModifier;
 
-		if(techTreeScript.listOfImprovements[8].hasBeenBuilt == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetType == thisPlayer.homePlanetType)
+		if(improvementsBasic.listOfImprovements[8].hasBeenBuilt == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetType == thisPlayer.homePlanetType)
 		{
 			tempSci = tempSci * 2;
 			tempInd = tempInd * 2;
@@ -143,12 +143,12 @@ public class SystemSIMData : MasterScript
 				{
 					float additionalOwnership = CheckOwnershipBonus(systemListConstructor.systemList[i].systemOwnedBy);
 
-					if(techTreeScript.listOfImprovements[18].hasBeenBuilt == true)
+					if(improvementsBasic.listOfImprovements[18].hasBeenBuilt == true)
 					{
 						additionalOwnership = 0;
 					}
 
-					float ownershipToAdd = (additionalOwnership + 1) * techTreeScript.ownershipModifier;
+					float ownershipToAdd = (additionalOwnership + 1) * improvementsBasic.ownershipModifier;
 
 					if(ownershipToAdd > systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership - systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership)
 					{
@@ -210,15 +210,15 @@ public class SystemSIMData : MasterScript
 			
 		if(totalSystemSIM >= 1600.0f && totalSystemSIM < 3200)
 		{
-			techTreeScript.techTier = 1;
+			improvementsBasic.techTier = 1;
 		}
 		if(totalSystemSIM >= 3200.0f && totalSystemSIM < 6400)
 		{
-			techTreeScript.techTier = 2;
+			improvementsBasic.techTier = 2;
 		}
 		if(totalSystemSIM >= 6400.0f)
 		{
-			techTreeScript.techTier = 3;
+			improvementsBasic.techTier = 3;
 		}
 	}
 

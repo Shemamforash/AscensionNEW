@@ -18,6 +18,7 @@ public class SystemGUI : MasterScript
 	{
 		systemScrollviews = gameObject.GetComponent<SystemScrollviews> ();
 		SetUpPlanets ();
+		selectedPlanet = -1;
 	}
 
 	void Update()
@@ -27,12 +28,18 @@ public class SystemGUI : MasterScript
 			selectedSystem = RefreshCurrentSystem(playerTurnScript.tempObject);
 
 			systemSIMData = playerTurnScript.tempObject.GetComponent<SystemSIMData>();
-			techTreeScript = playerTurnScript.tempObject.GetComponent<TechTreeScript>();
+			improvementsBasic = playerTurnScript.tempObject.GetComponent<ImprovementsBasic>();
 		}
 		
 		if(cameraFunctionsScript.openMenu == false)
 		{
-			NGUITools.SetActive(playerSystemInfoScreen, false);
+			if(playerSystemInfoScreen.activeInHierarchy == true)
+			{
+				NGUITools.SetActive(playerSystemInfoScreen, false);
+				selectedPlanet = -1;
+				systemScrollviews.selectedPlanet = -1;
+				systemScrollviews.tabContainer.GetComponent<UILabel>().text = null;
+			}
 		}
 		
 		if(cameraFunctionsScript.openMenu == true)
@@ -189,12 +196,12 @@ public class SystemGUI : MasterScript
 		{
 			if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
 			{
-				systemScrollviews.selectedPlanet = selectedPlanet;
 				NGUITools.SetActive(systemScrollviews.improvementsToBuildScrollView, true);
 				NGUITools.SetActive(systemScrollviews.tabContainer, true);
 				systemScrollviews.techTierToShow = 0;
-				GameObject.Find ("Unbuilt Label").GetComponent<UILabel>().text = "Build Improvements On " + systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetName;
+				systemScrollviews.tabContainer.GetComponent<UILabel>().text = "Build Improvements On " + systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetName;
 				systemScrollviews.UpdateScrollviewContents();
+				systemScrollviews.selectedPlanet = selectedPlanet;
 			}
 
 			if(playerTurnScript.capital >= 5)
@@ -209,8 +216,6 @@ public class SystemGUI : MasterScript
 				}
 			}
 		}
-
-		selectedPlanet = -1;
 	}
 
 	public void ImprovePlanet()

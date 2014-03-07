@@ -266,7 +266,7 @@ public class HeroScriptParent : MasterScript
 		systemListConstructor.systemList [system].systemObject.renderer.material = playerTurnScript.materialInUse;
 
 		lineRenderScript = systemListConstructor.systemList [system].systemObject.GetComponent<LineRenderScript> ();
-		techTreeScript = systemListConstructor.systemList [system].systemObject.GetComponent<TechTreeScript> ();
+		improvementsBasic = systemListConstructor.systemList [system].systemObject.GetComponent<ImprovementsBasic> ();
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
 
 		systemDefence.underInvasion = false;
@@ -277,14 +277,14 @@ public class HeroScriptParent : MasterScript
 		{
 			for(int j = 0; j < systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt.Count; ++j)
 			{
-				for(int k = 0; k < techTreeScript.listOfImprovements.Count; ++k)
+				for(int k = 0; k < improvementsBasic.listOfImprovements.Count; ++k)
 				{
-					if(systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt[j] == techTreeScript.listOfImprovements[k].improvementName)
+					if(systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt[j] == improvementsBasic.listOfImprovements[k].improvementName)
 					{
-						if(techTreeScript.listOfImprovements[k].improvementCategory != "Generic" || techTreeScript.listOfImprovements[k].improvementCategory != playerTurnScript.playerRace)
+						if(improvementsBasic.listOfImprovements[k].improvementCategory != "Generic" || improvementsBasic.listOfImprovements[k].improvementCategory != playerTurnScript.playerRace)
 						{
 							systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt.RemoveAt(j);
-							techTreeScript.listOfImprovements[k].hasBeenBuilt = false;
+							improvementsBasic.listOfImprovements[k].hasBeenBuilt = false;
 						}
 					}
 				}

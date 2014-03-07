@@ -15,7 +15,7 @@ public class PlayerTurn : TurnInfo
 			if(tempObject != null && tempObject.tag == "StarSystem")
 			{
 				systemSIMData = tempObject.GetComponent<SystemSIMData>();
-				techTreeScript = tempObject.GetComponent<TechTreeScript>();
+				improvementsBasic = tempObject.GetComponent<ImprovementsBasic>();
 			}
 		}
 		

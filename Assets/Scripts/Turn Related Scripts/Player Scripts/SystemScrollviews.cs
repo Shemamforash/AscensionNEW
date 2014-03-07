@@ -9,7 +9,7 @@ public class SystemScrollviews : MasterScript
 	private List<GameObject> builtImprovementList = new List<GameObject>();
 	private List<GameObject> improvementsList = new List<GameObject>();
 	private List<UIButton> tabList = new List<UIButton> ();
-	public int selectedPlanet, techTierToShow;
+	public int techTierToShow, selectedPlanet;
 
 	void Start()
 	{		
@@ -25,12 +25,18 @@ public class SystemScrollviews : MasterScript
 			if(improvementsToBuildScrollView.activeInHierarchy == true)
 			{
 				NGUITools.SetActive(improvementsToBuildScrollView, false);
-				selectedPlanet = -1;
 
 				foreach(Transform child in improvementMessageScrollview.transform)
 				{
 					NGUITools.SetActive(child.gameObject, false);
 				}
+
+				for(int i = 0; i < builtImprovementList.Count; ++i)
+				{
+					NGUITools.SetActive(builtImprovementList[i], false);
+				}
+
+				Debug.Log (selectedPlanet);
 			}
 		}
 
@@ -47,6 +53,7 @@ public class SystemScrollviews : MasterScript
 
 		if(cameraFunctionsScript.openMenu == true)
 		{
+			UpdateScrollviewContents();
 			UpdateBuiltImprovements();
 		}
 
@@ -104,23 +111,23 @@ public class SystemScrollviews : MasterScript
 	{
 		GameObject improvement = UIButton.current.gameObject;
 
-		techTreeScript = systemListConstructor.systemList[systemGUI.selectedSystem].systemObject.GetComponent<TechTreeScript>();
+		improvementsBasic = systemListConstructor.systemList[systemGUI.selectedSystem].systemObject.GetComponent<ImprovementsBasic>();
 		
-		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
+		for(int i = 0; i < improvementsBasic.listOfImprovements.Count; ++i)
 		{
-			if(techTreeScript.listOfImprovements[i].improvementName == improvement.name)
+			if(improvementsBasic.listOfImprovements[i].improvementName == improvement.name)
 			{
 				for(int j = 0; j < systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[selectedPlanet].improvementSlots; ++j)
 				{
 					if(systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] == null)
 					{
-						if(techTreeScript.ImproveSystem(i) == true)
+						if(improvementsBasic.ImproveSystem(i) == true)
 						{
 							NGUITools.SetActive (improvement, false);
-							systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] = techTreeScript.listOfImprovements[i].improvementName;
+							systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[j] = improvementsBasic.listOfImprovements[i].improvementName;
 							UpdateBuiltImprovements();
 							UpdateScrollviewContents();
-							techTreeScript.ActiveTechnologies(systemGUI.selectedSystem, playerTurnScript);
+							improvementsBasic.ActiveTechnologies(systemGUI.selectedSystem, playerTurnScript);
 							break;
 						}
 					}
@@ -131,11 +138,11 @@ public class SystemScrollviews : MasterScript
 
 	public void UpdateBuiltImprovements()
 	{
-		techTreeScript = systemListConstructor.systemList[systemGUI.selectedSystem].systemObject.GetComponent<TechTreeScript>();
+		improvementsBasic = systemListConstructor.systemList[systemGUI.selectedSystem].systemObject.GetComponent<ImprovementsBasic>();
 
-		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
+		for(int i = 0; i < improvementsBasic.listOfImprovements.Count; ++i)
 		{
-			if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true && techTreeScript.listOfImprovements[i].improvementMessage != "")
+			if(improvementsBasic.listOfImprovements[i].hasBeenBuilt == true && improvementsBasic.listOfImprovements[i].improvementMessage != "")
 			{
 				if(builtImprovementList[i].activeInHierarchy == false)
 				{
@@ -145,7 +152,17 @@ public class SystemScrollviews : MasterScript
 					improvementMessageScrollview.GetComponent<UIScrollView>().ResetPosition();
 					improvementMessageScrollview.GetComponent<UIGrid>().repositionNow = true;
 				}
-				builtImprovementList[i].GetComponent<UILabel>().text = techTreeScript.listOfImprovements[i].improvementMessage;
+
+
+				builtImprovementList[i].GetComponent<UILabel>().text = improvementsBasic.listOfImprovements[i].improvementMessage;
+			}
+
+			if(improvementsBasic.listOfImprovements[i].hasBeenBuilt == false)
+			{
+				if(builtImprovementList[i].activeInHierarchy == true)
+				{
+					NGUITools.SetActive(builtImprovementList[i], false);
+				}
 			}
 		}
 	}
@@ -167,11 +184,11 @@ public class SystemScrollviews : MasterScript
 	{
 		for(int i = 0; i < 4; ++i)
 		{
-			if(techTreeScript.techTier >= i && tabList[i].enabled == false)
+			if(improvementsBasic.techTier >= i && tabList[i].enabled == false)
 			{
 				tabList[i].enabled = true;
 			}
-			if(techTreeScript.techTier < i && tabList[i].enabled == true)
+			if(improvementsBasic.techTier < i && tabList[i].enabled == true)
 			{
 				tabList[i].enabled = false;
 			}
@@ -180,22 +197,22 @@ public class SystemScrollviews : MasterScript
 
 	public void UpdateScrollviewContents()
 	{
-		techTreeScript = systemListConstructor.systemList[systemGUI.selectedSystem].systemObject.GetComponent<TechTreeScript>();
+		improvementsBasic = systemListConstructor.systemList[systemGUI.selectedSystem].systemObject.GetComponent<ImprovementsBasic>();
 
 		CheckForTierUnlock ();
 						
-		for(int i = 0; i < techTreeScript.listOfImprovements.Count; ++i)
+		for(int i = 0; i < improvementsBasic.listOfImprovements.Count; ++i)
 		{		
-			if(techTreeScript.listOfImprovements[i].hasBeenBuilt == false && techTreeScript.listOfImprovements[i].improvementLevel <= techTreeScript.techTier)
+			if(improvementsBasic.listOfImprovements[i].hasBeenBuilt == false && improvementsBasic.listOfImprovements[i].improvementLevel <= improvementsBasic.techTier && selectedPlanet != -1)
 			{
-				if(techTreeScript.listOfImprovements[i].improvementCategory == playerTurnScript.playerRace ||  techTreeScript.listOfImprovements[i].improvementCategory == "Generic")
+				if(improvementsBasic.listOfImprovements[i].improvementCategory == playerTurnScript.playerRace ||  improvementsBasic.listOfImprovements[i].improvementCategory == "Generic")
 				{
-					if(techTreeScript.listOfImprovements[i].improvementLevel == techTierToShow)
+					if(improvementsBasic.listOfImprovements[i].improvementLevel == techTierToShow)
 					{
 						NGUITools.SetActive(improvementsList[i], true); //If tech has not been built, set it to active so it can be shown in the scrollview
-						improvementsList[i].transform.Find ("Label").GetComponent<UILabel>().text = improvementsList[i].name + "\n" + (systemListConstructor.basicImprovementsList[i].cost - techTreeScript.improvementCostModifier);
+						improvementsList[i].transform.Find ("Label").GetComponent<UILabel>().text = improvementsList[i].name + "\n" + (systemListConstructor.basicImprovementsList[i].cost - improvementsBasic.improvementCostModifier);
 					}
-					if(techTreeScript.listOfImprovements[i].improvementLevel != techTierToShow)
+					if(improvementsBasic.listOfImprovements[i].improvementLevel != techTierToShow)
 					{
 						NGUITools.SetActive(improvementsList[i], false);
 					}
@@ -207,7 +224,12 @@ public class SystemScrollviews : MasterScript
 				}
 			}
 
-			if(techTreeScript.listOfImprovements[i].hasBeenBuilt == true || techTreeScript.listOfImprovements[i].improvementLevel > techTreeScript.techTier)
+			else
+			{
+				NGUITools.SetActive(improvementsList[i], false);
+			}
+
+			if(improvementsBasic.listOfImprovements[i].hasBeenBuilt == true || improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.techTier)
 			{
 				NGUITools.SetActive(improvementsList[i], false);
 			}
