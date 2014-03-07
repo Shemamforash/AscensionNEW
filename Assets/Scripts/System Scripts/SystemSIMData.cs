@@ -19,7 +19,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public bool canImprove, foundPlanetData, isEmbargoed, isPromoted;
 
-	public float totalSystemScience, totalSystemIndustry, totalSystemSIM, tempTotalSci, tempTotalInd;
+	public float totalSystemScience, totalSystemIndustry, totalSystemSIM, totalSystemAmber, tempTotalSci, tempTotalInd;
 	public float scienceModifier, industryModifier;
 	public float tempSci = 0.0f, tempInd = 0.0f;
 
@@ -125,6 +125,42 @@ public class SystemSIMData : MasterScript
 			totalSystemScience = 0;
 			totalSystemIndustry = 0;
 		}
+
+		if(thisPlayer.playerRace == "Selkies")
+		{
+			IncreaseAmber(i);
+		}
+	}
+
+	private void IncreaseAmber (int system)
+	{
+		if(improvementsBasic.listOfImprovements[28].hasBeenBuilt == true)
+		{
+			float tempMod = 1.0f;
+			
+			if(improvementsBasic.IsBuiltOnPlanetType(system, 28, "Molten") == true)
+			{
+				tempMod = 1.5f;
+			}
+			
+			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			{
+				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
+				
+				if(tempString == "Molten" || tempString == "Desert" || tempString == "Rocky")
+				{
+					totalSystemAmber += (tempMod * 2f) * improvementsBasic.amberPercentBonus;
+				}
+				else
+				{
+					totalSystemAmber += tempMod * improvementsBasic.amberPercentBonus;
+				}
+			}
+		}
+
+		totalSystemAmber += improvementsBasic.amberPointBonus;
+
+		racialTraitScript.amber += totalSystemAmber;
 	}
 
 	public void IncreaseOwnership()
@@ -139,7 +175,8 @@ public class SystemSIMData : MasterScript
 				
 				CheckImprovement(i, j);
 
-				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership && systemDefence.underInvasion == false)
+				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < (systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus)
+				   && systemDefence.underInvasion == false)
 				{
 					float additionalOwnership = CheckOwnershipBonus(systemListConstructor.systemList[i].systemOwnedBy);
 
@@ -150,9 +187,10 @@ public class SystemSIMData : MasterScript
 
 					float ownershipToAdd = (additionalOwnership + 1) * improvementsBasic.ownershipModifier;
 
-					if(ownershipToAdd > systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership - systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership)
+					if(ownershipToAdd > (systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus) - systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership)
 					{
-						ownershipToAdd = systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership - systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership;
+						ownershipToAdd = (systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus)
+							- systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership;
 					}
 
 					systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership += ownershipToAdd;

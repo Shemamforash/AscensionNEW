@@ -251,4 +251,85 @@
       E="If System Defence is compromised, generate +100% Science and Industry"
     />
   </Record>
+  <Record>
+    <Row
+      A="Amber Refinery"
+      B="Selkies"
+      C="0"
+      D="50"
+      E="+1(2) Amber on (hot) planets. -5% Ownership growth and Resource Production"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Amber Integration"
+      B="Selkies"
+      C="0"
+      D="50"
+      E="-1 Improvement cost for every Amber produced"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Shared Burden"
+      B="Selkies"
+      C="0"
+      D="50"
+      E="-5% Amber Penalty for each connected Allied system"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Relinquished Profits"
+      B="Selkies"
+      C="1"
+      D="100"
+      E="-4 Amber produced, -50% Amber Penalty"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Overclocked"
+      B="Selkies"
+      C="1"
+      D="100"
+      E="+1% Amber for every Industry produced"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="100% Efficiency"
+      B="Selkies"
+      C="2"
+      D="200"
+      E="-2 Amber produced, - 50% Amber Penalty"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Motherlode"
+      B="Selkies"
+      C="2"
+      D="200"
+      E="+50% Amber production if Amber production is greater than 10"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Amber Terraforming"
+      B="Selkies"
+      C="3"
+      D="400"
+      E="+1% Ownership cap on Planets for every Amber produced"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Compact Workspace"
+      B="Selkies"
+      C="3"
+      D="400"
+      E="+1(2) Improvement Slots on Plains(Molten) planets"
+    />
+  </Record>
 </Records>

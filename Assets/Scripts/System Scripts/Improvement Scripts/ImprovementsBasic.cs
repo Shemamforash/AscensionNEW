@@ -6,9 +6,9 @@ using System.Xml;
 
 public class ImprovementsBasic : MasterScript 
 {
-	public float sciencePercentBonus, industryPercentBonus, tempCount, scienceBonusModifier, ownershipModifier;
+	public float sciencePercentBonus, industryPercentBonus, amberPercentBonus, amberPointBonus, tempCount, scienceBonusModifier, ownershipModifier, maxOwnershipBonus;
 	public GameObject tooltip;
-	public int techTier = 0, improvementCostModifier = 0;
+	public int techTier = 0, improvementCostModifier = 0, researchCost;
 	private GenericImprovements genericImprovements;
 	private HumanImprovements humanImprovements;
 	private NereidesImprovements nereidesImprovements;
@@ -66,6 +66,8 @@ public class ImprovementsBasic : MasterScript
 		improvementCostModifier = 0;
 		scienceBonusModifier = 1.0f;
 		ownershipModifier = 1.0f;
+		amberPercentBonus = 1.0f;
+		researchCost = 0;
 
 		tempCount = 0.0f;
 
@@ -140,6 +142,25 @@ public class ImprovementsBasic : MasterScript
 		}
 
 		return noOfPlayersInState;
+	}
+
+	public bool IsBuiltOnPlanetType(int system, int improvementNo, string planetType)
+	{
+		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+		{
+			for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Count; ++j)
+			{
+				if(systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j] == listOfImprovements[improvementNo].improvementName)
+				{
+					if(systemListConstructor.systemList[system].planetsInSystem[i].planetType == planetType)
+					{
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 }
 

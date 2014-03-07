@@ -100,7 +100,7 @@ public class TechTreeGUI : MasterScript
 					if(HeroTechTree.heroTechList[preTech].isActive == true && HeroTechTree.heroTechList[techNo].isActive == false)
 					{
 						techLabels[j].button.enabled = true;
-						techLabels[j].label.text = HeroTechTree.heroTechList[techNo].techName;
+						techLabels[j].label.text = HeroTechTree.heroTechList[techNo].techName + " " + (HeroTechTree.heroTechList[techNo].scienceCost - playerTurnScript.researchCostModifier);
 						techLabels[j].label.gameObject.GetComponent<UISprite>().spriteName = "Blank Text Box";
 						continue;
 					}
@@ -115,7 +115,7 @@ public class TechTreeGUI : MasterScript
 
 		for(int i = 0; i < HeroTechTree.heroTechList.Count; ++i)
 		{
-			if(HeroTechTree.heroTechList[i].techName == UIButton.current.gameObject.name && playerTurnScript.science >= HeroTechTree.heroTechList[i].scienceCost)
+			if(HeroTechTree.heroTechList[i].techName == UIButton.current.gameObject.name && playerTurnScript.science >= (HeroTechTree.heroTechList[i].scienceCost + playerTurnScript.researchCostModifier))
 			{
 				playerTurnScript.science -= HeroTechTree.heroTechList[i].scienceCost;
 				HeroTechTree.heroTechList[i].isActive = true;

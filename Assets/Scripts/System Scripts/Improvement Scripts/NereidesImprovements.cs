@@ -31,19 +31,10 @@ public class NereidesImprovements : MasterScript
 					improvements.tempCount += 1f;
 				}
 			}
-			
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+
+			if(improvements.IsBuiltOnPlanetType(system, 22, "Icy") == true)
 			{
-				for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Count; ++j)
-				{
-					if(systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j] == improvements.listOfImprovements[22].improvementName)
-					{
-						if(systemListConstructor.systemList[system].planetsInSystem[i].planetType == "Icy")
-						{
-							improvements.tempCount = improvements.tempCount * 2f;
-						}
-					}
-				}
+				improvements.tempCount = improvements.tempCount * 2f;
 			}
 			
 			thisPlayer.capital += (int)improvements.tempCount;
@@ -81,20 +72,11 @@ public class NereidesImprovements : MasterScript
 		{
 			improvements.scienceBonusModifier += 1.0f;
 			improvements.tempCount = 100f;
-			
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+
+			if(improvements.IsBuiltOnPlanetType(system, 25, "Icy") == true)
 			{
-				for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Count; ++j)
-				{
-					if(systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j] == improvements.listOfImprovements[25].improvementName)
-					{
-						if(systemListConstructor.systemList[system].planetsInSystem[i].planetType == "Icy")
-						{
-							improvements.scienceBonusModifier += 1.5f;
-							improvements.tempCount = 150f;
-						}
-					}
-				}
+				improvements.scienceBonusModifier += 1.5f;
+				improvements.tempCount = 150f;
 			}
 			
 			improvements.listOfImprovements[25].improvementMessage = ("+" + improvements.tempCount + "% Effect from Science Improvements");
@@ -103,21 +85,10 @@ public class NereidesImprovements : MasterScript
 		if(improvements.listOfImprovements[26].hasBeenBuilt == true)
 		{
 			improvements.tempCount = 0.1f;
-			
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+
+			if(improvements.IsBuiltOnPlanetType(system, 26, "Icy") == true || improvements.IsBuiltOnPlanetType(system, 26, "Tundra") == true || improvements.IsBuiltOnPlanetType(system, 26, "Dead") == true)
 			{
-				for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Count; ++j)
-				{
-					if(systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j] == improvements.listOfImprovements[25].improvementName)
-					{
-						string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
-						
-						if(tempString == "Icy" || tempString == "Tundra" || tempString == "Dead")
-						{
-							improvements.tempCount = 0.15f;
-						}
-					}
-				}
+				improvements.tempCount = 0.15f;
 			}
 			
 			improvements.ownershipModifier += improvements.tempCount * racialTraitScript.nereidesStacks;
