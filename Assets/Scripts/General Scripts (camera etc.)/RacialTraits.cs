@@ -3,7 +3,7 @@ using System.Collections;
 
 public class RacialTraits : MasterScript 
 {
-	public float ambitionCounter, ambitionOwnershipModifier;
+	public float ambitionCounter, ambitionOwnershipModifier, amber;
 	public int nereidesStacks;
 	public UILabel racialLabel;
 
@@ -55,7 +55,6 @@ public class RacialTraits : MasterScript
 			{
 				ambitionCounter -= 0.5f;
 			}
-
 			if(ambitionCounter < -100f)
 			{
 				ambitionCounter = -100f;
@@ -64,6 +63,10 @@ public class RacialTraits : MasterScript
 			{
 				ambitionCounter = 100f;
 			}
+		}
+		if(player.playerRace == "Nereides")
+		{
+			player.researchCostModifier += nereidesStacks;
 		}
 	}
 
@@ -81,7 +84,7 @@ public class RacialTraits : MasterScript
 
 		if(playerTurnScript.playerRace == "Selkies")
 		{
-			racialLabel.text = "Not implemented";
+			racialLabel.text = amber + " Amber";
 		}
 	}
 }
