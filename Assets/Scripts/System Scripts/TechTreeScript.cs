@@ -6,10 +6,9 @@ using System.Xml;
 
 public class TechTreeScript : MasterScript 
 {
-	public float sciencePercentBonus, industryPercentBonus;
-	public float tempCount;
+	public float sciencePercentBonus, industryPercentBonus, tempCount, scienceBonusModifier, ownershipModifier;
 	public GameObject tooltip;
-	public int techTier = 0;
+	public int techTier = 0, improvementCostModifier = 0;
 	private int currentPlanetsWithHyperNet = 0;
 
 	public List<ImprovementClass> listOfImprovements = new List<ImprovementClass>();
@@ -27,9 +26,9 @@ public class TechTreeScript : MasterScript
 
 	public bool ImproveSystem(int improvement) //Occurs if button of tech is clicked.
 	{
-		if(playerTurnScript.industry >= listOfImprovements[improvement].improvementCost) //Checks cost of tech and current industry
+		if(playerTurnScript.industry >= (listOfImprovements[improvement].improvementCost - improvementCostModifier)) //Checks cost of tech and current industry
 		{
-			playerTurnScript.industry -= listOfImprovements[improvement].improvementCost;
+			playerTurnScript.industry -= (listOfImprovements[improvement].improvementCost - improvementCostModifier);
 			listOfImprovements[improvement].hasBeenBuilt = true;
 			return true;
 		}
@@ -60,6 +59,9 @@ public class TechTreeScript : MasterScript
 	{
 		sciencePercentBonus = 0.0f; //Resets the percentage modifier for SIM. Is there an easier way?
 		industryPercentBonus = 0.0f;
+		improvementCostModifier = 0;
+		scienceBonusModifier = 1.0f;
+		ownershipModifier = 1.0f;
 
 		tempCount = 0.0f;
 
@@ -83,6 +85,12 @@ public class TechTreeScript : MasterScript
 		{
 			CheckHumanImprovements(system, thisPlayer);
 		}
+		if(thisPlayer.playerRace == "Nereides")
+		{
+			CheckNereidesImprovements(system, thisPlayer);
+		}
+
+		sciencePercentBonus = sciencePercentBonus * scienceBonusModifier;
 	}
 
 	public void CheckTierZero(int system, TurnInfo thisPlayer)
@@ -263,7 +271,6 @@ public class TechTreeScript : MasterScript
 		
 		if(listOfImprovements[11].hasBeenBuilt == true)
 		{
-			tempCount = 0.0f;
 			int i = HyperNet(thisPlayer);
 			
 			sciencePercentBonus += (i * 0.05f);
@@ -271,6 +278,139 @@ public class TechTreeScript : MasterScript
 			tempCount = (i * 0.05f);
 			
 			listOfImprovements[11].improvementMessage = ("+" + tempCount + "% SIM from systems with Hypernet");
+		}
+	}
+
+	public void CheckNereidesImprovements(int system, TurnInfo thisPlayer)
+	{
+		if(listOfImprovements[20].hasBeenBuilt == true)
+		{
+			improvementCostModifier += racialTraitScript.nereidesStacks;
+			listOfImprovements[20].improvementMessage = ("-" + racialTraitScript.nereidesStacks + " Industry Cost for Improvements");
+		}
+
+		if(listOfImprovements[21].hasBeenBuilt == true)
+		{
+			tempCount = 0.1f * (float)racialTraitScript.nereidesStacks;
+			sciencePercentBonus += tempCount;
+			listOfImprovements[21].improvementMessage = ("+" + tempCount + "% Science from Elation");
+		}
+
+		if(listOfImprovements[22].hasBeenBuilt == true)
+		{
+			tempCount = 0f;
+
+			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			{
+				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
+
+				if(tempString == "Icy" || tempString == "Tundra" || tempString == "Dead")
+				{
+					tempCount += 1f;
+				}
+			}
+
+			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			{
+				for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Count; ++j)
+				{
+					if(systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j] == listOfImprovements[22].improvementName)
+					{
+						if(systemListConstructor.systemList[system].planetsInSystem[i].planetType == "Icy")
+						{
+							tempCount = tempCount * 2f;
+						}
+					}
+				}
+			}
+
+			thisPlayer.capital += (int)tempCount;
+			listOfImprovements[22].improvementMessage = ("+" + tempCount + " Capital from Cold Planets");
+		}
+
+		if(listOfImprovements[23].hasBeenBuilt == true)
+		{
+			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			{
+				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
+				
+				if(tempString == "Icy")
+				{
+					systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots = 3;
+					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
+				}
+
+				if(tempString == "Tundra")
+				{
+					systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots = 4;
+					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
+				}
+			}
+
+			listOfImprovements[23].improvementMessage = ("+1 Improvement Slot on Tundra and Icy Planets");
+		}
+
+		if(listOfImprovements[24].hasBeenBuilt == true)
+		{
+			listOfImprovements[24].improvementMessage = ("+50% Industry and 0% Science on Hot Planets");
+		}
+
+		if(listOfImprovements[25].hasBeenBuilt == true)
+		{
+			scienceBonusModifier += 1.0f;
+			tempCount = 100f;
+
+			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			{
+				for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Count; ++j)
+				{
+					if(systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j] == listOfImprovements[25].improvementName)
+					{
+						if(systemListConstructor.systemList[system].planetsInSystem[i].planetType == "Icy")
+						{
+							scienceBonusModifier += 1.5f;
+							tempCount = 150f;
+						}
+					}
+				}
+			}
+
+			listOfImprovements[25].improvementMessage = ("+" + tempCount + "% Effect from Science Improvements");
+		}
+
+		if(listOfImprovements[26].hasBeenBuilt == true)
+		{
+			tempCount = 0.1f;
+
+			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			{
+				for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Count; ++j)
+				{
+					if(systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j] == listOfImprovements[25].improvementName)
+					{
+						string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
+
+						if(tempString == "Icy" || tempString == "Tundra" || tempString == "Dead")
+						{
+							tempCount = 0.15f;
+						}
+					}
+				}
+			}
+
+			ownershipModifier += tempCount * racialTraitScript.nereidesStacks;
+			listOfImprovements[26].improvementMessage = ("+" + tempCount * racialTraitScript.nereidesStacks + "Ownership from Elation");
+		}
+
+		if(listOfImprovements[27].hasBeenBuilt == true)
+		{
+			if(systemListConstructor.systemList[system].systemDefence < systemDefence.maxSystemDefence)
+			{
+				sciencePercentBonus += 1f;
+				industryPercentBonus += 1f;
+
+				listOfImprovements[27].improvementMessage = ("+100% Resource Production from Invasion");
+			}
 		}
 	}
 

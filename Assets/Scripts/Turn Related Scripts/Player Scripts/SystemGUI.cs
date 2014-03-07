@@ -146,6 +146,7 @@ public class SystemGUI : MasterScript
 				if(tempTransform[j].gameObject.tag == "Improvement Slot")
 				{
 					planet.improvementSlots.Add(tempTransform[j].gameObject);
+					tempTransform[j].GetComponent<UILabel>().depth = 1;
 					NGUITools.SetActive(tempTransform[j].gameObject, false);
 				}
 			}
@@ -190,8 +191,10 @@ public class SystemGUI : MasterScript
 			{
 				systemScrollviews.selectedPlanet = selectedPlanet;
 				NGUITools.SetActive(systemScrollviews.improvementsToBuildScrollView, true);
+				NGUITools.SetActive(systemScrollviews.tabContainer, true);
+				systemScrollviews.techTierToShow = 0;
+				GameObject.Find ("Unbuilt Label").GetComponent<UILabel>().text = "Build Improvements On " + systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetName;
 				systemScrollviews.UpdateScrollviewContents();
-				systemScrollviews.UpdateScrollViewPosition();
 			}
 
 			if(playerTurnScript.capital >= 5)
@@ -230,9 +233,8 @@ public class SystemGUI : MasterScript
 			playerTurnScript.industry -= systemSIMData.improvementCost;
 			playerTurnScript.capital -= systemSIMData.improvementNumber + 1;
 			++systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetImprovementLevel;
+			UpdateColonisedPlanetDetails(selectedPlanet);
 		}
-
-		systemSIMData.SystemSIMCounter(selectedSystem, playerTurnScript);
 
 		selectedPlanet = -1;
 	}

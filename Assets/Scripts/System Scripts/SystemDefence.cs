@@ -3,7 +3,8 @@ using System.Collections;
 
 public class SystemDefence : MasterScript 
 {
-	public int defenceRegenerator, system, regenerateTimer;
+	public int system, regenerateTimer;
+	public float maxSystemDefence, defenceRegenerator;
 	public bool underInvasion, canEnter, regenerated = true;
 
 	void Start () 
@@ -15,16 +16,16 @@ public class SystemDefence : MasterScript
 
 	public void CalculateSystemDefence() 
 	{
-		int tempDefence = 0;
+		maxSystemDefence = 0f;
 
 		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
 		{
-			tempDefence += systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
+			maxSystemDefence += systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
 		}
 
-		tempDefence = (tempDefence / systemListConstructor.systemList [system].systemSize) * 10;
+		maxSystemDefence = (maxSystemDefence / systemListConstructor.systemList [system].systemSize) * 10f;
 
-		defenceRegenerator = tempDefence / 5;
+		defenceRegenerator = maxSystemDefence / 5f;
 
 		if(underInvasion == false)
 		{
@@ -38,13 +39,13 @@ public class SystemDefence : MasterScript
 				CalculatePlanetDefence(i);
 			}
 
-			if(regenerateTimer <= 0 && systemListConstructor.systemList [system].systemDefence != tempDefence)
+			if(regenerateTimer <= 0 && systemListConstructor.systemList [system].systemDefence != maxSystemDefence)
 			{
 				regenerateTimer = 0;
 
-				systemListConstructor.systemList [system].systemDefence += defenceRegenerator;
+				systemListConstructor.systemList [system].systemDefence += (int)defenceRegenerator;
 
-				if(systemListConstructor.systemList [system].systemDefence >= tempDefence)
+				if(systemListConstructor.systemList [system].systemDefence >= maxSystemDefence)
 				{
 					regenerated = true;
 				}
@@ -56,22 +57,22 @@ public class SystemDefence : MasterScript
 			
 			if(regenerated == true)
 			{
-				systemListConstructor.systemList [system].systemDefence = tempDefence;
+				systemListConstructor.systemList [system].systemDefence = (int)maxSystemDefence;
 			}
 		}
 	}
 
 	public void CalculatePlanetDefence(int planet)
 	{
-		int maxDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership * systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel;
+		float maxPlanetDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership * systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel;
 		
-		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence != maxDefence)
+		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence != maxPlanetDefence)
 		{
 			systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence += defenceRegenerator;
 
-			if(systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence > maxDefence)
+			if(systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence > maxPlanetDefence)
 			{
-				systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence = maxDefence;
+				systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence = maxPlanetDefence;
 			}
 		}
 	}

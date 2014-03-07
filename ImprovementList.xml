@@ -179,4 +179,76 @@
       E="When ambition is greater than 75, this system gains 25% resource output. When lower than 75, this system loses 25% resource output."
     />
   </Record>
+  <Record>
+    <Row
+      A="Recycling"
+      B="Nereides"
+      C="0"
+      D="50"
+      E="Improvements cost 1 fewer Industry to build for every stack of Elation"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Positive Thinking"
+      B="Nereides"
+      C="0"
+      D="50"
+      E="Generate +0.1% Science for every stack of Elation"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Natural Economy"
+      B="Nereides"
+      C="1"
+      D="100"
+      E="+1(2) Capital for every Cold Planet (if built on Icy Planet)"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Careful Planning"
+      B="Nereides"
+      C="1"
+      D="100"
+      E="+1 Improvement Slots on Cold planets (excluding Dead planets)"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Planetary Factories"
+      B="Nereides"
+      C="2"
+      D="200"
+      E="Generate +50% Industry, but no Science, on Hot planets"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Knowledge"
+      B="Nereides"
+      C="2"
+      D="200"
+      E="+100(150)% Benefit from Science Improvements (if built on Icy Planet)"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Exponential Growth"
+      B="Nereides"
+      C="3"
+      D="400"
+      E="+0.1(0.15)% Ownership for every stack of Elation (if built on Icy Planet)"
+    />
+  </Record>
+  <Record>
+    <Row
+      A="Focus"
+      B="Nereides"
+      C="3"
+      D="400"
+      E="If System Defence is compromised, generate +100% Science and Industry"
+    />
+  </Record>
 </Records>

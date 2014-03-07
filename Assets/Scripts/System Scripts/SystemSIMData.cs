@@ -35,6 +35,17 @@ public class SystemSIMData : MasterScript
 		ownershipBonus = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership / 66.6666f;
 		scienceModifier = (ownershipBonus + thisPlayer.raceScience + techTreeScript.sciencePercentBonus);
 		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + techTreeScript.industryPercentBonus + racialTraitScript.NereidesIndustryModifer(thisPlayer));
+
+		if(techTreeScript.listOfImprovements[24].hasBeenBuilt == true)
+		{
+			string tempString = systemListConstructor.systemList[system].planetsInSystem[planet].planetType;
+			
+			if(tempString == "Molten" || tempString == "Desert" || tempString == "Rocky")
+			{
+				scienceModifier = 0f;
+				industryModifier += 50.0f;
+			}
+		}
 	}
 
 	public void CheckPlanetValues(int system, int planet, TurnInfo thisPlayer)
@@ -130,14 +141,14 @@ public class SystemSIMData : MasterScript
 
 				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership && systemDefence.underInvasion == false)
 				{
-					int additionalOwnership = CheckOwnershipBonus(systemListConstructor.systemList[i].systemOwnedBy);
+					float additionalOwnership = CheckOwnershipBonus(systemListConstructor.systemList[i].systemOwnedBy);
 
 					if(techTreeScript.listOfImprovements[18].hasBeenBuilt == true)
 					{
 						additionalOwnership = 0;
 					}
 
-					int ownershipToAdd = additionalOwnership + 1;
+					float ownershipToAdd = (additionalOwnership + 1) * techTreeScript.ownershipModifier;
 
 					if(ownershipToAdd > systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership - systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership)
 					{
@@ -156,7 +167,7 @@ public class SystemSIMData : MasterScript
 		}
 	}
 
-	public int CheckOwnershipBonus(string owner)
+	public float CheckOwnershipBonus(string owner)
 	{
 		if(owner == "Humans")
 		{
