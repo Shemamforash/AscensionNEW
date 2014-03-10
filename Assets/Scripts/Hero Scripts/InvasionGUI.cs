@@ -242,6 +242,7 @@ public class InvasionGUI : MasterScript
 		{
 		case "Fission":
 			bombTimers[0] = Time.time;
+			systemListConstructor.systemList[system].planetsInSystem[i].poisonActive = true;
 			break;
 		case "Fusion":
 			bombTimers[1] = Time.time;

@@ -70,6 +70,42 @@ public class RacialTraits : MasterScript
 		}
 	}
 
+	public void IncreaseAmber (int system)
+	{
+		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
+		improvementsBasic = systemListConstructor.systemList [system].systemObject.GetComponent<ImprovementsBasic> ();
+		
+		systemSIMData.totalSystemAmber = 0f;
+		
+		if(improvementsBasic.listOfImprovements[28].hasBeenBuilt == true)
+		{
+			float tempMod = 0.1f;
+			
+			if(improvementsBasic.IsBuiltOnPlanetType(system, 28, "Molten") == true)
+			{
+				tempMod = 0.15f;
+			}
+			
+			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			{
+				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
+				
+				if(tempString == "Molten" || tempString == "Desert" || tempString == "Rocky")
+				{
+					systemSIMData.totalSystemAmber += (tempMod * 2f) * improvementsBasic.amberPercentBonus;
+				}
+				else
+				{
+					systemSIMData.totalSystemAmber += tempMod * improvementsBasic.amberPercentBonus;
+				}
+			}
+		}
+		
+		systemSIMData.totalSystemAmber += improvementsBasic.amberPointBonus;
+		
+		racialTraitScript.amber += systemSIMData.totalSystemAmber;
+	}
+
 	void Update()
 	{
 		if(playerTurnScript.playerRace == "Humans")
