@@ -7,7 +7,9 @@ public class SelkiesImprovements : MasterScript
 
 	public void CheckSelkiesImprovements(int system, ImprovementsBasic improvements, TurnInfo thisPlayer)
 	{
-		amberPenaltyModifier = 0f;
+		amberPenaltyModifier = 0.05f;
+
+		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
 
 		if(improvements.listOfImprovements[29].hasBeenBuilt == true)
 		{
@@ -105,13 +107,15 @@ public class SelkiesImprovements : MasterScript
 				amberPenaltyModifier = 0f;
 			}
 
-			amberPenalty += systemSIMData.totalSystemAmber * amberPenaltyModifier;
+			systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
 
-			improvementsBasic.ownershipModifier -= amberPenalty;
-			improvementsBasic.sciencePercentBonus -= amberPenalty;
-			improvementsBasic.industryPercentBonus -= amberPenalty;
+			amberPenalty = systemSIMData.totalSystemAmber * amberPenaltyModifier;
+
+			improvements.ownershipModifier -= amberPenalty;
+			improvements.sciencePercentBonus -= amberPenalty;
+			improvements.industryPercentBonus -= amberPenalty;
 			
-			improvements.listOfImprovements[28].improvementMessage = ("System is suffering -" + amberPenalty * systemSIMData.totalSystemAmber + "% Resource production from Amber Penalty");
+			improvements.listOfImprovements[28].improvementMessage = ("System is suffering -" + amberPenalty * 100 + "% Resource production from Amber Penalty");
 		}
 	}
 }

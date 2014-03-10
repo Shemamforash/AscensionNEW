@@ -12,6 +12,7 @@ public class ImprovementsBasic : MasterScript
 	private GenericImprovements genericImprovements;
 	private HumanImprovements humanImprovements;
 	private NereidesImprovements nereidesImprovements;
+	private SelkiesImprovements selkiesImprovements;
 	public List<ImprovementClass> listOfImprovements = new List<ImprovementClass>();
 
 	void Start()
@@ -24,6 +25,7 @@ public class ImprovementsBasic : MasterScript
 		genericImprovements = GameObject.Find ("ScriptsContainer").GetComponent<GenericImprovements> ();
 		humanImprovements = GameObject.Find ("ScriptsContainer").GetComponent<HumanImprovements> ();
 		nereidesImprovements = GameObject.Find ("ScriptsContainer").GetComponent<NereidesImprovements> ();
+		selkiesImprovements = GameObject.Find ("ScriptsContainer").GetComponent<SelkiesImprovements> ();
 
 		LoadNewTechTree();
 	}
@@ -94,6 +96,10 @@ public class ImprovementsBasic : MasterScript
 		if(thisPlayer.playerRace == "Nereides")
 		{
 			nereidesImprovements.CheckNereidesImprovements(system, this, thisPlayer);
+		}
+		if(thisPlayer.playerRace == "Selkies")
+		{
+			selkiesImprovements.CheckSelkiesImprovements(system, this, thisPlayer);
 		}
 
 		sciencePercentBonus = sciencePercentBonus * scienceBonusModifier;
