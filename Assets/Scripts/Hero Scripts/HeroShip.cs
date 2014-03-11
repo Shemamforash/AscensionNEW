@@ -178,7 +178,7 @@ public class HeroShip : MasterScript
 	{
 		DiplomaticPosition position = null;
 
-		if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
+		/*if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
 		{
 			position = diplomacyScript.playerEnemyOneRelations;
 		}
@@ -209,6 +209,7 @@ public class HeroShip : MasterScript
 				canEmbargo = false;
 			}
 		}
+		*/
 	}
 
 	private void MakeNewTradeRoutes()

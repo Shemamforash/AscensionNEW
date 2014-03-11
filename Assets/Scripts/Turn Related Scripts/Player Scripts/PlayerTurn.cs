@@ -49,14 +49,16 @@ public class PlayerTurn : TurnInfo
 
 				if(systemListConstructor.systemList[j].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
 				{
-					if(diplomacyScript.playerEnemyOneRelations.hasMadeContact == false)
+					/*if(diplomacyScript.playerEnemyOneRelations.hasMadeContact == false)
 					{
 						diplomacyScript.playerEnemyOneRelations.hasMadeContact = true;
 					}
+					*/
 				}
 
 				if(turnInfoScript.allPlayers.Count > 1)
 				{
+					/*
 					if(systemListConstructor.systemList[j].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
 					{
 						if(diplomacyScript.playerEnemyTwoRelations.hasMadeContact == false)
@@ -64,6 +66,7 @@ public class PlayerTurn : TurnInfo
 							diplomacyScript.playerEnemyTwoRelations.hasMadeContact = true;
 						}
 					}
+					*/
 				}
 			}
 

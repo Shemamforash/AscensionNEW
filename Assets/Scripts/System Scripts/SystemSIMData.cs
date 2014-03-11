@@ -11,7 +11,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public int numPlanets, improvementNumber, antiStealthPower;
 	[HideInInspector]
-	public float scienceBonus, industryBonus, improvementCost, ownershipBonus, adjacencyBonus, industrySEModifier, scienceSEModifier;
+	public float scienceBonus, industryBonus, improvementCost, ownershipBonus, adjacencyBonus, industrySEModifier, scienceSEModifier, embargoTimer, promotionTimer;
 	[HideInInspector]
 	public string improvementLevel;
 	[HideInInspector]
@@ -122,6 +122,11 @@ public class SystemSIMData : MasterScript
 
 			if(isPromoted == true)
 			{
+				if(promotionTimer + 30.0f < Time.time)
+				{
+					isPromoted = false;
+				}
+
 				adjacencyBonus = adjacencyBonus + 1.5f;
 			}
 
@@ -131,6 +136,11 @@ public class SystemSIMData : MasterScript
 
 		if(isEmbargoed == true)
 		{
+			if(embargoTimer + 20.0f < Time.time)
+			{
+				isEmbargoed = false;
+			}
+
 			totalSystemScience = 0;
 			totalSystemIndustry = 0;
 		}
@@ -270,21 +280,21 @@ public class SystemSIMData : MasterScript
 			improvementLevel = "Poor";
 			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 25;
 			canImprove = true;
-			improvementCost = 10.0f;
+			improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue / 3;
 		}
 		if(improvementNumber == 1)
 		{
 			improvementLevel = "Normal";
 			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 50;
 			canImprove = true;
-			improvementCost = 20.0f;
+			improvementCost = (systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue * 2) / 3;
 		}
 		if(improvementNumber == 2)
 		{
 			improvementLevel = "Good";
 			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 75;
 			canImprove = true;
-			improvementCost = 40.0f;
+			improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue + (systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue / 3);
 		}
 		if(improvementNumber == 3)
 		{

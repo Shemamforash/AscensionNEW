@@ -8,157 +8,173 @@ public class DiplomacyControlScript : MasterScript
 	public string tempState;
 	public GameObject invasionQuad;
 	public Material unownedMaterial;
+	private float tempValue;
 
-	public DiplomaticPosition playerEnemyOneRelations = new DiplomaticPosition();
-	public DiplomaticPosition playerEnemyTwoRelations = new DiplomaticPosition();
-	public DiplomaticPosition enemyOneEnemyTwoRelations = new DiplomaticPosition();
+	public List<DiplomaticPosition> relationsList = new List<DiplomaticPosition>();
 
 	void Start()
 	{
-		SetUpRelationsList (playerEnemyOneRelations);
-		SetUpRelationsList (playerEnemyTwoRelations);
-		SetUpRelationsList (enemyOneEnemyTwoRelations);
+		SetUpRelationsList ();
 	}
 
-	public void SetUpRelationsList(DiplomaticPosition thisObject)
+	public void SetUpRelationsList()
 	{
-		thisObject.diplomaticState = "";
-		thisObject.peaceCounter = 0;
-		thisObject.firstContactTimer = Time.time;
-		thisObject.timeAtColdWar = Time.time;
-		thisObject.timeAtPeace = Time.time;
-		thisObject.warBonus = 0.0f;
-		thisObject.peaceBonus = 0.0f;
-		thisObject.canDeclareWar = false;
-		thisObject.ceaseFirePeriodExpired = true;
-		thisObject.hasMadeContact = false;
-	}
+		for(int i = 0; i < turnInfoScript.allPlayers.Count; ++i)
+		{
+			DiplomaticPosition relation = new DiplomaticPosition();
 
-	public void CheckForWarDeclarationAndPeaceExpiration(DiplomaticPosition tempObject)
-	{
-		if(tempObject.timeAtColdWar > tempObject.timeAtColdWar + 40.0f)
-		{
-			tempObject.canDeclareWar = true;
-		}
+			relation.playerOne = turnInfoScript.allPlayers[i];
+			relation.playerTwo = playerTurnScript;
+			relation.stateCounter = 49;
+			relation.firstContact = false;
 
-		if(tempObject.timeAtPeace > tempObject.timeAtPeace + 40.0f)
-		{
-			tempObject.ceaseFirePeriodExpired = true;
-		}
-	}
+			relationsList.Add (relation);
 
-	public void PeaceTimer()
-	{
-		if(playerEnemyOneRelations.hasMadeContact == true)
-		{
-			if(Time.time > playerEnemyOneRelations.firstContactTimer + 30.0f)
+			for(int j = 0; j < turnInfoScript.allPlayers.Count; ++j)
 			{
-				playerEnemyOneRelations.ceaseFirePeriodExpired = true;
-			}
-		}
-		if(playerEnemyTwoRelations.hasMadeContact == true)
-		{
-			if(Time.time > playerEnemyTwoRelations.firstContactTimer + 30.0f)
-			{
-				playerEnemyTwoRelations.ceaseFirePeriodExpired = true;
-			}
-		}
-		if(enemyOneEnemyTwoRelations.hasMadeContact == true)
-		{
-			if(Time.time > enemyOneEnemyTwoRelations.firstContactTimer + 30.0f)
-			{
-				enemyOneEnemyTwoRelations.ceaseFirePeriodExpired = true;
+				if(turnInfoScript.allPlayers[i].playerRace == turnInfoScript.allPlayers[j].playerRace)
+				{
+					continue;
+				}
+
+				bool skip = false;
+
+				for(int k = 0; k < relationsList.Count; ++k)
+				{
+					if(relationsList[k].playerOne.playerRace == turnInfoScript.allPlayers[i].playerRace && relationsList[k].playerTwo.playerRace == turnInfoScript.allPlayers[j].playerRace)
+					{
+						skip = true;
+						break;
+					}
+					if(relationsList[k].playerTwo.playerRace == turnInfoScript.allPlayers[i].playerRace && relationsList[k].playerOne.playerRace == turnInfoScript.allPlayers[j].playerRace)
+					{
+						skip = true;
+						break;
+					}
+				}
+
+				if(skip == false)
+				{
+					DiplomaticPosition relationTwo = new DiplomaticPosition();
+
+					relationTwo.playerOne = turnInfoScript.allPlayers[i];
+					relationTwo.playerTwo = turnInfoScript.allPlayers[j];
+					relationTwo.stateCounter = 49;
+					relationTwo.firstContact = false;
+					
+					relationsList.Add (relationTwo);
+				}
 			}
 		}
 	}
 
-	public void CheckForDiplomaticStateChange(DiplomaticPosition tempObject)
+	public DiplomaticPosition ReturnDiplomaticRelation(string firstRace, string secondRace)
 	{
-		RefreshNumbers (tempObject);
-
-		InvokeDiplomaticStateBonuses (tempObject);
-
-		CheckForWarDeclarationAndPeaceExpiration (tempObject);
-
-		if(tempObject.peaceCounter > 50 || tempObject.ceaseFirePeriodExpired == false)
+		for(int i = 0; i < relationsList.Count; ++i)
 		{
-			tempObject.diplomaticState = "Peace";
-
-			if(tempObject.peaceCounter < 50)
+			if(relationsList[i].playerOne.playerRace == firstRace && relationsList[i].playerTwo.playerRace == secondRace)
 			{
-				tempObject.peaceCounter = 50;
+				return relationsList[i];
+			}
+			if(relationsList[i].playerTwo.playerRace == firstRace && relationsList[i].playerOne.playerRace == secondRace)
+			{
+				return relationsList[i];
 			}
 		}
-
-		if(tempObject.peaceCounter < -50)
-		{
-			tempObject.diplomaticState = "War";
-		}
-
-		if(tempObject.peaceCounter < 50 &&  tempObject.peaceCounter > -50 && tempObject.ceaseFirePeriodExpired == true)
-		{
-			tempObject.diplomaticState = "Cold War";
-		}
-
-		RefreshNumbers (tempObject);
+		return null;
 	}
 
-	public void InvokeDiplomaticStateBonuses(DiplomaticPosition tempObject)
+	public void PeaceTreatyOverride()
 	{
-		if(tempObject.peaceCounter > -50)
+		for(int i = 0; i < relationsList.Count; ++i)
 		{
-			tempObject.peaceBonus = (tempObject.peaceCounter + 50) / 1000.0f;
-
-			if(tempObject.peaceCounter > 50)
+			if(relationsList[i].peaceTreatyTimer != 0.0f)
 			{
-				tempObject.peaceBonus = 0.1f;
+				if(relationsList[i].peaceTreatyTimer + 30.0f < Time.time)
+				{
+					relationsList[i].peaceTreatyTimer = 0.0f;
+					relationsList[i].ceaseFireActive = false;
+				}
+				else
+				{
+					relationsList[i].ceaseFireActive = true;
+				}
 			}
-		}
-
-		if(tempObject.peaceCounter < 50)
-		{
-			tempObject.warBonus = (tempObject.peaceCounter - 50) / 100.0f;
-
-			if(tempObject.peaceCounter < -50)
-			{
-				tempObject.warBonus = 1.0f;
-			}
-		}
-
-		if (tempObject.diplomaticState == "War")
-		{
-			//prevent adjacency bonuses, merchants etc.
-		}
-
-		if (tempObject.diplomaticState == "Peace")
-		{
-			//prevent invasions, start timer for peace
-		}
-
-		if(tempObject.diplomaticState == "Cold War")
-		{
-			//increase possibility of stealth detection
 		}
 	}
 
-	private void RefreshNumbers(DiplomaticPosition tempObject)
+	private void CalculateOffDefModifier(int i) //Off/Def eq: y = (200 / (x + 14.14) ^2) + 0.5
 	{
-		if(tempObject.peaceCounter > 100)
+		tempValue = Math.Pow(relationsList[i].stateCounter + 14.14f, 2);
+		
+		tempValue = (200 / tempValue) + 0.5f;
+		
+		relationsList[i].offDefModifier = tempValue;
+	}
+
+	private void CalculateResourceModifier(int i)
+	{
+		tempValue = (relationsList[i].stateCounter * 0.005f) + 0.75;
+
+		relationsList [i].resourceModifier = tempValue;
+	}
+
+	private void CalculateStealthModifier(int i) //Stealth eq: y = (-1(2)/10000 * (x - 50)^2) + 0.75
+	{
+		tempValue = Math.Pow (relationsList [i].stateCounter - 50, 2);
+
+		if(relationsList[i].stateCounter < 50)
 		{
-			tempObject.peaceCounter = 100;
+			tempValue = -0.0001f * tempValue;
 		}
 
-		if(tempObject.peaceCounter < -100)
+		if(relationsList[i].stateCounter >= 50)
 		{
-			tempObject.peaceCounter = -100;
+			tempValue = -0.0002f * tempValue;
+		}
+
+		relationsList [i].stealthModifier = tempValue + 0.75f;
+	}
+
+	private void CalculateOwnershipModifier(int i)
+	{
+		tempValue = Math.Log (relationsList [i].stateCounter + 1);
+
+		tempValue = (tempValue * 0.3742f) + 0.5f;
+
+		relationsList [i].ownershipModifier = tempValue;
+	}
+
+	public void DiplomaticStateEffects(DiplomaticPosition tempObject)
+	{
+		for(int i = 0; i < relationsList.Count; ++i) 
+		{
+			CalculateOffDefModifier(i);
+		}
+	}
+
+	private void ClampStateValues()
+	{
+		for(int i = 0; i < relationsList.Count; ++i)
+		{
+			if(relationsList[i].stateCounter > 100)
+			{
+				relationsList[i].stateCounter = 100;
+			}
+
+			if(relationsList[i].stateCounter < 0)
+			{
+				relationsList[i].stateCounter = 0;
+			}
 		}
 	}
 }
 
 public class DiplomaticPosition
 {
+	public TurnInfo playerOne, playerTwo;
 	public string diplomaticState;
-	public int peaceCounter;
-	public float warBonus, peaceBonus, firstContactTimer, timeAtPeace, timeAtColdWar;
-	public bool canDeclareWar, ceaseFirePeriodExpired, hasMadeContact;
+	public int stateCounter;
+	public float timeAtPeace, timeAtColdWar, timeAtWar, peaceTreatyTimer, offDefModifier, resourceModifier, stealthModifier, ownershipModifier;
+	public bool ceaseFireActive, firstContact, adjacencyBonus, autoFight, tradeAllowed, peaceTreatyAllowed;
 }

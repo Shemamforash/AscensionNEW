@@ -59,7 +59,7 @@ public class HeroScriptParent : MasterScript
 
 	public DiplomaticPosition FindDiplomaticConnection()
 	{
-		if(heroOwnedBy == playerTurnScript.playerRace)
+		/*if(heroOwnedBy == playerTurnScript.playerRace)
 		{
 			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
 			{
@@ -104,6 +104,7 @@ public class HeroScriptParent : MasterScript
 				}
 			}
 		}
+		*/
 
 		return null;
 	}

@@ -118,7 +118,7 @@ public class TurnInfo : MasterScript
 				winConditions.CheckWin(allPlayers[i]);
 			}
 
-			diplomacyScript.PeaceTimer ();
+			//diplomacyScript.PeaceTimer ();
 		}
 	}
 
@@ -183,17 +183,17 @@ public class TurnInfo : MasterScript
 	{
 		if(selectedPlayer == playerTurnScript || selectedPlayer == turnInfoScript.allPlayers[0])
 		{
-			diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyOneRelations);
+			//diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyOneRelations);
 		}
 		if(turnInfoScript.allPlayers.Count > 1)
 		{
 			if(selectedPlayer == playerTurnScript || selectedPlayer == turnInfoScript.allPlayers[1])
 			{
-				diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyTwoRelations);
+				//diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyTwoRelations);
 			}
 			if(selectedPlayer == turnInfoScript.allPlayers[0] || selectedPlayer == turnInfoScript.allPlayers[1])
 			{
-				diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.enemyOneEnemyTwoRelations);
+				//diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.enemyOneEnemyTwoRelations);
 			}
 		}
 	}

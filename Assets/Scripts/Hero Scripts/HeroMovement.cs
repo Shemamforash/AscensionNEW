@@ -114,8 +114,6 @@ public class HeroMovement : MasterScript
 				systemDefence.underInvasion = false;
 				systemDefence.regenerateTimer = 3;
 				heroScript.isInvading = false;
-				systemSIMData.isEmbargoed = false;
-				systemSIMData.isPromoted = false;
 				systemListConstructor.systemList[currentVertex].enemyHero = null;
 
 				++currentVertex; //Update current system
