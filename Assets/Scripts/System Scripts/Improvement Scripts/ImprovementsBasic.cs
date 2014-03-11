@@ -108,7 +108,8 @@ public class ImprovementsBasic : MasterScript
 	public int CheckDiplomaticStateOfAllPlayers(TurnInfo thisPlayer, string state)
 	{
 		int noOfPlayersInState = 0;
-		
+
+		/*
 		if(thisPlayer == playerTurnScript)
 		{
 			if(diplomacyScript.playerEnemyOneRelations.diplomaticState == state)
@@ -146,6 +147,7 @@ public class ImprovementsBasic : MasterScript
 				++noOfPlayersInState;
 			}
 		}
+		*/
 
 		return noOfPlayersInState;
 	}

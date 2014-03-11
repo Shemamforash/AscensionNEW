@@ -75,6 +75,26 @@ public class SystemGUI : MasterScript
 		}
 	}
 
+	private void UpdateVariables()
+	{
+		if(playerTurnScript.playerRace != null && cameraFunctionsScript.selectedSystem != null)
+		{
+			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
+			systemSIMData = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<SystemSIMData>();
+			
+			if(selectedPlanet != -1)
+			{
+				systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
+			}
+			
+			if(cameraFunctionsScript.openMenu == true)
+			{
+				systemIndustry.text = Math.Round (systemSIMData.totalSystemIndustry, 1).ToString();
+				systemScience.text = Math.Round (systemSIMData.totalSystemScience, 1).ToString();  
+			}
+		}
+	}
+
 	public void PositionGrid(GameObject grid, int size)
 	{
 		float gridWidth = (size * grid.GetComponent<UIGrid>().cellWidth) / 2 - (grid.GetComponent<UIGrid>().cellWidth/2);
@@ -90,38 +110,6 @@ public class SystemGUI : MasterScript
 		if(numberOfHeroes <= 6)
 		{
 			heroGUI.CheckIfCanHire();
-		}
-	}
-
-	private void UpdateVariables()
-	{
-		if(playerTurnScript.playerRace != null && cameraFunctionsScript.selectedSystem != null)
-		{
-			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
-			systemSIMData = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<SystemSIMData>();
-			
-			if(selectedPlanet != -1)
-			{
-				systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
-			}
-			
-			if(cameraFunctionsScript.openMenu == true)
-			{
-				for(int i = 0; i < 6; ++i)
-				{
-					if(i < systemListConstructor.systemList[selectedSystem].systemSize)
-					{
-						NGUITools.SetActive(planetElementList[i].spriteObject, true);
-					}
-					if(i >= systemListConstructor.systemList[selectedSystem].systemSize)
-					{
-						NGUITools.SetActive(planetElementList[i].spriteObject, false);
-					}
-				}
-
-				systemIndustry.text = Math.Round (systemSIMData.totalSystemIndustry, 1).ToString();
-				systemScience.text = Math.Round (systemSIMData.totalSystemScience, 1).ToString();  
-			}
 		}
 	}
 
@@ -204,14 +192,14 @@ public class SystemGUI : MasterScript
 				systemScrollviews.selectedPlanet = selectedPlanet;
 			}
 
-			if(playerTurnScript.capital >= 5)
+			if(playerTurnScript.capital >= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].capitalValue)
 			{
 				if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
 				{
 					systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
 					++playerTurnScript.planetsColonisedThisTurn;
 					systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
-					playerTurnScript.capital -= 5;
+					playerTurnScript.capital -= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].capitalValue;
 					playerTurnScript.capitalModifier += 0.1f;
 				}
 			}
@@ -230,18 +218,41 @@ public class SystemGUI : MasterScript
 		}
 
 		systemSIMData.improvementNumber = systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetImprovementLevel;
-		
-		systemSIMData.CheckImprovement(selectedSystem, selectedPlanet);
 
-		if(playerTurnScript.industry >= systemSIMData.improvementCost && playerTurnScript.capital >= systemSIMData.improvementNumber + 1)
+		if(systemSIMData.improvementNumber < 3)
 		{
-			playerTurnScript.industry -= systemSIMData.improvementCost;
-			playerTurnScript.capital -= systemSIMData.improvementNumber + 1;
-			++systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetImprovementLevel;
-			UpdateColonisedPlanetDetails(selectedPlanet);
-		}
+			systemSIMData.CheckImprovement(selectedSystem, selectedPlanet);
 
-		selectedPlanet = -1;
+			float industryImprovementCost = IndustryCost(systemSIMData.improvementNumber, selectedSystem, selectedPlanet);
+
+			if(playerTurnScript.industry >= industryImprovementCost && playerTurnScript.capital >= systemSIMData.improvementCost)
+			{
+				playerTurnScript.industry -= industryImprovementCost;
+				playerTurnScript.capital -= systemSIMData.improvementCost;
+				++systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetImprovementLevel;
+				UpdateColonisedPlanetDetails(selectedPlanet);
+			}
+
+			selectedPlanet = -1;
+		}
+	}
+
+	private float IndustryCost(int level, int system, int planet)
+	{
+		float temp = systemListConstructor.systemList [system].planetsInSystem [planet].planetIndustry + 
+						systemListConstructor.systemList [system].planetsInSystem [planet].planetScience;
+
+		switch(level)
+		{
+		case 0:
+			return temp * 2f;
+		case 1:
+			return temp * 4;
+		case 2:
+			return temp * 8f;
+		default:
+			return -1;
+		}
 	}
 
 	private void UpdateColonisedPlanetDetails(int i)
@@ -269,8 +280,9 @@ public class SystemGUI : MasterScript
 		if(systemSIMData.improvementNumber < 3)
 		{
 			planetElementList[i].improveButton.isEnabled = true;
-			planetElementList[i].industryCost.text = systemSIMData.improvementCost.ToString();
-			planetElementList[i].capitalCost.text = (systemSIMData.improvementNumber + 1).ToString();
+			float temp = IndustryCost(systemSIMData.improvementNumber, selectedSystem, i);
+			planetElementList[i].industryCost.text = (Math.Round (temp, 1)).ToString();
+			planetElementList[i].capitalCost.text = systemSIMData.improvementCost.ToString();
 		}
 		
 		if(systemSIMData.improvementNumber == 3)
@@ -285,7 +297,6 @@ public class SystemGUI : MasterScript
 
 	private void UpdateUncolonisedPlanetDetails(int i)
 	{
-		systemSIMData.CheckPlanetValues (selectedSystem, i, playerTurnScript);
 		NGUITools.SetActive (planetElementList [i].scienceProductionSprite, false);
 		NGUITools.SetActive (planetElementList [i].industryProductionSprite, false);
 		planetElementList[i].infoLabel.text = "Uncolonised\nClick to Colonise";

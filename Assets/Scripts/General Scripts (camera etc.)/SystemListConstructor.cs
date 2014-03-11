@@ -157,6 +157,7 @@ public class SystemListConstructor : MasterScript
 						newPlanet.planetOwnership = 0;
 						newPlanet.planetScience = FindPlanetSIM(newPlanet.planetType, "Science");
 						newPlanet.planetIndustry = FindPlanetSIM(newPlanet.planetType, "Industry");
+						newPlanet.capitalValue = (int)FindPlanetSIM(newPlanet.planetType, "Capital");
 						newPlanet.maxOwnership = 0;
 						newPlanet.improvementSlots = (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots");
 						newPlanet.underEnemyControl = false;
@@ -188,19 +189,23 @@ public class SystemListConstructor : MasterScript
 
 	public void PlanetRead()
 	{		
-		using(StreamReader rimReader =  new StreamReader("PlanetRIMData.txt"))
+		using(XmlReader reader =  XmlReader.Create("PlanetSicData.xml"))
 		{
-			for(int i = 0; i < 12; ++i)
+			while(reader.Read ())
 			{
-				PlanetInfo planet = new PlanetInfo();
-				
-				planet.planetType = rimReader.ReadLine ();
-				planet.planetCategory = rimReader.ReadLine ();
-				planet.science = float.Parse (rimReader.ReadLine ());
-				planet.industry = float.Parse (rimReader.ReadLine ());
-				planet.improvementSlots = int.Parse (rimReader.ReadLine ());
-				
-				planetList.Add (planet);
+				if(reader.Name == "Row")
+				{
+					PlanetInfo planet = new PlanetInfo();
+					
+					planet.planetType = reader.GetAttribute ("A");
+					planet.planetCategory = reader.GetAttribute ("B");
+					planet.science = float.Parse (reader.GetAttribute("C"));
+					planet.industry = float.Parse (reader.GetAttribute("D"));
+					planet.improvementSlots = int.Parse (reader.GetAttribute("E"));
+					planet.capitalCost = int.Parse (reader.GetAttribute("F"));
+					
+					planetList.Add (planet);
+				}
 			}
 		}
 	}
@@ -224,17 +229,18 @@ public class SystemListConstructor : MasterScript
 		{
 			if(planetList[i].planetType == planetType)
 			{
-				if(resourceType == "Improvement Slots")
+				switch(resourceType)
 				{
+				case "Improvement Slots":
 					return planetList[i].improvementSlots;
-				}
-				else if(resourceType == "Science")
-				{
+				case "Science":
 					return planetList[i].science;
-				}
-				else if(resourceType == "Industry")
-				{
+				case "Industry":
 					return planetList[i].industry;
+				case "Capital":
+					return (float)planetList[i].capitalCost;
+				default:
+					break;
 				}
 			}
 		}
@@ -270,7 +276,7 @@ public class PlanetInfo
 	public string planetType, planetCategory;
 	public bool colonised;
 	public float science, industry;
-	public int improvementSlots;
+	public int improvementSlots, capitalCost;
 }
 
 public class StarSystem
@@ -291,7 +297,7 @@ public class Planet
 	public List<string> improvementsBuilt = new List<string> ();
 	public float planetScience, planetIndustry, planetOwnership, planetDefence, virusTimer, chillTimer, poisonTimer, chillLength;
 	public bool planetColonised, underEnemyControl, virusActive, chillActive, poisonActive;
-	public int planetImprovementLevel, improvementSlots, maxOwnership;
+	public int planetImprovementLevel, improvementSlots, maxOwnership, capitalValue;
 }
 
 public class BasicImprovement
