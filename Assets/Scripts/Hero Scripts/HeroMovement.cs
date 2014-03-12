@@ -121,11 +121,6 @@ public class HeroMovement : MasterScript
 				heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system
 
 				heroShip = gameObject.GetComponent<HeroShip>();
-
-				if(heroScript.heroTier2 == "Diplomat")
-				{
-					heroShip.DiplomatAbilities(currentVertex);
-				}
 			}
 
 			gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, (10 * heroScript.movementSpeed) * Time.deltaTime);

@@ -6,6 +6,8 @@ using System.Xml;
 
 public class SystemListConstructor : MasterScript 
 {
+	private AmbientStarRandomiser ambientStars;
+
 	[HideInInspector]
 	public List<StarSystem> systemList = new List<StarSystem>();
 	[HideInInspector]
@@ -25,7 +27,6 @@ public class SystemListConstructor : MasterScript
 	private void Start()
 	{
 		mapSize = PlayerPrefs.GetInt ("Map Size");
-
 		PlanetRead ();
 		SystemRead ();
 		HeroTechTree.ReadTechFile ();
@@ -33,6 +34,10 @@ public class SystemListConstructor : MasterScript
 		CheckSystem ();
 		CreateObjects ();
 		mapConstructor.DrawMinimumSpanningTree ();
+
+		ambientStars = GameObject.Find ("ScriptsContainer").GetComponent<AmbientStarRandomiser> ();
+		ambientStars.GenerateStars ();
+
 		LoadBasicTechTree ();
 
 		for(int i = 0; i < systemList.Count; ++i)

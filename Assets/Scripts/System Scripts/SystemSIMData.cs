@@ -48,7 +48,7 @@ public class SystemSIMData : MasterScript
 		systemDefence.CheckStatusEffects(planet);
 
 		ownershipBonus = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership / 66.6666f;
-		scienceModifier = (ownershipBonus + thisPlayer.raceScience + improvementsBasic.sciencePercentBonus) * scienceSEModifier;
+		scienceModifier = ((ownershipBonus * thisPlayer.raceScience) + improvementsBasic.sciencePercentBonus) * scienceSEModifier;
 		industryModifier = (ownershipBonus + thisPlayer.raceIndustry + improvementsBasic.industryPercentBonus + racialTraitScript.NereidesIndustryModifer(thisPlayer)) * industrySEModifier;
 
 		if(improvementsBasic.listOfImprovements[24].hasBeenBuilt == true)
@@ -71,7 +71,7 @@ public class SystemSIMData : MasterScript
 		
 		improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel;
 		
-		CheckImprovement(system, planet);
+		systemFunctions.CheckImprovement(system, planet);
 
 		tempSci = systemListConstructor.systemList [system].planetsInSystem [planet].planetScience * scienceModifier;
 		tempInd = systemListConstructor.systemList [system].planetsInSystem [planet].planetIndustry * industryModifier;
@@ -161,7 +161,7 @@ public class SystemSIMData : MasterScript
 			{
 				improvementNumber = systemListConstructor.systemList[i].planetsInSystem[j].planetImprovementLevel;
 				
-				CheckImprovement(i, j);
+				systemFunctions.CheckImprovement(i, j);
 
 				if(systemListConstructor.systemList[i].planetsInSystem[j].planetOwnership < (systemListConstructor.systemList[i].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus)
 				   && systemDefence.underInvasion == false)
@@ -230,24 +230,6 @@ public class SystemSIMData : MasterScript
 		return totalAdjacencyBonus;
 	}
 
-	public void CheckUnlockedTier()
-	{
-		totalSystemSIM += totalSystemScience + totalSystemIndustry;
-			
-		if(totalSystemSIM >= 1600.0f && totalSystemSIM < 3200 && improvementsBasic.techTier != 1)
-		{
-			improvementsBasic.techTier = 1;
-		}
-		if(totalSystemSIM >= 3200.0f && totalSystemSIM < 6400 && improvementsBasic.techTier != 2)
-		{
-			improvementsBasic.techTier = 2;
-		}
-		if(totalSystemSIM >= 6400.0f && improvementsBasic.techTier != 3)
-		{
-			improvementsBasic.techTier = 3;
-		}
-	}
-
 	public void UpdatePlanetPowerArray(int system)
 	{
 		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
@@ -258,7 +240,7 @@ public class SystemSIMData : MasterScript
 
 			improvementNumber = systemListConstructor.systemList[system].planetsInSystem[i].planetImprovementLevel;
 			
-			CheckImprovement(system, i);
+			systemFunctions.CheckImprovement(system, i);
 
 			float tempSIM = (systemListConstructor.systemList[system].planetsInSystem[i].planetScience + systemListConstructor.systemList[system].planetsInSystem[i].planetIndustry)
 							* systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership / 66.6666f;
@@ -270,37 +252,6 @@ public class SystemSIMData : MasterScript
 			turnInfoScript.mostPowerfulPlanets.Add (planet);
 
 			++turnInfoScript.savedIterator;
-		}
-	}
-
-	public void CheckImprovement(int system, int planet) //Contains data on the quality of planets and the bonuses they receive
-	{
-		if(improvementNumber == 0)
-		{
-			improvementLevel = "Poor";
-			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 25;
-			canImprove = true;
-			improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue / 3;
-		}
-		if(improvementNumber == 1)
-		{
-			improvementLevel = "Normal";
-			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 50;
-			canImprove = true;
-			improvementCost = (systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue * 2) / 3;
-		}
-		if(improvementNumber == 2)
-		{
-			improvementLevel = "Good";
-			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 75;
-			canImprove = true;
-			improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue + (systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue / 3);
-		}
-		if(improvementNumber == 3)
-		{
-			improvementLevel = "Superb";
-			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 100;
-			canImprove = false;
 		}
 	}
 }

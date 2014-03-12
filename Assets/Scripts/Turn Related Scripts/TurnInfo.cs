@@ -108,6 +108,7 @@ public class TurnInfo : MasterScript
 	{
 		if(playerTurnScript.playerRace != null)
 		{
+			diplomacyScript.DiplomaticStateEffects();
 			turnInfoScript.turn += 1.0f;
 			turnInfoScript.TurnEnd (playerTurnScript);
 			winConditions.CheckWin(playerTurnScript);
@@ -117,8 +118,6 @@ public class TurnInfo : MasterScript
 				allPlayers[i].Expand(allPlayers[i]);
 				winConditions.CheckWin(allPlayers[i]);
 			}
-
-			//diplomacyScript.PeaceTimer ();
 		}
 	}
 
@@ -141,7 +140,7 @@ public class TurnInfo : MasterScript
 
 			improvementsBasic.ActiveTechnologies(i, selectedPlayer);
 			systemSIMData.SystemSIMCounter(i, selectedPlayer);
-			systemSIMData.CheckUnlockedTier();
+			systemFunctions.CheckUnlockedTier(improvementsBasic, i);
 			systemSIMData.IncreaseOwnership();
 
 			selectedPlayer.science += systemSIMData.totalSystemScience;
@@ -163,8 +162,6 @@ public class TurnInfo : MasterScript
 		
 		racialTraitScript.RacialBonus (selectedPlayer);
 
-		SelectedPlayerDiplomacyChangeCheck (selectedPlayer);
-
 		turnInfoScript.SortSystemPower();
 		
 		selectedPlayer.capital += (selectedPlayer.capitalModifier + 1f) * selectedPlayer.raceCapital;
@@ -177,25 +174,6 @@ public class TurnInfo : MasterScript
 		selectedPlayer.planetsColonisedThisTurn = 0;
 
 		selectedPlayer.systemsColonisedThisTurn = 0;
-	}
-
-	private void SelectedPlayerDiplomacyChangeCheck(TurnInfo selectedPlayer)
-	{
-		if(selectedPlayer == playerTurnScript || selectedPlayer == turnInfoScript.allPlayers[0])
-		{
-			//diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyOneRelations);
-		}
-		if(turnInfoScript.allPlayers.Count > 1)
-		{
-			if(selectedPlayer == playerTurnScript || selectedPlayer == turnInfoScript.allPlayers[1])
-			{
-				//diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.playerEnemyTwoRelations);
-			}
-			if(selectedPlayer == turnInfoScript.allPlayers[0] || selectedPlayer == turnInfoScript.allPlayers[1])
-			{
-				//diplomacyScript.CheckForDiplomaticStateChange (diplomacyScript.enemyOneEnemyTwoRelations);
-			}
-		}
 	}
 
 	public void SortSystemPower()

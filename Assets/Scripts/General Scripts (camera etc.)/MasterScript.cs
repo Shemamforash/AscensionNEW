@@ -9,6 +9,8 @@ public class MasterScript : MonoBehaviour
 	public SystemListConstructor systemListConstructor;
 	[HideInInspector]
 	public MapConstructor mapConstructor;
+	[HideInInspector]
+	public AmbientStarRandomiser ambientStarRandomiser;
 
 	[HideInInspector]
 	public SystemSIMData systemSIMData;
@@ -27,6 +29,10 @@ public class MasterScript : MonoBehaviour
 	public AIBasicParent baseAIScript;
 	[HideInInspector]
 	public WinConditions winConditions;
+	[HideInInspector]
+	public SystemFunctions systemFunctions;
+	[HideInInspector]
+	public SystemInvasions systemInvasion;
 	
 	[HideInInspector]
 	public ImprovementsBasic improvementsBasic;
@@ -42,6 +48,8 @@ public class MasterScript : MonoBehaviour
 	public RacialTraits racialTraitScript;
 	[HideInInspector]
 	public OverlayGUI overlayGUI;
+	[HideInInspector]
+	public UIObjects uiObjects;
 
 	[HideInInspector]
 	public SystemGUI systemGUI;
@@ -52,7 +60,7 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public InvasionGUI invasionGUI;
 
-	private void Awake()
+	private void Awake() //Assigns script references
 	{
 		systemListConstructor = GameObject.FindGameObjectWithTag("ScriptContainer").GetComponent<SystemListConstructor>();
 		cameraFunctionsScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFunctions>();
@@ -67,9 +75,13 @@ public class MasterScript : MonoBehaviour
 		invasionGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<InvasionGUI> ();
 		mapConstructor = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<MapConstructor> ();
 		winConditions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<WinConditions> ();
+		systemFunctions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<SystemFunctions> ();
+		systemInvasion = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<SystemInvasions> ();
+		uiObjects = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<UIObjects> ();
+		ambientStarRandomiser = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AmbientStarRandomiser> ();
 	}
 
-	public int RefreshCurrentSystem(GameObject thisSystem)
+	public int RefreshCurrentSystem(GameObject thisSystem) //Returns the systemList enumerator of a system gameobject
 	{
 		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
 		{
@@ -82,7 +94,7 @@ public class MasterScript : MonoBehaviour
 		return 0;
 	}
 
-	public void WipePlanetInfo(int system, int planet)
+	public void WipePlanetInfo(int system, int planet) //Used to reset planets to default
 	{
 		systemListConstructor.systemList [system].planetsInSystem [planet].planetColonised = false;
 		systemListConstructor.systemList [system].planetsInSystem [planet].planetImprovementLevel = 0;

@@ -254,6 +254,9 @@ public class InvasionGUI : MasterScript
 			break;
 		}
 
+		DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (heroScript.heroOwnedBy, systemListConstructor.systemList [system].systemOwnedBy);
+		temp.stateCounter -= 2;
+
 		heroScript.planetInvade = -1;
 		bombSelected = null;
 	}
@@ -267,7 +270,8 @@ public class InvasionGUI : MasterScript
 			if(planetList[i] == UIButton.current.gameObject)
 			{
 				heroScript.planetInvade = i;
-				heroScript.PlanetInvasion();
+				systemInvasion.heroScript = heroScript;
+				systemInvasion.PlanetInvasion(heroScript.system, heroScript.planetInvade);
 
 				if(bombSelected != null)
 				{
