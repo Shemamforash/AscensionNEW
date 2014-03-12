@@ -30,18 +30,18 @@ public class AIBasicParent : TurnInfo
 			
 			float systemSIM = CheckThroughSystems (thisPlayer);
 			
-			if(planetSIM > systemSIM && thisPlayer.capital >= 5.0f)
+			if(planetSIM > systemSIM && thisPlayer.capital >= systemListConstructor.systemList[tempSystem].planetsInSystem[tempPlanet].capitalValue)
 			{
 				currentPlanet = tempPlanet;
 				
 				currentSystem = tempSystem;
 
-				thisPlayer.capital -= 5.0f;
+				thisPlayer.capital -= systemListConstructor.systemList[tempSystem].planetsInSystem[tempPlanet].capitalValue;
 
 				thisPlayer.capitalModifier += 0.05f;
 			}
 			
-			if(systemSIM > planetSIM && thisPlayer.capital >= 10.0f)
+			if(systemSIM > planetSIM && thisPlayer.capital >= 20.0f)
 			{
 				currentPlanet = tempPlanetB;
 				
@@ -54,12 +54,14 @@ public class AIBasicParent : TurnInfo
 				lineRenderScript.SetRaceLineColour(thisPlayer.playerRace);
 				
 				systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
+
+				ambientStarRandomiser.AmbientColourChange(currentSystem);
 				
 				++systemsInPlay;
 
 				++thisPlayer.systemsColonisedThisTurn;
 
-				thisPlayer.capital -= 10.0f;
+				thisPlayer.capital -= 20.0f;
 
 				thisPlayer.capitalModifier += 0.1f;
 			}
@@ -174,7 +176,7 @@ public class AIBasicParent : TurnInfo
 	{
 		for(int i = 0; i < turnInfoScript.mostPowerfulPlanets.Count - 1; i++)
 		{
-			if(thisPlayer.industry < 10.0f && thisPlayer.capital < 1.0f)
+			if(thisPlayer.industry < 0.8f && thisPlayer.capital < 1.0f)
 			{
 				break;
 			}
@@ -196,17 +198,19 @@ public class AIBasicParent : TurnInfo
 
 		systemSIMData.improvementNumber = systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 		
-		systemSIMData.CheckImprovement(system, planetPosition);
+		systemFunctions.CheckImprovement(system, planetPosition);
 		
 		if(systemSIMData.canImprove == true && systemDefence.underInvasion == false)
 		{
-			if(thisPlayer.industry >= systemSIMData.improvementCost && thisPlayer.capital >= systemSIMData.improvementNumber + 1)
+			float industryImprovementCost = systemFunctions.IndustryCost(systemSIMData.improvementNumber, system, planetPosition);
+
+			if(thisPlayer.industry >= industryImprovementCost && thisPlayer.capital >= systemSIMData.improvementCost)
 			{
 				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 				
-				thisPlayer.industry -= (int)systemSIMData.improvementCost;
+				thisPlayer.industry -= industryImprovementCost;
 
-				thisPlayer.capital -= systemSIMData.improvementNumber + 1;
+				thisPlayer.capital -= systemSIMData.improvementCost;
 			}
 		}
 	}

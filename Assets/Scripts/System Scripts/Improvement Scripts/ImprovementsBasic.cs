@@ -109,45 +109,14 @@ public class ImprovementsBasic : MasterScript
 	{
 		int noOfPlayersInState = 0;
 
-		/*
-		if(thisPlayer == playerTurnScript)
+		for(int i = 0; i < diplomacyScript.relationsList.Count; ++i)
 		{
-			if(diplomacyScript.playerEnemyOneRelations.diplomaticState == state)
+			if(diplomacyScript.relationsList[i].playerOne.playerRace == thisPlayer.playerRace || diplomacyScript.relationsList[i].playerTwo.playerRace == thisPlayer.playerRace)
 			{
-				++noOfPlayersInState;
-			}
-			
-			if(diplomacyScript.playerEnemyTwoRelations.diplomaticState == state)
-			{
+				diplomacyScript.relationsList[i].diplomaticState = state;
 				++noOfPlayersInState;
 			}
 		}
-		
-		if(thisPlayer == turnInfoScript.allPlayers[0])
-		{
-			if(diplomacyScript.playerEnemyOneRelations.diplomaticState == state)
-			{
-				++noOfPlayersInState;
-			}
-			
-			if(diplomacyScript.enemyOneEnemyTwoRelations.diplomaticState == state)
-			{
-				++noOfPlayersInState;
-			}
-		}
-		if(thisPlayer == turnInfoScript.allPlayers[1])
-		{
-			if(diplomacyScript.playerEnemyTwoRelations.diplomaticState == state)
-			{
-				++noOfPlayersInState;
-			}
-			
-			if(diplomacyScript.enemyOneEnemyTwoRelations.diplomaticState == state)
-			{
-				++noOfPlayersInState;
-			}
-		}
-		*/
 
 		return noOfPlayersInState;
 	}

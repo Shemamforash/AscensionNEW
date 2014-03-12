@@ -154,7 +154,7 @@ public class SystemGUI : MasterScript
 	{
 		systemSIMData.improvementNumber = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel;
 		
-		systemSIMData.CheckImprovement(selectedSystem, i);
+		systemFunctions.CheckImprovement(selectedSystem, i);
 		
 		if(systemSIMData.canImprove == false)
 		{
@@ -221,9 +221,9 @@ public class SystemGUI : MasterScript
 
 		if(systemSIMData.improvementNumber < 3)
 		{
-			systemSIMData.CheckImprovement(selectedSystem, selectedPlanet);
+			systemFunctions.CheckImprovement(selectedSystem, selectedPlanet);
 
-			float industryImprovementCost = IndustryCost(systemSIMData.improvementNumber, selectedSystem, selectedPlanet);
+			float industryImprovementCost = systemFunctions.IndustryCost(systemSIMData.improvementNumber, selectedSystem, selectedPlanet);
 
 			if(playerTurnScript.industry >= industryImprovementCost && playerTurnScript.capital >= systemSIMData.improvementCost)
 			{
@@ -234,24 +234,6 @@ public class SystemGUI : MasterScript
 			}
 
 			selectedPlanet = -1;
-		}
-	}
-
-	private float IndustryCost(int level, int system, int planet)
-	{
-		float temp = systemListConstructor.systemList [system].planetsInSystem [planet].planetIndustry + 
-						systemListConstructor.systemList [system].planetsInSystem [planet].planetScience;
-
-		switch(level)
-		{
-		case 0:
-			return temp * 2f;
-		case 1:
-			return temp * 4;
-		case 2:
-			return temp * 8f;
-		default:
-			return -1;
 		}
 	}
 
@@ -272,7 +254,7 @@ public class SystemGUI : MasterScript
 		planetElementList [i].scienceProduction.text = systemSIMData.allPlanetsInfo [i].scienceOutput;
 		
 		systemSIMData.improvementNumber = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel;
-		systemSIMData.CheckImprovement(selectedSystem, i);
+		systemFunctions.CheckImprovement(selectedSystem, i);
 		
 		NGUITools.SetActive(planetElementList[i].spriteObject, true);
 		NGUITools.SetActive(planetElementList[i].improveButton.gameObject, true);
@@ -280,7 +262,7 @@ public class SystemGUI : MasterScript
 		if(systemSIMData.improvementNumber < 3)
 		{
 			planetElementList[i].improveButton.isEnabled = true;
-			float temp = IndustryCost(systemSIMData.improvementNumber, selectedSystem, i);
+			float temp = systemFunctions.IndustryCost(systemSIMData.improvementNumber, selectedSystem, i);
 			planetElementList[i].industryCost.text = (Math.Round (temp, 1)).ToString();
 			planetElementList[i].capitalCost.text = systemSIMData.improvementCost.ToString();
 		}

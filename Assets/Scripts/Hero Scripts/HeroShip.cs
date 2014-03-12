@@ -14,35 +14,18 @@ public class HeroShip : MasterScript
 		heroMovement = gameObject.GetComponent<HeroMovement> ();
 	}
 
-	private void CheckEmbargoButton()
+	private void CheckButtonsAllowed()
 	{
-		switch (canEmbargo)
+		if(heroScript.heroTier2 == "Diplomat")
 		{
-		case true:
-			NGUITools.SetActive(heroGUI.embargoButton, true);
-			++tempChildren;
-			break;
-		case false:
-			NGUITools.SetActive(heroGUI.embargoButton, false);
-			break;
-		default:
-			break;
-		}
-	}
-
-	private void CheckPromoteButton()
-	{
-		switch (canPromote)
-		{
-		case true:
 			NGUITools.SetActive(heroGUI.promoteButton, true);
-			++tempChildren;
-			break;
-		case false:
+			NGUITools.SetActive(heroGUI.embargoButton, true);
+			tempChildren = tempChildren + 2;
+		}
+		else
+		{
 			NGUITools.SetActive(heroGUI.promoteButton, false);
-			break;
-		default:
-			break;
+			NGUITools.SetActive(heroGUI.embargoButton, false);
 		}
 	}
 
@@ -58,8 +41,7 @@ public class HeroShip : MasterScript
 			{
 				++tempChildren;
 
-				CheckEmbargoButton();
-				CheckPromoteButton();
+				CheckButtonsAllowed();
 
 				if(canViewSystem == true)
 				{
@@ -130,8 +112,6 @@ public class HeroShip : MasterScript
 
 				MerchantFunctions((ShipFunctions.logisticsRating + 1) * numberOfMerchants);
 			}
-
-			DiplomatAbilities(system);
 		}
 
 		if(heroScript.heroTier2 == "Infiltrator")
@@ -172,44 +152,6 @@ public class HeroShip : MasterScript
 				heroScript.primaryPower = heroScript.primaryPower * 2;
 			}
 		}
-	}
-
-	public void DiplomatAbilities(int system)
-	{
-		DiplomaticPosition position = null;
-
-		/*if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
-		{
-			position = diplomacyScript.playerEnemyOneRelations;
-		}
-
-		if(turnInfoScript.allPlayers.Count > 1)
-		{
-			if(systemListConstructor.systemList[system].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
-			{
-				position = diplomacyScript.playerEnemyTwoRelations;
-			}
-		}
-
-		if(position != null)
-		{
-			if(position.diplomaticState == "War")
-			{
-				canPromote = false;
-				canEmbargo = true;
-			}
-			if(position.diplomaticState == "Cold War")
-			{
-				canPromote = true;
-				canEmbargo = true;
-			}
-			if(position.diplomaticState == "Peace")
-			{
-				canPromote = true;
-				canEmbargo = false;
-			}
-		}
-		*/
 	}
 
 	private void MakeNewTradeRoutes()
@@ -294,8 +236,7 @@ public class HeroShip : MasterScript
 			
 			route.playerSystem = systemListConstructor.systemList[chosenPlayerSystem].systemObject;
 			route.enemySystem = systemListConstructor.systemList[chosenEnemySystem].systemObject;
-			
-			heroScript.CreateConnectionLine(route.playerSystem, route.enemySystem);
+			route.connectorObject = uiObjects.CreateConnectionLine(route.playerSystem, route.enemySystem);
 			
 			allTradeRoutes.Add (route);
 		}
@@ -351,6 +292,9 @@ public class HeroShip : MasterScript
 				eSysData.totalSystemScience += pSciTransfer;
 				pSysData.totalSystemIndustry += eIndTransfer;
 				pSysData.totalSystemScience += eSciTransfer;
+
+				DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (systemListConstructor.systemList[pSys].systemOwnedBy, systemListConstructor.systemList [eSys].systemOwnedBy);
+				temp.stateCounter += 1;
 			}
 
 			else if(i >= allTradeRoutes.Count)

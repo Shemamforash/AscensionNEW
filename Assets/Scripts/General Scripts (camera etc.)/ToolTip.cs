@@ -7,9 +7,10 @@ public class ToolTip : MasterScript
 	public UIWidget tooltipWidget;
 	public UIPanel rootPanel;
 	private float timer, xDif, yDif;
-	private bool showTooltip = false;
+	private bool showTooltip = false, setPosition;
 	private string tooltipText = null;
 	private TechTreeGUI techTreeGUI;
+	private Vector3 mouseTooltipPosition;
 
 	void Start()
 	{
@@ -25,6 +26,11 @@ public class ToolTip : MasterScript
 		if(Input.mousePosition.x + 250 > rootPanel.width)
 		{
 			xDif = -250f;
+		}
+
+		if(Input.mousePosition.y + tooltipWidget.height  > rootPanel.width)
+		{
+			yDif = -yDif;
 		}
 		
 		Vector3 position = new Vector3(Input.mousePosition.x + xDif, Input.mousePosition.y + yDif, 0.0f); //TODO
@@ -81,7 +87,14 @@ public class ToolTip : MasterScript
 					showTooltip = true;
 				}
 
-				if(showTooltip == true && timer + 0.5f <= Time.time)
+				mouseTooltipPosition = Input.mousePosition; //TODO
+
+				if(showTooltip == true && timer + 0.1f <= Time.time && setPosition == false)
+				{
+					setPosition = true;
+				}
+
+				if(showTooltip == true && timer + 0.5f <= Time.time && Input.mousePosition == mouseTooltipPosition)
 				{
 					if(tooltipText != "")
 					{
@@ -96,6 +109,8 @@ public class ToolTip : MasterScript
 			else
 			{
 				showTooltip = false;
+				setPosition = false;
+				mouseTooltipPosition = Input.mousePosition;
 			}
 		}
 
@@ -104,7 +119,9 @@ public class ToolTip : MasterScript
 			if(tooltip.activeInHierarchy == true)
 			{
 				NGUITools.SetActive(tooltip, false);
+				mouseTooltipPosition = Input.mousePosition;
 				showTooltip = false;
+				setPosition = false;
 			}
 		}
 	}

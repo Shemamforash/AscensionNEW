@@ -46,7 +46,8 @@ public class HeroGUI : MasterScript
 
 	public void InvasionButtonClick()
 	{
-		heroScript.StartSystemInvasion();
+		systemInvasion.heroScript = heroScript;
+		systemInvasion.StartSystemInvasion(heroScript.system);
 	}
 
 	public void Embargo()

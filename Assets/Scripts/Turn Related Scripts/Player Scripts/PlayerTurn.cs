@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerTurn : TurnInfo
 {
 	public GameObject tempObject;
-	public bool isOkToColonise, systemHasBeenColonised;
+	public bool isOkToColonise, systemHasBeenColonised, checkFirstContact = true;
 
 	void Update()
 	{
@@ -40,33 +40,48 @@ public class PlayerTurn : TurnInfo
 				continue;
 			}
 		}
-		
+
 		if(isOkToColonise == true && capital >= 10.0f)
 		{
-			for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
+			if(checkFirstContact == true)
 			{
-				int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
-
-				if(systemListConstructor.systemList[j].systemOwnedBy == turnInfoScript.allPlayers[0].playerRace)
+				for(int i = 0; i < diplomacyScript.relationsList.Count; ++i)
 				{
-					/*if(diplomacyScript.playerEnemyOneRelations.hasMadeContact == false)
+					checkFirstContact = false;
+					
+					if(diplomacyScript.relationsList[i].firstContact == false)
 					{
-						diplomacyScript.playerEnemyOneRelations.hasMadeContact = true;
+						checkFirstContact = true;
 					}
-					*/
 				}
 
-				if(turnInfoScript.allPlayers.Count > 1)
+				for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
 				{
-					/*
-					if(systemListConstructor.systemList[j].systemOwnedBy == turnInfoScript.allPlayers[1].playerRace)
+					int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
+
+					for(int k = 0; k < diplomacyScript.relationsList.Count; ++k)
 					{
-						if(diplomacyScript.playerEnemyTwoRelations.hasMadeContact == false)
+						if(diplomacyScript.relationsList[k].playerOne.playerRace == systemListConstructor.systemList[system].systemOwnedBy)
 						{
-							diplomacyScript.playerEnemyTwoRelations.hasMadeContact = true;
+							if(diplomacyScript.relationsList[k].playerTwo.playerRace == systemListConstructor.systemList[j].systemOwnedBy)
+							{
+								if(diplomacyScript.relationsList[k].firstContact == false)
+								{
+									diplomacyScript.relationsList[k].firstContact = true;
+								}
+							}
+						}
+						if(diplomacyScript.relationsList[k].playerTwo.playerRace == systemListConstructor.systemList[system].systemOwnedBy)
+						{
+							if(diplomacyScript.relationsList[k].playerOne.playerRace == systemListConstructor.systemList[j].systemOwnedBy)
+							{
+								if(diplomacyScript.relationsList[k].firstContact == false)
+								{
+									diplomacyScript.relationsList[k].firstContact = true;
+								}
+							}
 						}
 					}
-					*/
 				}
 			}
 
@@ -75,6 +90,8 @@ public class PlayerTurn : TurnInfo
 			lineRenderScript.SetRaceLineColour(playerRace);
 			
 			systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
+
+			ambientStarRandomiser.AmbientColourChange(system);
 			
 			playerTurnScript.capital -= 10.0f;
 
@@ -105,6 +122,8 @@ public class PlayerTurn : TurnInfo
 		systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 
 		systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
+
+		ambientStarRandomiser.AmbientColourChange(i);
 
 		lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
 

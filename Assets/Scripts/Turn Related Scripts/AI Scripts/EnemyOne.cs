@@ -21,6 +21,8 @@ public class EnemyOne : AIBasicParent
 
 				systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
 
+				ambientStarRandomiser.AmbientColourChange(i);
+
 				lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
 				lineRenderScript.SetRaceLineColour(playerRace);

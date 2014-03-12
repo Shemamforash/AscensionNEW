@@ -12,7 +12,7 @@ public class RacialTraits : MasterScript
 		ambitionCounter = 0;
 	}
 
-	public void Purge()
+	public void Purge() //Nereides function to produce elation
 	{
 		while(playerTurnScript.science >= 100 && playerTurnScript.industry >= 100)
 		{
@@ -22,7 +22,7 @@ public class RacialTraits : MasterScript
 		}
 	}
 
-	public float NereidesIndustryModifer (TurnInfo thisPlayer)
+	public float NereidesIndustryModifer (TurnInfo thisPlayer) //Returns industry modifier based on elation
 	{
 		if(thisPlayer.playerRace == "Nereides")
 		{
@@ -32,7 +32,7 @@ public class RacialTraits : MasterScript
 		return 0;
 	}
 
-	public float HumanTrait()
+	public float HumanTrait() //Returns ambition modifier
 	{
 		ambitionOwnershipModifier = ambitionCounter / 25.0f;
 

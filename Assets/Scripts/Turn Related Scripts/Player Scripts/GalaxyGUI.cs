@@ -7,7 +7,7 @@ public class GalaxyGUI : MasterScript
 	public GameObject coloniseButton, planetSelectionWindow, purgeButton;
 	private List<GameObject> planetSelectionList = new List<GameObject>();
 	private int selectedSystem;
-	private string tempRace, scienceString, industryString, capitalString, turnNumber, playerEnemyOneDiplomacy, playerEnemyTwoDiplomacy;
+	private string tempRace, scienceString, industryString, capitalString, turnNumber;
 	public UILabel scienceLabel, industryLabel, capitalLabel, raceLabel, turnLabel, diplomacyLabelOne, diplomacyLabelTwo;
 
 	void Start()
@@ -38,9 +38,6 @@ public class GalaxyGUI : MasterScript
 			{
 				NGUITools.SetActive(coloniseButton, true);
 			}
-
-			//playerEnemyOneDiplomacy = diplomacyScript.playerEnemyOneRelations.diplomaticState + " | " + diplomacyScript.playerEnemyOneRelations.stateCounter;
-			//playerEnemyTwoDiplomacy = diplomacyScript.playerEnemyTwoRelations.diplomaticState + " | " + diplomacyScript.playerEnemyTwoRelations.stateCounter;
 		}
 	}
 
@@ -71,8 +68,23 @@ public class GalaxyGUI : MasterScript
 		industryLabel.text = industryString;
 		capitalLabel.text = capitalString;
 		turnLabel.text = turnNumber;
-		diplomacyLabelOne.text = playerEnemyOneDiplomacy;
-		diplomacyLabelTwo.text = playerEnemyTwoDiplomacy;
+
+		string tempString = null;
+
+		for(int i = 0; i < diplomacyScript.relationsList.Count; ++i)
+		{
+			if(diplomacyScript.relationsList[i].playerOne.playerRace == playerTurnScript.playerRace || diplomacyScript.relationsList[i].playerTwo.playerRace == playerTurnScript.playerRace)
+			{
+				tempString = tempString + diplomacyScript.relationsList[i].diplomaticState + " | " + diplomacyScript.relationsList[i].stateCounter;
+
+				if(i != diplomacyScript.relationsList.Count - 1)
+				{
+					tempString = tempString + "\n";
+				}
+			}
+		}
+
+		diplomacyLabelOne.text = tempString;
 	}
 
 	public void CheckToColoniseSystem()
