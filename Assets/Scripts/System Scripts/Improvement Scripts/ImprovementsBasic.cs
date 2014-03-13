@@ -63,8 +63,8 @@ public class ImprovementsBasic : MasterScript
 
 	public void ActiveTechnologies(int system, TurnInfo thisPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
-		sciencePercentBonus = 0.0f; //Resets the percentage modifier for SIM. Is there an easier way?
-		industryPercentBonus = 0.0f;
+		sciencePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
+		industryPercentBonus = 1.0f;
 		improvementCostModifier = 0;
 		scienceBonusModifier = 1.0f;
 		ownershipModifier = 1.0f;

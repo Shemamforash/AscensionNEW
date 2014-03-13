@@ -84,7 +84,7 @@ public class SystemGUI : MasterScript
 			
 			if(selectedPlanet != -1)
 			{
-				systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
+				systemSIMData.CheckPlanetValues(selectedPlanet, "None");
 			}
 			
 			if(cameraFunctionsScript.openMenu == true)
@@ -198,7 +198,7 @@ public class SystemGUI : MasterScript
 				{
 					systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
 					++playerTurnScript.planetsColonisedThisTurn;
-					systemSIMData.CheckPlanetValues(selectedSystem, selectedPlanet, playerTurnScript);
+					systemSIMData.CheckPlanetValues(selectedPlanet, "None");
 					playerTurnScript.capital -= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].capitalValue;
 					playerTurnScript.capitalModifier += 0.1f;
 				}

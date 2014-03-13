@@ -53,19 +53,17 @@ public class HeroGUI : MasterScript
 	public void Embargo()
 	{
 		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData> ();
-		systemSIMData.isPromoted = false;
-		systemSIMData.isEmbargoed = true;
+		systemSIMData.promotedBy = null;
+		systemSIMData.embargoedBy = heroScript.heroOwnedBy;
 		systemSIMData.embargoTimer = Time.time;
-		systemSIMData.SystemSIMCounter(RefreshCurrentSystem(heroScript.heroLocation), playerTurnScript);
 	}
 
 	public void Promote()
 	{
 		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData> ();
-		systemSIMData.isEmbargoed = false;
-		systemSIMData.isPromoted = true;
+		systemSIMData.embargoedBy = null;
+		systemSIMData.promotedBy = heroScript.heroOwnedBy;
 		systemSIMData.promotionTimer = Time.time;
-		systemSIMData.SystemSIMCounter(RefreshCurrentSystem(heroScript.heroLocation), playerTurnScript);
 	}
 
 	public void CheckIfCanHire()

@@ -7,12 +7,9 @@ public class AmbientStarRandomiser : MasterScript
 	public int totalStars;
 	public float maxGenerateDistance;
 	public GameObject ambientStar;
+	public Texture starA, starB, starC, starD, starE, starF;
+	private Texture tempTexture;
 	private List<GameObject> ambientStarList = new List<GameObject> ();
-	private StarColourChange starColourChange;
-	private Color32 humanColour = new Color(0, 255, 0, 1);
-	private Color32 selkiesColour = new Color(255, 0, 0, 1);
-	private Color32 nereidesColour = new Color(0, 106, 255, 1);
-	private Color32 defaultColour = new Color(255, 105, 0, 1);
 
 	public void GenerateStars () 
 	{
@@ -27,10 +24,17 @@ public class AmbientStarRandomiser : MasterScript
 
 				float xDis = Random.Range(systemX - maxGenerateDistance, systemX + maxGenerateDistance);
 				float yDis = Random.Range(systemY - maxGenerateDistance, systemY + maxGenerateDistance);
+				float zDis = Random.Range(-7.5f, 7.5f);
 
-				Vector3 location = new Vector3(xDis, yDis, 0.0f);
+				float scale = Random.Range(0.65f, 0.85f);
+		
+				Vector3 location = new Vector3(xDis, yDis, zDis);
 
 				GameObject star = Instantiate(ambientStar, location, Quaternion.identity) as GameObject;
+
+				star.renderer.material.mainTexture = PickTexture(Random.Range (0,99));
+
+				star.transform.localScale = new Vector3(scale, scale, scale);
 
 				ambientStarList.Add (star);
 
@@ -39,6 +43,23 @@ public class AmbientStarRandomiser : MasterScript
 		}
 	}
 
+	private Texture PickTexture(int chooseTexture)
+	{
+		if(chooseTexture < 40)
+		{
+			return starA;
+		}
+		else if(chooseTexture >= 40 && chooseTexture < 80)
+		{
+			return starB;
+		}
+		else if(chooseTexture >= 80)
+		{
+			return starF;
+		}
+		return null;
+	}
+	
 	public void AmbientColourChange(int system)
 	{
 		for(int i = 0; i < ambientStarList.Count; ++i)
@@ -47,27 +68,21 @@ public class AmbientStarRandomiser : MasterScript
 
 			if(distance < maxGenerateDistance / 2)
 			{
-				starColourChange = ambientStarList[i].GetComponent<StarColourChange>();
-
-				starColourChange.colourA = starColourChange.thisLight.color;
-
 				switch(systemListConstructor.systemList[system].systemOwnedBy)
 				{
 				case "Humans":
-					starColourChange.colourB = humanColour;
+					ambientStarList[i].renderer.material.mainTexture = starC;
 					break;
 				case "Selkies":
-					starColourChange.colourB = selkiesColour;
+					ambientStarList[i].renderer.material.mainTexture = starD;
 					break;
 				case "Nereides":
-					starColourChange.colourB = nereidesColour;
+					ambientStarList[i].renderer.material.mainTexture = starE;
 					break;
 				default:
-					starColourChange.colourB = defaultColour;
+					ambientStarList[i].renderer.material.mainTexture = PickTexture(Random.Range(0,99));
 					break;
 				}
-
-				starColourChange.changeColour = true;
 			}
 		}
 	}

@@ -58,7 +58,7 @@ public class GenericImprovements : MasterScript
 			
 			if(j != 0)
 			{
-				systemSIMData.scienceBonus += (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
+				systemSIMData.scienceUnitBonus += (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
 				improvements.tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 			}
 			
@@ -147,10 +147,10 @@ public class GenericImprovements : MasterScript
 			improvements.tempCount = 0.0f;
 			float tempCountB = 0.0f;
 			
-			systemSIMData.scienceBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
+			systemSIMData.scienceUnitBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
 			improvements.tempCount = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
 			
-			systemSIMData.industryBonus -= (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
+			systemSIMData.industryUnitBonus -= (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			tempCountB = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
 			
 			improvements.listOfImprovements[9].improvementMessage = ("+" + improvements.tempCount + " Science, -" + tempCountB + " Industry On System");

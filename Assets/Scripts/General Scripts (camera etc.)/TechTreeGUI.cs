@@ -80,7 +80,7 @@ public class TechTreeGUI : MasterScript
 					techLabels[j].button.enabled = false;
 				}
 
-				if(HeroTechTree.heroTechList[techNo].prerequisite == null && HeroTechTree.heroTechList[techNo].isActive == false)
+				if(HeroTechTree.heroTechList[techNo].prerequisite == "Basic Components" && HeroTechTree.heroTechList[techNo].isActive == false)
 				{
 					techLabels[j].button.enabled = true;
 					continue;

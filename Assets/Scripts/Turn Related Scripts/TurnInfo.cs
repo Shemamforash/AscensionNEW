@@ -44,7 +44,7 @@ public class TurnInfo : MasterScript
 
 			systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
 			
-			systemSIMData.UpdatePlanetPowerArray(i);
+			systemSIMData.UpdatePlanetPowerArray();
 		}
 
 		SortSystemPower ();
@@ -125,6 +125,8 @@ public class TurnInfo : MasterScript
 	{		
 		selectedPlayer.researchCostModifier = 0;
 
+		diplomacyScript.DiplomaticStateEffects ();
+
 		for(int i = 0; i < systemListConstructor.mapSize; ++i)
 		{
 			if(systemListConstructor.systemList[i].systemOwnedBy != selectedPlayer.playerRace)
@@ -139,7 +141,7 @@ public class TurnInfo : MasterScript
 			systemDefence.CalculateSystemDefence();
 
 			improvementsBasic.ActiveTechnologies(i, selectedPlayer);
-			systemSIMData.SystemSIMCounter(i, selectedPlayer);
+			systemSIMData.SystemSIMCounter(selectedPlayer);
 			systemFunctions.CheckUnlockedTier(improvementsBasic, i);
 			systemSIMData.IncreaseOwnership();
 
