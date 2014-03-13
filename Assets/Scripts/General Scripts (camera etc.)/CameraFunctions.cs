@@ -126,6 +126,9 @@ public class CameraFunctions : MasterScript
 
 	public void PanCamera() //Used to pan camera
 	{		
+		updatedX = transform.position.x;
+		updatedY = transform.position.y;
+
 		if(Input.GetAxis ("Horizontal") > 0)
 		{
 			moveCamera = false;
@@ -185,7 +188,9 @@ public class CameraFunctions : MasterScript
 	
 	public void ZoomCamera() //Changes height of camera
 	{		
-		if(Input.GetAxis ("Mouse ScrollWheel") < 0) //Zoom in
+		zPosition = transform.position.z;
+
+		if(Input.GetAxis ("Mouse ScrollWheel") < 0) //Zoom out
 		{
 			moveCamera = false;
 
@@ -196,10 +201,10 @@ public class CameraFunctions : MasterScript
 				zPosition = maxZoom;
 			}
 
-			cameraMain.transform.position = new Vector3(cameraMain.transform.position.x, cameraMain.transform.position.y, zPosition);
+			cameraMain.transform.position = new Vector3(transform.position.x, transform.position.y, zPosition);
 		}
 
-		if(Input.GetAxis ("Mouse ScrollWheel") > 0) //Zoom out
+		if(Input.GetAxis ("Mouse ScrollWheel") > 0) //Zoom in
 		{
 			moveCamera = false;
 
@@ -210,7 +215,7 @@ public class CameraFunctions : MasterScript
 				zPosition = minZoom;
 			}
 
-			cameraMain.transform.position = new Vector3(cameraMain.transform.position.x, cameraMain.transform.position.y, zPosition);
+			cameraMain.transform.position = new Vector3(transform.position.x, transform.position.y, zPosition);
 		}
 	}
 

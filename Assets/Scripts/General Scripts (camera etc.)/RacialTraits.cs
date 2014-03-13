@@ -29,7 +29,7 @@ public class RacialTraits : MasterScript
 			return nereidesStacks / 10;
 		}
 
-		return 0;
+		return 1;
 	}
 
 	public float HumanTrait() //Returns ambition modifier
