@@ -6,12 +6,11 @@ public class HeroScriptParent : MasterScript
 {
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, invasionObject;
-	public HeroDetailsWindow heroDetails;
 	public int currentLevel = 1, movementSpeed, planetInvade = -1, system;
-	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength, armour;
-	public string heroTier2, heroTier3, heroOwnedBy, heroShipType;
+	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength; 
+	public string heroTier2 = null, heroTier3 = null, heroOwnedBy, heroShipType;
 	public bool isInvading = false, canLevelUp, reachedLevel2, reachedLevel3;
-	private float heroAge;
+	public float heroAge, classModifier, maxArmour, currentArmour;
 	private GameObject levelUpLabel;
 
 	void Start()
@@ -24,21 +23,11 @@ public class HeroScriptParent : MasterScript
 		system = RefreshCurrentSystem (heroLocation);
 
 		movementSpeed = 1;
+		classModifier = 1;
+		currentArmour = 100;
 
-		heroGUI.heroDetailsContainer.GetComponent<UIGrid> ().enabled = true;
-
-		heroDetails = new HeroDetailsWindow ();
-
-		heroDetails.window = NGUITools.AddChild (heroGUI.heroDetailsContainer, heroGUI.heroDetailsPrefab);
-
-		heroDetails.dropDownOne = heroDetails.window.transform.Find ("First Specialisation").gameObject.GetComponent<UIPopupList>();
-		EventDelegate.Add (heroDetails.dropDownOne.gameObject.GetComponent<UIPopupList> ().onChange, heroGUI.SetSpecialisation);
-		heroDetails.dropDownTwo = heroDetails.window.transform.Find ("Second Specialisation").gameObject.GetComponent<UIPopupList>();
-		EventDelegate.Add (heroDetails.dropDownTwo.gameObject.GetComponent<UIPopupList> ().onChange, heroGUI.SetSpecialisation);
-
-		heroGUI.heroDetailsContainer.GetComponent<UIGrid>().repositionNow = true;
-
-		NGUITools.SetActive (heroDetails.window, false);
+		levelUpLabel = NGUITools.AddChild(GameObject.Find ("UI Root"), heroGUI.levelUpPrefab);
+		NGUITools.SetActive (levelUpLabel, false);
 	}
 
 	void Update()
@@ -47,8 +36,10 @@ public class HeroScriptParent : MasterScript
 
 		if(levelUpLabel != null)
 		{
-			Vector3 position = cameraFunctionsScript.cameraMain.WorldToViewportPoint (gameObject.transform.position);
-			
+			Vector3 position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 2.0f, gameObject.transform.position.z);
+
+			position = cameraFunctionsScript.cameraMain.WorldToViewportPoint (position);
+
 			position = overlayGUI.uiCamera.ViewportToWorldPoint (position);
 			
 			Vector3 newPosition = new Vector3(position.x, position.y, -37.0f);
@@ -83,53 +74,63 @@ public class HeroScriptParent : MasterScript
 
 	public void HeroEndTurnFunctions()
 	{
+		heroShip.ShipAbilities ();
+
 		if(isInvading == true)
 		{
-			systemInvasion.heroScript = this;
-			systemInvasion.ContinueInvasion(system);
+			systemInvasion.hero = this;
+			systemDefence = systemListConstructor.systemList[system].systemObject.GetComponent<SystemDefence>();
 
+			if(systemDefence.canEnter == false)
+			{
+				systemInvasion.ContinueInvasion(system);
+			}
 			if(systemDefence.canEnter == true && planetInvade != -1)
 			{
-				systemInvasion.heroScript = this;
 				systemInvasion.PlanetInvasion(system, planetInvade);
 			}
+		}
 
-			DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (heroOwnedBy, systemListConstructor.systemList[system].systemOwnedBy);
-			temp.stateCounter -= 1;
+		if(isInvading == false && currentArmour != maxArmour)
+		{
+			currentArmour += maxArmour * 0.02f;
+
+			if(currentArmour >= maxArmour)
+			{
+				currentArmour = maxArmour;
+			}
 		}
 
 		if(heroAge + 6 <= Time.time && reachedLevel2 == false) 
 		{
 			reachedLevel2 = true;
-			AddLevelUpDelegate();
+			AddLevelUpIcon();
 		}
 
-		if(heroAge + 7 <= Time.time && reachedLevel3 == false)
+		if(heroAge + 7 <= Time.time && reachedLevel3 == false && heroTier2 != "")
 		{
 			reachedLevel3 = true;
-			AddLevelUpDelegate();
+			AddLevelUpIcon();
 		}
 
-		heroShip.ShipAbilities ();
+		if(levelUpLabel.activeInHierarchy != false)
+		{
+			if(canLevelUp == false && levelUpLabel.activeInHierarchy == true)
+			{
+				NGUITools.SetActive(levelUpLabel, false);
+			}
+		}
 	}
 
-	private void AddLevelUpDelegate()
+	private void AddLevelUpIcon()
 	{
-		levelUpLabel = NGUITools.AddChild(GameObject.Find ("UI Root"), heroGUI.levelUpPrefab);
+		NGUITools.SetActive(levelUpLabel, true);
 		
 		levelUpLabel.transform.Find ("Label").GetComponent<UILabel>().depth = 1;
-		
-		EventDelegate.Add(levelUpLabel.GetComponent<UIButton>().onClick, LevelUp);
-	}
 
-	public void LevelUp()
-	{
-		NGUITools.Destroy (UIButton.current.gameObject);
-		heroGUI.selectedHero = gameObject;
-		++heroScript.currentLevel;
 		canLevelUp = true;
-		NGUITools.SetActive (heroGUI.heroDetailsContainer, false);
-		heroGUI.OpenHeroDetails();
+
+		++heroScript.currentLevel;
 	}
 }
 

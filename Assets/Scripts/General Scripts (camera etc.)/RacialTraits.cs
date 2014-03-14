@@ -26,17 +26,22 @@ public class RacialTraits : MasterScript
 	{
 		if(thisPlayer.playerRace == "Nereides")
 		{
-			return nereidesStacks / 10;
+			return (nereidesStacks / 10) + 1;
 		}
 
 		return 1;
 	}
 
-	public float HumanTrait() //Returns ambition modifier
+	public float HumanTrait(TurnInfo thisPlayer) //Returns ambition modifier
 	{
-		ambitionOwnershipModifier = ambitionCounter / 25.0f;
+		if(thisPlayer.playerRace == "Humans" && improvementsBasic.listOfImprovements[18].hasBeenBuilt == false)
+		{
+			ambitionOwnershipModifier = ambitionCounter / 40.0f;
 
-		return ambitionOwnershipModifier;
+			return ambitionOwnershipModifier;
+		}
+
+		return 1f;
 	}
 
 	public void RacialBonus(TurnInfo player)
@@ -53,7 +58,7 @@ public class RacialTraits : MasterScript
 			}
 			if(player.systemsColonisedThisTurn == 0 && player.planetsColonisedThisTurn == 0)
 			{
-				ambitionCounter -= 0.5f;
+				ambitionCounter -= 0.25f;
 			}
 			if(ambitionCounter < -100f)
 			{
@@ -92,11 +97,11 @@ public class RacialTraits : MasterScript
 				
 				if(tempString == "Molten" || tempString == "Desert" || tempString == "Rocky")
 				{
-					systemSIMData.totalSystemAmber += (tempMod * 2f) * improvementsBasic.amberPercentBonus;
+					systemSIMData.totalSystemAmber += (tempMod * 2f) * improvementsBasic.amberProductionBonus;
 				}
 				else
 				{
-					systemSIMData.totalSystemAmber += tempMod * improvementsBasic.amberPercentBonus;
+					systemSIMData.totalSystemAmber += tempMod * improvementsBasic.amberProductionBonus;
 				}
 			}
 		}

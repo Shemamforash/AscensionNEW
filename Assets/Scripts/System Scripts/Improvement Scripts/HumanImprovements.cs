@@ -48,7 +48,7 @@ public class HumanImprovements : MasterScript
 			{
 				if(systemListConstructor.systemList[system].planetsInSystem[i].planetImprovementLevel == 3)
 				{
-					systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership = 120;
+					improvements.maxOwnershipBonus += 20;
 				}
 			}
 			

@@ -156,7 +156,7 @@ public class InvasionGUI : MasterScript
 			planetList[i].GetComponent<UIButton>().enabled = false;
 		}
 		
-		planetList[i].GetComponent<UILabel>().text = invasionInfo;
+		planetList [i].GetComponent<UILabel> ().text = invasionInfo;
 	}
 
 	private void UpdateBombButton()
@@ -236,8 +236,12 @@ public class InvasionGUI : MasterScript
 		}
 	}
 
-	private void BombPlanet(int i)
+	private void BombPlanet(int i, int system)
 	{
+		heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
+		DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (heroScript.heroOwnedBy, systemListConstructor.systemList [system].systemOwnedBy);
+		temp.stateCounter -= 2;
+
 		switch(bombSelected)
 		{
 		case "Fission":
@@ -246,6 +250,7 @@ public class InvasionGUI : MasterScript
 			break;
 		case "Fusion":
 			bombTimers[1] = Time.time;
+			systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership -= 20;
 			break;
 		case "Antimatter":
 			bombTimers[2] = Time.time;
@@ -253,9 +258,6 @@ public class InvasionGUI : MasterScript
 		default:
 			break;
 		}
-
-		DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (heroScript.heroOwnedBy, systemListConstructor.systemList [system].systemOwnedBy);
-		temp.stateCounter -= 2;
 
 		heroScript.planetInvade = -1;
 		bombSelected = null;
@@ -270,12 +272,12 @@ public class InvasionGUI : MasterScript
 			if(planetList[i] == UIButton.current.gameObject)
 			{
 				heroScript.planetInvade = i;
-				systemInvasion.heroScript = heroScript;
+				systemInvasion.hero = heroScript;
 				systemInvasion.PlanetInvasion(heroScript.system, heroScript.planetInvade);
 
 				if(bombSelected != null)
 				{
-					BombPlanet(i);
+					BombPlanet(i, heroScript.system);
 				}
 
 				break;

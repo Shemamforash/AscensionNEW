@@ -58,6 +58,7 @@ public class GenericImprovements : MasterScript
 			
 			if(j != 0)
 			{
+				systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
 				systemSIMData.scienceUnitBonus += (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
 				improvements.tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 			}

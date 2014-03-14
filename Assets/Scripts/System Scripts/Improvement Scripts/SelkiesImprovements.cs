@@ -3,12 +3,8 @@ using System.Collections;
 
 public class SelkiesImprovements : MasterScript 
 {
-	private float amberPenalty, amberPenaltyModifier;
-
 	public void CheckSelkiesImprovements(int system, ImprovementsBasic improvements, TurnInfo thisPlayer)
 	{
-		amberPenaltyModifier = 0.05f;
-
 		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
 
 		if(improvements.listOfImprovements[29].hasBeenBuilt == true)
@@ -32,14 +28,14 @@ public class SelkiesImprovements : MasterScript
 				}
 			}
 
-			amberPenaltyModifier -= adjacentSystems * 0.05f;
+			improvements.amberPenalty -= adjacentSystems * 0.05f;
 
 			improvements.listOfImprovements[30].improvementMessage = ("-" + (adjacentSystems * 0.05f) + " Amber Penalty from adjacent Selkies Systems");
 		}
 
 		if(improvements.listOfImprovements[32].hasBeenBuilt == true)
 		{
-			improvements.amberPercentBonus += systemSIMData.totalSystemIndustry * 0.01f;
+			improvements.amberProductionBonus += systemSIMData.totalSystemIndustry * 0.01f;
 
 			improvements.listOfImprovements[32].improvementMessage = ("+" + (systemSIMData.totalSystemIndustry * 0.01f) + "% Amber production from Industry production");
 		}
@@ -48,7 +44,7 @@ public class SelkiesImprovements : MasterScript
 		{
 			if(systemSIMData.totalSystemAmber > 10.0f)
 			{
-				improvements.amberPercentBonus += 0.5f;
+				improvements.amberProductionBonus += 0.5f;
 			}
 		}
 
@@ -86,7 +82,7 @@ public class SelkiesImprovements : MasterScript
 		{
 			improvements.amberPointBonus -= 4f;
 
-			amberPenaltyModifier = amberPenaltyModifier / 2f;
+			improvements.amberPenalty = improvements.amberPenalty / 2f;
 
 			improvements.listOfImprovements[31].improvementMessage = "-4 Amber production, Amber penalty is halved";
 		}
@@ -95,27 +91,16 @@ public class SelkiesImprovements : MasterScript
 		{
 			improvements.amberPointBonus -= 2f;
 			
-			amberPenaltyModifier = amberPenaltyModifier / 2f;
+			improvements.amberPenalty = improvements.amberPenalty / 2f;
 			
 			improvements.listOfImprovements[33].improvementMessage = "-2 Amber production, Amber penalty is halved";
 		}
 
 		if(improvements.listOfImprovements[28].hasBeenBuilt == true)
 		{
-			if(amberPenaltyModifier < 0f)
-			{
-				amberPenaltyModifier = 0f;
-			}
-
 			systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
-
-			amberPenalty = systemSIMData.totalSystemAmber * amberPenaltyModifier;
-
-			improvements.ownershipModifier -= amberPenalty;
-			improvements.sciencePercentBonus -= amberPenalty;
-			improvements.industryPercentBonus -= amberPenalty;
 			
-			improvements.listOfImprovements[28].improvementMessage = ("System is suffering -" + amberPenalty * 100 + "% Resource production from Amber Penalty");
+			improvements.listOfImprovements[28].improvementMessage = ("System is suffering -" + improvements.amberPenalty * 100 + "% Resource production from Amber Penalty");
 		}
 	}
 }

@@ -89,8 +89,8 @@ public class SystemGUI : MasterScript
 			
 			if(cameraFunctionsScript.openMenu == true)
 			{
-				systemIndustry.text = Math.Round (systemSIMData.totalSystemIndustry, 1).ToString();
-				systemScience.text = Math.Round (systemSIMData.totalSystemScience, 1).ToString();  
+				systemIndustry.text = Math.Round (systemSIMData.totalSystemIndustry, 1) + " (" + Math.Round (systemSIMData.systemIndustryModifier,1) + ")";
+				systemScience.text = Math.Round (systemSIMData.totalSystemScience, 1) + " (" + Math.Round (systemSIMData.systemScienceModifier,1) + ")";  
 			}
 		}
 	}

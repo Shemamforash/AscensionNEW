@@ -4,7 +4,7 @@ using System.Collections;
 public class SystemInvasions : MasterScript
 {
 	public GameObject invasionQuad;
-	private HeroScriptParent hero;
+	public HeroScriptParent hero;
 
 	public void PlanetInvasion(int system, int planet)
 	{
@@ -12,6 +12,7 @@ public class SystemInvasions : MasterScript
 		{
 			systemListConstructor.systemList [system].planetsInSystem [planet].planetDefence -= hero.secondaryPower;
 			systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership -= hero.secondaryCollateral;
+			hero.currentArmour -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (hero.currentArmour * hero.classModifier);
 			
 			if(systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership <= 0)
 			{
@@ -139,7 +140,11 @@ public class SystemInvasions : MasterScript
 	public void ContinueInvasion(int system)
 	{		
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
+		hero.currentArmour -= systemListConstructor.systemList [system].systemOffence / (hero.currentArmour * hero.classModifier);
 		systemListConstructor.systemList [system].systemDefence -= hero.primaryPower;
+
+		DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (hero.heroOwnedBy, systemListConstructor.systemList[system].systemOwnedBy);
+		temp.stateCounter -= 1;
 		
 		if(systemListConstructor.systemList [system].systemDefence <= 0)
 		{

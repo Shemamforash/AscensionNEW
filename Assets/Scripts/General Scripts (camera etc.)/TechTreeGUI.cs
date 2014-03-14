@@ -115,9 +115,9 @@ public class TechTreeGUI : MasterScript
 
 		for(int i = 0; i < HeroTechTree.heroTechList.Count; ++i)
 		{
-			if(HeroTechTree.heroTechList[i].techName == UIButton.current.gameObject.name && playerTurnScript.science >= (HeroTechTree.heroTechList[i].scienceCost + playerTurnScript.researchCostModifier))
+			if(HeroTechTree.heroTechList[i].techName == UIButton.current.gameObject.name && playerTurnScript.science >= (HeroTechTree.heroTechList[i].scienceCost - playerTurnScript.researchCostModifier))
 			{
-				playerTurnScript.science -= HeroTechTree.heroTechList[i].scienceCost;
+				playerTurnScript.science -= (HeroTechTree.heroTechList[i].scienceCost - playerTurnScript.researchCostModifier);
 				HeroTechTree.heroTechList[i].isActive = true;
 				ShipFunctions.UpdateShips();
 				CheckActiveTech();

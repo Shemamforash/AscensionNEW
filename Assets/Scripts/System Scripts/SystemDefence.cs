@@ -23,7 +23,8 @@ public class SystemDefence : MasterScript
 			maxSystemDefence += systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
 		}
 
-		maxSystemDefence = (maxSystemDefence / systemListConstructor.systemList [system].systemSize) * 10f;
+		maxSystemDefence = (maxSystemDefence / systemListConstructor.systemList [system].systemSize) * 20f;
+		systemListConstructor.systemList [system].systemOffence = (int)(maxSystemDefence / 2f);
 
 		defenceRegenerator = maxSystemDefence / 5f;
 
@@ -65,7 +66,8 @@ public class SystemDefence : MasterScript
 	public void CalculatePlanetDefence(int planet)
 	{
 		float maxPlanetDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership * systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel;
-		
+		systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence = maxPlanetDefence;
+
 		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence != maxPlanetDefence)
 		{
 			systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence += defenceRegenerator;
