@@ -21,7 +21,7 @@ public static class ShipFunctions
 		dropshipCollateral = 0;
 		engineValue = 1;
 		infiltratorEngine = false;
-		armourRating = 0;
+		armourRating = 100;
 		logisticsRating = 0;
 
 		for(int i = 0; i < HeroTechTree.heroTechList.Count; ++i)

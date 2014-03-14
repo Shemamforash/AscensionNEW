@@ -88,7 +88,7 @@ public class TurnInfo : MasterScript
 		{
 			raceScience = 1 * gameSpeedModifer;
 			raceIndustry = 1.4f * gameSpeedModifer;
-			raceCapital = 10.5f;
+			raceCapital = 0.5f;
 			homeSystem = "Samael";
 			homePlanetType = "Plains";
 			materialInUse = turnInfoScript.selkiesMaterial;
@@ -97,7 +97,7 @@ public class TurnInfo : MasterScript
 		{
 			raceScience = 2 * gameSpeedModifer;
 			raceIndustry = 1 * gameSpeedModifer;
-			raceCapital = 0.4f;
+			raceCapital = 10.4f;
 			homeSystem = "Nepthys";
 			homePlanetType = "Icy";
 			materialInUse = turnInfoScript.nereidesMaterial;
@@ -143,7 +143,6 @@ public class TurnInfo : MasterScript
 			improvementsBasic.ActiveTechnologies(i, selectedPlayer);
 			systemSIMData.SystemSIMCounter(selectedPlayer);
 			systemFunctions.CheckUnlockedTier(improvementsBasic, i);
-			systemSIMData.IncreaseOwnership();
 
 			selectedPlayer.science += systemSIMData.totalSystemScience;
 			selectedPlayer.industry += systemSIMData.totalSystemIndustry;

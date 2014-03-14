@@ -63,10 +63,10 @@ public class HeroShip : MasterScript
 			NGUITools.SetActive(heroGUI.invasionButton, false);
 		}
 
-		RepositionAllPlanets();
+		RepositionButtons();
 	}
 
-	private void RepositionAllPlanets()
+	private void RepositionButtons()
 	{
 		if(gridChildren != tempChildren)
 		{
@@ -88,7 +88,7 @@ public class HeroShip : MasterScript
 
 		ShipFunctions.UpdateShips ();
 		heroScript.primaryPower = ShipFunctions.primaryWeaponPower;
-		heroScript.armour = ShipFunctions.armourRating;
+		heroScript.maxArmour = ShipFunctions.armourRating;
 		heroScript.movementSpeed = ShipFunctions.engineValue;
 
 		if(heroScript.heroTier2 == "Diplomat")

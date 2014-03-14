@@ -1,13 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System;
 
 public class SystemSIMData : MasterScript
 {
-	//THIS IS A PROTOTYPE ONLY CLASS. THIS WILL BE USED TO STORE PLANET DATA AND DISPLAY IT IN A GUI UNTIL A TRUE UI AND PLANET SCREEN CAN BE CREATED
-
 	[HideInInspector]
 	public int improvementNumber, antiStealthPower, thisSystem;
 	[HideInInspector]
@@ -21,8 +18,8 @@ public class SystemSIMData : MasterScript
 
 	public float totalSystemScience, totalSystemIndustry, totalSystemSIM, totalSystemAmber;
 	public float flResourceModifier, flOwnershipModifier, flOffDefModifier;
-	public float systemScienceModifier, systemIndustryModifier;
-	public float finalScienceModifier, finalIndustryModifier, finalOwnershipModifier;
+	public float planetScienceModifier, planetIndustryModifier;
+	public float systemScienceModifier, systemIndustryModifier, systemOwnershipModifier;
 	private TurnInfo thisPlayer;
 
 	void Start()
@@ -53,7 +50,6 @@ public class SystemSIMData : MasterScript
 		float tempTotalSci = 0.0f, tempTotalInd = 0.0f;
 		thisPlayer = player;
 		CheckFrontLineBonus ();
-		CalculateBaseSystemModifiers ();
 
 		for(int j = 0; j < systemListConstructor.systemList[thisSystem].systemSize; ++j)
 		{
@@ -64,27 +60,29 @@ public class SystemSIMData : MasterScript
 			}
 		}
 
-		totalSystemScience = tempTotalSci + scienceUnitBonus;
-		totalSystemIndustry = tempTotalInd + industryUnitBonus;
+		CalculateSystemModifierValues ();
+
+		totalSystemScience = (tempTotalSci + scienceUnitBonus) * systemScienceModifier;
+		totalSystemIndustry = (tempTotalInd + industryUnitBonus) * systemIndustryModifier;
 
 		if(thisPlayer.playerRace == "Selkies")
 		{
 			racialTraitScript.IncreaseAmber(thisSystem);
 		}
+
+		IncreaseOwnership ();
 	}
 
-	private void CalculateBaseSystemModifiers()
+	private void CalculateSystemModifierValues()
 	{
-		systemIndustryModifier = 0f; 
-		systemScienceModifier = 0f;
-		
-		systemIndustryModifier += thisPlayer.raceScience * improvementsBasic.sciencePercentBonus * EmbargoPenalty () * PromoteBonus () * flResourceModifier;
-		systemScienceModifier += thisPlayer.raceScience * improvementsBasic.industryPercentBonus * racialTraitScript.NereidesIndustryModifer (thisPlayer) * EmbargoPenalty() * PromoteBonus() * flResourceModifier;
+		systemScienceModifier =  improvementsBasic.sciencePercentBonus * EmbargoPenalty() * PromoteBonus() * improvementsBasic.amberPenalty * flResourceModifier;
+		systemIndustryModifier =  improvementsBasic.industryPercentBonus * racialTraitScript.NereidesIndustryModifer (thisPlayer) * EmbargoPenalty () * PromoteBonus () * improvementsBasic.amberPenalty * flResourceModifier;
+		systemOwnershipModifier = racialTraitScript.HumanTrait (thisPlayer) * improvementsBasic.amberPenalty * flOwnershipModifier * improvementsBasic.ownershipModifier;
 	}
 
 	public float CheckPlanetValues(int planet, string resource)
 	{
-		GetModifierValues (planet);
+		CalculatePlanetModifierValues (planet);
 		
 		float tempSci = 0, tempInd = 0;
 		
@@ -94,8 +92,8 @@ public class SystemSIMData : MasterScript
 		
 		systemFunctions.CheckImprovement(thisSystem, planet);
 		
-		tempSci = systemListConstructor.systemList [thisSystem].planetsInSystem [planet].planetScience * finalScienceModifier;
-		tempInd = systemListConstructor.systemList [thisSystem].planetsInSystem [planet].planetIndustry * finalIndustryModifier;
+		tempSci = systemListConstructor.systemList [thisSystem].planetsInSystem [planet].planetScience * planetScienceModifier;
+		tempInd = systemListConstructor.systemList [thisSystem].planetsInSystem [planet].planetIndustry * planetIndustryModifier;
 		
 		if(improvementsBasic.listOfImprovements[8].hasBeenBuilt == true && systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetType == thisPlayer.homePlanetType)
 		{
@@ -105,10 +103,13 @@ public class SystemSIMData : MasterScript
 		
 		if(systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetColonised == true)
 		{
+			string sOut = Math.Round(tempSci, 1) + "\n(" + Math.Round (planetScienceModifier, 1) + ")";
+			string iOut = Math.Round (tempInd,1) + "\n(" + Math.Round (planetIndustryModifier, 1) + ")";
+
 			allPlanetsInfo[planet].generalInfo = gameObject.name + " " + (planet+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
 				+ Math.Round(systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetOwnership, 1) + "% Owned\n";
-			allPlanetsInfo[planet].scienceOutput = Math.Round(tempSci, 1).ToString();
-			allPlanetsInfo[planet].industryOutput = Math.Round (tempInd,1).ToString();
+			allPlanetsInfo[planet].scienceOutput = sOut;
+			allPlanetsInfo[planet].industryOutput = iOut;
 		}
 		
 		switch(resource)
@@ -122,13 +123,13 @@ public class SystemSIMData : MasterScript
 		}
 	}
 
-	private void GetModifierValues(int planet)
+	private void CalculatePlanetModifierValues(int planet)
 	{
 		systemDefence.CheckStatusEffects(planet);
 		
 		baseResourceBonus = systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetOwnership / 66.6666f;
-		finalScienceModifier = baseResourceBonus * scienceBuffModifier * systemScienceModifier;
-		finalIndustryModifier = baseResourceBonus * industryBuffModifier * systemIndustryModifier;
+		planetScienceModifier = thisPlayer.raceScience * baseResourceBonus * scienceBuffModifier;
+		planetIndustryModifier = thisPlayer.raceIndustry * baseResourceBonus * industryBuffModifier;
 		
 		if(improvementsBasic.listOfImprovements[24].hasBeenBuilt == true)
 		{
@@ -136,8 +137,8 @@ public class SystemSIMData : MasterScript
 			
 			if(tempString == "Molten" || tempString == "Desert" || tempString == "Rocky")
 			{
-				finalScienceModifier = 0f;
-				finalIndustryModifier += finalIndustryModifier * 0.5f;
+				planetScienceModifier = 0f;
+				planetIndustryModifier += planetIndustryModifier * 0.5f;
 			}
 		}
 	}	
@@ -155,19 +156,7 @@ public class SystemSIMData : MasterScript
 				if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership < (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus)
 				   && systemDefence.underInvasion == false)
 				{
-					float additionalOwnership = 0;
-
-					if(systemListConstructor.systemList[thisSystem].systemOwnedBy == "Humans")
-					{
-						additionalOwnership = (int)racialTraitScript.HumanTrait();
-					}
-
-					if(improvementsBasic.listOfImprovements[18].hasBeenBuilt == true)
-					{
-						additionalOwnership = 0;
-					}
-
-					float ownershipToAdd = (additionalOwnership + 1) * improvementsBasic.ownershipModifier;
+					float ownershipToAdd = systemOwnershipModifier;
 
 					if(ownershipToAdd > (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus) - systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership)
 					{

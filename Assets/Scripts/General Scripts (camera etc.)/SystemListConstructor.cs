@@ -290,7 +290,7 @@ public class StarSystem
 	public Vector3 systemPosition;
 	public GameObject systemObject, allyHero, enemyHero;
 	public GameObject tradeRoute;
-	public int systemSize, numberOfConnections, systemDefence;
+	public int systemSize, numberOfConnections, systemDefence, systemOffence;
 	public List<Planet> planetsInSystem = new List<Planet> ();
 	public List<Node> tempConnections = new List<Node>();
 	public List<GameObject> permanentConnections = new List<GameObject>();
@@ -300,7 +300,7 @@ public class Planet
 {
 	public string planetName, planetType, planetCategory;
 	public List<string> improvementsBuilt = new List<string> ();
-	public float planetScience, planetIndustry, planetOwnership, planetDefence, virusTimer, chillTimer, poisonTimer, chillLength;
+	public float planetScience, planetIndustry, planetOwnership, planetDefence, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength;
 	public bool planetColonised, underEnemyControl, virusActive, chillActive, poisonActive;
 	public int planetImprovementLevel, improvementSlots, maxOwnership, capitalValue;
 }

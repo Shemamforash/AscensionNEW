@@ -6,7 +6,7 @@ using System.Xml;
 
 public class ImprovementsBasic : MasterScript 
 {
-	public float sciencePercentBonus, industryPercentBonus, amberPercentBonus, amberPointBonus, tempCount, scienceBonusModifier, ownershipModifier, maxOwnershipBonus;
+	public float sciencePercentBonus, industryPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, tempCount, scienceBonusModifier, ownershipModifier, maxOwnershipBonus;
 	public GameObject tooltip;
 	public int techTier = 0, improvementCostModifier = 0, researchCost;
 	private GenericImprovements genericImprovements;
@@ -68,8 +68,11 @@ public class ImprovementsBasic : MasterScript
 		improvementCostModifier = 0;
 		scienceBonusModifier = 1.0f;
 		ownershipModifier = 1.0f;
-		amberPercentBonus = 1.0f;
+		amberPenalty = 1f;
+		amberPointBonus = 0f;
+		amberProductionBonus = 1f;
 		researchCost = 0;
+		maxOwnershipBonus = 0f;
 
 		tempCount = 0.0f;
 
