@@ -77,7 +77,7 @@ public class SystemSIMData : MasterScript
 	{
 		systemScienceModifier =  improvementsBasic.sciencePercentBonus * EmbargoPenalty() * PromoteBonus() * improvementsBasic.amberPenalty * flResourceModifier;
 		systemIndustryModifier =  improvementsBasic.industryPercentBonus * racialTraitScript.NereidesIndustryModifer (thisPlayer) * EmbargoPenalty () * PromoteBonus () * improvementsBasic.amberPenalty * flResourceModifier;
-		systemOwnershipModifier = racialTraitScript.HumanTrait (thisPlayer) * improvementsBasic.amberPenalty * flOwnershipModifier * improvementsBasic.ownershipModifier;
+		systemOwnershipModifier = racialTraitScript.HumanTrait (thisPlayer, improvementsBasic) * improvementsBasic.amberPenalty * flOwnershipModifier * improvementsBasic.ownershipModifier;
 	}
 
 	public float CheckPlanetValues(int planet, string resource)

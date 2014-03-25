@@ -5,19 +5,64 @@ public class AIBasicParent : TurnInfo
 {
 	public string selkiesHomeSystem, nereidesHomeSystem, humansHomeSystem;
 	private float tempSIM, highestSIM;
-	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem;
-	
-	public void Expand(TurnInfo thisPlayer)
+	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem, checkHeroTimer = 0;
+	private bool saveForHero;
+	private TurnInfo thisPlayer;
+
+	public void Expand(TurnInfo player)
 	{
+		thisPlayer = player;
+
 		for(float i = thisPlayer.capital; i > 0; --i)
 		{
-			AIExpansion(thisPlayer);
+			CheckToSaveForHero();
+
+			if(saveForHero == false)
+			{
+				AIExpansion();
+			}
+
+			if(saveForHero == true)
+			{
+				heroGUI.CheckIfCanHire(thisPlayer);
+			}
 		}
 
 		turnInfoScript.TurnEnd(thisPlayer);
 	}
 
-	public void AIExpansion(TurnInfo thisPlayer)
+	private void CheckToSaveForHero()
+	{
+		checkHeroTimer++;
+		
+		if(checkHeroTimer == 6)
+		{
+			float temp = 0;
+			
+			for(int j = 0; j < systemListConstructor.systemList.Count; ++j)
+			{
+				if(systemListConstructor.systemList[j].systemOwnedBy == thisPlayer.playerRace)
+				{
+					systemSIMData = systemListConstructor.systemList[j].systemObject.GetComponent<SystemSIMData>();
+					temp += systemSIMData.totalSystemScience + systemSIMData.totalSystemIndustry;
+				}
+				
+				if(temp >= ((playerOwnedHeroes.Count * 20f) + 20f))
+				{
+					saveForHero = true;
+				}
+
+				else if(temp < ((playerOwnedHeroes.Count * 20f) + 20f))
+				{
+					saveForHero = false;
+				}
+			}
+
+			checkHeroTimer = 0;
+		}
+	}
+
+	public void AIExpansion()
 	{
 		if(thisPlayer.capital > 1)
 		{

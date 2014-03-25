@@ -107,10 +107,7 @@ public class SystemGUI : MasterScript
 
 	public void HireHero()
 	{
-		if(numberOfHeroes <= 6)
-		{
-			heroGUI.CheckIfCanHire();
-		}
+		heroGUI.CheckIfCanHire(playerTurnScript);
 	}
 
 	private void SetUpPlanets()
