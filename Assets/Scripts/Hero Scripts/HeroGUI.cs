@@ -129,18 +129,16 @@ public class HeroGUI : MasterScript
 		systemSIMData.promotionTimer = Time.time;
 	}
 
-	public void CheckIfCanHire()
+	public void CheckIfCanHire(TurnInfo player)
 	{
-		if(playerTurnScript.capital >= 50 && playerTurnScript.playerOwnedHeroes.Count < 7)
+		if(player.capital >= 50 && player.playerOwnedHeroes.Count < 7)
 		{
-			int i = RefreshCurrentSystem(GameObject.Find(playerTurnScript.homeSystem));
+			int i = RefreshCurrentSystem(GameObject.Find(player.homeSystem));
 
 			GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[i].systemObject.transform.position, 
 			                                                       systemListConstructor.systemList[i].systemObject.transform.rotation);
 
 			instantiatedHero.name = "Basic Hero";
-
-			playerTurnScript.playerOwnedHeroes.Add (instantiatedHero);
 
 			heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
 
@@ -148,7 +146,7 @@ public class HeroGUI : MasterScript
 
 			heroScript.heroLocation = systemListConstructor.systemList[i].systemObject;
 
-			heroScript.heroOwnedBy = playerTurnScript.playerRace;
+			heroScript.heroOwnedBy = player.playerRace;
 
 			heroShip = instantiatedHero.GetComponent<HeroShip>();
 
@@ -156,7 +154,9 @@ public class HeroGUI : MasterScript
 
 			++heroCounter;
 
-			playerTurnScript.capital -= 50;;
+			player.capital -= 50;
+
+			player.playerOwnedHeroes.Add (instantiatedHero);
 		}
 	}
 

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class RacialTraits : MasterScript 
 {
@@ -32,13 +33,16 @@ public class RacialTraits : MasterScript
 		return 1;
 	}
 
-	public float HumanTrait(TurnInfo thisPlayer) //Returns ambition modifier
+	public float HumanTrait(TurnInfo thisPlayer, ImprovementsBasic improvements) //Returns ambition modifier
 	{
-		if(thisPlayer.playerRace == "Humans" && improvementsBasic.listOfImprovements[18].hasBeenBuilt == false)
+		if(thisPlayer.playerRace == "Humans")
 		{
-			ambitionOwnershipModifier = ambitionCounter / 40.0f;
+			if(improvements.listOfImprovements[18].hasBeenBuilt == false)
+			{
+				ambitionOwnershipModifier = ambitionCounter / 40.0f;
 
-			return ambitionOwnershipModifier;
+				return ambitionOwnershipModifier;
+			}
 		}
 
 		return 1f;
@@ -125,7 +129,7 @@ public class RacialTraits : MasterScript
 
 		if(playerTurnScript.playerRace == "Selkies")
 		{
-			racialLabel.text = amber + " Amber";
+			racialLabel.text = Math.Round(amber, 2) + " Amber";
 		}
 	}
 }

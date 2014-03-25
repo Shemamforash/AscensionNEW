@@ -37,7 +37,7 @@ public class HeroShip : MasterScript
 		{
 			system = RefreshCurrentSystem(heroScript.heroLocation);
 
-			if(systemListConstructor.systemList[system].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[system].systemOwnedBy != null)
+			if(systemListConstructor.systemList[system].systemOwnedBy != heroScript.heroOwnedBy && systemListConstructor.systemList[system].systemOwnedBy != null)
 			{
 				++tempChildren;
 
@@ -82,8 +82,9 @@ public class HeroShip : MasterScript
 		}
 	}
 
-	public void ShipAbilities()
+	public void ShipAbilities(TurnInfo thisPlayer)
 	{
+		heroScript = gameObject.GetComponent<HeroScriptParent> ();
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
 		ShipFunctions.UpdateShips ();
@@ -100,9 +101,9 @@ public class HeroShip : MasterScript
 			{
 				int numberOfMerchants = 0;
 
-				for(int i = 0; i < playerTurnScript.playerOwnedHeroes.Count; i++)
+				for(int i = 0; i < thisPlayer.playerOwnedHeroes.Count; i++)
 				{
-					HeroScriptParent tempScript = playerTurnScript.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
+					HeroScriptParent tempScript = thisPlayer.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
 
 					if(tempScript.heroTier3 == "Merchant")
 					{
@@ -110,7 +111,7 @@ public class HeroShip : MasterScript
 					}
 				}
 
-				MerchantFunctions((ShipFunctions.logisticsRating + 1) * numberOfMerchants);
+				MerchantFunctions((ShipFunctions.logisticsRating + 1) * numberOfMerchants, thisPlayer);
 			}
 		}
 
@@ -123,7 +124,7 @@ public class HeroShip : MasterScript
 
 			systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
 
-			if(systemListConstructor.systemList[system].systemOwnedBy != playerTurnScript.playerRace)
+			if(systemListConstructor.systemList[system].systemOwnedBy != thisPlayer.playerRace)
 			{
 				if(ShipFunctions.stealthValue >= systemSIMData.antiStealthPower)
 				{
@@ -154,7 +155,7 @@ public class HeroShip : MasterScript
 		}
 	}
 
-	private void MakeNewTradeRoutes()
+	private void MakeNewTradeRoutes(TurnInfo thisPlayer)
 	{
 		float tempIndSci = 0;
 		int chosenEnemySystem = -1, chosenPlayerSystem = -1;
@@ -169,7 +170,7 @@ public class HeroShip : MasterScript
 					{
 						int system = RefreshCurrentSystem(systemListConstructor.systemList[i].permanentConnections[k]);
 
-						if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace) //If connection is owned by player
+						if(systemListConstructor.systemList[system].systemOwnedBy == thisPlayer.playerRace) //If connection is owned by player
 						{
 							bool skip = false;
 
@@ -206,7 +207,7 @@ public class HeroShip : MasterScript
 			{
 				int system = RefreshCurrentSystem(systemListConstructor.systemList[chosenEnemySystem].permanentConnections[i]);
 				
-				if(systemListConstructor.systemList[system].systemOwnedBy == playerTurnScript.playerRace) //If connection is owned by player
+				if(systemListConstructor.systemList[system].systemOwnedBy == thisPlayer.playerRace) //If connection is owned by player
 				{
 					bool skip = false;
 
@@ -242,7 +243,7 @@ public class HeroShip : MasterScript
 		}
 	}
 
-	public void MerchantFunctions(int links)
+	public void MerchantFunctions(int links, TurnInfo thisPlayer)
 	{
 		Debug.Log (links);
 
@@ -250,7 +251,7 @@ public class HeroShip : MasterScript
 		{
 			int pSys = RefreshCurrentSystem(allTradeRoutes[i].playerSystem);
 
-			if(systemListConstructor.systemList[pSys].systemOwnedBy != playerTurnScript.playerRace)
+			if(systemListConstructor.systemList[pSys].systemOwnedBy != thisPlayer.playerRace)
 			{
 				int eSys = RefreshCurrentSystem(allTradeRoutes[i].enemySystem);
 				bool notEnemyOwned = false;
@@ -299,7 +300,7 @@ public class HeroShip : MasterScript
 
 			else if(i >= allTradeRoutes.Count)
 			{
-				MakeNewTradeRoutes();
+				MakeNewTradeRoutes(thisPlayer);
 			}
 		}
 	}

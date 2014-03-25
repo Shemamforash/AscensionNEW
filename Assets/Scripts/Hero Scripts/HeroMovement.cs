@@ -148,29 +148,26 @@ public class HeroMovement : MasterScript
 
 	public Vector3 HeroPositionAroundStar(GameObject location)
 	{
-		Vector3 position = new Vector3 ();
+		Vector3 position = new Vector3();
 
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
 
-		if(heroScript.heroOwnedBy == playerTurnScript.playerRace)
+		switch(heroScript.heroOwnedBy)
 		{
+		case "Humans":
 			position.x = location.transform.position.x;
 			position.y = location.transform.position.y + 1.5f;
-		}
-
-		if(heroScript.heroOwnedBy == turnInfoScript.allPlayers[0].name)
-		{
-			position.x = location.transform.position.x + 0.75f;
-			position.y = location.transform.position.y - 0.5f;
-		}
-
-		if(turnInfoScript.allPlayers.Count > 1)
-		{
-			if(heroScript.heroOwnedBy == turnInfoScript.allPlayers[1].name)
-			{
-				position.x = location.transform.position.x - 0.75f;
-				position.y = location.transform.position.y - 0.5f;
-			}
+			break;
+		case "Selkies":
+			position.x = location.transform.position.x + 1.5f;
+			position.y = location.transform.position.y - 1.0f;
+			break;
+		case "Nereides":
+			position.x = location.transform.position.x - 1.5f;
+			position.y = location.transform.position.y - 1.0f;
+			break;
+		default:
+			break;
 		}
 
 		position.z = location.transform.position.z;

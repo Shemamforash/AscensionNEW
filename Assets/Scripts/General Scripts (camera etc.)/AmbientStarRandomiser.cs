@@ -9,7 +9,7 @@ public class AmbientStarRandomiser : MasterScript
 	public GameObject ambientStar;
 	public Texture starA, starB, starC, starD, starE, starF;
 	private Texture tempTexture;
-	private List<GameObject> ambientStarList = new List<GameObject> ();
+	private List<AmbientStar> ambientStarList = new List<AmbientStar> ();
 
 	public void GenerateStars () 
 	{
@@ -17,6 +17,8 @@ public class AmbientStarRandomiser : MasterScript
 
 		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
 		{
+			AmbientStar tempObj = new AmbientStar();
+
 			for(int j = 0; j < ambientStarsPerSystem; ++j)
 			{
 				float systemX = systemListConstructor.systemList[i].systemObject.transform.position.x;
@@ -36,11 +38,16 @@ public class AmbientStarRandomiser : MasterScript
 
 				star.transform.localScale = new Vector3(scale, scale, scale);
 
-				ambientStarList.Add (star);
+				tempObj.nearbyStars.Add(star);
 
 				star.transform.parent = GameObject.Find ("Ambient Star Container").transform;
 			}
+
+			ambientStarList.Add(tempObj);
 		}
+
+		AmbientStarBatcher batcher = GameObject.Find ("Ambient Star Container").GetComponent<AmbientStarBatcher> ();
+		batcher.BatchChildren ();
 	}
 
 	private Texture PickTexture(int chooseTexture)
@@ -64,26 +71,33 @@ public class AmbientStarRandomiser : MasterScript
 	{
 		for(int i = 0; i < ambientStarList.Count; ++i)
 		{
-			float distance = Vector3.Distance(systemListConstructor.systemList[system].systemObject.transform.position, ambientStarList[i].transform.position);
-
-			if(distance < maxGenerateDistance / 2)
+			if(ambientStarList[i].mainStar == systemListConstructor.systemList[system].systemObject)
 			{
-				switch(systemListConstructor.systemList[system].systemOwnedBy)
+				for(int j = 0; j < ambientStarList[i].nearbyStars.Count; ++j)
 				{
-				case "Humans":
-					ambientStarList[i].renderer.material.mainTexture = starC;
-					break;
-				case "Selkies":
-					ambientStarList[i].renderer.material.mainTexture = starD;
-					break;
-				case "Nereides":
-					ambientStarList[i].renderer.material.mainTexture = starE;
-					break;
-				default:
-					ambientStarList[i].renderer.material.mainTexture = PickTexture(Random.Range(0,99));
-					break;
+					switch(systemListConstructor.systemList[system].systemOwnedBy)
+					{
+					case "Humans":
+						ambientStarList[i].nearbyStars[j].renderer.material.mainTexture = starC;
+						break;
+					case "Selkies":
+						ambientStarList[i].nearbyStars[j].renderer.material.mainTexture = starD;
+						break;
+					case "Nereides":
+						ambientStarList[i].nearbyStars[j].renderer.material.mainTexture = starE;
+						break;
+					default:
+						ambientStarList[i].nearbyStars[j].renderer.material.mainTexture = PickTexture(Random.Range(0,99));
+						break;
+					}
 				}
 			}
 		}
 	}
+}
+
+public class AmbientStar
+{
+	public List<GameObject> nearbyStars = new List<GameObject>();
+	public GameObject mainStar;
 }

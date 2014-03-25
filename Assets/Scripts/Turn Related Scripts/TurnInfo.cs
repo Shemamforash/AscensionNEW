@@ -79,7 +79,7 @@ public class TurnInfo : MasterScript
 		{
 			raceScience = 1 * gameSpeedModifer;
 			raceIndustry = 1 * gameSpeedModifer;
-			raceCapital = 0.6f;
+			raceCapital = 10.6f;
 			homeSystem = "Midgard";
 			homePlanetType = "Ocean";
 			materialInUse = turnInfoScript.humansMaterial;
@@ -88,7 +88,7 @@ public class TurnInfo : MasterScript
 		{
 			raceScience = 1 * gameSpeedModifer;
 			raceIndustry = 1.4f * gameSpeedModifer;
-			raceCapital = 0.5f;
+			raceCapital = 10.5f;
 			homeSystem = "Samael";
 			homePlanetType = "Plains";
 			materialInUse = turnInfoScript.selkiesMaterial;
@@ -97,7 +97,7 @@ public class TurnInfo : MasterScript
 		{
 			raceScience = 2 * gameSpeedModifer;
 			raceIndustry = 1 * gameSpeedModifer;
-			raceCapital = 10.4f;
+			raceCapital = 0.4f;
 			homeSystem = "Nepthys";
 			homePlanetType = "Icy";
 			materialInUse = turnInfoScript.nereidesMaterial;
@@ -158,7 +158,7 @@ public class TurnInfo : MasterScript
 		for(int j = 0; j < selectedPlayer.playerOwnedHeroes.Count; ++j)
 		{				
 			heroScript = selectedPlayer.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
-			heroScript.HeroEndTurnFunctions();
+			heroScript.HeroEndTurnFunctions(selectedPlayer);
 		}
 		
 		racialTraitScript.RacialBonus (selectedPlayer);

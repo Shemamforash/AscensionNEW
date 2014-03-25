@@ -72,9 +72,10 @@ public class HeroScriptParent : MasterScript
 		return null;
 	}
 
-	public void HeroEndTurnFunctions()
+	public void HeroEndTurnFunctions(TurnInfo thisPlayer)
 	{
-		heroShip.ShipAbilities ();
+		heroShip = gameObject.GetComponent<HeroShip> ();
+		heroShip.ShipAbilities (thisPlayer);
 
 		if(isInvading == true)
 		{
@@ -104,20 +105,29 @@ public class HeroScriptParent : MasterScript
 		if(heroAge + 6 <= Time.time && reachedLevel2 == false) 
 		{
 			reachedLevel2 = true;
-			AddLevelUpIcon();
+			if(thisPlayer == playerTurnScript)
+			{
+				AddLevelUpIcon();
+			}
 		}
 
 		if(heroAge + 7 <= Time.time && reachedLevel3 == false && heroTier2 != "")
 		{
 			reachedLevel3 = true;
-			AddLevelUpIcon();
+			if(thisPlayer == playerTurnScript)
+			{
+				AddLevelUpIcon();
+			}
 		}
 
-		if(levelUpLabel.activeInHierarchy != false)
+		if(thisPlayer == playerTurnScript)
 		{
-			if(canLevelUp == false && levelUpLabel.activeInHierarchy == true)
+			if(levelUpLabel.activeInHierarchy != false)
 			{
-				NGUITools.SetActive(levelUpLabel, false);
+				if(canLevelUp == false && levelUpLabel.activeInHierarchy == true)
+				{
+					NGUITools.SetActive(levelUpLabel, false);
+				}
 			}
 		}
 	}
