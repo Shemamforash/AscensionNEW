@@ -59,6 +59,7 @@ public class MasterScript : MonoBehaviour
 	public GalaxyGUI galaxyGUI;
 	[HideInInspector]
 	public InvasionGUI invasionGUI;
+	public EmpireBoundaries empireBoundaries;
 
 	private void Awake() //Assigns script references
 	{
@@ -79,6 +80,7 @@ public class MasterScript : MonoBehaviour
 		systemInvasion = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<SystemInvasions> ();
 		uiObjects = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<UIObjects> ();
 		ambientStarRandomiser = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AmbientStarRandomiser> ();
+		empireBoundaries = GameObject.Find ("Empire Boundaries").GetComponent<EmpireBoundaries> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem) //Returns the systemList enumerator of a system gameobject

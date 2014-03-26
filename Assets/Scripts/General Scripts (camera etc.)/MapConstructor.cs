@@ -153,11 +153,53 @@ public class MapConstructor : MasterScript
 		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
 		{
 			systemListConstructor.systemList[i].numberOfConnections = systemListConstructor.systemList[i].permanentConnections.Count;
+
+			SortConnectionsByAngle(i);
 		}
 
 		AssignMaximumConnections ();
 	}
-	
+
+	private void SortConnectionsByAngle (int i)
+	{
+		Vector3 zeroVector = systemListConstructor.systemList [i].permanentConnections [0].transform.position;
+
+		for(int j = systemListConstructor.systemList[i].permanentConnections.Count; j > 0; --j)
+		{
+			bool swapsMade = false;
+
+			for(int k = 2; k < j; ++k)
+			{
+				float angleA = Vector3.Angle(systemListConstructor.systemList[i].permanentConnections[k].transform.position, zeroVector);
+
+				if(Vector3.Cross(systemListConstructor.systemList[i].permanentConnections[k].transform.position, zeroVector).y < 0)
+				{
+					angleA = -angleA;
+				}
+
+				float angleB = Vector3.Angle(systemListConstructor.systemList[i].permanentConnections[k - 1].transform.position, zeroVector);
+
+				if(Vector3.Cross(systemListConstructor.systemList[i].permanentConnections[k - 1].transform.position, zeroVector).y < 0)
+				{
+					angleB = -angleB;
+				}
+
+				if(angleB > angleA)
+				{
+					GameObject temp = systemListConstructor.systemList[i].permanentConnections[k];
+					systemListConstructor.systemList[i].permanentConnections[k] = systemListConstructor.systemList[i].permanentConnections[k - 1];
+					systemListConstructor.systemList[i].permanentConnections[k - 1] = temp;
+					swapsMade = true;
+				}
+			}
+
+			if(swapsMade == false)
+			{
+				break;
+			}
+		}
+	}
+
 	private void AddPermanentSystem(int thisSystem, int nearestSystem)
 	{
 		systemListConstructor.systemList[thisSystem].permanentConnections.Add (systemListConstructor.systemList[nearestSystem].systemObject); //Add target system to current systems permanent connections

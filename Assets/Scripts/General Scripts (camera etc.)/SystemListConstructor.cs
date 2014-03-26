@@ -48,6 +48,7 @@ public class SystemListConstructor : MasterScript
 		}
 
 		galaxyGUI.SelectRace(PlayerPrefs.GetString ("Player Race"));
+		empireBoundaries.SetVertexPoints ();
 	}
 
 	public int RefreshCurrentSystemA(GameObject thisSystem)
