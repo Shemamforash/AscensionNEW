@@ -101,7 +101,7 @@ public class AIBasicParent : TurnInfo
 				systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
 
 				ambientStarRandomiser.AmbientColourChange(currentSystem);
-				
+
 				++systemsInPlay;
 
 				++thisPlayer.systemsColonisedThisTurn;

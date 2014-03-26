@@ -6,71 +6,118 @@ public class EmpireBoundaries : MasterScript
 {
 	private LineRenderer lineRenderer;
 	private List<Vector3> vertexPoints = new List<Vector3>();
-	private Color white;
-	private float width = 0.2f;
-	private int numberOfPoints = 20, system;
+	private float width = 1.5f, radius;
+	private int numberOfPoints = 40, system;
+	private Vector3 intersectionOne, intersectionTwo;
 
-	public void SetVertexPoints()
+	private void RoundLine(Vector3 systemPosition, float boundOne, float boundTwo)
 	{
-		lineRenderer = gameObject.GetComponent<LineRenderer> ();
-		white = Color.red;
+		for(int i = 0; i < 19; ++i)
+		{
+			if(i * 22.5f < boundOne || i * 22.5f > boundTwo)
+			{
+				continue;
+			}
 
-		vertexPoints.Clear();
-		system = RefreshCurrentSystem(GameObject.Find (playerTurnScript.homeSystem));
-		float radius = 1000;
-		float totalAngle = 0;
+			float xPos = radius * Mathf.Cos (Mathf.Deg2Rad * (i * 22.5f));
+			float yPos = radius * Mathf.Sin (Mathf.Deg2Rad * (i * 22.5f));
+			Vector3 position = new Vector3(systemPosition.x + xPos, systemPosition.y + yPos, systemPosition.z);
+			vertexPoints.Add(position);
+		}
+	}
+
+	private void CalculateRadius()
+	{
+		radius = 100f;
 
 		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 		{
-			Vector3 midpoint = (systemListConstructor.systemList[system].systemObject.transform.position + systemListConstructor.systemList[system].permanentConnections[i].transform.position) / 2;
-			float distance = Vector3.Distance(systemListConstructor.systemList[system].systemObject.transform.position, midpoint);
-
-			if(i + 1 < systemListConstructor.systemList[system].permanentConnections.Count)
-			{
-				totalAngle += Vector3.Angle (systemListConstructor.systemList[system].permanentConnections[i].transform.position, systemListConstructor.systemList[system].permanentConnections[i + 1].transform.position);
-			}
-
+			float distance = Vector3.Distance(systemListConstructor.systemList[system].systemObject.transform.position, systemListConstructor.systemList[system].permanentConnections[i].transform.position);
+			
 			if(radius > distance)
 			{
 				radius = distance;
 			}
-
-			vertexPoints.Add(midpoint);
 		}
 
-		float angle = 0;
+		radius = radius / 2;
+	}
 
-		if(totalAngle < 180f && systemListConstructor.systemList[system].permanentConnections.Count > 1)
+	private void CircleLineIntersection(Vector3 startPoint, Vector3 endPoint)
+	{
+		float gradient = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.y); //Straight Line
+		gradient = -(1/gradient);
+		float yIntersect = startPoint.y - gradient * startPoint.x;
+
+		float A = (gradient * gradient) + 1;
+		float B = (gradient * yIntersect) - (gradient * startPoint.y) - startPoint.x;
+		float C = (startPoint.y * startPoint.y) - (radius * radius) + (startPoint.x * startPoint.x) - (2 * yIntersect * startPoint.y) + (yIntersect * yIntersect);
+
+		float xIntersectOne = (-B + Mathf.Sqrt ((B * B) - 4 * A * C)) / (2 * A);
+		float xIntersectTwo = (-B - Mathf.Sqrt ((B * B) - 4 * A * C)) / (2 * A);
+		float yIntersectOne = (gradient * xIntersectOne) + yIntersect;
+		float yIntersectTwo = (gradient * xIntersectTwo) + yIntersect;
+
+		intersectionOne = new Vector3 (xIntersectOne, yIntersectOne, startPoint.z);
+		intersectionTwo = new Vector3 (xIntersectTwo, yIntersectTwo, startPoint.z);
+	}
+
+	public void SetVertexPoints(int selectedSystem)
+	{
+		bool neighboursFound = false, moveSystem = false;
+		int target = -1;
+
+		for(int i = 0; i < systemListConstructor.systemList[selectedSystem].permanentConnections.Count; ++i)
 		{
-			for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
-			{
-				angle += Vector3.Angle(Vector3.zero, systemListConstructor.systemList[system].permanentConnections[i].transform.position);
-			}
-
-			angle = - (angle / systemListConstructor.systemList[system].permanentConnections.Count);
-		}
-
-		if(systemListConstructor.systemList[system].permanentConnections.Count == 1)
-		{
-			angle = -Vector3.Angle(Vector3.zero, systemListConstructor.systemList[system].permanentConnections[0].transform.position);
-		}
+			target = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[i]);
 			
-		float angleVPos = angle - 90f;
-		float angleVNeg = angle + 90f;
+			if(systemListConstructor.systemList[target].systemOwnedBy == systemListConstructor.systemList[system].systemOwnedBy)
+			{
+				neighboursFound = true;
+				
+				CircleLineIntersection(systemListConstructor.systemList[selectedSystem].systemObject.transform.position, systemListConstructor.systemList[target].systemObject.transform.position);
+				vertexPoints.Add (intersectionOne);
+				CircleLineIntersection(systemListConstructor.systemList[target].systemObject.transform.position, systemListConstructor.systemList[selectedSystem].systemObject.transform.position);
+				vertexPoints.Add (intersectionTwo);
+				CalculateRadius ();
+				
+				float boundOne = Mathf.Rad2Deg * Mathf.Acos (intersectionTwo.x / radius);
+				float boundTwo = Mathf.Rad2Deg * Mathf.Acos (intersectionOne.x / radius);
+				
+				RoundLine (systemListConstructor.systemList [target].systemObject.transform.position, boundOne, boundTwo);
 
-		Vector3 perpendicularVector = new Vector3(Mathf.Cos(Mathf.Deg2Rad * angle), Mathf.Sin(Mathf.Deg2Rad * angle), 0.0f);
+				moveSystem = true;
+			}
+			
+			if(target == system || moveSystem == true)
+			{
+				break;	
+			}
+		}
 
-		Vector3 perpVPos = new Vector3(Mathf.Cos(Mathf.Deg2Rad * angleVPos), Mathf.Sin(Mathf.Deg2Rad * angleVPos), 0.0f);
-		Vector3 perpVNeg = new Vector3(Mathf.Cos(Mathf.Deg2Rad * angleVNeg), Mathf.Sin(Mathf.Deg2Rad * angleVNeg), 0.0f);
+		if(moveSystem == true && target != system)
+		{
+			SetVertexPoints(target);
+		}
 
-		Debug.Log (perpVPos.normalized * radius);
+		if(neighboursFound == false)
+		{
+			CalculateRadius ();
+			RoundLine (systemListConstructor.systemList [system].systemObject.transform.position, -100.0f, 1000.0f);
+		}
+	}
 
-		vertexPoints.Add (systemListConstructor.systemList[system].systemObject.transform.position + (perpVPos.normalized * radius));
-		vertexPoints.Add (systemListConstructor.systemList[system].systemObject.transform.position + (perpendicularVector.normalized * radius));
-		vertexPoints.Add (systemListConstructor.systemList[system].systemObject.transform.position + (perpVNeg.normalized * radius));
+	public void CreateBoundary(int selectedSystem)
+	{
+		lineRenderer = gameObject.GetComponent<LineRenderer> ();
 
-		lineRenderer.SetColors (white, white);
+		vertexPoints.Clear();
+
+		system = selectedSystem;
+
 		lineRenderer.SetWidth (width, width);
+
+		SetVertexPoints (system);
 
 		lineRenderer.SetVertexCount (numberOfPoints * (vertexPoints.Count - 2));
 
@@ -92,7 +139,7 @@ public class EmpireBoundaries : MasterScript
 
 			if(i == vertexPoints.Count - 3)
 			{
-				pointStep = 1f / (numberOfPoints - 1f);
+				pointStep = 1f / (numberOfPoints - 1.0f);
 			}
 
 			for(int j = 0; j < numberOfPoints; ++j)

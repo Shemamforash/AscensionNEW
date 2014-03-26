@@ -58,7 +58,7 @@ public class MapConstructor : MasterScript
 
 			float angle = Vector3.Angle(directionVector1, directionVector2);
 
-			if(angle <= 15.0f)
+			if(angle <= 30.0f)
 			{
 				return false;
 			}
@@ -70,7 +70,7 @@ public class MapConstructor : MasterScript
 			
 			float angle = Vector3.Angle(directionVector1, directionVector2);
 			
-			if(angle <= 15.0f)
+			if(angle <= 30.0f)
 			{
 				return false;
 			}
