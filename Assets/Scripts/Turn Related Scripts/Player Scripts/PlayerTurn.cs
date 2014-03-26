@@ -92,6 +92,8 @@ public class PlayerTurn : TurnInfo
 			systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
 
 			ambientStarRandomiser.AmbientColourChange(system);
+
+			empireBoundaries.CreateBoundary (system);
 			
 			playerTurnScript.capital -= 10.0f;
 
@@ -128,6 +130,8 @@ public class PlayerTurn : TurnInfo
 		lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
 		lineRenderScript.SetRaceLineColour(playerRace);
+
+		empireBoundaries.CreateBoundary(i);
 
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{
