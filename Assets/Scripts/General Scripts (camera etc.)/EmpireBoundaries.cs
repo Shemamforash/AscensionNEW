@@ -9,10 +9,11 @@ public class EmpireBoundaries : MasterScript
 	private float width = 1.5f, radius;
 	private int numberOfPoints = 40, system;
 	private Vector3 intersectionOne, intersectionTwo;
+	private bool finalIteration = false;
 
 	private void RoundLine(Vector3 systemPosition, float boundOne, float boundTwo)
 	{
-		for(int i = 0; i < 19; ++i)
+		for(int i = 0; i < 17; ++i)
 		{
 			if(i * 22.5f < boundOne || i * 22.5f > boundTwo)
 			{
@@ -26,13 +27,13 @@ public class EmpireBoundaries : MasterScript
 		}
 	}
 
-	private void CalculateRadius()
+	private void CalculateRadius(int j)
 	{
 		radius = 100f;
 
-		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[j].permanentConnections.Count; ++i)
 		{
-			float distance = Vector3.Distance(systemListConstructor.systemList[system].systemObject.transform.position, systemListConstructor.systemList[system].permanentConnections[i].transform.position);
+			float distance = Vector3.Distance(systemListConstructor.systemList[j].systemObject.transform.position, systemListConstructor.systemList[j].permanentConnections[i].transform.position);
 			
 			if(radius > distance)
 			{
@@ -43,18 +44,19 @@ public class EmpireBoundaries : MasterScript
 		radius = radius / 2;
 	}
 
-	private void CircleLineIntersection(Vector3 startPoint, Vector3 endPoint)
+	private void CircleLineIntersection(Vector3 startPoint, Vector3 endPoint) //Finally working DO NOT TOUCH
 	{
-		float gradient = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.y); //Straight Line
+		float gradient = (startPoint.y - endPoint.y) / (startPoint.x - endPoint.x); //Straight Line
 		gradient = -(1/gradient);
-		float yIntersect = startPoint.y - gradient * startPoint.x;
+		float yIntersect = startPoint.y - (gradient * startPoint.x);
 
-		float A = (gradient * gradient) + 1;
-		float B = (gradient * yIntersect) - (gradient * startPoint.y) - startPoint.x;
-		float C = (startPoint.y * startPoint.y) - (radius * radius) + (startPoint.x * startPoint.x) - (2 * yIntersect * startPoint.y) + (yIntersect * yIntersect);
+		float A = (gradient * gradient) + 1; //M^2 + 1 This is fine
+		float B = 2 * ((gradient * yIntersect) - (gradient * startPoint.y) - startPoint.x); //2(MC - MB - A) This appears good
+		float C = (startPoint.x * startPoint.x) + (startPoint.y * startPoint.y) + (yIntersect * yIntersect) - (radius * radius) - (2 * startPoint.y * yIntersect); //A^2 + B^2 + C^2 - R^2 - 2BC Fine too
 
-		float xIntersectOne = (-B + Mathf.Sqrt ((B * B) - 4 * A * C)) / (2 * A);
-		float xIntersectTwo = (-B - Mathf.Sqrt ((B * B) - 4 * A * C)) / (2 * A);
+		float xIntersectOne = (-B + Mathf.Sqrt ((B * B) - (4 * A * C))) / (2 * A);
+		float xIntersectTwo = (-B - Mathf.Sqrt ((B * B) - (4 * A * C))) / (2 * A);
+
 		float yIntersectOne = (gradient * xIntersectOne) + yIntersect;
 		float yIntersectTwo = (gradient * xIntersectTwo) + yIntersect;
 
@@ -62,29 +64,79 @@ public class EmpireBoundaries : MasterScript
 		intersectionTwo = new Vector3 (xIntersectTwo, yIntersectTwo, startPoint.z);
 	}
 
+	public void GetBound(int thisSystem, int parentSystem)
+	{
+		float boundOne = Mathf.Rad2Deg * Mathf.Acos (intersectionTwo.x / radius);
+		float boundTwo = 0;
+
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
+		{
+			if(systemListConstructor.systemList[thisSystem].permanentConnections[i] == systemListConstructor.systemList[parentSystem].systemObject)
+			{
+				bool foundNextSystem = false;
+
+				int sys = i;
+
+				while(foundNextSystem == false)
+				{
+					++sys;
+
+					if(sys >= systemListConstructor.systemList[thisSystem].permanentConnections.Count)
+					{
+						sys = 0;
+					}
+
+					int j = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[sys]);
+
+					if(systemListConstructor.systemList[j].systemOwnedBy == systemListConstructor.systemList[thisSystem].systemOwnedBy)
+					{
+						foundNextSystem = true;
+					}
+				}
+
+				CalculateRadius (thisSystem);
+				CircleLineIntersection(systemListConstructor.systemList[thisSystem].systemObject.transform.position, systemListConstructor.systemList[thisSystem].permanentConnections[sys].transform.position);
+				boundTwo = Mathf.Rad2Deg * Mathf.Acos (intersectionOne.x / radius);
+				break;
+			}
+		}
+
+		RoundLine (systemListConstructor.systemList [thisSystem].systemObject.transform.position, boundOne, boundTwo);
+	}
+
+	private void AddVertices(int i, int j)
+	{
+		CalculateRadius (i);
+		
+		CircleLineIntersection(systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[j].systemObject.transform.position);
+
+		if(vertexPoints.Contains(intersectionOne) == true)
+		{
+			vertexPoints.Add (intersectionTwo);
+		}
+		if(vertexPoints.Contains(intersectionOne) == false)
+		{
+			vertexPoints.Add (intersectionOne);
+		}
+	}
+
 	public void SetVertexPoints(int selectedSystem)
 	{
 		bool neighboursFound = false, moveSystem = false;
 		int target = -1;
 
-		for(int i = 0; i < systemListConstructor.systemList[selectedSystem].permanentConnections.Count; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[selectedSystem].permanentConnections.Count; ++i) //For each connection in permanent connections
 		{
-			target = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[i]);
+			target = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[i]); //Target is first owner permanent connections (clockwise)
 			
 			if(systemListConstructor.systemList[target].systemOwnedBy == systemListConstructor.systemList[system].systemOwnedBy)
 			{
 				neighboursFound = true;
-				
-				CircleLineIntersection(systemListConstructor.systemList[selectedSystem].systemObject.transform.position, systemListConstructor.systemList[target].systemObject.transform.position);
-				vertexPoints.Add (intersectionOne);
-				CircleLineIntersection(systemListConstructor.systemList[target].systemObject.transform.position, systemListConstructor.systemList[selectedSystem].systemObject.transform.position);
-				vertexPoints.Add (intersectionTwo);
-				CalculateRadius ();
-				
-				float boundOne = Mathf.Rad2Deg * Mathf.Acos (intersectionTwo.x / radius);
-				float boundTwo = Mathf.Rad2Deg * Mathf.Acos (intersectionOne.x / radius);
-				
-				RoundLine (systemListConstructor.systemList [target].systemObject.transform.position, boundOne, boundTwo);
+
+				AddVertices(system, target);
+				AddVertices(target, system);
+
+				//GetBound(target, selectedSystem);
 
 				moveSystem = true;
 			}
@@ -95,14 +147,19 @@ public class EmpireBoundaries : MasterScript
 			}
 		}
 
-		if(moveSystem == true && target != system)
+		if(moveSystem == true && finalIteration == false)
 		{
+			if(target == system)
+			{
+				finalIteration = true;
+			}
+
 			SetVertexPoints(target);
 		}
 
 		if(neighboursFound == false)
 		{
-			CalculateRadius ();
+			CalculateRadius (system);
 			RoundLine (systemListConstructor.systemList [system].systemObject.transform.position, -100.0f, 1000.0f);
 		}
 	}
@@ -118,6 +175,14 @@ public class EmpireBoundaries : MasterScript
 		lineRenderer.SetWidth (width, width);
 
 		SetVertexPoints (system);
+
+		vertexPoints.Add (vertexPoints [0]);
+		vertexPoints.Add (vertexPoints [1]);
+
+		for(int i = 0; i < vertexPoints.Count; ++i)
+		{
+			Debug.Log (vertexPoints[i]);
+		}
 
 		lineRenderer.SetVertexCount (numberOfPoints * (vertexPoints.Count - 2));
 
