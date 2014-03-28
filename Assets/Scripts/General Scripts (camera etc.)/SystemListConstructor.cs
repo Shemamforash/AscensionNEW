@@ -38,6 +38,8 @@ public class SystemListConstructor : MasterScript
 		ambientStars = GameObject.Find ("ScriptsContainer").GetComponent<AmbientStarRandomiser> ();
 		ambientStars.GenerateStars ();
 
+		empireBoundaries.CalculateRadius ();
+
 		LoadBasicTechTree ();
 
 		for(int i = 0; i < systemList.Count; ++i)
