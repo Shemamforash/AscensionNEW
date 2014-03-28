@@ -5,15 +5,19 @@ using System.IO;
 
 public class MapConstructor : MasterScript
 {
-	private List<ConnectionCoordinates> coordinateList = new List<ConnectionCoordinates>();
+	public List<ConnectionCoordinates> coordinateList = new List<ConnectionCoordinates>();
 	public float distanceMax;
 	public bool connected = false;
+	public List<int> allIntersections = new List<int>();
 
-	public bool TestForIntersection(GameObject thisSystem, GameObject targetSystem)
+	public bool TestForIntersection(Vector3 thisSystem, Vector3 targetSystem, bool includeIntersections)
 	{
-		float A1 = targetSystem.transform.position.y - thisSystem.transform.position.y;
-		float B1 = thisSystem.transform.position.x - targetSystem.transform.position.x;
-		float C1 = (A1 * thisSystem.transform.position.x) + (B1 * thisSystem.transform.position.y);
+		allIntersections.Clear ();
+		bool intersects = false;
+
+		float A1 = targetSystem.y - thisSystem.y;
+		float B1 = thisSystem.x - targetSystem.x;
+		float C1 = (A1 * thisSystem.x) + (B1 * thisSystem.y);
 
 		for (int i = 0; i < coordinateList.Count; ++i) 
 		{
@@ -33,16 +37,25 @@ public class MapConstructor : MasterScript
 
 			Vector2 intersection = new Vector2(x, y);
 
-			if(PointLiesOnLine(thisSystem.transform.position, targetSystem.transform.position, intersection))
+			if(PointLiesOnLine(thisSystem, targetSystem, intersection))
 			{
 				if(PointLiesOnLine(coordinateList[i].systemA, coordinateList[i].systemB, intersection))
 				{
-					return false;
+					if(includeIntersections == true)
+					{
+						allIntersections.Add (i);
+					}
+					intersects = true;
 				}
 			}
 		}
 
-		return true;
+		if(intersects == true)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	public bool TestForAngle(GameObject thisSystem, GameObject targetSystem)
@@ -124,7 +137,7 @@ public class MapConstructor : MasterScript
 				
 				for(int k = 0; k < unlinkedSystems.Count; ++k) //For all unlinked systems
 				{
-					if(TestForIntersection(linkedSystems[j], unlinkedSystems[k]) == false && TestForAngle(linkedSystems[j], unlinkedSystems[k]) == false)
+					if(TestForIntersection(linkedSystems[j].transform.position, unlinkedSystems[k].transform.position, false) == true && TestForAngle(linkedSystems[j], unlinkedSystems[k]) == false)
 					{
 						continue;
 					}
@@ -206,7 +219,9 @@ public class MapConstructor : MasterScript
 		systemListConstructor.systemList [nearestSystem].permanentConnections.Add (systemListConstructor.systemList [thisSystem].systemObject);
 		
 		ConnectionCoordinates connection = new ConnectionCoordinates ();
-		
+
+		connection.systemOne = systemListConstructor.systemList [thisSystem].systemObject;
+		connection.systemTwo = systemListConstructor.systemList [nearestSystem].systemObject;
 		connection.systemA = systemListConstructor.systemList [thisSystem].systemObject.transform.position;
 		connection.systemB = systemListConstructor.systemList [nearestSystem].systemObject.transform.position;
 		
@@ -378,7 +393,7 @@ public class MapConstructor : MasterScript
 					continue;
 				}
 
-				if(TestForIntersection(systemListConstructor.systemList[j].systemObject, systemListConstructor.systemList[targetSystem].systemObject) == true)
+				if(TestForIntersection(systemListConstructor.systemList[j].systemObject.transform.position, systemListConstructor.systemList[targetSystem].systemObject.transform.position, false) == false)
 				{
 					if(TestForAngle(systemListConstructor.systemList[j].systemObject, systemListConstructor.systemList[targetSystem].systemObject) == true)
 					{
@@ -402,6 +417,7 @@ public class MapConstructor : MasterScript
 
 public class ConnectionCoordinates
 {
+	public GameObject systemOne, systemTwo;
 	public Vector3 systemA, systemB;
 }
 

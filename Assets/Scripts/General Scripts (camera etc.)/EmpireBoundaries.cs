@@ -8,8 +8,28 @@ public class EmpireBoundaries : MasterScript
 	private List<Vector3> vertexPoints = new List<Vector3>();
 	private float width = 1.5f, radius;
 	private int numberOfPoints = 40, system;
-	private Vector3 intersectionOne, intersectionTwo;
-	private bool finalIteration = false;
+	private Vector3 intersectionLeft, intersectionRight;
+	private List<Vector3> vectorList = new List<Vector3>();
+
+	public void CalculateRadius()
+	{
+		float tempRadius = 100f;
+
+		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
+		{
+			for(int j = 0; j < systemListConstructor.systemList[i].permanentConnections.Count; ++j)
+			{
+				float tempDistance = Vector3.Distance(systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[i].permanentConnections[j].transform.position);
+
+				if(tempDistance < tempRadius)
+				{
+					tempRadius = tempDistance;
+				}
+			}
+		}
+
+		radius = tempRadius / 2;
+	}
 
 	private void RoundLine(Vector3 systemPosition, float boundOne, float boundTwo)
 	{
@@ -25,23 +45,6 @@ public class EmpireBoundaries : MasterScript
 			Vector3 position = new Vector3(systemPosition.x + xPos, systemPosition.y + yPos, systemPosition.z);
 			vertexPoints.Add(position);
 		}
-	}
-
-	private void CalculateRadius(int j)
-	{
-		radius = 100f;
-
-		for(int i = 0; i < systemListConstructor.systemList[j].permanentConnections.Count; ++i)
-		{
-			float distance = Vector3.Distance(systemListConstructor.systemList[j].systemObject.transform.position, systemListConstructor.systemList[j].permanentConnections[i].transform.position);
-			
-			if(radius > distance)
-			{
-				radius = distance;
-			}
-		}
-
-		radius = radius / 2;
 	}
 
 	private void CircleLineIntersection(Vector3 startPoint, Vector3 endPoint) //Finally working DO NOT TOUCH
@@ -60,67 +63,145 @@ public class EmpireBoundaries : MasterScript
 		float yIntersectOne = (gradient * xIntersectOne) + yIntersect;
 		float yIntersectTwo = (gradient * xIntersectTwo) + yIntersect;
 
-		intersectionOne = new Vector3 (xIntersectOne, yIntersectOne, startPoint.z);
-		intersectionTwo = new Vector3 (xIntersectTwo, yIntersectTwo, startPoint.z);
+		float A1 = endPoint.y - startPoint.y;
+		float B1 = startPoint.x - endPoint.x;
+		float C1 = (A1 * startPoint.x) + (B1 * endPoint.y);
+
+		Vector3 line = endPoint - startPoint;
+
+		Vector3 cross = Vector3.Cross (line, new Vector3 (xIntersectOne, yIntersectOne, 0f));
+
+		Debug.Log ("Cross " + cross);
+
+		if(cross.z <= 0)
+		{
+			intersectionLeft = new Vector3 (xIntersectOne, yIntersectOne, startPoint.z);
+			intersectionRight = new Vector3 (xIntersectTwo, yIntersectTwo, startPoint.z);
+		}
+		if(cross.z > 0)
+		{
+			intersectionRight = new Vector3 (xIntersectOne, yIntersectOne, startPoint.z);
+			intersectionLeft = new Vector3 (xIntersectTwo, yIntersectTwo, startPoint.z);
+		}
 	}
 
-	public void GetBound(int thisSystem, int parentSystem)
+	public void GetBound(int thisSystem, int parentSystem) //Gets bounds between systems
 	{
-		float boundOne = Mathf.Rad2Deg * Mathf.Acos (intersectionTwo.x / radius);
-		float boundTwo = 0;
+		float boundOne = Mathf.Rad2Deg * Mathf.Acos (intersectionRight.x / radius); //Bound one is connection point between system and parent
+		float boundTwo = 0; //Reset boundtwo
 
-		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i) //For all permanent connections
 		{
-			if(systemListConstructor.systemList[thisSystem].permanentConnections[i] == systemListConstructor.systemList[parentSystem].systemObject)
+			if(systemListConstructor.systemList[thisSystem].permanentConnections[i] == systemListConstructor.systemList[parentSystem].systemObject) //If connection == parent system
 			{
-				bool foundNextSystem = false;
+				bool foundNextSystem = false; //Default variables
 
 				int sys = i;
 
-				while(foundNextSystem == false)
+				while(foundNextSystem == false) //While next system == false
 				{
-					++sys;
+					++sys; //Increase the iterator of permanentconnections
 
-					if(sys >= systemListConstructor.systemList[thisSystem].permanentConnections.Count)
+					if(sys >= systemListConstructor.systemList[thisSystem].permanentConnections.Count) //If iterator is greater than count, reset to 0
 					{
 						sys = 0;
 					}
 
 					int j = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[sys]);
 
-					if(systemListConstructor.systemList[j].systemOwnedBy == systemListConstructor.systemList[thisSystem].systemOwnedBy)
+					if(systemListConstructor.systemList[j].systemOwnedBy == systemListConstructor.systemList[thisSystem].systemOwnedBy) //If connected system is owned by player
 					{
-						foundNextSystem = true;
+						foundNextSystem = true; //Found next system to move to
 					}
 				}
 
-				CalculateRadius (thisSystem);
-				CircleLineIntersection(systemListConstructor.systemList[thisSystem].systemObject.transform.position, systemListConstructor.systemList[thisSystem].permanentConnections[sys].transform.position);
-				boundTwo = Mathf.Rad2Deg * Mathf.Acos (intersectionOne.x / radius);
+				CircleLineIntersection(systemListConstructor.systemList[thisSystem].systemObject.transform.position, systemListConstructor.systemList[thisSystem].permanentConnections[sys].transform.position); //Get new intersection
+				boundTwo = Mathf.Rad2Deg * Mathf.Acos (intersectionLeft.x / radius); //Set bound two to point of intersection
 				break;
 			}
 		}
 
-		RoundLine (systemListConstructor.systemList [thisSystem].systemObject.transform.position, boundOne, boundTwo);
+		RoundLine (systemListConstructor.systemList [thisSystem].systemObject.transform.position, boundOne, boundTwo); //Round the line off between bounds one and two
 	}
 
-	private void AddVertices(int i, int j)
+	private bool AddVertices(int i, int j)
 	{
-		CalculateRadius (i);
-		
-		CircleLineIntersection(systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[j].systemObject.transform.position);
+		int k = 0; //Reset counter
 
-		if(vertexPoints.Contains(intersectionOne) == true)
+		CircleLineIntersection(systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[j].systemObject.transform.position); //Find intersections of perpline and circle
+
+		if(vertexPoints.Contains(intersectionLeft)) //If vertexpoints contains the left intersection, increase the counter
 		{
-			vertexPoints.Add (intersectionTwo);
+			++k;
 		}
-		if(vertexPoints.Contains(intersectionOne) == false)
+
+		vertexPoints.Add (intersectionLeft); //Add the intersection to vertexpoints
+
+		CircleLineIntersection(systemListConstructor.systemList[j].systemObject.transform.position, systemListConstructor.systemList[i].systemObject.transform.position); //Find intersection of perpline in reverse
+
+		if(vertexPoints.Contains(intersectionRight)) //If vertexpoints contains corresponding intersection on nearest circle, increase counter
 		{
-			vertexPoints.Add (intersectionOne);
+			++k;
 		}
+
+		vertexPoints.Add (intersectionRight); //Add the intersection to vertexpoints
+
+		Debug.Log ("VertexPoints " + intersectionLeft + " | " + intersectionRight);
+
+		//GetBound (i, j)
+		if(k == 2) //If both intersections are already in vertexpoints, we must be at the beginning
+		{
+			return false; //Return
+		}
+
+		return true; //Continue
 	}
 
-	public void SetVertexPoints(int selectedSystem)
+	public bool IsBoundarySystem(int currentSystem) //Checks if system is a boundary system
+	{
+		vectorList.Clear (); //Clear list
+
+		//Create vectors to represent +/- x and y lines originating from system
+		Vector3 left = new Vector3(systemListConstructor.systemList[currentSystem].systemObject.transform.position.x - 0.5f, -20f, systemListConstructor.systemList[currentSystem].systemObject.transform.position.z);
+		Vector3 right = new Vector3(systemListConstructor.systemList[currentSystem].systemObject.transform.position.x + 0.5f, 110f, systemListConstructor.systemList[currentSystem].systemObject.transform.position.z);
+		Vector3 above = new Vector3(110f, systemListConstructor.systemList[currentSystem].systemObject.transform.position.y + 0.5f, systemListConstructor.systemList[currentSystem].systemObject.transform.position.z);
+		Vector3 below = new Vector3(-20f, systemListConstructor.systemList[currentSystem].systemObject.transform.position.y - 0.5f, systemListConstructor.systemList[currentSystem].systemObject.transform.position.z);
+
+		//Add to list
+		vectorList.Add (left);
+		vectorList.Add (right);
+		vectorList.Add (above);
+		vectorList.Add (below);
+
+		int counter = 0;
+
+		for(int i = 0; i < vectorList.Count; ++i)
+		{
+			if(mapConstructor.TestForIntersection(systemListConstructor.systemList[currentSystem].systemObject.transform.position, vectorList[i], true) == true) //Check to see if these vectors intersect with any connections
+			{
+				for(int j = 0; j < mapConstructor.allIntersections.Count; ++j) //Returns an array of all intersections
+				{
+					int k = RefreshCurrentSystem(mapConstructor.coordinateList[mapConstructor.allIntersections[j]].systemOne); 
+					int l = RefreshCurrentSystem(mapConstructor.coordinateList[mapConstructor.allIntersections[j]].systemTwo);
+
+					if(systemListConstructor.systemList[k].systemOwnedBy == systemListConstructor.systemList[currentSystem].systemOwnedBy && 
+					   systemListConstructor.systemList[l].systemOwnedBy == systemListConstructor.systemList[currentSystem].systemOwnedBy) //If both systems in connection are owned by player
+					{
+						++counter; //This is not a boundary system
+					}
+				}
+			}
+		}
+
+		if(counter < 4)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public void SetVertexPoints(int selectedSystem, bool isInitial)
 	{
 		bool neighboursFound = false, moveSystem = false;
 		int target = -1;
@@ -128,60 +209,71 @@ public class EmpireBoundaries : MasterScript
 		for(int i = 0; i < systemListConstructor.systemList[selectedSystem].permanentConnections.Count; ++i) //For each connection in permanent connections
 		{
 			target = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[i]); //Target is first owner permanent connections (clockwise)
-			
-			if(systemListConstructor.systemList[target].systemOwnedBy == systemListConstructor.systemList[system].systemOwnedBy)
+
+			if(systemListConstructor.systemList[target].systemOwnedBy == systemListConstructor.systemList[selectedSystem].systemOwnedBy)
 			{
-				neighboursFound = true;
-
-				AddVertices(system, target);
-				AddVertices(target, system);
-
-				//GetBound(target, selectedSystem);
-
-				moveSystem = true;
+				if(IsBoundarySystem(target) == true)
+				{
+					neighboursFound = true;
+					
+					bool tempBool = AddVertices(system, target);
+					
+					if(tempBool == true)
+					{
+						moveSystem = true;
+					}
+				}
 			}
 			
-			if(target == system || moveSystem == true)
+			if(moveSystem == true)
 			{
 				break;	
 			}
 		}
 
-		if(moveSystem == true && finalIteration == false)
+		if(selectedSystem == system && isInitial == false)
 		{
-			if(target == system)
-			{
-				finalIteration = true;
-			}
+			moveSystem = false;
+		}
 
-			SetVertexPoints(target);
+		if(moveSystem == true)
+		{
+			SetVertexPoints(target, false);
 		}
 
 		if(neighboursFound == false)
 		{
-			CalculateRadius (system);
 			RoundLine (systemListConstructor.systemList [system].systemObject.transform.position, -100.0f, 1000.0f);
 		}
 	}
 
-	public void CreateBoundary(int selectedSystem)
+	public void CreateBoundary(string race)
 	{
-		lineRenderer = gameObject.GetComponent<LineRenderer> ();
+		lineRenderer = gameObject.GetComponent<LineRenderer> (); //Get reference to linerenderer component
 
-		vertexPoints.Clear();
+		vertexPoints.Clear(); //Clear current linerenderer vertices
 
-		system = selectedSystem;
+		lineRenderer.SetWidth (width, width); //Set width
 
-		lineRenderer.SetWidth (width, width);
+		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
+		{
+			if(systemListConstructor.systemList[i].systemOwnedBy == race && IsBoundarySystem(i) == true) //Find a boundary system
+			{
+				system = i; //Set starting system to this system
+			}
+		}
 
-		SetVertexPoints (system);
-
-		vertexPoints.Add (vertexPoints [0]);
-		vertexPoints.Add (vertexPoints [1]);
+		SetVertexPoints (system, true); //Set all the other vertex points
 
 		for(int i = 0; i < vertexPoints.Count; ++i)
 		{
-			Debug.Log (vertexPoints[i]);
+			Debug.Log ("Vertex " + vertexPoints[i]);
+
+			if(vertexPoints.Count < 8)
+			{
+				AmbientStarRandomiser ambientStars = GameObject.Find ("ScriptsContainer").GetComponent<AmbientStarRandomiser> ();;
+				GameObject thingy = (GameObject)Instantiate(ambientStars.ambientStar, vertexPoints[i], Quaternion.identity);
+			}
 		}
 
 		lineRenderer.SetVertexCount (numberOfPoints * (vertexPoints.Count - 2));
