@@ -99,7 +99,7 @@ public class RacialTraits : MasterScript
 			{
 				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
 				
-				if(tempString == "Molten" || tempString == "Desert" || tempString == "Rocky")
+				if(tempString == "Molten" || tempString == "Chasm" || tempString == "Waste")
 				{
 					systemSIMData.totalSystemAmber += (tempMod * 2f) * improvementsBasic.amberProductionBonus;
 				}

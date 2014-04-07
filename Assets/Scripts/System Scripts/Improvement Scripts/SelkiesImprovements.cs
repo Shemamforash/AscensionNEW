@@ -68,14 +68,14 @@ public class SelkiesImprovements : MasterScript
 					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
 				}
 				
-				if(tempString == "Plains")
+				if(tempString == "Prairie")
 				{
 					systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots = 3;
 					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
 				}
 			}
 			
-			improvements.listOfImprovements[23].improvementMessage = ("+1/+2 Improvement Slot(s) on Plains/Molten Planets");
+			improvements.listOfImprovements[23].improvementMessage = ("+1/+2 Improvement Slot(s) on Prairie/Molten Planets");
 		}
 
 		if(improvements.listOfImprovements[31].hasBeenBuilt == true)

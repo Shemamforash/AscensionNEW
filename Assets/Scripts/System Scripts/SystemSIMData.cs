@@ -135,7 +135,7 @@ public class SystemSIMData : MasterScript
 		{
 			string tempString = systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetType;
 			
-			if(tempString == "Molten" || tempString == "Desert" || tempString == "Rocky")
+			if(tempString == "Molten" || tempString == "Chasm" || tempString == "Waste")
 			{
 				planetScienceModifier = 0f;
 				planetIndustryModifier += planetIndustryModifier * 0.5f;

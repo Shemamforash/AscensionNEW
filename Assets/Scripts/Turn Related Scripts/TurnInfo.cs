@@ -90,7 +90,7 @@ public class TurnInfo : MasterScript
 			raceIndustry = 1.4f * gameSpeedModifer;
 			raceCapital = 10.5f;
 			homeSystem = "Samael";
-			homePlanetType = "Plains";
+			homePlanetType = "Prairie";
 			materialInUse = turnInfoScript.selkiesMaterial;
 		}
 		if(playerRace == "Nereides")
@@ -99,7 +99,7 @@ public class TurnInfo : MasterScript
 			raceIndustry = 1 * gameSpeedModifer;
 			raceCapital = 0.4f;
 			homeSystem = "Nepthys";
-			homePlanetType = "Icy";
+			homePlanetType = "Boreal";
 			materialInUse = turnInfoScript.nereidesMaterial;
 		}
 	}

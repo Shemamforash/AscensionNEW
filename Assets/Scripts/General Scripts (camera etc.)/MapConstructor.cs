@@ -92,7 +92,7 @@ public class MapConstructor : MasterScript
 		return true;
 	}
 
-	private bool PointLiesOnLine(Vector3 systemA, Vector3 systemB, Vector2 intersection)
+	public bool PointLiesOnLine(Vector3 systemA, Vector3 systemB, Vector2 intersection)
 	{
 		Vector2 point1 = new Vector2(systemA.x, systemA.y);
 		Vector2 point2 = new Vector2(systemB.x, systemB.y);
