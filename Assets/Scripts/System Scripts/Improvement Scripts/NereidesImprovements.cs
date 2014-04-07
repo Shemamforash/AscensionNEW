@@ -26,13 +26,13 @@ public class NereidesImprovements : MasterScript
 			{
 				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
 				
-				if(tempString == "Icy" || tempString == "Tundra" || tempString == "Dead")
+				if(tempString == "Boreal" || tempString == "Tundra" || tempString == "Desolate")
 				{
 					improvements.tempCount += 1f;
 				}
 			}
 
-			if(improvements.IsBuiltOnPlanetType(system, 22, "Icy") == true)
+			if(improvements.IsBuiltOnPlanetType(system, 22, "Boreal") == true)
 			{
 				improvements.tempCount = improvements.tempCount * 2f;
 			}
@@ -47,7 +47,7 @@ public class NereidesImprovements : MasterScript
 			{
 				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
 				
-				if(tempString == "Icy")
+				if(tempString == "Boreal")
 				{
 					systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots = 3;
 					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
@@ -60,7 +60,7 @@ public class NereidesImprovements : MasterScript
 				}
 			}
 			
-			improvements.listOfImprovements[23].improvementMessage = ("+1 Improvement Slot on Tundra and Icy Planets");
+			improvements.listOfImprovements[23].improvementMessage = ("+1 Improvement Slot on Tundra and Boreal Planets");
 		}
 		
 		if(improvements.listOfImprovements[24].hasBeenBuilt == true)
@@ -73,7 +73,7 @@ public class NereidesImprovements : MasterScript
 			improvements.scienceBonusModifier += 1.0f;
 			improvements.tempCount = 100f;
 
-			if(improvements.IsBuiltOnPlanetType(system, 25, "Icy") == true)
+			if(improvements.IsBuiltOnPlanetType(system, 25, "Boreal") == true)
 			{
 				improvements.scienceBonusModifier += 1.5f;
 				improvements.tempCount = 150f;
@@ -86,7 +86,7 @@ public class NereidesImprovements : MasterScript
 		{
 			improvements.tempCount = 0.1f;
 
-			if(improvements.IsBuiltOnPlanetType(system, 26, "Icy") == true || improvements.IsBuiltOnPlanetType(system, 26, "Tundra") == true || improvements.IsBuiltOnPlanetType(system, 26, "Dead") == true)
+			if(improvements.IsBuiltOnPlanetType(system, 26, "Boreal") == true || improvements.IsBuiltOnPlanetType(system, 26, "Tundra") == true || improvements.IsBuiltOnPlanetType(system, 26, "Desolate") == true)
 			{
 				improvements.tempCount = 0.15f;
 			}

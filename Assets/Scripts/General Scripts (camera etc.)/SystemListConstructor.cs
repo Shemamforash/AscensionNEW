@@ -196,7 +196,7 @@ public class SystemListConstructor : MasterScript
 
 	public void PlanetRead()
 	{		
-		using(XmlReader reader =  XmlReader.Create("PlanetSicData.xml"))
+		using(XmlReader reader =  XmlReader.Create("PlanetSICData.xml"))
 		{
 			while(reader.Read ())
 			{

@@ -8,7 +8,7 @@ public class EmpireBoundaries : MasterScript
 	private List<Vector3> vertexPoints = new List<Vector3>();
 	private float width = 1.5f, radius;
 	private int numberOfPoints = 40, system;
-	private Vector3 intersectionLeft, intersectionRight;
+	private Vector3 intersectionLeftStart, intersectionLeftEnd;
 	private List<Vector3> vectorList = new List<Vector3>();
 
 	public void CalculateRadius()
@@ -49,45 +49,91 @@ public class EmpireBoundaries : MasterScript
 
 	private void CircleLineIntersection(Vector3 startPoint, Vector3 endPoint) //Finally working DO NOT TOUCH
 	{
-		float gradient = (startPoint.y - endPoint.y) / (startPoint.x - endPoint.x); //Straight Line
-		gradient = -(1/gradient);
-		float yIntersect = startPoint.y - (gradient * startPoint.x);
+		float posGradient = (startPoint.y - endPoint.y) / (startPoint.x - endPoint.x); //Straight Line
+		float yIntersect0 = startPoint.y - (posGradient * startPoint.x);
+		float negGradient = -(1/posGradient);
+		float yIntersect1 = startPoint.y - (negGradient * startPoint.x);
+		float yIntersect2 = endPoint.y - (negGradient * endPoint.x);
 
-		float A = (gradient * gradient) + 1; //M^2 + 1 This is fine
-		float B = 2 * ((gradient * yIntersect) - (gradient * startPoint.y) - startPoint.x); //2(MC - MB - A) This appears good
-		float C = (startPoint.x * startPoint.x) + (startPoint.y * startPoint.y) + (yIntersect * yIntersect) - (radius * radius) - (2 * startPoint.y * yIntersect); //A^2 + B^2 + C^2 - R^2 - 2BC Fine too
+		float A1 = (negGradient * negGradient) + 1; //M^2 + 1 This is fine
+		float B1 = 2 * ((negGradient * yIntersect1) - (negGradient * startPoint.y) - startPoint.x); //2(MC - MB - A) This appears good
+		float C1 = (startPoint.x * startPoint.x) + (startPoint.y * startPoint.y) + (yIntersect1 * yIntersect1) - (radius * radius) - (2 * startPoint.y * yIntersect1); //A^2 + B^2 + C^2 - R^2 - 2BC Fine too
 
-		float xIntersectOne = (-B + Mathf.Sqrt ((B * B) - (4 * A * C))) / (2 * A);
-		float xIntersectTwo = (-B - Mathf.Sqrt ((B * B) - (4 * A * C))) / (2 * A);
+		float A2 = (negGradient * negGradient) + 1; //M^2 + 1 This is fine
+		float B2 = 2 * ((negGradient * yIntersect2) - (negGradient * endPoint.y) - endPoint.x); //2(MC - MB - A) This appears good
+		float C2 = (endPoint.x * endPoint.x) + (endPoint.y * endPoint.y) + (yIntersect2 * yIntersect2) - (radius * radius) - (2 * endPoint.y * yIntersect2); //A^2 + B^2 + C^2 - R^2 - 2BC Fine too
 
-		float yIntersectOne = (gradient * xIntersectOne) + yIntersect;
-		float yIntersectTwo = (gradient * xIntersectTwo) + yIntersect;
+		float xIntersectOneA = (-B1 + Mathf.Sqrt ((B1 * B1) - (4 * A1 * C1))) / (2 * A1);
+		float xIntersectTwoA = (-B1 - Mathf.Sqrt ((B1 * B1) - (4 * A1 * C1))) / (2 * A1);
 
-		float A1 = endPoint.y - startPoint.y;
-		float B1 = startPoint.x - endPoint.x;
-		float C1 = (A1 * startPoint.x) + (B1 * endPoint.y);
+		float yIntersectOneA = (negGradient * xIntersectOneA) + yIntersect1;
+		float yIntersectTwoA = (negGradient * xIntersectTwoA) + yIntersect1;
 
-		Vector3 line = endPoint - startPoint;
+		float xIntersectOneB = (-B2 + Mathf.Sqrt ((B2 * B2) - (4 * A2 * C2))) / (2 * A2);
+		float xIntersectTwoB = (-B2 - Mathf.Sqrt ((B2 * B2) - (4 * A2 * C2))) / (2 * A2);
+		
+		float yIntersectOneB = (negGradient * xIntersectOneB) + yIntersect2;
+		float yIntersectTwoB = (negGradient * xIntersectTwoB) + yIntersect2;
 
-		Vector3 cross = Vector3.Cross (line, new Vector3 (xIntersectOne, yIntersectOne, 0f));
+		bool inverse = false;
 
-		Debug.Log ("Cross " + cross);
-
-		if(cross.z <= 0)
+		if(startPoint.y > endPoint.y)
 		{
-			intersectionLeft = new Vector3 (xIntersectOne, yIntersectOne, startPoint.z);
-			intersectionRight = new Vector3 (xIntersectTwo, yIntersectTwo, startPoint.z);
+			inverse = true;
 		}
-		if(cross.z > 0)
+
+		if(xIntersectOneA < (yIntersectOneA - yIntersect0 / posGradient))
 		{
-			intersectionRight = new Vector3 (xIntersectOne, yIntersectOne, startPoint.z);
-			intersectionLeft = new Vector3 (xIntersectTwo, yIntersectTwo, startPoint.z);
+			if(inverse == true)
+			{
+				intersectionLeftStart = new Vector3(xIntersectTwoA, yIntersectTwoA, startPoint.z);
+			}
+			else
+			{
+				intersectionLeftStart = new Vector3 (xIntersectOneA, yIntersectOneA, startPoint.z);
+			}
+		}
+
+		if(xIntersectOneA > (yIntersectOneA - yIntersect0 / posGradient))
+		{
+			if(inverse == true)
+			{
+				intersectionLeftStart = new Vector3 (xIntersectOneA, yIntersectOneA, startPoint.z);
+			}
+			else
+			{
+				intersectionLeftStart = new Vector3(xIntersectTwoA, yIntersectTwoA, startPoint.z);
+			}
+		}
+
+		if(xIntersectOneB < (yIntersectOneB - yIntersect0 / posGradient))
+		{
+			if(inverse == true)
+			{
+				intersectionLeftEnd = new Vector3 (xIntersectTwoB, yIntersectTwoB, startPoint.z);
+			}
+			else
+			{
+				intersectionLeftEnd = new Vector3 (xIntersectOneB, yIntersectOneB, startPoint.z);
+			}
+		}
+
+		if(xIntersectOneB > (yIntersectOneB - yIntersect0 / posGradient))
+		{
+			if(inverse == true)
+			{
+				intersectionLeftEnd = new Vector3 (xIntersectOneB, yIntersectOneB, startPoint.z);
+			}
+			else
+			{
+				intersectionLeftEnd = new Vector3 (xIntersectTwoB, yIntersectTwoB, startPoint.z);
+			}
 		}
 	}
 
 	public void GetBound(int thisSystem, int parentSystem) //Gets bounds between systems
 	{
-		float boundOne = Mathf.Rad2Deg * Mathf.Acos (intersectionRight.x / radius); //Bound one is connection point between system and parent
+		float boundOne = Mathf.Rad2Deg * Mathf.Acos (intersectionLeftEnd.x / radius); //Bound one is connection point between system and parent
 		float boundTwo = 0; //Reset boundtwo
 
 		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i) //For all permanent connections
@@ -116,7 +162,7 @@ public class EmpireBoundaries : MasterScript
 				}
 
 				CircleLineIntersection(systemListConstructor.systemList[thisSystem].systemObject.transform.position, systemListConstructor.systemList[thisSystem].permanentConnections[sys].transform.position); //Get new intersection
-				boundTwo = Mathf.Rad2Deg * Mathf.Acos (intersectionLeft.x / radius); //Set bound two to point of intersection
+				boundTwo = Mathf.Rad2Deg * Mathf.Acos (intersectionLeftStart.x / radius); //Set bound two to point of intersection
 				break;
 			}
 		}
@@ -130,25 +176,23 @@ public class EmpireBoundaries : MasterScript
 
 		CircleLineIntersection(systemListConstructor.systemList[i].systemObject.transform.position, systemListConstructor.systemList[j].systemObject.transform.position); //Find intersections of perpline and circle
 
-		if(vertexPoints.Contains(intersectionLeft)) //If vertexpoints contains the left intersection, increase the counter
+		if(vertexPoints.Contains(intersectionLeftStart)) //If vertexpoints contains the left intersection, increase the counter
 		{
 			++k;
 		}
 
-		vertexPoints.Add (intersectionLeft); //Add the intersection to vertexpoints
+		else
+		{
+			vertexPoints.Add (intersectionLeftStart); //Add the intersection to vertexpoints
+		}
 
-		CircleLineIntersection(systemListConstructor.systemList[j].systemObject.transform.position, systemListConstructor.systemList[i].systemObject.transform.position); //Find intersection of perpline in reverse
-
-		if(vertexPoints.Contains(intersectionRight)) //If vertexpoints contains corresponding intersection on nearest circle, increase counter
+		if(vertexPoints.Contains(intersectionLeftEnd)) //If vertexpoints contains corresponding intersection on nearest circle, increase counter
 		{
 			++k;
 		}
 
-		vertexPoints.Add (intersectionRight); //Add the intersection to vertexpoints
+		vertexPoints.Add (intersectionLeftEnd); //Add the intersection to vertexpoints
 
-		Debug.Log ("VertexPoints " + intersectionLeft + " | " + intersectionRight);
-
-		//GetBound (i, j)
 		if(k == 2) //If both intersections are already in vertexpoints, we must be at the beginning
 		{
 			return false; //Return
@@ -201,14 +245,30 @@ public class EmpireBoundaries : MasterScript
 		return false;
 	}
 
-	public void SetVertexPoints(int selectedSystem, bool isInitial)
+	public void SetVertexPoints(int selectedSystem, int prevSystem, bool isInitial)
 	{
 		bool neighboursFound = false, moveSystem = false;
-		int target = -1;
+		int target = -1, startingIterator = 0;
+
+		if(isInitial == false)
+		{
+			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].permanentConnections.Count; ++i)
+			{
+				if(systemListConstructor.systemList[selectedSystem].permanentConnections[i] == systemListConstructor.systemList[prevSystem].systemObject)
+				{
+					startingIterator = i + 1;
+				}                                                                                                         
+			}
+		}
 
 		for(int i = 0; i < systemListConstructor.systemList[selectedSystem].permanentConnections.Count; ++i) //For each connection in permanent connections
 		{
-			target = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[i]); //Target is first owner permanent connections (clockwise)
+			if(startingIterator >= systemListConstructor.systemList[selectedSystem].permanentConnections.Count)
+			{
+				startingIterator = 0;
+			}
+
+			target = RefreshCurrentSystem(systemListConstructor.systemList[selectedSystem].permanentConnections[startingIterator]); //Target is first owner permanent connections (clockwise)
 
 			if(systemListConstructor.systemList[target].systemOwnedBy == systemListConstructor.systemList[selectedSystem].systemOwnedBy)
 			{
@@ -216,7 +276,7 @@ public class EmpireBoundaries : MasterScript
 				{
 					neighboursFound = true;
 					
-					bool tempBool = AddVertices(system, target);
+					bool tempBool = AddVertices(selectedSystem, target);
 					
 					if(tempBool == true)
 					{
@@ -229,6 +289,8 @@ public class EmpireBoundaries : MasterScript
 			{
 				break;	
 			}
+
+			startingIterator++;
 		}
 
 		if(selectedSystem == system && isInitial == false)
@@ -238,12 +300,42 @@ public class EmpireBoundaries : MasterScript
 
 		if(moveSystem == true)
 		{
-			SetVertexPoints(target, false);
+			SetVertexPoints(target, selectedSystem, false);
 		}
 
 		if(neighboursFound == false)
 		{
 			RoundLine (systemListConstructor.systemList [system].systemObject.transform.position, -100.0f, 1000.0f);
+		}
+	}
+
+	private void CheckForIntersection(int i)
+	{
+		float A1 = vertexPoints[i - 3].y - vertexPoints[i - 2].y;
+		float B1 = vertexPoints[i - 2].x - vertexPoints[i - 3].x;
+		float C1 = (A1 * vertexPoints[i - 2].x) + (B1 * vertexPoints[i - 2].y);
+
+		float A2 = vertexPoints[i - 1].y - vertexPoints[i].y;
+		float B2 = vertexPoints[i].x - vertexPoints[i - 1].x;
+		float C2 = (A2 * vertexPoints[i].x) + (B2 * vertexPoints[i].y);
+		
+		float determinant = (A1 * B2) - (A2 * B1);
+		
+		if (determinant != 0.0f) 
+		{
+			float x = (B2 * C1 - B1 * C2) / determinant;
+			float y = (A1 * C2 - A2 * C1) / determinant;
+			
+			Vector2 intersection = new Vector2(x, y);
+			
+			if(mapConstructor.PointLiesOnLine(vertexPoints[i - 3], vertexPoints[i - 2], intersection))
+			{
+				if(mapConstructor.PointLiesOnLine(vertexPoints[i - 1], vertexPoints[i], intersection))
+				{
+					vertexPoints[i - 2] = new Vector3(intersection.x, intersection.y, vertexPoints[i].z);
+					vertexPoints.RemoveAt (i - 1);
+				}
+			}
 		}
 	}
 
@@ -263,18 +355,15 @@ public class EmpireBoundaries : MasterScript
 			}
 		}
 
-		SetVertexPoints (system, true); //Set all the other vertex points
+		SetVertexPoints (system, -1, true); //Set all the other vertex points
 
-		for(int i = 0; i < vertexPoints.Count; ++i)
+		for(int i = 3; i < vertexPoints.Count; ++i)
 		{
-			Debug.Log ("Vertex " + vertexPoints[i]);
-
-			if(vertexPoints.Count < 8)
-			{
-				AmbientStarRandomiser ambientStars = GameObject.Find ("ScriptsContainer").GetComponent<AmbientStarRandomiser> ();;
-				GameObject thingy = (GameObject)Instantiate(ambientStars.ambientStar, vertexPoints[i], Quaternion.identity);
-			}
+			CheckForIntersection(i);
 		}
+
+		vertexPoints.Add (vertexPoints [0]);
+		vertexPoints.Add (vertexPoints [1]);
 
 		lineRenderer.SetVertexCount (numberOfPoints * (vertexPoints.Count - 2));
 
