@@ -12,7 +12,7 @@ public class TurnInfo : MasterScript
 	public string[,] planetRIM = new string[12,5];
 	public List<PlanetPower> mostPowerfulPlanets = new List<PlanetPower>();
 	[HideInInspector]
-	public bool playerHasWon, startSteps;
+	public bool playerHasWon, startSteps, isPlayer;
 	public Camera mainCamera;
 	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse, emptyMaterial;
 	public string playerRace, homePlanetType, playerHasWonRace, homeSystem;

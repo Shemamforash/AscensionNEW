@@ -43,19 +43,19 @@ public class HeroMovement : MasterScript
 		tempRoute.Clear ();
 		nodeTiers.Clear ();
 
-		queuedVertices.Enqueue (heroScript.heroLocation);
+		queuedVertices.Enqueue (heroScript.heroLocation); //Add hero's current location
 		
-		while(queuedVertices.Count > 0)
+		while(queuedVertices.Count > 0) //While queue has contents
 		{
-			GameObject currentObject = queuedVertices.Dequeue ();
+			GameObject currentObject = queuedVertices.Dequeue (); //Current object is first queue object
 			
-			if(currentObject == pathfindTarget)
+			if(currentObject == pathfindTarget) //If the current object is equal to the target
 			{
-				tempRoute.Add (pathfindTarget);
+				tempRoute.Add (pathfindTarget); //Add it to the temproute
 				
-				while(currentObject != heroScript.heroLocation)
+				while(currentObject != heroScript.heroLocation) //While the current object doesnt equal the hero's location
 				{
-					for(int i = 0; i < nodeTiers.Count; ++i)
+					for(int i = 0; i < nodeTiers.Count; ++i) //Recursively add the nodes to a list to form a route
 					{
 						if(nodeTiers[i].thisNode == currentObject)
 						{
@@ -71,18 +71,18 @@ public class HeroMovement : MasterScript
 			
 			int k = RefreshCurrentSystem(currentObject);
 			
-			for(int j = 0; j < systemListConstructor.systemList[k].permanentConnections.Count; ++j)
+			for(int j = 0; j < systemListConstructor.systemList[k].permanentConnections.Count; ++j) //For all systems connected to this system
 			{
-				GameObject tempObject = systemListConstructor.systemList[k].permanentConnections[j];
+				GameObject tempObject = systemListConstructor.systemList[k].permanentConnections[j]; //Get a reference to the system
 				
-				if(visitedVertices.Contains(tempObject) == false)
+				if(visitedVertices.Contains(tempObject) == false) //If the system has not been visited
 				{
-					visitedVertices.Add (tempObject);
-					queuedVertices.Enqueue(tempObject);
+					visitedVertices.Add (tempObject); //Set it to visitied
+					queuedVertices.Enqueue(tempObject); //Queue it up
 					
-					PathFindingNodes node = new PathFindingNodes();
+					PathFindingNodes node = new PathFindingNodes(); //Add new pathfinding node
 					
-					node.precededBy = currentObject;
+					node.precededBy = currentObject; //Set up node
 					node.thisNode = tempObject;
 					
 					nodeTiers.Add (node);

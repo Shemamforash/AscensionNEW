@@ -18,9 +18,11 @@ public class LineRenderScript : MasterScript
 	[HideInInspector]
 	private GameObject objectB;
 	public Material opaqueMaterial;
+	private Transform connectorLineContainer;
 
 	public void StartUp()
 	{	
+		connectorLineContainer = GameObject.Find ("Connector Lines Container").transform;
 		systemSIMData = gameObject.GetComponent<SystemSIMData>();
 		thisSystem = RefreshCurrentSystem (gameObject);
 
@@ -94,6 +96,8 @@ public class LineRenderScript : MasterScript
 		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 		{
 			GameObject clone = (GameObject)Instantiate (aQuad, connectorLines[i].midPoint, connectorLines[i].rotation);
+
+			clone.transform.parent = connectorLineContainer;
 
 			clone.transform.localScale = connectorLines[i].scale;
 

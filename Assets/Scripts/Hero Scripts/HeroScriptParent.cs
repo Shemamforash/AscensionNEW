@@ -9,9 +9,10 @@ public class HeroScriptParent : MasterScript
 	public int currentLevel = 1, movementSpeed, planetInvade = -1, system;
 	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength; 
 	public string heroTier2 = null, heroTier3 = null, heroOwnedBy, heroShipType;
-	public bool isInvading = false, canLevelUp, reachedLevel2, reachedLevel3;
+	public bool isInvading = false, canLevelUp, reachedLevel2, reachedLevel3, isBusy;
 	public float heroAge, classModifier, maxArmour, currentArmour;
 	private GameObject levelUpLabel;
+	public int aiInvadeTarget = -1, aiProtectTarget = -1;
 
 	void Start()
 	{
@@ -72,10 +73,30 @@ public class HeroScriptParent : MasterScript
 		return null;
 	}
 
+	private void AIHeroFunctions()
+	{
+		int i = RefreshCurrentSystem(heroLocation);
+
+		if(aiInvadeTarget != -1)
+		{
+			if(i == aiInvadeTarget && isInvading == false)
+			{
+				systemInvasion = systemListConstructor.systemList[i].systemObject.GetComponent<SystemInvasions>();
+
+				systemInvasion.StartSystemInvasion(i);
+			}
+		}
+	}
+
 	public void HeroEndTurnFunctions(TurnInfo thisPlayer)
 	{
 		heroShip = gameObject.GetComponent<HeroShip> ();
 		heroShip.ShipAbilities (thisPlayer);
+
+		if(thisPlayer.isPlayer == false)
+		{
+			AIHeroFunctions();
+		}
 
 		if(isInvading == true)
 		{

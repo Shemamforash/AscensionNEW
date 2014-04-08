@@ -15,33 +15,73 @@ public class AIHeroBehaviour : MasterScript
 		{
 			if(diplomacyScript.relationsList[i].playerOne.playerRace == player.playerRace || diplomacyScript.relationsList[i].playerTwo.playerRace == player.playerRace)
 			{
+				string enemyRace = null;
+
+				if(diplomacyScript.relationsList[i].playerTwo.playerRace == player.playerRace)
+				{
+					enemyRace = diplomacyScript.relationsList[i].playerOne.playerRace;
+				}
+				if(diplomacyScript.relationsList[i].playerOne.playerRace == player.playerRace)
+				{
+					enemyRace = diplomacyScript.relationsList[i].playerTwo.playerRace;
+				}
+
 				if(diplomacyScript.relationsList[i].diplomaticState == "War")
 				{
-					float protectSystemValue = 0f;
-					int systemToProtect = -1;
+					float protectSystemValue = 0f, invadeSystemValue = 0f;
+					int systemToProtect = -1, systemToInvade = -1;
 
 					for(int j = 0; j < systemListConstructor.systemList.Count; ++j)
 					{
-						if(systemListConstructor.systemList[j].systemOwnedBy == player.playerRace)
+						systemDefence = systemListConstructor.systemList[j].systemObject.GetComponent<SystemDefence>();
+						systemSIMData = systemListConstructor.systemList[j].systemObject.GetComponent<SystemSIMData>();
+
+						if(systemListConstructor.systemList[j].systemOwnedBy == player.playerRace && systemDefence.underInvasion == true && systemSIMData.totalSystemSIM > protectSystemValue)
 						{
-							systemDefence = systemListConstructor.systemList[j].systemObject.GetComponent<SystemDefence>();
+							protectSystemValue = systemSIMData.totalSystemSIM;
+							systemToProtect = j;
+						}
 
-							if(systemDefence.underInvasion == true)
+						if(systemListConstructor.systemList[j].systemOwnedBy == enemyRace && systemDefence.underInvasion != true)
+						{
+							float tempSIM = systemSIMData.totalSystemSIM;
+							float tempDefence = systemDefence.maxSystemDefence;
+
+							float simToDefRatio = tempSIM/tempDefence;
+
+							if(simToDefRatio > invadeSystemValue)
 							{
-								systemSIMData = systemListConstructor.systemList[j].systemObject.GetComponent<SystemSIMData>();
-
-								if(systemSIMData.totalSystemSIM > protectSystemValue)
-								{
-									protectSystemValue = systemSIMData.totalSystemSIM;
-									systemToProtect = j;
-								}
+								invadeSystemValue = simToDefRatio;
+								systemToInvade = j;
 							}
 						}
 					}
 
-					if(systemToProtect != -1)
+					if(systemToProtect != -1 && systemToInvade == -1)
 					{
-						ProtectSystem(systemToProtect);
+						SetDestinationSystem(systemToProtect, "Protect");
+					}
+					if(systemToProtect == -1 && systemToInvade != -1)
+					{
+						SetDestinationSystem(systemToInvade, "Invade");
+					}
+					if(systemToProtect != -1 && systemToInvade != -1)
+					{
+						systemSIMData = systemListConstructor.systemList[systemToProtect].systemObject.GetComponent<SystemSIMData>();
+						systemDefence = systemListConstructor.systemList[systemToProtect].systemObject.GetComponent<SystemDefence>();
+
+						float tempSIM = systemSIMData.totalSystemSIM;
+						float tempDefence = systemDefence.maxSystemDefence;
+						float simToDefRatio = tempSIM/tempDefence;
+
+						if(simToDefRatio >= invadeSystemValue)
+						{
+							SetDestinationSystem(systemToProtect, "Protect");
+						}
+						else
+						{
+							SetDestinationSystem(systemToInvade, "Invade");
+						}
 					}
 				}
 			}
@@ -77,7 +117,7 @@ public class AIHeroBehaviour : MasterScript
 		{
 			heroScript = player.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
 
-			if(heroScript.reachedLevel2 == true && heroScript.heroTier2 == null)
+			if(heroScript.reachedLevel2 == true && heroScript.heroTier2 == "")
 			{
 				int randomNo = Random.Range (0, 100);
 
@@ -130,7 +170,7 @@ public class AIHeroBehaviour : MasterScript
 				}
 			}
 
-			if(heroScript.reachedLevel3 == true && heroScript.heroTier3 == null)
+			if(heroScript.reachedLevel3 == true && heroScript.heroTier3 == "")
 			{
 				int randomNo = Random.Range (0, 1);
 				string choiceOne = null, choiceTwo = null;
@@ -165,26 +205,39 @@ public class AIHeroBehaviour : MasterScript
 		}
 	}
 
-	private void ProtectSystem(int targetSystem)
+	private void SetDestinationSystem(int targetSystem, string task)
 	{
 		float offence = 0f;
 		int hero = -1;
+		bool foundHero = false;
 		
 		for(int k = 0; k < player.playerOwnedHeroes.Count; ++k)
 		{
 			heroScript = player.playerOwnedHeroes[k].GetComponent<HeroScriptParent>();
 			
-			if(offence < heroScript.primaryPower)
+			if(offence < heroScript.primaryPower && heroScript.isBusy == false)
 			{
 				offence = heroScript.primaryPower;
 				hero = k;
+				foundHero = true;
 			}
 		}
-		
-		heroMovement = player.playerOwnedHeroes[hero].GetComponent<HeroMovement>();
-		
-		heroMovement.pathfindTarget = systemListConstructor.systemList[targetSystem].systemObject;
-		
-		heroMovement.FindPath();
+
+		if(foundHero == true)
+		{
+			heroMovement = player.playerOwnedHeroes[hero].GetComponent<HeroMovement>();
+			heroScript = player.playerOwnedHeroes[hero].GetComponent<HeroScriptParent>();
+			
+			heroMovement.pathfindTarget = systemListConstructor.systemList[targetSystem].systemObject;
+			
+			heroMovement.FindPath();
+
+			heroScript.isBusy = true;
+
+			if(task == "Invade")
+			{
+				heroScript.aiInvadeTarget = targetSystem;
+			}
+		}
 	}
 }

@@ -23,6 +23,7 @@ public class SystemListConstructor : MasterScript
 	public GameObject systemClone, originalSystem;
 	private float xPos, yPos, distanceXY;
 	public float systemScale = 0.0f;
+	public Transform systemContainer;
 
 	private void Start()
 	{
@@ -118,6 +119,8 @@ public class SystemListConstructor : MasterScript
 		for(int i = 0; i < systemList.Count; ++i)
 		{
 			systemClone = (GameObject)Instantiate(originalSystem, systemList[i].systemPosition, Quaternion.identity);
+
+			systemClone.transform.parent = systemContainer;
 		
 			systemClone.transform.localScale = new Vector3(systemScale, systemScale, systemScale);
 

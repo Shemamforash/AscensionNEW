@@ -66,6 +66,17 @@ public class SystemInvasions : MasterScript
 			OwnSystem(system);
 			invasionGUI.openInvasionMenu = false;
 		}
+
+		if(systemDestroyed == true || systemEnemyControlled == true)
+		{
+			for(int i = 0; i < turnInfoScript.allPlayers.Count; ++i)
+			{
+				if(turnInfoScript.allPlayers[i].playerRace == hero.heroOwnedBy)
+				{
+					hero.aiInvadeTarget = -1;
+				}
+			}
+		}
 	}
 	
 	private void DestroySystem(int system)
