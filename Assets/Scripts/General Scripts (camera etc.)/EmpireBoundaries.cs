@@ -82,51 +82,74 @@ public class EmpireBoundaries : MasterScript
 			inverse = true;
 		}
 
-		if(xIntersectOneA < (yIntersectOneA - yIntersect0 / posGradient))
+		if(startPoint.y == endPoint.y)
 		{
-			if(inverse == true)
+			if(yIntersectOneA > (posGradient * xIntersectOneA - yIntersect0))
 			{
-				intersectionLeftStart = new Vector3(xIntersectTwoA, yIntersectTwoA, startPoint.z);
-			}
-			else
-			{
-				intersectionLeftStart = new Vector3 (xIntersectOneA, yIntersectOneA, startPoint.z);
-			}
-		}
-
-		if(xIntersectOneA > (yIntersectOneA - yIntersect0 / posGradient))
-		{
-			if(inverse == true)
-			{
-				intersectionLeftStart = new Vector3 (xIntersectOneA, yIntersectOneA, startPoint.z);
+				intersectionLeftStart = new Vector3(xIntersectOneA, yIntersectOneA, startPoint.z);
 			}
 			else
 			{
 				intersectionLeftStart = new Vector3(xIntersectTwoA, yIntersectTwoA, startPoint.z);
 			}
-		}
-
-		if(xIntersectOneB < (yIntersectOneB - yIntersect0 / posGradient))
-		{
-			if(inverse == true)
-			{
-				intersectionLeftEnd = new Vector3 (xIntersectTwoB, yIntersectTwoB, startPoint.z);
-			}
-			else
-			{
-				intersectionLeftEnd = new Vector3 (xIntersectOneB, yIntersectOneB, startPoint.z);
-			}
-		}
-
-		if(xIntersectOneB > (yIntersectOneB - yIntersect0 / posGradient))
-		{
-			if(inverse == true)
+			if(yIntersectOneB > (posGradient * xIntersectOneB - yIntersect0))
 			{
 				intersectionLeftEnd = new Vector3 (xIntersectOneB, yIntersectOneB, startPoint.z);
 			}
 			else
 			{
 				intersectionLeftEnd = new Vector3 (xIntersectTwoB, yIntersectTwoB, startPoint.z);
+			}
+		}
+
+		if(startPoint.y != endPoint.y)
+		{
+			if(xIntersectOneA < (yIntersectOneA - yIntersect0 / posGradient))
+			{
+				if(inverse == true)
+				{
+					intersectionLeftStart = new Vector3(xIntersectTwoA, yIntersectTwoA, startPoint.z);
+				}
+				else
+				{
+					intersectionLeftStart = new Vector3 (xIntersectOneA, yIntersectOneA, startPoint.z);
+				}
+			}
+
+			if(xIntersectOneA > (yIntersectOneA - yIntersect0 / posGradient))
+			{
+				if(inverse == true)
+				{
+					intersectionLeftStart = new Vector3 (xIntersectOneA, yIntersectOneA, startPoint.z);
+				}
+				else
+				{
+					intersectionLeftStart = new Vector3(xIntersectTwoA, yIntersectTwoA, startPoint.z);
+				}
+			}
+
+			if(xIntersectOneB < (yIntersectOneB - yIntersect0 / posGradient))
+			{
+				if(inverse == true)
+				{
+					intersectionLeftEnd = new Vector3 (xIntersectTwoB, yIntersectTwoB, startPoint.z);
+				}
+				else
+				{
+					intersectionLeftEnd = new Vector3 (xIntersectOneB, yIntersectOneB, startPoint.z);
+				}
+			}
+
+			if(xIntersectOneB > (yIntersectOneB - yIntersect0 / posGradient))
+			{
+				if(inverse == true)
+				{
+					intersectionLeftEnd = new Vector3 (xIntersectOneB, yIntersectOneB, startPoint.z);
+				}
+				else
+				{
+					intersectionLeftEnd = new Vector3 (xIntersectTwoB, yIntersectTwoB, startPoint.z);
+				}
 			}
 		}
 	}
@@ -181,10 +204,10 @@ public class EmpireBoundaries : MasterScript
 			++k;
 		}
 
-		else
-		{
+		//else
+		//{
 			vertexPoints.Add (intersectionLeftStart); //Add the intersection to vertexpoints
-		}
+		//}
 
 		if(vertexPoints.Contains(intersectionLeftEnd)) //If vertexpoints contains corresponding intersection on nearest circle, increase counter
 		{
@@ -357,13 +380,10 @@ public class EmpireBoundaries : MasterScript
 
 		SetVertexPoints (system, -1, true); //Set all the other vertex points
 
-		for(int i = 3; i < vertexPoints.Count; ++i)
+		for(int i = 0; i < vertexPoints.Count; ++i)
 		{
-			CheckForIntersection(i);
+			Debug.Log (vertexPoints[i]);
 		}
-
-		vertexPoints.Add (vertexPoints [0]);
-		vertexPoints.Add (vertexPoints [1]);
 
 		lineRenderer.SetVertexCount (numberOfPoints * (vertexPoints.Count - 2));
 
