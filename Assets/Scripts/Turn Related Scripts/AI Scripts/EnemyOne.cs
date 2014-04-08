@@ -13,7 +13,7 @@ public class EnemyOne : AIBasicParent
 
 		GameObject home = GameObject.Find (homeSystem);
 
-		for(int i = 0;  i < systemListConstructor.systemList.Count; ++i)
+		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
 		{
 			if(systemListConstructor.systemList[i].systemObject == home)
 			{
@@ -39,6 +39,8 @@ public class EnemyOne : AIBasicParent
 				break;
 			}
 		}
+
+		empireBoundaries.ModifyBoundaryCircles ();
 	}
 }
 

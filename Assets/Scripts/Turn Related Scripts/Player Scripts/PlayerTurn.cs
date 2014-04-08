@@ -106,6 +106,8 @@ public class PlayerTurn : TurnInfo
 			isOkToColonise = false;
 
 			systemHasBeenColonised = true;
+
+			empireBoundaries.ModifyBoundaryCircles ();
 		}
 	}
 
@@ -137,5 +139,7 @@ public class PlayerTurn : TurnInfo
 				break;
 			}
 		}
+
+		empireBoundaries.ModifyBoundaryCircles ();
 	}
 }
