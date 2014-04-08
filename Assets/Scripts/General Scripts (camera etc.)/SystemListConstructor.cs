@@ -35,10 +35,10 @@ public class SystemListConstructor : MasterScript
 		CreateObjects ();
 		mapConstructor.DrawMinimumSpanningTree ();
 
+		empireBoundaries.SetArrSize ();
+
 		ambientStars = GameObject.Find ("ScriptsContainer").GetComponent<AmbientStarRandomiser> ();
 		ambientStars.GenerateStars ();
-
-		empireBoundaries.CalculateRadius ();
 
 		LoadBasicTechTree ();
 

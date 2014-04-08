@@ -8,6 +8,7 @@ public class AIBasicParent : TurnInfo
 	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem, checkHeroTimer = 0;
 	private bool saveForHero;
 	private TurnInfo thisPlayer;
+	private AIHeroBehaviour heroBehaviour;
 
 	public void Expand(TurnInfo player)
 	{
@@ -29,6 +30,10 @@ public class AIBasicParent : TurnInfo
 		}
 
 		turnInfoScript.TurnEnd(thisPlayer);
+
+		heroBehaviour = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AIHeroBehaviour> ();
+
+		heroBehaviour.HeroDecisionStart (player);
 	}
 
 	private void CheckToSaveForHero()
@@ -109,6 +114,8 @@ public class AIBasicParent : TurnInfo
 				thisPlayer.capital -= 20.0f;
 
 				thisPlayer.capitalModifier += 0.1f;
+
+				empireBoundaries.ModifyBoundaryCircles ();
 			}
 
 			if(currentPlanet != -1 && currentSystem != -1)
