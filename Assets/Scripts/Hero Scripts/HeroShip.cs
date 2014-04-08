@@ -245,8 +245,6 @@ public class HeroShip : MasterScript
 
 	public void MerchantFunctions(int links, TurnInfo thisPlayer)
 	{
-		Debug.Log (links);
-
 		for(int i = 0; i < allTradeRoutes.Count; ++i)
 		{
 			int pSys = RefreshCurrentSystem(allTradeRoutes[i].playerSystem);
@@ -293,9 +291,6 @@ public class HeroShip : MasterScript
 				eSysData.totalSystemScience += pSciTransfer;
 				pSysData.totalSystemIndustry += eIndTransfer;
 				pSysData.totalSystemScience += eSciTransfer;
-
-				DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (systemListConstructor.systemList[pSys].systemOwnedBy, systemListConstructor.systemList [eSys].systemOwnedBy);
-				temp.stateCounter += 1;
 			}
 
 			else if(i >= allTradeRoutes.Count)

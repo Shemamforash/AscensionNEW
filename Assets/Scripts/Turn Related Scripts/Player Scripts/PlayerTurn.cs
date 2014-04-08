@@ -113,6 +113,8 @@ public class PlayerTurn : TurnInfo
 
 	public void StartTurn()
 	{
+		isPlayer = true;
+
 		PickRace ();
 
 		cameraFunctionsScript.selectedSystem = GameObject.Find (homeSystem); //Set the selected system

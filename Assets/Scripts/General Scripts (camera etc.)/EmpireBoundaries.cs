@@ -6,6 +6,7 @@ public class EmpireBoundaries : MasterScript
 {
 	private GameObject[] boundRings;
 	public GameObject blankCircle;
+	public Transform boundaryContainer;
 	private float radius;
 	public Material humansMat, selkiesMat, nereidesMat;
 
@@ -41,6 +42,8 @@ public class EmpireBoundaries : MasterScript
 		CalculateRadius (system);
 
 		GameObject temp = (GameObject)Instantiate (blankCircle, systemListConstructor.systemList [system].systemObject.transform.position, Quaternion.identity);
+
+		temp.transform.parent = boundaryContainer;
 
 		temp.transform.localScale = new Vector3 (radius, radius, radius);
 

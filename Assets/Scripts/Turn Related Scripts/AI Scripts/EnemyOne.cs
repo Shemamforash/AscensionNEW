@@ -5,6 +5,8 @@ public class EnemyOne : AIBasicParent
 {	
 	public void RaceStart(string thisRace)
 	{		
+		isPlayer = false;
+
 		playerRace = thisRace;
 
 		PickRace ();
