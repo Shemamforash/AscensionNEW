@@ -7,12 +7,12 @@ public class RacialTraits : MasterScript
 	public float ambitionCounter, ambitionOwnershipModifier, amber;
 	public int nereidesStacks;
 	public UILabel racialLabel;
-
+	
 	void Start()
 	{
 		ambitionCounter = 0;
 	}
-
+	
 	public void Purge() //Nereides function to produce elation
 	{
 		while(playerTurnScript.science >= 100 && playerTurnScript.industry >= 100)
@@ -22,17 +22,17 @@ public class RacialTraits : MasterScript
 			++nereidesStacks;
 		}
 	}
-
+	
 	public float NereidesIndustryModifer (TurnInfo thisPlayer) //Returns industry modifier based on elation
 	{
 		if(thisPlayer.playerRace == "Nereides")
 		{
 			return (nereidesStacks / 10) + 1;
 		}
-
+		
 		return 1;
 	}
-
+	
 	public float HumanTrait(TurnInfo thisPlayer, ImprovementsBasic improvements) //Returns ambition modifier
 	{
 		if(thisPlayer.playerRace == "Humans")
@@ -40,14 +40,14 @@ public class RacialTraits : MasterScript
 			if(improvements.listOfImprovements[18].hasBeenBuilt == false)
 			{
 				ambitionOwnershipModifier = ambitionCounter / 40.0f;
-
+				
 				return ambitionOwnershipModifier;
 			}
 		}
-
+		
 		return 1f;
 	}
-
+	
 	public void RacialBonus(TurnInfo player)
 	{
 		if(player.playerRace == "Humans")
@@ -78,7 +78,7 @@ public class RacialTraits : MasterScript
 			player.researchCostModifier += nereidesStacks;
 		}
 	}
-
+	
 	public void IncreaseAmber (int system)
 	{
 		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
@@ -114,19 +114,19 @@ public class RacialTraits : MasterScript
 		
 		racialTraitScript.amber += systemSIMData.totalSystemAmber;
 	}
-
+	
 	void Update()
 	{
 		if(playerTurnScript.playerRace == "Humans")
 		{
 			racialLabel.text = ("Ambition: " + ((int)ambitionCounter).ToString());
 		}
-
+		
 		if(playerTurnScript.playerRace == "Nereides")
 		{
 			racialLabel.text = nereidesStacks + " stacks";
 		}
-
+		
 		if(playerTurnScript.playerRace == "Selkies")
 		{
 			racialLabel.text = Math.Round(amber, 2) + " Amber";

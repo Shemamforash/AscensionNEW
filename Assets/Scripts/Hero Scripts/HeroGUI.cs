@@ -5,16 +5,10 @@ using System;
 
 public class HeroGUI : MasterScript 
 {
-	public bool openHeroLevellingScreen, listFilled;
-	public GameObject heroObject, merchantQuad, selectedHero, invasionButton, embargoButton, promoteButton, buttonContainer, turnInfoBar, levelUpPrefab, heroDetailsContainer;
+	public bool openHeroLevellingScreen;
+	public GameObject heroObject, merchantQuad, selectedHero, invasionButton, embargoButton, promoteButton, buttonContainer, turnInfoBar, heroDetailsContainer;
 	public UILabel heroHealth, heroName;
-	public UIPopupList dropDownOne, dropDownTwo;
-	public string[] heroLevelTwoSpecs = new string[3] {"Diplomat", "Soldier", "Infiltrator"};
-	private string[] heroLevelThreeSpecs = new string[6] {"Ambassador", "Smuggler", "Vanguard", "Warlord", "Hacker", "Drone"};
-	public GUISkin mySkin;
-	public int heroCounter = 1, j;
-	private float timer;
-	private Rect[] tier1, tier2;
+	public int heroCounter = 1;
 
 	void Update()
 	{
@@ -55,51 +49,6 @@ public class HeroGUI : MasterScript
 			NGUITools.SetActive(heroDetailsContainer, true);
 			heroHealth.text = Math.Round(heroScript.currentArmour, 1) + "/" + Math.Round(heroScript.maxArmour, 1);
 			heroName.text = "Hero Dude/Ette";
-
-			if(heroScript.canLevelUp == false)
-			{
-				if(heroScript.heroTier2 != "")
-				{
-					dropDownOne.value = heroScript.heroTier2;
-				}
-				else if(heroScript.heroTier2 == "")
-				{
-					dropDownOne.value = "Unspecialised";
-				}
-				if(heroScript.heroTier3 != "")
-				{
-					dropDownTwo.value = heroScript.heroTier3;
-				}
-				else if(heroScript.heroTier3 == "")
-				{
-					dropDownTwo.value = "Unspecialised";
-				}
-
-				dropDownOne.enabled = false;
-				dropDownTwo.enabled = false;
-				dropDownOne.gameObject.GetComponent<UIButton>().enabled = false;
-				dropDownTwo.gameObject.GetComponent<UIButton>().enabled = false;
-			}
-			
-			if(heroScript.canLevelUp == true)
-			{
-				if(heroScript.currentLevel == 2 && heroScript.heroTier2 == "" && listFilled == false)
-				{
-					FillList(dropDownOne);
-					listFilled = true;
-					dropDownOne.gameObject.GetComponent<UIButton>().enabled = true;
-					dropDownOne.enabled = true;
-				}
-				
-				if(heroScript.currentLevel == 3 && heroScript.heroTier3 == "" && heroScript.heroTier2 != "" && listFilled == false)
-				{
-					FillList(dropDownTwo);
-					listFilled = true;
-					dropDownTwo.gameObject.GetComponent<UIButton>().enabled = true;
-					dropDownTwo.enabled = true;
-				}
-			}
-	
 		}
 		if(selectedHero == null)
 		{
@@ -129,7 +78,7 @@ public class HeroGUI : MasterScript
 		systemSIMData.promotionTimer = Time.time;
 	}
 
-	public void CheckIfCanHire(TurnInfo player)
+	public void CheckIfCanHire(TurnInfo player, string heroType)
 	{
 		if(player.capital >= 50 && player.playerOwnedHeroes.Count < 7)
 		{
@@ -141,6 +90,8 @@ public class HeroGUI : MasterScript
 			instantiatedHero.name = "Basic Hero";
 
 			heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
+
+			heroScript.heroType = heroType;
 
 			heroMovement = instantiatedHero.GetComponent<HeroMovement>();
 
@@ -157,85 +108,18 @@ public class HeroGUI : MasterScript
 			player.capital -= 50;
 
 			player.playerOwnedHeroes.Add (instantiatedHero);
-		}
-	}
 
-	public void FillList(UIPopupList popup)
-	{
-		popup.items.Clear ();
-
-		if(heroScript.currentLevel == 2)
-		{
-			popup.items.Add("");
-			popup.items.Add("Infiltrator");
-			popup.items.Add("Soldier");
-			popup.items.Add("Diplomat");
-		}
-
-		if(heroScript.currentLevel == 3)
-		{
-			popup.items.Add("");
-
-			if(heroScript.heroTier2 == "Infiltrator")
+			switch(heroScript.heroType)
 			{
-				popup.items.Add("Drone");
-				popup.items.Add("Hacker");
-			}
-			if(heroScript.heroTier2 == "Soldier")
-			{
-				popup.items.Add("Warlord");
-				popup.items.Add("Vanguard");
-			}
-			if(heroScript.heroTier2 == "Diplomat")
-			{
-				popup.items.Add("Ambassador");
-				popup.items.Add("Merchant");
-			}
-		}
-	}
-
-	public void SetSpecialisation()
-	{
-		for(int i = 0; i < playerTurnScript.playerOwnedHeroes.Count; ++i)
-		{
-			if(playerTurnScript.playerOwnedHeroes[i] == heroGUI.selectedHero)
-			{
-				heroScript = playerTurnScript.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
-
-				if(heroScript.canLevelUp == true)
-				{
-					string tempString = UIPopupList.current.gameObject.GetComponent<UIPopupList>().value;
-
-					if(tempString != "")
-					{
-						if(UIPopupList.current.gameObject.name == "First Specialisation")
-						{
-							heroScript.heroTier2 = tempString;
-
-							switch(heroScript.heroTier2)
-							{
-							case "Soldier":
-								heroScript.classModifier = 1.75f;
-								break;
-							case "Infiltrator":
-								heroScript.classModifier = 1f;
-								break;
-							case "Diplomat":
-								heroScript.classModifier = 1.5f;
-								break;
-							}
-						}
-
-						if(UIPopupList.current.gameObject.name == "Second Specialisation")
-						{					
-							heroScript.heroTier3 = tempString;
-						}
-
-						heroScript.canLevelUp = false;
-
-						listFilled = false;
-					}
-				}
+			case "Soldier":
+				heroScript.classModifier = 1.75f;
+				break;
+			case "Infiltrator":
+				heroScript.classModifier = 1f;
+				break;
+			case "Diplomat":
+				heroScript.classModifier = 1.5f;
+				break;
 			}
 		}
 	}

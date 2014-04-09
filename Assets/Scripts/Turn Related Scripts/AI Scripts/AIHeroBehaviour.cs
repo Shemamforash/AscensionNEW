@@ -9,8 +9,6 @@ public class AIHeroBehaviour : MasterScript
 	{
 		player = thisPlayer;
 
-		CheckForLevelUp ();
-
 		for(int i = 0; i < diplomacyScript.relationsList.Count; ++i)
 		{
 			if(diplomacyScript.relationsList[i].playerOne.playerRace == player.playerRace || diplomacyScript.relationsList[i].playerTwo.playerRace == player.playerRace)
@@ -88,9 +86,10 @@ public class AIHeroBehaviour : MasterScript
 		}
 	}
 
-	private void CheckForLevelUp()
+	public string SetSpecialisation()
 	{
 		float dipMod = 0;
+		string type = null;
 
 		for(int i = 0; i < diplomacyScript.relationsList.Count; ++i)
 		{
@@ -117,7 +116,7 @@ public class AIHeroBehaviour : MasterScript
 		{
 			heroScript = player.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
 
-			if(heroScript.reachedLevel2 == true && heroScript.heroTier2 == "")
+			if(heroScript.heroType == "")
 			{
 				int randomNo = Random.Range (0, 100);
 
@@ -125,15 +124,15 @@ public class AIHeroBehaviour : MasterScript
 				{
 					if(randomNo < 25)
 					{
-						heroScript.heroTier2 = "Soldier";
+						type = "Soldier";
 					}
 					if(randomNo < 50 && randomNo >= 25)
 					{
-						heroScript.heroTier2 = "Infiltrator";
+						type = "Infiltrator";
 					}
 					if(randomNo > 50)
 					{
-						heroScript.heroTier2 = "Diplomat";
+						type = "Diplomat";
 					}
 				}
 
@@ -141,15 +140,15 @@ public class AIHeroBehaviour : MasterScript
 				{
 					if(randomNo < 25)
 					{
-						heroScript.heroTier2 = "Soldier";
+						type = "Soldier";
 					}
 					if(randomNo < 50 && randomNo >= 25)
 					{
-						heroScript.heroTier2 = "Diplomat";
+						type = "Diplomat";
 					}
 					if(randomNo > 50)
 					{
-						heroScript.heroTier2 = "Infiltrator";
+						type = "Infiltrator";
 					}
 				}
 
@@ -157,52 +156,21 @@ public class AIHeroBehaviour : MasterScript
 				{
 					if(randomNo < 25)
 					{
-						heroScript.heroTier2 = "Diplomat";
+						type = "Diplomat";
 					}
 					if(randomNo < 50 && randomNo >= 25)
 					{
-						heroScript.heroTier2 = "Infiltrator";
+						type = "Infiltrator";
 					}
 					if(randomNo > 50)
 					{
-						heroScript.heroTier2 = "Soldier";
+						type = "Soldier";
 					}
 				}
 			}
-
-			if(heroScript.reachedLevel3 == true && heroScript.heroTier3 == "")
-			{
-				int randomNo = Random.Range (0, 1);
-				string choiceOne = null, choiceTwo = null;
-
-				switch(heroScript.heroTier2)
-				{
-				case "Diplomat":
-					choiceOne = "Merchant";
-					choiceTwo = "Ambassador";
-					break;
-				case "Soldier":
-					choiceOne = "Warlord";
-					choiceTwo = "Vanguard";
-					break;
-				case "Infiltrator":
-					choiceOne = "Drone";
-					choiceTwo = "Hacker";
-					break;
-				default:
-					break;
-				}
-
-				if(randomNo == 0)
-				{
-					heroScript.heroTier3 = choiceOne;
-				}
-				else
-				{
-					heroScript.heroTier3 = choiceTwo;
-				}
-			}
 		}
+
+		return type;
 	}
 
 	private void SetDestinationSystem(int targetSystem, string task)

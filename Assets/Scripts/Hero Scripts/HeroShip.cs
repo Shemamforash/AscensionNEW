@@ -16,7 +16,7 @@ public class HeroShip : MasterScript
 
 	private void CheckButtonsAllowed()
 	{
-		if(heroScript.heroTier2 == "Diplomat")
+		if(heroScript.heroType == "Diplomat")
 		{
 			NGUITools.SetActive(heroGUI.promoteButton, true);
 			NGUITools.SetActive(heroGUI.embargoButton, true);
@@ -92,30 +92,27 @@ public class HeroShip : MasterScript
 		heroScript.maxArmour = ShipFunctions.armourRating;
 		heroScript.movementSpeed = ShipFunctions.engineValue;
 
-		if(heroScript.heroTier2 == "Diplomat")
+		if(heroScript.heroType == "Diplomat")
 		{
 			heroScript.secondaryPower = ShipFunctions.dropshipPower;
 			heroScript.secondaryCollateral = ShipFunctions.dropshipCollateral;
 
-			if(heroScript.heroTier3 == "Merchant")
-			{
-				int numberOfMerchants = 0;
+			int numberOfMerchants = 0;
 
 				for(int i = 0; i < thisPlayer.playerOwnedHeroes.Count; i++)
 				{
 					HeroScriptParent tempScript = thisPlayer.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
 
-					if(tempScript.heroTier3 == "Merchant")
+					if(tempScript.heroType == "Merchant")
 					{
 						++numberOfMerchants;
 					}
 				}
 
-				MerchantFunctions((ShipFunctions.logisticsRating + 1) * numberOfMerchants, thisPlayer);
-			}
+			MerchantFunctions((ShipFunctions.logisticsRating + 1) * numberOfMerchants, thisPlayer);
 		}
 
-		if(heroScript.heroTier2 == "Infiltrator")
+		if(heroScript.heroType == "Infiltrator")
 		{
 			heroScript.secondaryPower = ShipFunctions.bombPower;
 			heroScript.secondaryCollateral = ShipFunctions.bombCollateral;
@@ -143,7 +140,7 @@ public class HeroShip : MasterScript
 			}
 		}
 
-		if(heroScript.heroTier2 == "Soldier")
+		if(heroScript.heroType == "Soldier")
 		{
 			heroScript.secondaryPower = ShipFunctions.artilleryPower;
 			heroScript.secondaryCollateral = ShipFunctions.artilleryCollateral;

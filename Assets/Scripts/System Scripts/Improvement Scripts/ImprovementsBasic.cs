@@ -6,13 +6,12 @@ using System.Xml;
 
 public class ImprovementsBasic : MasterScript 
 {
-	public float sciencePercentBonus, industryPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, tempCount, scienceBonusModifier, ownershipModifier, maxOwnershipBonus;
+	public float sciencePercentBonus, industryPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, scienceBonusModifier, ownershipModifier, maxOwnershipBonus;
+	public float tempSciBonus, tempIndBonus, tempCapital, tempSciUnitBonus, tempIndUnitBonus, tempOwnershipBonus, tempResearchCostReduction, tempImprovementCostReduction, tempOwnershipUnitBonus, tempCount, tempBonusAmbition;
 	public GameObject tooltip;
-	public int techTier = 0, improvementCostModifier = 0, researchCost;
+	public int techTier = 0, improvementCostModifier = 0, researchCost, system;
 	private GenericImprovements genericImprovements;
-	private HumanImprovements humanImprovements;
-	private NereidesImprovements nereidesImprovements;
-	private SelkiesImprovements selkiesImprovements;
+
 	public List<ImprovementClass> listOfImprovements = new List<ImprovementClass>();
 
 	void Start()
@@ -23,9 +22,6 @@ public class ImprovementsBasic : MasterScript
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
 		heroScript = gameObject.GetComponent<HeroScriptParent>();
 		genericImprovements = GameObject.Find ("ScriptsContainer").GetComponent<GenericImprovements> ();
-		humanImprovements = GameObject.Find ("ScriptsContainer").GetComponent<HumanImprovements> ();
-		nereidesImprovements = GameObject.Find ("ScriptsContainer").GetComponent<NereidesImprovements> ();
-		selkiesImprovements = GameObject.Find ("ScriptsContainer").GetComponent<SelkiesImprovements> ();
 
 		LoadNewTechTree();
 	}
@@ -61,7 +57,7 @@ public class ImprovementsBasic : MasterScript
 		}
 	}
 
-	public void ActiveTechnologies(int system, TurnInfo thisPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
+	public void ActiveTechnologies(int curSystem, TurnInfo thisPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
 		sciencePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
 		industryPercentBonus = 1.0f;
@@ -75,34 +71,14 @@ public class ImprovementsBasic : MasterScript
 		maxOwnershipBonus = 0f;
 
 		tempCount = 0.0f;
+		system = curSystem;
 
-		if(techTier >= 0)
+		for(int i = 0; i < listOfImprovements.Count; ++i)
 		{
-			genericImprovements.CheckTierZero(system, this, thisPlayer);
-		}
-		if(techTier >= 1)
-		{
-			genericImprovements.CheckTierOne(system, this, thisPlayer);
-		}
-		if(techTier >= 2)
-		{
-			genericImprovements.CheckTierTwo(system, this, thisPlayer);
-		}
-		if(techTier == 3)
-		{
-			genericImprovements.CheckTierThree(system, this, thisPlayer);
-		}
-		if(thisPlayer.playerRace == "Humans")
-		{
-			humanImprovements.CheckHumanImprovements(system, this, thisPlayer);
-		}
-		if(thisPlayer.playerRace == "Nereides")
-		{
-			nereidesImprovements.CheckNereidesImprovements(system, this, thisPlayer);
-		}
-		if(thisPlayer.playerRace == "Selkies")
-		{
-			selkiesImprovements.CheckSelkiesImprovements(system, this, thisPlayer);
+			if(listOfImprovements[i].hasBeenBuilt == true)
+			{
+				genericImprovements.TechSwitch(i, this, thisPlayer, false);
+			}
 		}
 
 		sciencePercentBonus = sciencePercentBonus * scienceBonusModifier;

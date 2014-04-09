@@ -25,15 +25,32 @@ public class AIBasicParent : TurnInfo
 
 			if(saveForHero == true)
 			{
-				heroGUI.CheckIfCanHire(thisPlayer);
+				string temp = heroBehaviour.SetSpecialisation();
+				heroGUI.CheckIfCanHire(thisPlayer, temp);
 			}
 		}
 
 		turnInfoScript.TurnEnd(thisPlayer);
 
-		heroBehaviour = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AIHeroBehaviour> ();
+		if(heroBehaviour == null)
+		{
+			heroBehaviour = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AIHeroBehaviour> ();
+		}
 
 		heroBehaviour.HeroDecisionStart (player);
+	}
+
+	private void OptimumTechToBuild(int system)
+	{
+		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
+
+		float sciRatio = (100 / systemSIMData.totalSystemSIM) * systemSIMData.totalSystemScience;
+		float indRatio = (100 / systemSIMData.totalSystemSIM) * systemSIMData.totalSystemIndustry;
+
+		for(int i = 0; i < systemListConstructor.systemList[system].planetsInSystem.Count; ++i)
+		{
+
+		}
 	}
 
 	private void CheckToSaveForHero()
