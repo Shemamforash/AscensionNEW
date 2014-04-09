@@ -100,7 +100,7 @@ public class CameraFunctions : MasterScript
 
 							if(heroScript.heroLocation == systemListConstructor.systemList[i].systemObject)
 							{
-								if(heroScript.heroTier2 == "Infiltrator")
+								if(heroScript.heroType == "Infiltrator")
 								{
 									openInvMenu = true;
 								}

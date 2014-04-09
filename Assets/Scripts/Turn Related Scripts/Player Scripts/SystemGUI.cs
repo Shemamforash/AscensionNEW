@@ -12,7 +12,7 @@ public class SystemGUI : MasterScript
 	public GameObject planetPrefab;
 	public int selectedSystem, selectedPlanet, numberOfHeroes;
 	public List<PlanetUIElements> planetElementList = new List<PlanetUIElements>();
-	public GameObject planetListGrid, playerSystemInfoScreen;
+	public GameObject planetListGrid, playerSystemInfoScreen, heroChooseScreen;
 
 	void Start()
 	{
@@ -107,7 +107,15 @@ public class SystemGUI : MasterScript
 
 	public void HireHero()
 	{
-		heroGUI.CheckIfCanHire(playerTurnScript);
+		NGUITools.SetActive (heroChooseScreen, true);
+
+	}
+
+	public void ChooseHeroSpecialisation()
+	{
+		string heroToHire = UIButton.current.transform.parent.gameObject.name;
+		heroGUI.CheckIfCanHire(playerTurnScript, heroToHire);
+		NGUITools.SetActive (heroChooseScreen, false);
 	}
 
 	private void SetUpPlanets()

@@ -124,7 +124,7 @@ public class InvasionGUI : MasterScript
 			
 			else
 			{
-				if(heroScript.heroTier2 == "Infiltrator" && bombSelected == null)
+				if(heroScript.heroType == "Infiltrator" && bombSelected == null)
 				{
 					planetList[i].GetComponent<UIButton>().isEnabled = false;
 				}

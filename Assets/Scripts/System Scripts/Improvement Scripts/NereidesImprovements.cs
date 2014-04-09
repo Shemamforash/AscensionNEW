@@ -3,108 +3,186 @@ using System.Collections;
 
 public class NereidesImprovements : MasterScript 
 {
-	public void CheckNereidesImprovements(int system, ImprovementsBasic improvements, TurnInfo thisPlayer)
+	private ImprovementsBasic improvements;
+	private bool checkValue;
+	private TurnInfo thisPlayer;
+	
+	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
 	{
-		if(improvements.listOfImprovements[20].hasBeenBuilt == true)
-		{
-			improvements.improvementCostModifier += racialTraitScript.nereidesStacks;
-			improvements.listOfImprovements[20].improvementMessage = ("-" + racialTraitScript.nereidesStacks + " Industry Cost for Improvements");
-		}
+		improvements = tempImprov;
+		checkValue = check;
+		thisPlayer = player;
 		
-		if(improvements.listOfImprovements[21].hasBeenBuilt == true)
+		switch (tech)
 		{
-			improvements.tempCount = 0.1f * (float)racialTraitScript.nereidesStacks;
-			improvements.sciencePercentBonus += improvements.tempCount;
-			improvements.listOfImprovements[21].improvementMessage = ("+" + improvements.tempCount + "% Science from Elation");
-		}
-		
-		if(improvements.listOfImprovements[22].hasBeenBuilt == true)
-		{
-			improvements.tempCount = 0f;
-			
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
-			{
-				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
-				
-				if(tempString == "Boreal" || tempString == "Tundra" || tempString == "Desolate")
-				{
-					improvements.tempCount += 1f;
-				}
-			}
-
-			if(improvements.IsBuiltOnPlanetType(system, 22, "Boreal") == true)
-			{
-				improvements.tempCount = improvements.tempCount * 2f;
-			}
-			
-			thisPlayer.capital += (int)improvements.tempCount;
-			improvements.listOfImprovements[22].improvementMessage = ("+" + improvements.tempCount + " Capital from Cold Planets");
-		}
-		
-		if(improvements.listOfImprovements[23].hasBeenBuilt == true)
-		{
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
-			{
-				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
-				
-				if(tempString == "Boreal")
-				{
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots = 3;
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
-				}
-				
-				if(tempString == "Tundra")
-				{
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots = 4;
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
-				}
-			}
-			
-			improvements.listOfImprovements[23].improvementMessage = ("+1 Improvement Slot on Tundra and Boreal Planets");
-		}
-		
-		if(improvements.listOfImprovements[24].hasBeenBuilt == true)
-		{
-			improvements.listOfImprovements[24].improvementMessage = ("+50% Industry and 0% Science on Hot Planets");
-		}
-		
-		if(improvements.listOfImprovements[25].hasBeenBuilt == true)
-		{
-			improvements.scienceBonusModifier += 1.0f;
-			improvements.tempCount = 100f;
-
-			if(improvements.IsBuiltOnPlanetType(system, 25, "Boreal") == true)
-			{
-				improvements.scienceBonusModifier += 1.5f;
-				improvements.tempCount = 150f;
-			}
-			
-			improvements.listOfImprovements[25].improvementMessage = ("+" + improvements.tempCount + "% Effect from Science Improvements");
-		}
-		
-		if(improvements.listOfImprovements[26].hasBeenBuilt == true)
-		{
-			improvements.tempCount = 0.1f;
-
-			if(improvements.IsBuiltOnPlanetType(system, 26, "Boreal") == true || improvements.IsBuiltOnPlanetType(system, 26, "Tundra") == true || improvements.IsBuiltOnPlanetType(system, 26, "Desolate") == true)
-			{
-				improvements.tempCount = 0.15f;
-			}
-			
-			improvements.ownershipModifier += improvements.tempCount * racialTraitScript.nereidesStacks;
-			improvements.listOfImprovements[26].improvementMessage = ("+" + improvements.tempCount * racialTraitScript.nereidesStacks + "Ownership from Elation");
-		}
-		
-		if(improvements.listOfImprovements[27].hasBeenBuilt == true)
-		{
-			if(systemListConstructor.systemList[system].systemDefence < systemDefence.maxSystemDefence)
-			{
-				improvements.sciencePercentBonus += 1f;
-				improvements.industryPercentBonus += 1f;
-				
-				improvements.listOfImprovements[27].improvementMessage = ("+100% Resource Production from Invasion");
-			}
+		case 20:
+			TN1I1();
+			break;
+		case 21:
+			TN1I2();
+			break;
+		case 22:
+			TN2I1();
+			break;
+		case 23:
+			TN2I2();
+			break;
+		case 24:
+			TN3I1();
+			break;
+		case 25:
+			TN3I2();
+			break;
+		case 26:
+			TN4I1();
+			break;
+		case 27:
+			TN4I2();
+			break;
+		default:
+			break;
 		}
 	}
 
+	private void TN1I1()
+	{
+		improvements.tempImprovementCostReduction = racialTraitScript.nereidesStacks;
+
+		if(checkValue == false)
+		{
+			improvements.improvementCostModifier += (int)improvements.tempImprovementCostReduction;
+			improvements.listOfImprovements[20].improvementMessage = ("-" + racialTraitScript.nereidesStacks + " Industry Cost for Improvements");
+		}
+	}
+
+	private void TN1I2()
+	{
+		improvements.tempSciBonus = 0.1f * (float)racialTraitScript.nereidesStacks;
+
+		if(checkValue == false)
+		{
+			improvements.sciencePercentBonus += improvements.tempSciBonus;
+			improvements.listOfImprovements[21].improvementMessage = ("+" + improvements.tempCount + "% Science from Elation");
+		}
+	}
+
+	private void TN2I1()
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
+		{
+			string tempString = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetType;
+			
+			if(tempString == "Boreal" || tempString == "Tundra" || tempString == "Desolate")
+			{
+				improvements.tempCount += 1f;
+			}
+		}
+		
+		if(improvements.IsBuiltOnPlanetType(improvements.system, 22, "Boreal") == true)
+		{
+			improvements.tempCount = improvements.tempCount * 2f;
+		}
+
+		improvements.tempCapital = improvements.tempCount;
+
+		if(checkValue == false)
+		{
+			thisPlayer.capital += (int)improvements.tempCapital;
+			improvements.listOfImprovements[22].improvementMessage = ("+" + improvements.tempCount + " Capital from Cold Planets");
+		}
+	}
+
+	private void TN2I2() //TODO this needs a value
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
+		{
+			string tempString = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetType;
+			
+			if(tempString == "Boreal" && checkValue == false)
+			{
+				++systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementSlots;
+				systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Add (null);
+			}
+			
+			if(tempString == "Tundra" && checkValue == false)
+			{
+				++systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementSlots;
+				systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Add (null);
+			}
+		}
+
+		if(checkValue == false)
+		{
+			improvements.listOfImprovements[23].improvementMessage = ("+1 Improvement Slot on Tundra and Boreal Planets");
+		}
+	}
+
+	private void TN3I1()
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].planetsInSystem.Count; ++i)
+		{
+			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetCategory == "Hot")
+			{
+				improvements.tempSciUnitBonus = -systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetScience;
+				improvements.tempIndUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetIndustry * 0.5f;
+			}
+		}
+
+		if(checkValue == false)
+		{
+			improvements.listOfImprovements[24].improvementMessage = ("+50% Industry and 0% Science on Hot Planets");
+		}
+	}
+
+	private void TN3I2()
+	{
+		improvements.tempSciBonus += 1.0f;
+		improvements.tempCount = 100f;
+		
+		if(improvements.IsBuiltOnPlanetType(improvements.system, 25, "Boreal") == true)
+		{
+			improvements.tempSciBonus += 0.5f;
+			improvements.tempCount += 50f;
+		}
+
+		if(checkValue == false)
+		{
+			improvements.scienceBonusModifier += improvements.tempSciBonus;
+			improvements.listOfImprovements[25].improvementMessage = ("+" + improvements.tempCount + "% Effect from Science Improvements");
+		}
+	}
+
+	private void TN4I1()
+	{
+		if(improvements.IsBuiltOnPlanetType(improvements.system, 26, "Boreal") == true 
+		   || improvements.IsBuiltOnPlanetType(improvements.system, 26, "Tundra") == true 
+		   || improvements.IsBuiltOnPlanetType(improvements.system, 26, "Desolate") == true)
+		{
+			improvements.tempCount = 0.15f;
+		}
+
+		improvements.tempOwnershipBonus = improvements.tempCount * racialTraitScript.nereidesStacks;
+
+		if(checkValue == false)
+		{
+			improvements.ownershipModifier += improvements.tempOwnershipBonus;
+			improvements.listOfImprovements[26].improvementMessage = ("+" + improvements.tempCount * racialTraitScript.nereidesStacks + "Ownership from Elation");
+		}
+	}
+
+	private void TN4I2()
+	{
+		if(systemListConstructor.systemList[improvements.system].systemDefence < systemDefence.maxSystemDefence)
+		{
+			improvements.tempSciBonus = 1f;
+			improvements.tempIndBonus = 1f;
+		}
+
+		if(checkValue == false)
+		{
+			improvements.sciencePercentBonus += 1f;
+			improvements.industryPercentBonus += 1f;
+			improvements.listOfImprovements[27].improvementMessage = ("+100% Resource Production from Invasion");
+		}
+	}
 }

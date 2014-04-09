@@ -30,6 +30,11 @@ public class EmpireBoundaries : MasterScript
 		}
 
 		radius = tempRadius;
+
+		if(radius > 8f)
+		{
+			radius = 8f;
+		}
 	}
 
 	private void CreateCircle (int system, Material material)

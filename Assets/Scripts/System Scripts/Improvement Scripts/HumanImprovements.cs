@@ -3,122 +3,214 @@ using System.Collections;
 
 public class HumanImprovements : MasterScript 
 {
-	public void CheckHumanImprovements(int system, ImprovementsBasic improvements, TurnInfo thisPlayer)
+	private ImprovementsBasic improvements;
+	private bool checkValue;
+	private TurnInfo thisPlayer;
+
+	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
 	{
-		if(improvements.listOfImprovements[12].hasBeenBuilt == true)
+		improvements = tempImprov;
+		checkValue = check;
+		thisPlayer = player;
+		
+		switch (tech)
 		{
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+		case 12:
+			TH1I1();
+			break;
+		case 13:
+			TH1I2();
+			break;
+		case 14:
+			TH2I1();
+			break;
+		case 15:
+			TH2I2();
+			break;
+		case 16:
+			TH3I1();
+			break;
+		case 17:
+			TH3I2();
+			break;
+		case 18:
+			TH4I1();
+			break;
+		case 19:
+			TH4I2();
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void TH1I1()
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
+		{
+			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetColonised == true)
 			{
-				if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == true)
+				if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership < systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxOwnership)
 				{
-					if(systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership < systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership)
+					++improvements.tempOwnershipUnitBonus;
+
+					if(checkValue == false)
 					{
-						++systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
+						++systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership;
 					}
 				}
 			}
-			
+		}
+
+		if(checkValue == false)
+		{
 			improvements.listOfImprovements[12].improvementMessage = ("+1 Ownership per turn");
 		}
-		
-		if(improvements.listOfImprovements[13].hasBeenBuilt == true)
+	}
+
+	private void TH1I2()
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
 		{
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetCategory == "Terran")
 			{
-				if(systemListConstructor.systemList[system].planetsInSystem[i].planetCategory == "Terran")
+				float oToAdd = 0;
+
+				if(5 > systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxOwnership - systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership)
 				{
-					if(5 > systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership - systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership)
-					{
-						systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership += systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership - 
-							systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
-					}
-					else
-					{
-						systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership += 5;
-					}
+					oToAdd = systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxOwnership - 
+						systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership;
+				}
+				else
+				{
+					oToAdd = 5;
+				}
+
+				improvements.tempOwnershipUnitBonus += oToAdd;
+
+				if(checkValue == false)
+				{
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership += oToAdd;
 				}
 			}
-			
+		}
+
+		if(checkValue == false)
+		{
 			improvements.listOfImprovements[13].improvementMessage = ("+5 Ownership on Terran");
 		}
-		
-		if(improvements.listOfImprovements[14].hasBeenBuilt == true)
+	}
+
+	private void TH2I1()
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
 		{
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetImprovementLevel == 3)
 			{
-				if(systemListConstructor.systemList[system].planetsInSystem[i].planetImprovementLevel == 3)
+				improvements.tempOwnershipBonus += 20;
+
+				if(checkValue == false)
 				{
 					improvements.maxOwnershipBonus += 20;
 				}
 			}
-			
+		}
+
+		if(checkValue == false)
+		{
 			improvements.listOfImprovements[14].improvementMessage = ("+20% Max Ownership on Fully Improved Systems");
 		}
+	}
+
+	private void TH2I2()
+	{
+		improvements.tempSciBonus -= 0.3f;
+		improvements.tempIndBonus -= 0.3f;
 		
-		if(improvements.listOfImprovements[15].hasBeenBuilt == true)
-		{			
+		++improvements.tempBonusAmbition;
+
+		if(checkValue == false)
+		{
 			improvements.sciencePercentBonus -= 0.3f;
 			improvements.industryPercentBonus -= 0.3f;
-			
+
 			++racialTraitScript.ambitionCounter;
-			
+
 			improvements.listOfImprovements[15].improvementMessage = ("-30% SIM Converted to Ambition");
 		}
-		
-		if(improvements.listOfImprovements[16].hasBeenBuilt == true)
+	}
+
+	private void TH3I1()
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
 		{
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership < 33)
 			{
-				if(systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership < 33)
+				improvements.tempOwnershipUnitBonus += 33 - systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership;
+
+				if(checkValue == false)
 				{
-					systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership = 33;
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership = 33;
 				}
 			}
-			
+		}
+
+		if(checkValue == false)
+		{
 			improvements.listOfImprovements[16].improvementMessage = ("Minimum Ownership of 33%");
 		}
-		
-		if(improvements.listOfImprovements[17].hasBeenBuilt == true)
+	}
+
+	private void TH3I2()
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
 		{
-			improvements.tempCount = 0.0f;
-			
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetCategory == "Terran")
 			{
-				if(systemListConstructor.systemList[system].planetsInSystem[i].planetCategory == "Terran")
-				{
-					racialTraitScript.ambitionCounter += 2;
-					improvements.tempCount = 2.0f;
-					break;
-				}
+				improvements.tempBonusAmbition = 2;
+				break;
 			}
-			
-			improvements.listOfImprovements[17].improvementMessage = ("+" + improvements.tempCount + " Ambition from Terran Planet");
 		}
-		
-		if(improvements.listOfImprovements[18].hasBeenBuilt == true)
+
+		if(checkValue == false)
+		{
+			racialTraitScript.ambitionCounter += improvements.tempBonusAmbition;
+			improvements.listOfImprovements[17].improvementMessage = ("+" + improvements.tempBonusAmbition + " Ambition from Terran Planet");
+		}
+	}
+
+	private void TH4I1()
+	{
+		improvements.tempOwnershipBonus = racialTraitScript.ambitionCounter / 40.0f;
+
+		if(checkValue == false)
 		{
 			improvements.listOfImprovements[18].improvementMessage = ("Ambition has no effect on planet Ownership");
 		}
+	}
+
+	private void TH4I2()
+	{		
+		string tempString = null;
 		
-		if(improvements.listOfImprovements[19].hasBeenBuilt == true)
+		if(racialTraitScript.ambitionCounter > 75)
 		{
-			improvements.tempCount = 0.0f;
+			improvements.tempCount = (racialTraitScript.ambitionCounter - 75) / 100.0f;
 			
-			string tempString = null;
+			tempString = ("+" + improvements.tempCount + "% SIM from Renaissance");
+		}
+		if(racialTraitScript.ambitionCounter < -75)
+		{
+			improvements.tempCount = (racialTraitScript.ambitionCounter + 75) / 100.0f;
 			
-			if(racialTraitScript.ambitionCounter > 75)
-			{
-				improvements.tempCount = (racialTraitScript.ambitionCounter - 75) / 100.0f;
-				
-				tempString = ("+" + improvements.tempCount + "% SIM from Renaissance");
-			}
-			if(racialTraitScript.ambitionCounter < -75)
-			{
-				improvements.tempCount = (racialTraitScript.ambitionCounter + 75) / 100.0f;
-				
-				tempString = (improvements.tempCount + "% SIM from Depression");
-			}
-			
+			tempString = (improvements.tempCount + "% SIM from Depression");
+		}
+
+		improvements.tempSciBonus = improvements.tempCount;
+		improvements.tempIndBonus = improvements.tempCount;
+
+		if(checkValue == false)
+		{
 			improvements.sciencePercentBonus += improvements.tempCount;
 			improvements.industryPercentBonus += improvements.tempCount;
 			
