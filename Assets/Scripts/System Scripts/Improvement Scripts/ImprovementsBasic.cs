@@ -7,7 +7,9 @@ using System.Xml;
 public class ImprovementsBasic : MasterScript 
 {
 	public float sciencePercentBonus, industryPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, scienceBonusModifier, ownershipModifier, maxOwnershipBonus;
-	public float tempSciBonus, tempIndBonus, tempCapital, tempSciUnitBonus, tempIndUnitBonus, tempOwnershipBonus, tempResearchCostReduction, tempImprovementCostReduction, tempOwnershipUnitBonus, tempCount, tempBonusAmbition;
+	public float tempSciBonus, tempIndBonus, tempOwnershipBonus, tempCapital, tempSciUnitBonus, tempIndUnitBonus, tempResearchCostReduction, tempImprovementCostReduction, 
+			tempOwnershipUnitBonus, tempCount, tempBonusAmbition, tempAmberProductionBonus, tempAmberPointBonus, tempImprovementSlots, tempAmberPenalty;
+	public List<string> planetToBuildOn = new List<string>();
 	public GameObject tooltip;
 	public int techTier = 0, improvementCostModifier = 0, researchCost, system;
 	private GenericImprovements genericImprovements;

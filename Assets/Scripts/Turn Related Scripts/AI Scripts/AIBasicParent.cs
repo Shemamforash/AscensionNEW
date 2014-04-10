@@ -4,11 +4,17 @@ using System.Collections;
 public class AIBasicParent : TurnInfo
 {
 	public string selkiesHomeSystem, nereidesHomeSystem, humansHomeSystem;
-	private float tempSIM, highestSIM;
-	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem, checkHeroTimer = 0;
+	private float tempSIM, highestSIM, tempFloat;
+	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem, checkHeroTimer = 0, tempTech;
 	private bool saveForHero;
 	private TurnInfo thisPlayer;
 	private AIHeroBehaviour heroBehaviour;
+	private GenericImprovements improvements;
+
+	public void Start()
+	{
+		improvements = GameObject.Find ("ScriptsContainer").GetComponent<GenericImprovements> ();
+	}
 
 	public void Expand(TurnInfo player)
 	{
@@ -43,13 +49,246 @@ public class AIBasicParent : TurnInfo
 	private void OptimumTechToBuild(int system)
 	{
 		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
+		improvementsBasic = systemListConstructor.systemList [system].systemObject.GetComponent<ImprovementsBasic> ();
 
 		float sciRatio = (100 / systemSIMData.totalSystemSIM) * systemSIMData.totalSystemScience;
 		float indRatio = (100 / systemSIMData.totalSystemSIM) * systemSIMData.totalSystemIndustry;
 
-		for(int i = 0; i < systemListConstructor.systemList[system].planetsInSystem.Count; ++i)
-		{
+		tempFloat = 0f;
+		tempTech = -1;
+		tempPlanet = -1;
 
+		for(int i = 0; i < improvementsBasic.listOfImprovements.Count; ++i)
+		{
+			if(improvementsBasic.listOfImprovements[i].improvementCost > thisPlayer.industry)
+			{
+				continue;
+			}
+
+			if(improvementsBasic.listOfImprovements[i].improvementLevel <= improvementsBasic.techTier && improvementsBasic.listOfImprovements[i].hasBeenBuilt == false)
+			{
+				improvements.TechSwitch(i, improvementsBasic, thisPlayer, true);
+				bool okToBuild = false;
+
+				if(improvementsBasic.planetToBuildOn.Count > 0)
+				{
+					for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem.Count; ++j)
+					{
+						if(improvementsBasic.planetToBuildOn.Contains(systemListConstructor.systemList[system].planetsInSystem[j].planetType))
+						{
+							okToBuild = true;
+							tempPlanet = j;
+						}
+					}
+				}
+
+				if(tempPlanet != -1)
+				{
+					int tempPlanSize = 0;
+
+					for(int j = 0; j < systemListConstructor.systemList[system].planetsInSystem.Count; ++j)
+					{
+						int noSlots = 0;
+
+						for(int k = 0; k < systemListConstructor.systemList[system].planetsInSystem[j].improvementSlots; ++k)
+						{
+							if(systemListConstructor.systemList[system].planetsInSystem[j].improvementsBuilt[k] == null)
+							{
+								++noSlots;
+							}
+						}
+
+						if(noSlots > tempPlanSize)
+						{
+							tempPlanSize = noSlots;
+							tempPlanet = j;
+						}
+					}
+				}
+
+				if(improvementsBasic.planetToBuildOn.Count == 0)
+				{
+					okToBuild = true;
+				}
+
+				if(okToBuild == true)
+				{
+					RacialTechCheck(i);
+					GenericTechCheck(i);
+				}
+			}
+		}
+
+		if(tempTech != -1f)
+		{
+			if(improvementsBasic.ImproveSystem(system) == true)
+			{
+				for(int i = 0; i < systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[tempPlanet].improvementSlots; ++i)
+				{
+					if(systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[tempPlanet].improvementsBuilt[i] == null)
+					{
+						systemListConstructor.systemList[systemGUI.selectedSystem].planetsInSystem[tempPlanet].improvementsBuilt[i] = improvementsBasic.listOfImprovements[i].improvementName;
+					}
+				}
+			}
+		}
+	}
+
+	private void RacialTechCheck(int i)
+	{
+		if(thisPlayer.playerRace == "Humans")
+		{
+			if(improvementsBasic.tempBonusAmbition * 50 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+			{
+				if(improvementsBasic.tempBonusAmbition * 50 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat || tempTech == i)
+				{
+					tempFloat = improvementsBasic.tempBonusAmbition * 50 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempTech = i;
+				}
+			}
+		}
+		
+		if(thisPlayer.playerRace == "Selkies")
+		{
+			if((improvementsBasic.tempAmberPenalty + improvementsBasic.amberPenalty) * 10 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat || tempTech == i)
+			{
+				if(improvementsBasic.tempAmberPenalty > improvementsBasic.amberPenalty)
+				{
+					tempFloat = (improvementsBasic.tempAmberPenalty + improvementsBasic.amberPenalty) * 10 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempTech = i;
+				}
+			}
+			
+			if(improvementsBasic.amberPointBonus * 50 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat || tempTech == i)
+			{
+				if(improvementsBasic.amberPointBonus * 50 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+				{
+					if(tempTech == i)
+					{
+						tempFloat += improvementsBasic.amberPointBonus * 50 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					}
+					else
+					{
+						tempFloat = improvementsBasic.amberPointBonus * 50 * improvementsBasic.listOfImprovements[i].improvementLevel;
+						tempTech = i;
+					}
+				}
+			}
+			
+			if(improvementsBasic.amberProductionBonus * systemSIMData.totalSystemAmber * 100 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat || tempTech == i)
+			{
+				if(improvementsBasic.amberProductionBonus * systemSIMData.totalSystemAmber * 100 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+				{
+					if(tempTech == i)
+					{
+						tempFloat += improvementsBasic.amberProductionBonus * systemSIMData.totalSystemAmber * 100 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					}
+					else
+					{
+						tempFloat = improvementsBasic.amberProductionBonus * systemSIMData.totalSystemAmber * 100 * improvementsBasic.listOfImprovements[i].improvementLevel;
+						tempTech = i;
+					}
+				}
+			}
+		}
+	}
+
+	private void GenericTechCheck(int i)
+	{
+		if(improvementsBasic.tempIndUnitBonus * 4 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		{
+			if(improvementsBasic.tempIndUnitBonus > tempFloat)
+			{
+				if(tempTech == i)
+				{
+					tempFloat += improvementsBasic.tempIndUnitBonus * improvementsBasic.listOfImprovements[i].improvementLevel;
+				}
+				else
+				{
+					tempFloat = improvementsBasic.tempIndUnitBonus * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempTech = i;
+				}
+			}
+		}
+		
+		if(improvementsBasic.tempSciUnitBonus * 4 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		{
+			if(improvementsBasic.tempSciUnitBonus > tempFloat || tempTech == i)
+			{
+				if(tempTech == i)
+				{
+					tempFloat += improvementsBasic.tempSciUnitBonus * improvementsBasic.listOfImprovements[i].improvementLevel;
+				}
+				else
+				{
+					tempFloat = improvementsBasic.tempSciUnitBonus * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempTech = i;
+				}
+			}
+		}
+		
+		if(improvementsBasic.tempImprovementSlots * 100 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		{
+			if(improvementsBasic.tempImprovementSlots * 100 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat || tempTech == i)
+			{
+				if(tempTech == i)
+				{
+					tempFloat += improvementsBasic.tempImprovementSlots * 100 * improvementsBasic.listOfImprovements[i].improvementLevel;
+				}
+				else
+				{
+					tempFloat = improvementsBasic.tempImprovementSlots * 100 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempTech = i;
+				}
+			}
+		}
+		
+		if(improvementsBasic.tempCapital * 25 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		{
+			if(improvementsBasic.tempCapital * 25 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat)
+			{
+				if(tempTech == i)
+				{
+					tempFloat += improvementsBasic.tempCapital * 25 * improvementsBasic.listOfImprovements[i].improvementLevel;
+				}
+				else
+				{
+					tempFloat = improvementsBasic.tempCapital * 25 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempTech = i;
+				}
+			}
+		}
+		
+		if(improvementsBasic.tempImprovementCostReduction * 50 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		{
+			if(improvementsBasic.tempImprovementCostReduction * 50 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat)
+			{
+				if(tempTech == i)
+				{
+					tempFloat += improvementsBasic.tempImprovementCostReduction * 50 * improvementsBasic.listOfImprovements[i].improvementLevel;
+				}
+				else
+				{
+					tempFloat = improvementsBasic.tempImprovementCostReduction * 50 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempTech = i;
+				}
+			}
+		}
+		
+		if(improvementsBasic.tempResearchCostReduction * 50 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		{
+			if(improvementsBasic.tempResearchCostReduction * 50 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat)
+			{
+				if(tempTech == i)
+				{
+					tempFloat += improvementsBasic.tempResearchCostReduction * 50 * improvementsBasic.listOfImprovements[i].improvementLevel;
+				}
+				else
+				{
+					tempFloat = improvementsBasic.tempResearchCostReduction * 50 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempTech = i;
+				}
+			}
 		}
 	}
 

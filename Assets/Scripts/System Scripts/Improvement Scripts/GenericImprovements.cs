@@ -17,6 +17,92 @@ public class GenericImprovements : MasterScript
 		selkiesImprovements = GameObject.Find ("ScriptsContainer").GetComponent<SelkiesImprovements> ();
 	}
 
+	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
+	{
+		systemSIMData = systemListConstructor.systemList [improvements.system].systemObject.GetComponent<SystemSIMData> ();
+		
+		improvements = tempImprov;
+		checkValue = check;
+		thisPlayer = player;
+
+		improvements.planetToBuildOn = null;
+
+		improvements.tempSciUnitBonus = 0f;  
+		improvements.tempIndUnitBonus = 0f; 
+
+		improvements.tempSciBonus = 0f; //To Unit
+		improvements.tempIndBonus = 0f; //To Unit
+		improvements.tempOwnershipBonus = 0f; //To Unit
+		improvements.tempAmberPenalty = 0f; //To Unit
+		improvements.tempOwnershipUnitBonus = 0f; //To Unit
+
+		improvements.tempBonusAmbition = 0f; 
+		improvements.tempAmberProductionBonus = 0f; 
+		improvements.tempAmberPointBonus = 0f;
+		improvements.tempImprovementSlots = 0f;
+		improvements.tempCapital = 0f; 
+		
+		improvements.tempResearchCostReduction = 0f;  
+		improvements.tempImprovementCostReduction = 0f; 
+		
+		improvements.tempCount = 0f;		
+		
+		switch (tech)
+		{
+		case 0:
+			T0I1();
+			break;
+		case 1:
+			T0I2();
+			break;
+		case 2:
+			T0I3();
+			break;
+		case 3:
+			T1I1();
+			break;
+		case 4:
+			T1I2();
+			break;
+		case 5:
+			T1I3();
+			break;
+		case 6:
+			T2I1();
+			break;
+		case 7:
+			T2I2();
+			break;
+		case 8:
+			T2I3();
+			break;
+		case 9:
+			T3I1();
+			break;
+		case 10:
+			T3I2();
+			break;
+		case 11:
+			T3I3();
+			break;
+		default:
+			break;
+		}
+		
+		if(thisPlayer.playerRace == "Humans")
+		{
+			humanImprovements.TechSwitch(tech, tempImprov, thisPlayer, checkValue);
+		}
+		if(thisPlayer.playerRace == "Nereides")
+		{
+			nereidesImprovements.TechSwitch(tech, tempImprov, thisPlayer, checkValue);
+		}
+		if(thisPlayer.playerRace == "Selkies")
+		{
+			selkiesImprovements.TechSwitch(tech, tempImprov, thisPlayer, checkValue);
+		}
+	}
+
 	private void T0I1()
 	{
 		for(int i = 0; i < improvements.listOfImprovements.Count; ++i)
@@ -28,6 +114,9 @@ public class GenericImprovements : MasterScript
 				improvements.tempCount += 0.05f;
 			}
 		}
+
+		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * improvements.tempSciBonus;
+		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempIndBonus;
 
 		if(checkValue == false)
 		{
@@ -49,6 +138,8 @@ public class GenericImprovements : MasterScript
 				improvements.tempCount += 0.075f;
 			}
 		}
+
+		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempIndBonus;
 
 		if(checkValue == false)
 		{
@@ -75,9 +166,10 @@ public class GenericImprovements : MasterScript
 		if(j != 0)
 		{
 			systemSIMData = systemListConstructor.systemList[improvements.system].systemObject.GetComponent<SystemSIMData>();
-			improvements.tempSciUnitBonus = (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
-			improvements.tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 		}
+
+		improvements.tempSciUnitBonus = (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
+		improvements.tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 
 		if(checkValue == false)
 		{
@@ -91,6 +183,7 @@ public class GenericImprovements : MasterScript
 		int tempCount = CheckNumberOfPlanetsWithImprovement(4, thisPlayer, improvements);
 		
 		improvements.tempIndBonus = (tempCount * 0.05f);
+		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempIndBonus;
 
 		if(checkValue == false)
 		{
@@ -109,6 +202,9 @@ public class GenericImprovements : MasterScript
 			improvements.tempCount = 20f;
 		}
 
+		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * (improvements.tempOwnershipBonus / 66.666f);
+
 		if(checkValue == false)
 		{
 			improvements.maxOwnershipBonus += improvements.tempOwnershipBonus;
@@ -126,6 +222,8 @@ public class GenericImprovements : MasterScript
 				improvements.tempCount += 0.25f;
 			}
 		}
+
+		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * improvements.tempSciBonus;
 
 		if(checkValue == false)
 		{
@@ -148,12 +246,13 @@ public class GenericImprovements : MasterScript
 		
 		if(allPlanetsColonised == true)
 		{
-			improvements.tempIndBonus += 0.2f;
+			improvements.tempIndUnitBonus += 0.2f;
 			improvements.tempCount += 0.2f;
 		}
 		
 		improvements.tempIndBonus += 0.1f;
 		improvements.tempCount += 0.1f;
+		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempIndBonus;
 
 		if(checkValue == false)
 		{
@@ -227,78 +326,6 @@ public class GenericImprovements : MasterScript
 		{
 			improvements.researchCost += (int)improvements.tempResearchCostReduction;
 			improvements.listOfImprovements[11].improvementMessage = ("-" + improvements.tempCount + " Research cost from other Systems with this Improvement");
-		}
-	}
-
-	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
-	{
-		improvements = tempImprov;
-		checkValue = check;
-		thisPlayer = player;
-
-		improvements.tempCount = 0f;
-		improvements.tempSciBonus = 0f;
-		improvements.tempIndBonus = 0f;
-		improvements.tempCapital = 0f;
-		improvements.tempSciUnitBonus = 0f;
-		improvements.tempIndUnitBonus = 0f;
-		improvements.tempOwnershipBonus = 0f;
-		improvements.tempResearchCostReduction = 0f;
-		improvements.tempImprovementCostReduction = 0f;
-
-		switch (tech)
-		{
-		case 0:
-			T0I1();
-			break;
-		case 1:
-			T0I2();
-			break;
-		case 2:
-			T0I3();
-			break;
-		case 3:
-			T1I1();
-			break;
-		case 4:
-			T1I2();
-			break;
-		case 5:
-			T1I3();
-			break;
-		case 6:
-			T2I1();
-			break;
-		case 7:
-			T2I2();
-			break;
-		case 8:
-			T2I3();
-			break;
-		case 9:
-			T3I1();
-			break;
-		case 10:
-			T3I2();
-			break;
-		case 11:
-			T3I3();
-			break;
-		default:
-			break;
-		}
-
-		if(thisPlayer.playerRace == "Humans")
-		{
-			humanImprovements.TechSwitch(tech, tempImprov, thisPlayer, checkValue);
-		}
-		if(thisPlayer.playerRace == "Nereides")
-		{
-			nereidesImprovements.TechSwitch(tech, tempImprov, thisPlayer, checkValue);
-		}
-		if(thisPlayer.playerRace == "Selkies")
-		{
-			selkiesImprovements.CheckSelkiesImprovements(improvements.system, tempImprov, thisPlayer);
 		}
 	}
 
