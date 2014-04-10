@@ -3,104 +3,197 @@ using System.Collections;
 
 public class SelkiesImprovements : MasterScript 
 {
-	public void CheckSelkiesImprovements(int system, ImprovementsBasic improvements, TurnInfo thisPlayer)
+	private ImprovementsBasic improvements;
+	private bool checkValue;
+	private TurnInfo thisPlayer;
+	
+	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
 	{
-		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
+		systemSIMData = systemListConstructor.systemList[improvements.system].systemObject.GetComponent<SystemSIMData>();
 
-		if(improvements.listOfImprovements[29].hasBeenBuilt == true)
+		improvements = tempImprov;
+		checkValue = check;
+		thisPlayer = player;
+		
+		switch (tech) //The order of these is important
 		{
-			improvements.improvementCostModifier += (int)systemSIMData.totalSystemAmber;
+		case 28:
+			TS1I1();
+			break;
+		case 29:
+			TS1I2();
+			break;
+		case 30:
+			TS2I2();
+			break;
+		case 31:
+			TS3I2();
+			break;
+		case 32:
+			TS4I1();
+			break;
+		case 33:
+			TS4I2 ();
+			break;
+		case 34:
+			TS2I1();
+			break;
+		case 35:
+			TS3I1();
+			break;
+		case 36:
+			TS1I0();
+			break;
+		default:
+			break;
+		}
+	}
 
+	private void TS1I0()
+	{
+		improvements.tempAmberPenalty = improvements.amberPenalty;
+
+		if(checkValue == false)
+		{
+			improvements.listOfImprovements[28].improvementMessage = ("System is suffering -" + improvements.amberPenalty * 100 + "% Resource production from Amber Penalty");
+		}
+	}
+
+	private void TS1I1()
+	{
+		improvements.tempImprovementCostReduction = systemSIMData.totalSystemAmber;
+
+		if(checkValue == false)
+		{
+			improvements.improvementCostModifier += (int)improvements.tempImprovementCostReduction;
 			improvements.listOfImprovements[29].improvementMessage = ("System Improvements cost " + systemSIMData.totalSystemAmber + " fewer Industry from Amber production");
 		}
+	}
 
-		if(improvements.listOfImprovements[30].hasBeenBuilt == true)
+	private void TS1I2()
+	{
+		int adjacentSystems = 0;
+		
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].permanentConnections.Count; ++i)
 		{
-			int adjacentSystems = 0;
-
-			for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
+			int j = RefreshCurrentSystem(systemListConstructor.systemList[improvements.system].permanentConnections[i]);
+			
+			if(systemListConstructor.systemList[j].systemOwnedBy == thisPlayer.playerRace)
 			{
-				int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
-
-				if(systemListConstructor.systemList[j].systemOwnedBy == thisPlayer.playerRace)
-				{
-					++adjacentSystems;
-				}
+				++adjacentSystems;
 			}
+		}
 
-			improvements.amberPenalty -= adjacentSystems * 0.05f;
+		improvements.tempAmberPenalty -= adjacentSystems * 0.05f;
 
+		if(checkValue == false)
+		{
+			improvements.amberPenalty -= improvements.tempAmberPenalty;
 			improvements.listOfImprovements[30].improvementMessage = ("-" + (adjacentSystems * 0.05f) + " Amber Penalty from adjacent Selkies Systems");
 		}
+	}
 
-		if(improvements.listOfImprovements[32].hasBeenBuilt == true)
+	private void TS2I1()
+	{
+		improvements.tempAmberPointBonus -= 4f;
+		improvements.tempAmberPenalty = improvements.amberPenalty / 2f;
+
+		if(checkValue == false)
 		{
-			improvements.amberProductionBonus += systemSIMData.totalSystemIndustry * 0.01f;
-
-			improvements.listOfImprovements[32].improvementMessage = ("+" + (systemSIMData.totalSystemIndustry * 0.01f) + "% Amber production from Industry production");
-		}
-
-		if(improvements.listOfImprovements[34].hasBeenBuilt == true)
-		{
-			if(systemSIMData.totalSystemAmber > 10.0f)
-			{
-				improvements.amberProductionBonus += 0.5f;
-			}
-		}
-
-		if(improvements.listOfImprovements[35].hasBeenBuilt == true)
-		{
-			improvements.maxOwnershipBonus += systemSIMData.totalSystemAmber;
-
-			improvements.listOfImprovements[35].improvementMessage = ("+" + systemSIMData.totalSystemAmber + "% Ownership Cap from Amber production");
-		}
-
-		if(improvements.listOfImprovements[36].hasBeenBuilt == true)
-		{
-			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
-			{
-				string tempString = systemListConstructor.systemList[system].planetsInSystem[i].planetType;
-				
-				if(tempString == "Molten")
-				{
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots = 4;
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
-				}
-				
-				if(tempString == "Prairie")
-				{
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots = 3;
-					systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt.Add (null);
-				}
-			}
-			
-			improvements.listOfImprovements[23].improvementMessage = ("+1/+2 Improvement Slot(s) on Prairie/Molten Planets");
-		}
-
-		if(improvements.listOfImprovements[31].hasBeenBuilt == true)
-		{
-			improvements.amberPointBonus -= 4f;
-
-			improvements.amberPenalty = improvements.amberPenalty / 2f;
-
+			improvements.amberPointBonus -= improvements.tempAmberPointBonus;
+			improvements.amberPenalty = improvements.tempAmberPenalty;
 			improvements.listOfImprovements[31].improvementMessage = "-4 Amber production, Amber penalty is halved";
 		}
+	}
 
-		if(improvements.listOfImprovements[33].hasBeenBuilt == true)
+	private void TS2I2()
+	{
+		improvements.tempAmberProductionBonus += systemSIMData.totalSystemIndustry * 0.01f;
+		
+		if(checkValue == false)
 		{
-			improvements.amberPointBonus -= 2f;
-			
-			improvements.amberPenalty = improvements.amberPenalty / 2f;
-			
+			improvements.amberProductionBonus += improvements.tempAmberProductionBonus;
+			improvements.listOfImprovements[32].improvementMessage = ("+" + (systemSIMData.totalSystemIndustry * 0.01f) + "% Amber production from Industry production");
+		}
+	}
+
+	private void TS3I1()
+	{
+		improvements.tempAmberPointBonus -= 2f;
+		improvements.tempAmberPenalty = improvements.amberPenalty / 2f;
+
+		if(checkValue == false)
+		{
+			improvements.amberPointBonus -= improvements.tempAmberPointBonus;
+			improvements.amberPenalty = improvements.tempAmberPenalty;
 			improvements.listOfImprovements[33].improvementMessage = "-2 Amber production, Amber penalty is halved";
 		}
+	}
 
-		if(improvements.listOfImprovements[28].hasBeenBuilt == true)
+	private void TS3I2()
+	{
+		if(systemSIMData.totalSystemAmber > 10.0f)
 		{
-			systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
+			improvements.tempAmberProductionBonus += 0.5f;
+		}
+		
+		if(checkValue == false)
+		{
+			improvements.amberProductionBonus += improvements.tempAmberProductionBonus;
+			improvements.listOfImprovements[34].improvementMessage = ("+" + improvements.tempAmberProductionBonus * 100 + "% Amber production from Amber excess");
+		}
+	}
+
+	private void TS4I1()
+	{
+		improvements.tempOwnershipBonus += systemSIMData.totalSystemAmber;
+
+		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * (improvements.tempOwnershipBonus / 66.666f);
+
+		if(checkValue == false)
+		{
+			improvements.maxOwnershipBonus += improvements.tempOwnershipBonus;
+			improvements.listOfImprovements[35].improvementMessage = ("+" + systemSIMData.totalSystemAmber + "% Ownership Cap from Amber production");
+		}
+	}
+
+	private void TS4I2() //This also needs a value
+	{
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
+		{
+			string tempString = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetType;
 			
-			improvements.listOfImprovements[28].improvementMessage = ("System is suffering -" + improvements.amberPenalty * 100 + "% Resource production from Amber Penalty");
+			if(tempString == "Molten")
+			{
+				improvements.tempImprovementSlots += 2;
+
+				if(checkValue == false)
+				{
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementSlots += 2;
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Add (null);
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Add (null);
+				}
+			}
+			
+			if(tempString == "Prairie")
+			{
+				improvements.tempImprovementSlots += 1;
+
+				if(checkValue == false)
+				{
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementSlots += 1;
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Add (null);
+				}
+			}
+		}
+
+		improvements.planetToBuildOn.Add ("Molten");
+		improvements.planetToBuildOn.Add ("Prairie");
+	
+		if(checkValue == false)
+		{
+			improvements.listOfImprovements[36].improvementMessage = ("+1/+2 Improvement Slot(s) on Prairie/Molten Planets");
 		}
 	}
 }

@@ -305,9 +305,9 @@ public class Planet
 {
 	public string planetName, planetType, planetCategory;
 	public List<string> improvementsBuilt = new List<string> ();
-	public float planetScience, planetIndustry, planetOwnership, planetDefence, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength;
+	public float planetScience, planetIndustry, planetOwnership, planetDefence, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxOwnership;
 	public bool planetColonised, underEnemyControl, virusActive, chillActive, poisonActive;
-	public int planetImprovementLevel, improvementSlots, maxOwnership, capitalValue;
+	public int planetImprovementLevel, improvementSlots, capitalValue;
 }
 
 public class BasicImprovement
