@@ -56,8 +56,8 @@ public class HumanImprovements : MasterScript
 				{
 					float tempFloat = systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxOwnership - systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership;
 
-					improvements.tempSciUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetScience * ((tempFloat * 2f) / 66.666f);
-					improvements.tempIndUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetIndustry * ((tempFloat * 2f) / 66.666f);
+					improvements.tempKnwlUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetKnowledge * ((tempFloat * 2f) / 66.666f);
+					improvements.tempPowUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPower * ((tempFloat * 2f) / 66.666f);
 
 					if(checkValue == false)
 					{
@@ -103,8 +103,8 @@ public class HumanImprovements : MasterScript
 		improvements.planetToBuildOn.Add ("Forest");
 		improvements.planetToBuildOn.Add("Ocean");
 		improvements.planetToBuildOn.Add ("Prairie");
-		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
 
 		if(checkValue == false)
 		{
@@ -118,8 +118,8 @@ public class HumanImprovements : MasterScript
 		{
 			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetImprovementLevel == 3)
 			{
-				improvements.tempSciUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetScience * (20f / 66.666f);
-				improvements.tempIndUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetIndustry * (20f / 66.666f);
+				improvements.tempKnwlUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetKnowledge * (20f / 66.666f);
+				improvements.tempPowUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPower * (20f / 66.666f);
 
 				if(checkValue == false)
 				{
@@ -136,15 +136,15 @@ public class HumanImprovements : MasterScript
 
 	private void TH2I2()
 	{
-		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * -0.3f;
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * -0.3f;
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * -0.3f;
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * -0.3f;
 		
 		++improvements.tempBonusAmbition;
 
 		if(checkValue == false)
 		{
-			improvements.sciencePercentBonus -= 0.3f;
-			improvements.industryPercentBonus -= 0.3f;
+			improvements.knowledgePercentBonus -= 0.3f;
+			improvements.powerPercentBonus -= 0.3f;
 
 			++racialTraitScript.ambitionCounter;
 
@@ -158,8 +158,8 @@ public class HumanImprovements : MasterScript
 		{
 			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership < 33)
 			{
-				improvements.tempSciUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetScience * (33f / 66.666f);
-				improvements.tempIndUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetIndustry * (33f / 66.666f);
+				improvements.tempKnwlUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetKnowledge * (33f / 66.666f);
+				improvements.tempPowUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPower * (33f / 66.666f);
 
 				if(checkValue == false)
 				{
@@ -200,8 +200,8 @@ public class HumanImprovements : MasterScript
 	{
 		improvements.tempOwnershipBonus = racialTraitScript.ambitionCounter / 40.0f;
 
-		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
 
 		if(checkValue == false)
 		{
@@ -226,13 +226,13 @@ public class HumanImprovements : MasterScript
 			tempString = (improvements.tempCount + "% SIM from Depression");
 		}
 
-		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * improvements.tempCount;
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempCount;
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * improvements.tempCount;
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempCount;
 
 		if(checkValue == false)
 		{
-			improvements.sciencePercentBonus += improvements.tempCount;
-			improvements.industryPercentBonus += improvements.tempCount;			
+			improvements.knowledgePercentBonus += improvements.tempCount;
+			improvements.powerPercentBonus += improvements.tempCount;			
 			improvements.listOfImprovements[19].improvementMessage = (tempString);
 		}
 	}

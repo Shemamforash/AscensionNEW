@@ -90,8 +90,8 @@ public class WinConditions : MasterScript
 
 	void EconomicWin()
 	{
-		float scienceRate = 0;
-		float industryRate = 0;
+		float knowledgeRate = 0;
+		float powerRate = 0;
 
 		for(int i = 0; i < systemListConstructor.mapSize; ++i)
 		{
@@ -99,12 +99,12 @@ public class WinConditions : MasterScript
 			{
 				systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
 
-				scienceRate += systemSIMData.totalSystemScience;
-				industryRate += systemSIMData.totalSystemIndustry;
+				knowledgeRate += systemSIMData.totalSystemKnowledge;
+				powerRate += systemSIMData.totalSystemPower;
 			}
 		}
 
-		if(scienceRate >= 1000f && industryRate >= 1000f)
+		if(knowledgeRate >= 1000f && powerRate >= 1000f)
 		{
 			winPlayer = player.playerRace;
 			winCondition = "Economic";

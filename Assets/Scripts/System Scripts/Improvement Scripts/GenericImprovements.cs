@@ -27,11 +27,11 @@ public class GenericImprovements : MasterScript
 
 		improvements.planetToBuildOn = null;
 
-		improvements.tempSciUnitBonus = 0f;  
-		improvements.tempIndUnitBonus = 0f; 
+		improvements.tempKnwlUnitBonus = 0f;  
+		improvements.tempPowUnitBonus = 0f; 
 
-		improvements.tempSciBonus = 0f; //To Unit
-		improvements.tempIndBonus = 0f; //To Unit
+		improvements.tempKnwlBonus = 0f; //To Unit
+		improvements.tempPowBonus = 0f; //To Unit
 		improvements.tempOwnershipBonus = 0f; //To Unit
 		improvements.tempAmberPenalty = 0f; //To Unit
 		improvements.tempOwnershipUnitBonus = 0f; //To Unit
@@ -40,7 +40,7 @@ public class GenericImprovements : MasterScript
 		improvements.tempAmberProductionBonus = 0f; 
 		improvements.tempAmberPointBonus = 0f;
 		improvements.tempImprovementSlots = 0f;
-		improvements.tempCapital = 0f; 
+		improvements.tempWealth = 0f; 
 		
 		improvements.tempResearchCostReduction = 0f;  
 		improvements.tempImprovementCostReduction = 0f; 
@@ -109,19 +109,19 @@ public class GenericImprovements : MasterScript
 		{
 			if(improvements.listOfImprovements[i].hasBeenBuilt == true)
 			{
-				improvements.tempSciBonus += 0.05f;
-				improvements.tempIndBonus += 0.05f;
+				improvements.tempKnwlBonus += 0.05f;
+				improvements.tempPowBonus += 0.05f;
 				improvements.tempCount += 0.05f;
 			}
 		}
 
-		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * improvements.tempSciBonus;
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempIndBonus;
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * improvements.tempKnwlBonus;
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
 
 		if(checkValue == false)
 		{
-			improvements.sciencePercentBonus += improvements.tempSciBonus;
-			improvements.industryPercentBonus += improvements.tempIndBonus;
+			improvements.knowledgePercentBonus += improvements.tempKnwlBonus;
+			improvements.powerPercentBonus += improvements.tempPowBonus;
 			improvements.listOfImprovements[0].improvementMessage = ("+" + improvements.tempCount * 100f + "% Production from Improvements");
 		}
 	}
@@ -134,28 +134,28 @@ public class GenericImprovements : MasterScript
 			
 			if(systemListConstructor.systemList[k].systemOwnedBy == thisPlayer.playerRace)
 			{
-				improvements.tempIndBonus += 0.075f;
+				improvements.tempPowBonus += 0.075f;
 				improvements.tempCount += 0.075f;
 			}
 		}
 
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempIndBonus;
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
 
 		if(checkValue == false)
 		{
-			improvements.industryPercentBonus += improvements.tempIndBonus;
-			improvements.listOfImprovements[1].improvementMessage = ("+" + improvements.tempCount * 100f + "% Industry from nearby systems");
+			improvements.powerPercentBonus += improvements.tempPowBonus;
+			improvements.listOfImprovements[1].improvementMessage = ("+" + improvements.tempCount * 100f + "% Power from nearby systems");
 		}
 	}
 
 	private void T0I3()
 	{
-		improvements.tempCapital += thisPlayer.playerOwnedHeroes.Count * 0.02f;
+		improvements.tempWealth += thisPlayer.playerOwnedHeroes.Count * 0.02f;
 
 		if(checkValue == false)
 		{
-			thisPlayer.capital += improvements.tempCapital;
-			improvements.listOfImprovements[2].improvementMessage = ("+" + (thisPlayer.playerOwnedHeroes.Count * 2f) + "% Capital from active Heroes");
+			thisPlayer.wealth += improvements.tempWealth;
+			improvements.listOfImprovements[2].improvementMessage = ("+" + (thisPlayer.playerOwnedHeroes.Count * 2f) + "% Wealth from active Heroes");
 		}
 	}
 
@@ -168,13 +168,13 @@ public class GenericImprovements : MasterScript
 			systemSIMData = systemListConstructor.systemList[improvements.system].systemObject.GetComponent<SystemSIMData>();
 		}
 
-		improvements.tempSciUnitBonus = (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
+		improvements.tempKnwlUnitBonus = (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
 		improvements.tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
 
 		if(checkValue == false)
 		{
-			systemSIMData.scienceUnitBonus += improvements.tempSciUnitBonus;
-			improvements.listOfImprovements[3].improvementMessage = ("+" + improvements.tempCount + " Science from Peace");
+			systemSIMData.knowledgeUnitBonus += improvements.tempKnwlUnitBonus;
+			improvements.listOfImprovements[3].improvementMessage = ("+" + improvements.tempCount + " Knowledge from Peace");
 		}
 	}
 
@@ -182,13 +182,13 @@ public class GenericImprovements : MasterScript
 	{
 		int tempCount = CheckNumberOfPlanetsWithImprovement(4, thisPlayer, improvements);
 		
-		improvements.tempIndBonus = (tempCount * 0.05f);
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempIndBonus;
+		improvements.tempPowBonus = (tempCount * 0.05f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
 
 		if(checkValue == false)
 		{
-			improvements.industryPercentBonus += improvements.tempIndBonus;
-			improvements.listOfImprovements[4].improvementMessage = ("+" + improvements.tempCount * 5f + "% Industry from other Systems with this Improvement");
+			improvements.powerPercentBonus += improvements.tempPowBonus;
+			improvements.listOfImprovements[4].improvementMessage = ("+" + improvements.tempCount * 5f + "% Power from other Systems with this Improvement");
 		}
 	}
 
@@ -202,8 +202,8 @@ public class GenericImprovements : MasterScript
 			improvements.tempCount = 20f;
 		}
 
-		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
 
 		if(checkValue == false)
 		{
@@ -218,17 +218,17 @@ public class GenericImprovements : MasterScript
 		{
 			if(systemListConstructor.systemList[improvements.system].planetsInSystem[j].planetColonised == false)
 			{
-				improvements.tempSciBonus += 0.25f;
+				improvements.tempKnwlBonus += 0.25f;
 				improvements.tempCount += 0.25f;
 			}
 		}
 
-		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * improvements.tempSciBonus;
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * improvements.tempKnwlBonus;
 
 		if(checkValue == false)
 		{
-			improvements.sciencePercentBonus += improvements.tempSciBonus;
-			improvements.listOfImprovements[6].improvementMessage = ("+" + improvements.tempCount * 100f + "% Science from uncolonised planets");
+			improvements.knowledgePercentBonus += improvements.tempKnwlBonus;
+			improvements.listOfImprovements[6].improvementMessage = ("+" + improvements.tempCount * 100f + "% Knowledge from uncolonised planets");
 		}
 	}
 
@@ -246,18 +246,18 @@ public class GenericImprovements : MasterScript
 		
 		if(allPlanetsColonised == true)
 		{
-			improvements.tempIndUnitBonus += 0.2f;
+			improvements.tempPowUnitBonus += 0.2f;
 			improvements.tempCount += 0.2f;
 		}
 		
-		improvements.tempIndBonus += 0.1f;
+		improvements.tempPowBonus += 0.1f;
 		improvements.tempCount += 0.1f;
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * improvements.tempIndBonus;
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
 
 		if(checkValue == false)
 		{
-			improvements.industryPercentBonus += improvements.tempIndBonus;
-			improvements.listOfImprovements[7].improvementMessage = ("+" + improvements.tempCount * 100f + "% Industry on System");
+			improvements.powerPercentBonus += improvements.tempPowBonus;
+			improvements.listOfImprovements[7].improvementMessage = ("+" + improvements.tempCount * 100f + "% Power on System");
 		}
 	}
 
@@ -284,8 +284,8 @@ public class GenericImprovements : MasterScript
 
 			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetCategory == cat)
 			{
-				improvements.tempSciUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetScience;
-				improvements.tempIndUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetIndustry;
+				improvements.tempKnwlUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetKnowledge;
+				improvements.tempPowUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPower;
 			}
 		}
 
@@ -299,17 +299,17 @@ public class GenericImprovements : MasterScript
 	{
 		float tempCountB = 0.0f;
 		
-		improvements.tempSciUnitBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
-		improvements.tempCount = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemScience;
+		improvements.tempKnwlUnitBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemKnowledge;
+		improvements.tempCount = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemKnowledge;
 		
-		improvements.tempIndUnitBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
-		tempCountB = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemIndustry;
+		improvements.tempPowUnitBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemPower;
+		tempCountB = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemPower;
 
 		if(checkValue == false)
 		{
-			systemSIMData.scienceUnitBonus += improvements.tempSciUnitBonus;
-			systemSIMData.industryUnitBonus -= improvements.tempIndUnitBonus;
-			improvements.listOfImprovements[9].improvementMessage = ("+" + improvements.tempCount + " Science, -" + tempCountB + " Industry On System");
+			systemSIMData.knowledgeUnitBonus += improvements.tempKnwlUnitBonus;
+			systemSIMData.powerUnitBonus -= improvements.tempPowUnitBonus;
+			improvements.listOfImprovements[9].improvementMessage = ("+" + improvements.tempCount + " Knowledge, -" + tempCountB + " Power On System");
 		}
 	}
 

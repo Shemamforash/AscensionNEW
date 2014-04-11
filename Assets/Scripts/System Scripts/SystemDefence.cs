@@ -81,8 +81,8 @@ public class SystemDefence : MasterScript
 
 	public void CheckStatusEffects(int planet)
 	{
-		systemSIMData.scienceBuffModifier = 1.0f;
-		systemSIMData.industryBuffModifier = 1.0f;
+		systemSIMData.knowledgeBuffModifier = 1.0f;
+		systemSIMData.powerBuffModifier = 1.0f;
 
 		if(systemListConstructor.systemList[system].planetsInSystem[planet].chillActive == true)
 		{
@@ -116,8 +116,8 @@ public class SystemDefence : MasterScript
 
 		float sinDifference = Mathf.Sin(timeDifference) + 1;
 
-		systemSIMData.scienceBuffModifier = systemSIMData.scienceBuffModifier * sinDifference; // y = sin((x-300)/191) + 1
-		systemSIMData.industryBuffModifier = systemSIMData.industryBuffModifier * sinDifference;
+		systemSIMData.knowledgeBuffModifier = systemSIMData.knowledgeBuffModifier * sinDifference; // y = sin((x-300)/191) + 1
+		systemSIMData.powerBuffModifier = systemSIMData.powerBuffModifier * sinDifference;
 
 		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 		{
@@ -168,8 +168,8 @@ public class SystemDefence : MasterScript
 
 		if(systemListConstructor.systemList[system].planetsInSystem[planet].chillTimer + systemListConstructor.systemList[system].planetsInSystem[planet].chillLength >= Time.time)
 		{
-			systemSIMData.scienceBuffModifier = systemSIMData.scienceBuffModifier * 0.5f;
-			systemSIMData.industryBuffModifier = systemSIMData.industryBuffModifier * 0.5f;
+			systemSIMData.knowledgeBuffModifier = systemSIMData.knowledgeBuffModifier * 0.5f;
+			systemSIMData.powerBuffModifier = systemSIMData.powerBuffModifier * 0.5f;
 		}
 
 		if(systemListConstructor.systemList[system].planetsInSystem[planet].chillTimer + systemListConstructor.systemList[system].planetsInSystem[planet].chillLength < Time.time)

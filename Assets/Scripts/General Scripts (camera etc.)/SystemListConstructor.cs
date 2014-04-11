@@ -22,7 +22,7 @@ public class SystemListConstructor : MasterScript
 	public int mapSize;
 	public GameObject systemClone, originalSystem;
 	private float xPos, yPos, distanceXY;
-	public float systemScale = 0.0f;
+	public float systemScale = 0.0f, sysDistMin;
 	public Transform systemContainer;
 
 	private void Start()
@@ -73,33 +73,56 @@ public class SystemListConstructor : MasterScript
 
 		systemScale = (mapSize - 300.0f) / -160.0f;
 
-		bool filledSystem = false;
+		int difference = systemList.Count - firmSystems.Count;
 
-		for(int i = 0; i < 30; ++i)
+		for(int j = 0; j < difference; ++j)
 		{
-			if(filledSystem == true)
+			if(firmSystems.Count == mapSize)
 			{
 				break;
 			}
-
-			for(int j = 0; j < 6; ++j)
+			
+			randomInt = Random.Range (0, uncheckedSystems.Count - 1);
+			
+			if(CheckWithinMinMaxDistance(uncheckedSystems[randomInt]) == true)
 			{
-				if(firmSystems.Count == mapSize)
-				{
-					filledSystem = true;
-					break;
-				}
+				firmSystems.Add(uncheckedSystems[randomInt]);
+			}
 
-				randomInt = Random.Range (0, uncheckedSystems.Count);
+			uncheckedSystems.RemoveAt(randomInt);
+		}
+	}
 
-				if(j < mapSize / 30)
-				{
-					firmSystems.Add(uncheckedSystems[randomInt]);
-				}
+	private bool CheckWithinMinMaxDistance(string system)
+	{
+		Vector3 sysOne = systemList [CheckSystemName (system)].systemPosition;
 
-				uncheckedSystems.RemoveAt(randomInt);
+		for(int i = 0; i < firmSystems.Count; ++i)
+		{
+			Vector3 sysTwo = systemList[CheckSystemName(firmSystems[i])].systemPosition;
+
+			float distance = Vector3.Distance(sysOne, sysTwo);
+
+			if(distance < sysDistMin)
+			{
+				return false;
 			}
 		}
+
+		return true;
+	}
+
+	private int CheckSystemName(string name)
+	{
+		for(int i = 0; i < systemList.Count; ++i)
+		{
+			if(systemList[i].systemName == name)
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	}
 	
 	private void CheckSystem()
@@ -165,12 +188,36 @@ public class SystemListConstructor : MasterScript
 						newPlanet.planetImprovementLevel = 0;
 						newPlanet.planetColonised = false;
 						newPlanet.planetOwnership = 0;
-						newPlanet.planetScience = FindPlanetSIM(newPlanet.planetType, "Science");
-						newPlanet.planetIndustry = FindPlanetSIM(newPlanet.planetType, "Industry");
-						newPlanet.capitalValue = (int)FindPlanetSIM(newPlanet.planetType, "Capital");
+						newPlanet.planetKnowledge = FindPlanetSIM(newPlanet.planetType, "Knowledge");
+						newPlanet.planetPower = FindPlanetSIM(newPlanet.planetType, "Power");
+						newPlanet.wealthValue = (int)FindPlanetSIM(newPlanet.planetType, "Wealth");
 						newPlanet.maxOwnership = 0;
 						newPlanet.improvementSlots = (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots");
 						newPlanet.underEnemyControl = false;
+
+						int hasResources = Random.Range (0, 3);
+
+						if(hasResources == 0)
+						{
+							switch(newPlanet.planetCategory)
+							{
+							case "Hot":
+								newPlanet.rareResourceType = "Radioisotopes";
+								break;
+							case "Cold":
+								newPlanet.rareResourceType = "Liquid Hydrogen";
+								break;
+							case "Terran":
+								newPlanet.rareResourceType = "Blue Carbon";
+								break;
+							case "Gas Giant":
+								newPlanet.rareResourceType = "Antimatter";
+								break;
+							default:
+								newPlanet.rareResourceType = null;
+								break;
+							}
+						}
 						
 						for(int k = 0; k < (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots"); ++k)
 						{
@@ -189,8 +236,11 @@ public class SystemListConstructor : MasterScript
 
 					if(system.systemName == "Nepthys" || system.systemName == "Midgard" || system.systemName == "Samael")
 					{
-						firmSystems.Add (system.systemName);
-						uncheckedSystems.Remove(system.systemName);
+						if(PlayerPrefs.GetString("Planet One") == system.systemName || PlayerPrefs.GetString("Planet Two") == system.systemName || PlayerPrefs.GetString("Planet Three") == system.systemName)
+						{
+							firmSystems.Add (system.systemName);
+							uncheckedSystems.Remove(system.systemName);
+						}
 					}
 				}
 			}
@@ -209,10 +259,10 @@ public class SystemListConstructor : MasterScript
 					
 					planet.planetType = reader.GetAttribute ("A");
 					planet.planetCategory = reader.GetAttribute ("B");
-					planet.science = float.Parse (reader.GetAttribute("C"));
-					planet.industry = float.Parse (reader.GetAttribute("D"));
+					planet.knowledge = float.Parse (reader.GetAttribute("C"));
+					planet.power = float.Parse (reader.GetAttribute("D"));
 					planet.improvementSlots = int.Parse (reader.GetAttribute("E"));
-					planet.capitalCost = int.Parse (reader.GetAttribute("F"));
+					planet.wealthCost = int.Parse (reader.GetAttribute("F"));
 					
 					planetList.Add (planet);
 				}
@@ -243,12 +293,12 @@ public class SystemListConstructor : MasterScript
 				{
 				case "Improvement Slots":
 					return planetList[i].improvementSlots;
-				case "Science":
-					return planetList[i].science;
-				case "Industry":
-					return planetList[i].industry;
-				case "Capital":
-					return (float)planetList[i].capitalCost;
+				case "Knowledge":
+					return planetList[i].knowledge;
+				case "Power":
+					return planetList[i].power;
+				case "Wealth":
+					return (float)planetList[i].wealthCost;
 				default:
 					break;
 				}
@@ -285,8 +335,8 @@ public class PlanetInfo
 {
 	public string planetType, planetCategory;
 	public bool colonised;
-	public float science, industry;
-	public int improvementSlots, capitalCost;
+	public float knowledge, power;
+	public int improvementSlots, wealthCost;
 }
 
 public class StarSystem
@@ -303,11 +353,11 @@ public class StarSystem
 
 public class Planet
 {
-	public string planetName, planetType, planetCategory;
+	public string planetName, planetType, planetCategory, rareResourceType;
 	public List<string> improvementsBuilt = new List<string> ();
-	public float planetScience, planetIndustry, planetOwnership, planetDefence, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxOwnership;
+	public float planetKnowledge, planetPower, planetOwnership, planetDefence, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxOwnership;
 	public bool planetColonised, underEnemyControl, virusActive, chillActive, poisonActive;
-	public int planetImprovementLevel, improvementSlots, capitalValue;
+	public int planetImprovementLevel, improvementSlots, wealthValue;
 }
 
 public class BasicImprovement

@@ -183,9 +183,9 @@ public class AIHeroBehaviour : MasterScript
 		{
 			heroScript = player.playerOwnedHeroes[k].GetComponent<HeroScriptParent>();
 			
-			if(offence < heroScript.primaryPower && heroScript.isBusy == false)
+			if(offence < heroScript.primaryWealth && heroScript.isBusy == false)
 			{
-				offence = heroScript.primaryPower;
+				offence = heroScript.primaryWealth;
 				hero = k;
 				foundHero = true;
 			}

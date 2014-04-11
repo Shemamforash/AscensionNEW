@@ -12,21 +12,21 @@ public class SystemFunctions : MasterScript
 			systemSIMData.improvementLevel = "Poor";
 			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 25;
 			systemSIMData.canImprove = true;
-			systemSIMData.improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue / 3;
+			systemSIMData.improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].wealthValue / 3;
 		}
 		if(systemSIMData.improvementNumber == 1)
 		{
 			systemSIMData.improvementLevel = "Normal";
 			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 50;
 			systemSIMData.canImprove = true;
-			systemSIMData.improvementCost = (systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue * 2) / 3;
+			systemSIMData.improvementCost = (systemListConstructor.systemList[system].planetsInSystem[planet].wealthValue * 2) / 3;
 		}
 		if(systemSIMData.improvementNumber == 2)
 		{
 			systemSIMData.improvementLevel = "Good";
 			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 75;
 			systemSIMData.canImprove = true;
-			systemSIMData.improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue + (systemListConstructor.systemList[system].planetsInSystem[planet].capitalValue / 3);
+			systemSIMData.improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].wealthValue + (systemListConstructor.systemList[system].planetsInSystem[planet].wealthValue / 3);
 		}
 		if(systemSIMData.improvementNumber == 3)
 		{
@@ -36,10 +36,10 @@ public class SystemFunctions : MasterScript
 		}
 	}
 
-	public float IndustryCost(int level, int system, int planet)
+	public float PowerCost(int level, int system, int planet)
 	{
-		float temp = systemListConstructor.systemList [system].planetsInSystem [planet].planetIndustry + 
-			systemListConstructor.systemList [system].planetsInSystem [planet].planetScience;
+		float temp = systemListConstructor.systemList [system].planetsInSystem [planet].planetPower + 
+			systemListConstructor.systemList [system].planetsInSystem [planet].planetKnowledge;
 		
 		switch(level)
 		{
@@ -59,7 +59,7 @@ public class SystemFunctions : MasterScript
 	{
 		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
 		
-		systemSIMData.totalSystemSIM += systemSIMData.totalSystemScience + systemSIMData.totalSystemIndustry;
+		systemSIMData.totalSystemSIM += systemSIMData.totalSystemKnowledge + systemSIMData.totalSystemPower;
 		
 		if(systemSIMData.totalSystemSIM >= 1600.0f && systemSIMData.totalSystemSIM < 3200 && improvements.techTier != 1)
 		{

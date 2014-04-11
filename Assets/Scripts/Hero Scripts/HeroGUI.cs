@@ -80,7 +80,7 @@ public class HeroGUI : MasterScript
 
 	public void CheckIfCanHire(TurnInfo player, string heroType)
 	{
-		if(player.capital >= 50 && player.playerOwnedHeroes.Count < 7)
+		if(player.wealth >= 50 && player.playerOwnedHeroes.Count < 7)
 		{
 			int i = RefreshCurrentSystem(GameObject.Find(player.homeSystem));
 
@@ -105,7 +105,7 @@ public class HeroGUI : MasterScript
 
 			++heroCounter;
 
-			player.capital -= 50;
+			player.wealth -= 50;
 
 			player.playerOwnedHeroes.Add (instantiatedHero);
 

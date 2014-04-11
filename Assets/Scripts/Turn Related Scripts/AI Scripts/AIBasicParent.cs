@@ -4,7 +4,7 @@ using System.Collections;
 public class AIBasicParent : TurnInfo
 {
 	public string selkiesHomeSystem, nereidesHomeSystem, humansHomeSystem;
-	private float tempSIM, highestSIM, tempFloat;
+	private float tempSIM, highestSIM, tempFloat, knwlRatio, powRatio;
 	private int tempPlanet, tempSystem, tempPlanetB, tempSystemB, currentPlanet, currentSystem, checkHeroTimer = 0, tempTech;
 	private bool saveForHero;
 	private TurnInfo thisPlayer;
@@ -20,7 +20,7 @@ public class AIBasicParent : TurnInfo
 	{
 		thisPlayer = player;
 
-		for(float i = thisPlayer.capital; i > 0; --i)
+		for(float i = thisPlayer.wealth; i > 0; --i)
 		{
 			CheckToSaveForHero();
 
@@ -51,8 +51,8 @@ public class AIBasicParent : TurnInfo
 		systemSIMData = systemListConstructor.systemList [system].systemObject.GetComponent<SystemSIMData> ();
 		improvementsBasic = systemListConstructor.systemList [system].systemObject.GetComponent<ImprovementsBasic> ();
 
-		float sciRatio = (100 / systemSIMData.totalSystemSIM) * systemSIMData.totalSystemScience;
-		float indRatio = (100 / systemSIMData.totalSystemSIM) * systemSIMData.totalSystemIndustry;
+		knwlRatio = (100 / systemSIMData.totalSystemSIM) * systemSIMData.totalSystemKnowledge;
+		powRatio = (100 / systemSIMData.totalSystemSIM) * systemSIMData.totalSystemPower;
 
 		tempFloat = 0f;
 		tempTech = -1;
@@ -60,7 +60,7 @@ public class AIBasicParent : TurnInfo
 
 		for(int i = 0; i < improvementsBasic.listOfImprovements.Count; ++i)
 		{
-			if(improvementsBasic.listOfImprovements[i].improvementCost > thisPlayer.industry)
+			if(improvementsBasic.listOfImprovements[i].improvementCost > thisPlayer.power)
 			{
 				continue;
 			}
@@ -195,33 +195,33 @@ public class AIBasicParent : TurnInfo
 
 	private void GenericTechCheck(int i)
 	{
-		if(improvementsBasic.tempIndUnitBonus * 4 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		if(improvementsBasic.tempPowUnitBonus * 4 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
 		{
-			if(improvementsBasic.tempIndUnitBonus > tempFloat)
+			if(improvementsBasic.tempPowUnitBonus * powRatio > tempFloat)
 			{
 				if(tempTech == i)
 				{
-					tempFloat += improvementsBasic.tempIndUnitBonus * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempFloat += improvementsBasic.tempPowUnitBonus * powRatio * improvementsBasic.listOfImprovements[i].improvementLevel;
 				}
 				else
 				{
-					tempFloat = improvementsBasic.tempIndUnitBonus * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempFloat = improvementsBasic.tempPowUnitBonus * powRatio * improvementsBasic.listOfImprovements[i].improvementLevel;
 					tempTech = i;
 				}
 			}
 		}
 		
-		if(improvementsBasic.tempSciUnitBonus * 4 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		if(improvementsBasic.tempKnwlUnitBonus * 4 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
 		{
-			if(improvementsBasic.tempSciUnitBonus > tempFloat || tempTech == i)
+			if(improvementsBasic.tempKnwlUnitBonus * knwlRatio > tempFloat || tempTech == i)
 			{
 				if(tempTech == i)
 				{
-					tempFloat += improvementsBasic.tempSciUnitBonus * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempFloat += improvementsBasic.tempKnwlUnitBonus * knwlRatio * improvementsBasic.listOfImprovements[i].improvementLevel;
 				}
 				else
 				{
-					tempFloat = improvementsBasic.tempSciUnitBonus * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempFloat = improvementsBasic.tempKnwlUnitBonus * knwlRatio * improvementsBasic.listOfImprovements[i].improvementLevel;
 					tempTech = i;
 				}
 			}
@@ -243,17 +243,17 @@ public class AIBasicParent : TurnInfo
 			}
 		}
 		
-		if(improvementsBasic.tempCapital * 25 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
+		if(improvementsBasic.tempWealth * 25 * improvementsBasic.listOfImprovements[i].improvementLevel > improvementsBasic.listOfImprovements[i].improvementCost)
 		{
-			if(improvementsBasic.tempCapital * 25 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat)
+			if(improvementsBasic.tempWealth * 25 * improvementsBasic.listOfImprovements[i].improvementLevel > tempFloat)
 			{
 				if(tempTech == i)
 				{
-					tempFloat += improvementsBasic.tempCapital * 25 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempFloat += improvementsBasic.tempWealth * 25 * improvementsBasic.listOfImprovements[i].improvementLevel;
 				}
 				else
 				{
-					tempFloat = improvementsBasic.tempCapital * 25 * improvementsBasic.listOfImprovements[i].improvementLevel;
+					tempFloat = improvementsBasic.tempWealth * 25 * improvementsBasic.listOfImprovements[i].improvementLevel;
 					tempTech = i;
 				}
 			}
@@ -305,7 +305,7 @@ public class AIBasicParent : TurnInfo
 				if(systemListConstructor.systemList[j].systemOwnedBy == thisPlayer.playerRace)
 				{
 					systemSIMData = systemListConstructor.systemList[j].systemObject.GetComponent<SystemSIMData>();
-					temp += systemSIMData.totalSystemScience + systemSIMData.totalSystemIndustry;
+					temp += systemSIMData.totalSystemKnowledge + systemSIMData.totalSystemPower;
 				}
 				
 				if(temp >= ((playerOwnedHeroes.Count * 20f) + 20f))
@@ -325,9 +325,9 @@ public class AIBasicParent : TurnInfo
 
 	public void AIExpansion()
 	{
-		if(thisPlayer.capital > 1)
+		if(thisPlayer.wealth > 1)
 		{
-			turnInfoScript.RefreshPlanetPower();
+			turnInfoScript.RefreshPlanetWealth();
 
 			currentPlanet = -1;
 			currentSystem = -1;
@@ -336,18 +336,18 @@ public class AIBasicParent : TurnInfo
 			
 			float systemSIM = CheckThroughSystems (thisPlayer);
 			
-			if(planetSIM > systemSIM && thisPlayer.capital >= systemListConstructor.systemList[tempSystem].planetsInSystem[tempPlanet].capitalValue)
+			if(planetSIM > systemSIM && thisPlayer.wealth >= systemListConstructor.systemList[tempSystem].planetsInSystem[tempPlanet].wealthValue)
 			{
 				currentPlanet = tempPlanet;
 				
 				currentSystem = tempSystem;
 
-				thisPlayer.capital -= systemListConstructor.systemList[tempSystem].planetsInSystem[tempPlanet].capitalValue;
+				thisPlayer.wealth -= systemListConstructor.systemList[tempSystem].planetsInSystem[tempPlanet].wealthValue;
 
-				thisPlayer.capitalModifier += 0.05f;
+				thisPlayer.wealthModifier += 0.05f;
 			}
 			
-			if(systemSIM > planetSIM && thisPlayer.capital >= 20.0f)
+			if(systemSIM > planetSIM && thisPlayer.wealth >= 20.0f)
 			{
 				currentPlanet = tempPlanetB;
 				
@@ -367,9 +367,9 @@ public class AIBasicParent : TurnInfo
 
 				++thisPlayer.systemsColonisedThisTurn;
 
-				thisPlayer.capital -= 20.0f;
+				thisPlayer.wealth -= 20.0f;
 
-				thisPlayer.capitalModifier += 0.1f;
+				thisPlayer.wealthModifier += 0.1f;
 
 				empireBoundaries.ModifyBoundaryCircles ();
 			}
@@ -407,7 +407,7 @@ public class AIBasicParent : TurnInfo
 						continue;
 					}
 
-					tempSIM = (systemListConstructor.systemList[i].planetsInSystem[j].planetScience + systemListConstructor.systemList[i].planetsInSystem[j].planetIndustry)
+					tempSIM = (systemListConstructor.systemList[i].planetsInSystem[j].planetKnowledge + systemListConstructor.systemList[i].planetsInSystem[j].planetPower)
 						* (systemListConstructor.systemList[i].planetsInSystem[j].improvementSlots * 1.5f);
 
 					if(tempSIM > highestSIM)
@@ -449,7 +449,7 @@ public class AIBasicParent : TurnInfo
 
 						for(int l = 0; l < systemListConstructor.systemList[k].systemSize; ++l)
 						{
-							tempPlanetSIM = (systemListConstructor.systemList[k].planetsInSystem[l].planetScience + systemListConstructor.systemList[k].planetsInSystem[l].planetIndustry)  
+							tempPlanetSIM = (systemListConstructor.systemList[k].planetsInSystem[l].planetKnowledge + systemListConstructor.systemList[k].planetsInSystem[l].planetPower)  
 								* (systemListConstructor.systemList[k].planetsInSystem[l].improvementSlots);
 
 							if(tempPlanetSIM > tempHighestPlanetSIM)
@@ -482,18 +482,18 @@ public class AIBasicParent : TurnInfo
 
 	public void CheckToImprovePlanet(TurnInfo thisPlayer)
 	{
-		for(int i = 0; i < turnInfoScript.mostPowerfulPlanets.Count - 1; i++)
+		for(int i = 0; i < turnInfoScript.mostWealthfulPlanets.Count - 1; i++)
 		{
-			if(thisPlayer.industry < 0.8f && thisPlayer.capital < 1.0f)
+			if(thisPlayer.power < 0.8f && thisPlayer.wealth < 1.0f)
 			{
 				break;
 			}
 
-			int j = RefreshCurrentSystem(turnInfoScript.mostPowerfulPlanets[i].system);
+			int j = RefreshCurrentSystem(turnInfoScript.mostWealthfulPlanets[i].system);
 
 			if(systemListConstructor.systemList[j].systemOwnedBy == thisPlayer.playerRace)
 			{
-				ImprovePlanet(turnInfoScript.mostPowerfulPlanets[i].planetPosition, j, thisPlayer);
+				ImprovePlanet(turnInfoScript.mostWealthfulPlanets[i].planetPosition, j, thisPlayer);
 			}
 		}
 	}
@@ -510,15 +510,15 @@ public class AIBasicParent : TurnInfo
 		
 		if(systemSIMData.canImprove == true && systemDefence.underInvasion == false)
 		{
-			float industryImprovementCost = systemFunctions.IndustryCost(systemSIMData.improvementNumber, system, planetPosition);
+			float powerImprovementCost = systemFunctions.PowerCost(systemSIMData.improvementNumber, system, planetPosition);
 
-			if(thisPlayer.industry >= industryImprovementCost && thisPlayer.capital >= systemSIMData.improvementCost)
+			if(thisPlayer.power >= powerImprovementCost && thisPlayer.wealth >= systemSIMData.improvementCost)
 			{
 				++systemListConstructor.systemList[system].planetsInSystem[planetPosition].planetImprovementLevel;
 				
-				thisPlayer.industry -= industryImprovementCost;
+				thisPlayer.power -= powerImprovementCost;
 
-				thisPlayer.capital -= systemSIMData.improvementCost;
+				thisPlayer.wealth -= systemSIMData.improvementCost;
 			}
 		}
 	}

@@ -175,23 +175,23 @@ public class InvasionGUI : MasterScript
 
 					if(HeroTechTree.heroTechList[i].isActive == true)
 					{
-						float power = HeroTechTree.heroTechList[i].secondaryOffenceRating;
+						float wealth = HeroTechTree.heroTechList[i].secondaryOffenceRating;
 
-						if((bombTimers[i] + (power / 4f)) <= Time.time || bombTimers[i] == 0.0f)
+						if((bombTimers[i] + (wealth / 4f)) <= Time.time || bombTimers[i] == 0.0f)
 						{
 							bombButtons[i].GetComponent<UIButton>().isEnabled = true;
 							bombButtons[i].GetComponent<UISprite>().fillAmount = 1;
 							bombTimers[i] = 0.0f;
 						}
 						
-						if(power == 0 || (bombTimers[i] + (power / 4f)) > Time.time)
+						if(wealth == 0 || (bombTimers[i] + (wealth / 4f)) > Time.time)
 						{
 							bombButtons[i].GetComponent<UIButton>().isEnabled = false;
 						}
 
 						if(bombTimers[i] != 0.0f)
 						{
-							bombButtons[i].GetComponent<UISprite>().fillAmount = ((Time.time - bombTimers[i]) * 4) / power;
+							bombButtons[i].GetComponent<UISprite>().fillAmount = ((Time.time - bombTimers[i]) * 4) / wealth;
 						}
 					}
 				}

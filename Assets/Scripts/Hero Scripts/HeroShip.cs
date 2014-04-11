@@ -88,13 +88,13 @@ public class HeroShip : MasterScript
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
 		ShipFunctions.UpdateShips ();
-		heroScript.primaryPower = ShipFunctions.primaryWeaponPower;
+		heroScript.primaryWealth = ShipFunctions.primaryWeaponWealth;
 		heroScript.maxArmour = ShipFunctions.armourRating;
 		heroScript.movementSpeed = ShipFunctions.engineValue;
 
 		if(heroScript.heroType == "Diplomat")
 		{
-			heroScript.secondaryPower = ShipFunctions.dropshipPower;
+			heroScript.secondaryWealth = ShipFunctions.dropshipWealth;
 			heroScript.secondaryCollateral = ShipFunctions.dropshipCollateral;
 
 			int numberOfMerchants = 0;
@@ -114,7 +114,7 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Infiltrator")
 		{
-			heroScript.secondaryPower = ShipFunctions.bombPower;
+			heroScript.secondaryWealth = ShipFunctions.bombWealth;
 			heroScript.secondaryCollateral = ShipFunctions.bombCollateral;
 
 			canViewSystem = true;
@@ -123,7 +123,7 @@ public class HeroShip : MasterScript
 
 			if(systemListConstructor.systemList[system].systemOwnedBy != thisPlayer.playerRace)
 			{
-				if(ShipFunctions.stealthValue >= systemSIMData.antiStealthPower)
+				if(ShipFunctions.stealthValue >= systemSIMData.antiStealthWealth)
 				{
 					hasStealth = true;
 				}
@@ -142,19 +142,19 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Soldier")
 		{
-			heroScript.secondaryPower = ShipFunctions.artilleryPower;
+			heroScript.secondaryWealth = ShipFunctions.artilleryWealth;
 			heroScript.secondaryCollateral = ShipFunctions.artilleryCollateral;
 
 			if(ShipFunctions.soldierPrimary == true)
 			{
-				heroScript.primaryPower = heroScript.primaryPower * 2;
+				heroScript.primaryWealth = heroScript.primaryWealth * 2;
 			}
 		}
 	}
 
 	private void MakeNewTradeRoutes(TurnInfo thisPlayer)
 	{
-		float tempIndSci = 0;
+		float tempWlthKnwl = 0;
 		int chosenEnemySystem = -1, chosenPlayerSystem = -1;
 
 		for(int i = 0; i < systemListConstructor.systemList.Count; ++i) //For all systems
@@ -183,9 +183,9 @@ public class HeroShip : MasterScript
 							{
 								systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
 
-								float temp = systemSIMData.totalSystemIndustry + systemSIMData.totalSystemScience; //Get the system output
+								float temp = systemSIMData.totalSystemPower + systemSIMData.totalSystemKnowledge; //Get the system output
 
-								if(temp > tempIndSci) //If its larger than the previous output
+								if(temp > tempWlthKnwl) //If its larger than the previous output
 								{
 									chosenEnemySystem = i; //Set the enemy system to connect to this system
 								}
@@ -198,7 +198,7 @@ public class HeroShip : MasterScript
 
 		if(chosenEnemySystem != -1)
 		{
-			tempIndSci = 0;
+			tempWlthKnwl = 0;
 
 			for(int i = 0; i < systemListConstructor.systemList[chosenEnemySystem].permanentConnections.Count; ++i) //For all connections in enemy system
 			{
@@ -220,9 +220,9 @@ public class HeroShip : MasterScript
 					{
 						systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
 						
-						float temp = systemSIMData.totalSystemIndustry + systemSIMData.totalSystemScience; //Get the system output
+						float temp = systemSIMData.totalSystemPower + systemSIMData.totalSystemKnowledge; //Get the system output
 						
-						if(temp >= tempIndSci) //If its larger than the previous output
+						if(temp >= tempWlthKnwl) //If its larger than the previous output
 						{
 							chosenPlayerSystem = system; //Set the player system to connect to this system
 						}
@@ -278,16 +278,16 @@ public class HeroShip : MasterScript
 				SystemSIMData pSysData = systemListConstructor.systemList[pSys].systemObject.GetComponent<SystemSIMData>();
 				SystemSIMData eSysData = systemListConstructor.systemList[eSys].systemObject.GetComponent<SystemSIMData>();
 
-				float pIndTransfer = pSysData.totalSystemIndustry / 2;
-				float pSciTransfer = pSysData.totalSystemScience / 2;
+				float pIndTransfer = pSysData.totalSystemPower / 2;
+				float pSciTransfer = pSysData.totalSystemKnowledge / 2;
 
-				float eIndTransfer = eSysData.totalSystemIndustry / 2;
-				float eSciTransfer = eSysData.totalSystemScience / 2;
+				float eIndTransfer = eSysData.totalSystemPower / 2;
+				float eSciTransfer = eSysData.totalSystemKnowledge / 2;
 
-				eSysData.totalSystemIndustry += pIndTransfer;
-				eSysData.totalSystemScience += pSciTransfer;
-				pSysData.totalSystemIndustry += eIndTransfer;
-				pSysData.totalSystemScience += eSciTransfer;
+				eSysData.totalSystemPower += pIndTransfer;
+				eSysData.totalSystemKnowledge += pSciTransfer;
+				pSysData.totalSystemPower += eIndTransfer;
+				pSysData.totalSystemKnowledge += eSciTransfer;
 			}
 
 			else if(i >= allTradeRoutes.Count)

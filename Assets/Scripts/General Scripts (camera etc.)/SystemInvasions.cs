@@ -10,7 +10,7 @@ public class SystemInvasions : MasterScript
 	{
 		if(systemListConstructor.systemList [system].planetsInSystem [planet].underEnemyControl == false)
 		{
-			systemListConstructor.systemList [system].planetsInSystem [planet].planetDefence -= hero.secondaryPower;
+			systemListConstructor.systemList [system].planetsInSystem [planet].planetDefence -= hero.secondaryWealth;
 			systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership -= hero.secondaryCollateral;
 			hero.currentArmour -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (hero.currentArmour * hero.classModifier);
 			
@@ -152,7 +152,7 @@ public class SystemInvasions : MasterScript
 	{		
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
 		hero.currentArmour -= systemListConstructor.systemList [system].systemOffence / (hero.currentArmour * hero.classModifier);
-		systemListConstructor.systemList [system].systemDefence -= hero.primaryPower;
+		systemListConstructor.systemList [system].systemDefence -= hero.primaryWealth;
 
 		DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (hero.heroOwnedBy, systemListConstructor.systemList[system].systemOwnedBy);
 		temp.stateCounter -= 1;

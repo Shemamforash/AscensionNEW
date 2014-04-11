@@ -7,8 +7,8 @@ public class GalaxyGUI : MasterScript
 	public GameObject coloniseButton, planetSelectionWindow, purgeButton;
 	private List<GameObject> planetSelectionList = new List<GameObject>();
 	private int selectedSystem;
-	private string tempRace, scienceString, industryString, capitalString, turnNumber;
-	public UILabel scienceLabel, industryLabel, capitalLabel, raceLabel, turnLabel, diplomacyLabelOne, diplomacyLabelTwo;
+	private string tempRace, knowledgeString, powerString, wealthString, turnNumber;
+	public UILabel knowledgeLabel, powerLabel, wealthLabel, raceLabel, turnLabel, diplomacyLabelOne, diplomacyLabelTwo, rareResources;
 
 	void Start()
 	{
@@ -28,9 +28,9 @@ public class GalaxyGUI : MasterScript
 	{
 		if(playerTurnScript.playerRace != null && cameraFunctionsScript.selectedSystem != null)
 		{
-			scienceString = ((int)playerTurnScript.science).ToString();
-			industryString = ((int)playerTurnScript.industry).ToString ();
-			capitalString = ((int)playerTurnScript.capital).ToString ();
+			knowledgeString = ((int)playerTurnScript.knowledge).ToString();
+			powerString = ((int)playerTurnScript.power).ToString ();
+			wealthString = ((int)playerTurnScript.wealth).ToString ();
 			turnNumber = "Year: " + (2200 + (int)(turnInfoScript.turn / 2f)).ToString();
 			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 
@@ -64,10 +64,31 @@ public class GalaxyGUI : MasterScript
 
 	private void UpdateLabels()
 	{
-		scienceLabel.text = scienceString;
-		industryLabel.text = industryString;
-		capitalLabel.text = capitalString;
+		knowledgeLabel.text = knowledgeString;
+		powerLabel.text = powerString;
+		wealthLabel.text = wealthString;
 		turnLabel.text = turnNumber;
+
+		string resources = null;
+
+		if(playerTurnScript.antimatter > 0)
+		{
+			resources = "Antimatter: " + playerTurnScript.antimatter + "  ";
+		}
+		if(playerTurnScript.blueCarbon > 0)
+		{
+			resources = resources + "Blue Carbon: " + playerTurnScript.blueCarbon + "  ";
+		}
+		if(playerTurnScript.radioisotopes > 0)
+		{
+			resources = resources + "Radioisotopes: " + playerTurnScript.radioisotopes + "  ";
+		}
+		if(playerTurnScript.liquidH2 > 0)
+		{
+			resources = resources + "Liquid Hydrogen: " + playerTurnScript.liquidH2 + "  ";
+		}
+
+		rareResources.text = resources;
 
 		string tempString = null;
 
@@ -89,7 +110,7 @@ public class GalaxyGUI : MasterScript
 
 	public void CheckToColoniseSystem()
 	{
-		if(playerTurnScript.capital >= 10)
+		if(playerTurnScript.wealth >= 10)
 		{
 			playerTurnScript.FindSystem (selectedSystem);
 			SelectFirstPlanet();
@@ -120,7 +141,7 @@ public class GalaxyGUI : MasterScript
 		{
 			if(i < systemListConstructor.systemList[selectedSystem].systemSize)
 			{
-				float planetSIM = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetScience + systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetIndustry;
+				float planetSIM = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetKnowledge + systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetPower;
 				
 				string planetInfo = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetType + " " + planetSIM.ToString() + " SIM";
 
