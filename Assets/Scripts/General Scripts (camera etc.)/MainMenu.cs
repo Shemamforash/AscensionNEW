@@ -128,6 +128,30 @@ public class MainMenu : MonoBehaviour
 			PlayerPrefs.SetString ("AI One", objectList [1].currentRace.text);
 			PlayerPrefs.SetString ("AI Two", objectList [2].currentRace.text);
 
+			for(int i = 0; i < objectList.Count; ++i)
+			{
+				switch(objectList[i].currentRace.text)
+				{
+				case "Humans":
+					objectList[i].currentPlanet = "Midgard";
+					break;
+				case "Selkies":
+					objectList[i].currentPlanet = "Samael";
+					break;
+				case "Nereides":
+					objectList[i].currentPlanet = "Nepthys";
+					break;
+				default:
+					objectList[i].currentPlanet = "None";
+					break;
+				}
+			}
+
+			PlayerPrefs.SetString("Planet One", objectList[0].currentPlanet);
+			PlayerPrefs.SetString("Planet Two", objectList[1].currentPlanet);
+			PlayerPrefs.SetString("Planet Three", objectList[2].currentPlanet);
+
+
 			Application.LoadLevel("Crucible");
 		}
 	}
@@ -138,4 +162,5 @@ public class MainMenuScrollView
 	public UIPopupList raceChooseList;
 	public UISprite raceIcon;
 	public UILabel currentRace;
+	public string currentPlanet;
 }

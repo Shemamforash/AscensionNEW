@@ -66,7 +66,7 @@ public class SelkiesImprovements : MasterScript
 		if(checkValue == false)
 		{
 			improvements.improvementCostModifier += (int)improvements.tempImprovementCostReduction;
-			improvements.listOfImprovements[29].improvementMessage = ("System Improvements cost " + systemSIMData.totalSystemAmber + " fewer Industry from Amber production");
+			improvements.listOfImprovements[29].improvementMessage = ("System Improvements cost " + systemSIMData.totalSystemAmber + " fewer Power from Amber production");
 		}
 	}
 
@@ -108,12 +108,12 @@ public class SelkiesImprovements : MasterScript
 
 	private void TS2I2()
 	{
-		improvements.tempAmberProductionBonus += systemSIMData.totalSystemIndustry * 0.01f;
+		improvements.tempAmberProductionBonus += systemSIMData.totalSystemPower * 0.01f;
 		
 		if(checkValue == false)
 		{
 			improvements.amberProductionBonus += improvements.tempAmberProductionBonus;
-			improvements.listOfImprovements[32].improvementMessage = ("+" + (systemSIMData.totalSystemIndustry * 0.01f) + "% Amber production from Industry production");
+			improvements.listOfImprovements[32].improvementMessage = ("+" + (systemSIMData.totalSystemPower * 0.01f) + "% Amber production from Power production");
 		}
 	}
 
@@ -148,8 +148,8 @@ public class SelkiesImprovements : MasterScript
 	{
 		improvements.tempOwnershipBonus += systemSIMData.totalSystemAmber;
 
-		improvements.tempSciUnitBonus = systemSIMData.totalSystemScience * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempIndUnitBonus = systemSIMData.totalSystemIndustry * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
 
 		if(checkValue == false)
 		{

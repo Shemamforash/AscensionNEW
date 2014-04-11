@@ -8,7 +8,7 @@ public class SystemGUI : MasterScript
 	private SystemScrollviews systemScrollviews;
 
 	public GUISkin mySkin;
-	public UILabel systemIndustry, systemScience;
+	public UILabel systemPower, systemKnowledge;
 	public GameObject planetPrefab;
 	public int selectedSystem, selectedPlanet, numberOfHeroes;
 	public List<PlanetUIElements> planetElementList = new List<PlanetUIElements>();
@@ -58,7 +58,7 @@ public class SystemGUI : MasterScript
 					
 					if(systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised == true)
 					{
-						UpdateColonisedPlanetDetails(i);
+						UpdateColonisedPlanetDetails(i, selectedSystem);
 					}
 					
 					if(systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised == false)
@@ -89,8 +89,8 @@ public class SystemGUI : MasterScript
 			
 			if(cameraFunctionsScript.openMenu == true)
 			{
-				systemIndustry.text = Math.Round (systemSIMData.totalSystemIndustry, 1) + " (" + Math.Round (systemSIMData.systemIndustryModifier,1) + ")";
-				systemScience.text = Math.Round (systemSIMData.totalSystemScience, 1) + " (" + Math.Round (systemSIMData.systemScienceModifier,1) + ")";  
+				systemPower.text = Math.Round (systemSIMData.totalSystemPower, 1) + " (" + Math.Round (systemSIMData.systemPowerModifier,1) + ")";
+				systemKnowledge.text = Math.Round (systemSIMData.totalSystemKnowledge, 1) + " (" + Math.Round (systemSIMData.systemKnowledgeModifier,1) + ")";  
 			}
 		}
 	}
@@ -131,13 +131,14 @@ public class SystemGUI : MasterScript
 			EventDelegate.Add (planet.spriteObject.GetComponent<UIButton>().onClick, PlanetInterfaceClick);
 			planet.infoLabel = planet.spriteObject.transform.Find ("General Output Label").gameObject.GetComponent<UILabel>();
 			EventDelegate.Add (planet.spriteObject.transform.Find ("Improve Button").gameObject.GetComponent<UIButton>().onClick, ImprovePlanet);
-			planet.scienceProductionSprite = planet.spriteObject.transform.Find ("Science Output").gameObject;
-			planet.scienceProduction = planet.scienceProductionSprite.transform.Find("Science Label").gameObject.GetComponent<UILabel>();
-			planet.industryProductionSprite = planet.spriteObject.transform.Find("Industry Output").gameObject;
-			planet.industryProduction = planet.industryProductionSprite.transform.Find("Industry Label").gameObject.GetComponent<UILabel>();
+			planet.knowledgeProductionSprite = planet.spriteObject.transform.Find ("Knowledge Output").gameObject;
+			planet.knowledgeProduction = planet.knowledgeProductionSprite.transform.Find("Knowledge Label").gameObject.GetComponent<UILabel>();
+			planet.powerProductionSprite = planet.spriteObject.transform.Find("Power Output").gameObject;
+			planet.powerProduction = planet.powerProductionSprite.transform.Find("Power Label").gameObject.GetComponent<UILabel>();
 			planet.improveButton = planet.spriteObject.transform.Find("Improve Button").gameObject.GetComponent<UIButton>();
-			planet.capitalCost = planet.improveButton.transform.Find("Capital Cost").gameObject.GetComponent<UILabel>();
-			planet.industryCost = planet.improveButton.transform.Find("Industry Cost").gameObject.GetComponent<UILabel>();
+			planet.wealthCost = planet.improveButton.transform.Find("Wealth Cost").gameObject.GetComponent<UILabel>();
+			planet.powerCost = planet.improveButton.transform.Find("Power Cost").gameObject.GetComponent<UILabel>();
+			planet.rareResourceLabel = planet.spriteObject.transform.Find("Rare Resource Output").gameObject.GetComponent<UILabel>();
 			
 			Transform[] tempTransform = planet.spriteObject.GetComponentsInChildren<Transform>();
 			
@@ -191,21 +192,22 @@ public class SystemGUI : MasterScript
 			{
 				NGUITools.SetActive(systemScrollviews.improvementsToBuildScrollView, true);
 				NGUITools.SetActive(systemScrollviews.tabContainer, true);
+
 				systemScrollviews.techTierToShow = 0;
 				systemScrollviews.tabContainer.GetComponent<UILabel>().text = "Build Improvements On " + systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetName;
 				systemScrollviews.UpdateScrollviewContents();
 				systemScrollviews.selectedPlanet = selectedPlanet;
 			}
 
-			if(playerTurnScript.capital >= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].capitalValue)
+			if(playerTurnScript.wealth >= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].wealthValue)
 			{
 				if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
 				{
 					systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
 					++playerTurnScript.planetsColonisedThisTurn;
 					systemSIMData.CheckPlanetValues(selectedPlanet, "None");
-					playerTurnScript.capital -= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].capitalValue;
-					playerTurnScript.capitalModifier += 0.1f;
+					playerTurnScript.wealth -= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].wealthValue;
+					playerTurnScript.wealthModifier += 0.1f;
 				}
 			}
 		}
@@ -228,35 +230,46 @@ public class SystemGUI : MasterScript
 		{
 			systemFunctions.CheckImprovement(selectedSystem, selectedPlanet);
 
-			float industryImprovementCost = systemFunctions.IndustryCost(systemSIMData.improvementNumber, selectedSystem, selectedPlanet);
+			float powerImprovementCost = systemFunctions.PowerCost(systemSIMData.improvementNumber, selectedSystem, selectedPlanet);
 
-			if(playerTurnScript.industry >= industryImprovementCost && playerTurnScript.capital >= systemSIMData.improvementCost)
+			if(playerTurnScript.power >= powerImprovementCost && playerTurnScript.wealth >= systemSIMData.improvementCost)
 			{
-				playerTurnScript.industry -= industryImprovementCost;
-				playerTurnScript.capital -= systemSIMData.improvementCost;
+				playerTurnScript.power -= powerImprovementCost;
+				playerTurnScript.wealth -= systemSIMData.improvementCost;
 				++systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetImprovementLevel;
-				UpdateColonisedPlanetDetails(selectedPlanet);
+				UpdateColonisedPlanetDetails(selectedPlanet, selectedSystem);
 			}
 
 			selectedPlanet = -1;
 		}
 	}
 
-	private void UpdateColonisedPlanetDetails(int i)
+	private void UpdateColonisedPlanetDetails(int i, int system)
 	{
-		if(planetElementList[i].scienceProductionSprite.activeInHierarchy == false)
+		if(planetElementList[i].knowledgeProductionSprite.activeInHierarchy == false)
 		{
-			NGUITools.SetActive (planetElementList [i].scienceProductionSprite, true);
+			NGUITools.SetActive (planetElementList [i].knowledgeProductionSprite, true);
 		}
 
-		if(planetElementList[i].industryProductionSprite.activeInHierarchy == false)
+		if(planetElementList[i].powerProductionSprite.activeInHierarchy == false)
 		{
-			NGUITools.SetActive (planetElementList [i].industryProductionSprite, true);
+			NGUITools.SetActive (planetElementList [i].powerProductionSprite, true);
 		}
 
 		planetElementList[i].infoLabel.text = systemSIMData.allPlanetsInfo[i].generalInfo;
-		planetElementList [i].industryProduction.text = systemSIMData.allPlanetsInfo [i].industryOutput;
-		planetElementList [i].scienceProduction.text = systemSIMData.allPlanetsInfo [i].scienceOutput;
+		planetElementList [i].powerProduction.text = systemSIMData.allPlanetsInfo [i].powerOutput;
+		planetElementList [i].knowledgeProduction.text = systemSIMData.allPlanetsInfo [i].knowledgeOutput;
+
+		
+		if(systemListConstructor.systemList[system].planetsInSystem[i].rareResourceType != null)
+		{
+			planetElementList[i].rareResourceLabel.text = systemListConstructor.systemList[system].planetsInSystem[i].rareResourceType;
+			NGUITools.SetActive(planetElementList[i].rareResourceLabel.gameObject, true);
+		}
+		else
+		{
+			NGUITools.SetActive(planetElementList[i].rareResourceLabel.gameObject, false);
+		}
 		
 		systemSIMData.improvementNumber = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetImprovementLevel;
 		systemFunctions.CheckImprovement(selectedSystem, i);
@@ -267,9 +280,9 @@ public class SystemGUI : MasterScript
 		if(systemSIMData.improvementNumber < 3)
 		{
 			planetElementList[i].improveButton.isEnabled = true;
-			float temp = systemFunctions.IndustryCost(systemSIMData.improvementNumber, selectedSystem, i);
-			planetElementList[i].industryCost.text = (Math.Round (temp, 1)).ToString();
-			planetElementList[i].capitalCost.text = systemSIMData.improvementCost.ToString();
+			float temp = systemFunctions.PowerCost(systemSIMData.improvementNumber, selectedSystem, i);
+			planetElementList[i].powerCost.text = (Math.Round (temp, 1)).ToString();
+			planetElementList[i].wealthCost.text = systemSIMData.improvementCost.ToString();
 		}
 		
 		if(systemSIMData.improvementNumber == 3)
@@ -284,10 +297,11 @@ public class SystemGUI : MasterScript
 
 	private void UpdateUncolonisedPlanetDetails(int i)
 	{
-		NGUITools.SetActive (planetElementList [i].scienceProductionSprite, false);
-		NGUITools.SetActive (planetElementList [i].industryProductionSprite, false);
+		NGUITools.SetActive (planetElementList [i].knowledgeProductionSprite, false);
+		NGUITools.SetActive (planetElementList [i].powerProductionSprite, false);
 		planetElementList[i].infoLabel.text = "Uncolonised\nClick to Colonise";
 		NGUITools.SetActive(planetElementList[i].improveButton.gameObject, false);
+		NGUITools.SetActive(planetElementList[i].rareResourceLabel.gameObject, false);
 	}
 
 	private void UpdateImprovementGrid(int i)
@@ -310,8 +324,8 @@ public class SystemGUI : MasterScript
 
 public class PlanetUIElements
 {
-	public GameObject spriteObject, scienceProductionSprite, industryProductionSprite;
-	public UILabel infoLabel, industryProduction, scienceProduction, industryCost, capitalCost;
+	public GameObject spriteObject, knowledgeProductionSprite, powerProductionSprite;
+	public UILabel infoLabel, powerProduction, knowledgeProduction, powerCost, wealthCost, rareResourceLabel;
 	public UIButton improveButton;
 	public List<GameObject> improvementSlots = new List<GameObject>();
 }

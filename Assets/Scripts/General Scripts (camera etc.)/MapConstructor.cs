@@ -253,27 +253,27 @@ public class MapConstructor : MasterScript
 	
 	private int WeightedConnectionFinder(int randomInt)
 	{
-		if(randomInt < 9)
+		if(randomInt < 20)
 		{
 			return 1;
 		}
-		if(randomInt >= 9 && randomInt < 24)
+		if(randomInt >= 20 && randomInt < 30)
 		{
 			return 2;
 		}
-		if(randomInt >= 24 && randomInt < 49)
+		if(randomInt >= 40 && randomInt < 60)
 		{
 			return 3;
 		}
-		if(randomInt >= 49 && randomInt < 74)
+		if(randomInt >= 60 && randomInt < 80)
 		{
 			return 4;
 		}
-		if(randomInt >= 74 && randomInt < 89)
+		if(randomInt >= 80 && randomInt < 90)
 		{
 			return 5;
 		}
-		if(randomInt >= 89)
+		if(randomInt >= 90)
 		{
 			return 6;
 		}
@@ -285,7 +285,7 @@ public class MapConstructor : MasterScript
 	{
 		for(int i = 0; i < systemListConstructor.systemList.Count; ++i) //For all systems
 		{
-			int randomInt = WeightedConnectionFinder(Random.Range (0,99)); //Generate number
+			int randomInt = WeightedConnectionFinder(Random.Range (0,100)); //Generate number
 			
 			if(systemListConstructor.systemList[i].systemName == "Samael" || systemListConstructor.systemList[i].systemName == "Midgard" || systemListConstructor.systemList[i].systemName == "Nepthys")
 			{

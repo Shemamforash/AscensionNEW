@@ -34,18 +34,18 @@ public static class HeroTechTree
 					tech.logisticsRating = Convert.ToInt32 (reader.GetAttribute("H"));
 					tech.heroType = reader.GetAttribute("I");
 					tech.techType = reader.GetAttribute("J");
-					tech.scienceCost = Convert.ToInt32 (reader.GetAttribute("K"));
+					tech.knowledgeCost = Convert.ToInt32 (reader.GetAttribute("K"));
 					tech.prerequisite = reader.GetAttribute("L");
 
-					tech.techDetails = tech.techName + "\nResearch Cost: " + tech.scienceCost;
+					tech.techDetails = tech.techName + "\nResearch Cost: " + tech.knowledgeCost;
 
 					if(tech.primaryOffenceRating != 0)
 					{
-						tech.techDetails += "\nPrimary Weapon Power: " + tech.primaryOffenceRating;
+						tech.techDetails += "\nPrimary Weapon Wealth: " + tech.primaryOffenceRating;
 					}
 					if(tech.secondaryOffenceRating != 0)
 					{
-						tech.techDetails += "\nInvasion Weapon Power: " + tech.secondaryOffenceRating;
+						tech.techDetails += "\nInvasion Weapon Wealth: " + tech.secondaryOffenceRating;
 					}
 					if(tech.collateralRating != 0)
 					{
@@ -53,7 +53,7 @@ public static class HeroTechTree
 					}
 					if(tech.engineRating != 0)
 					{
-						tech.techDetails += "\nEngine Power: " + tech.engineRating;
+						tech.techDetails += "\nEngine Wealth: " + tech.engineRating;
 					}
 					if(tech.armourRating != 0)
 					{
@@ -81,7 +81,7 @@ public static class HeroTechTree
 
 public class HeroTech
 {
-	public int scienceCost = 0, armourRating = 0, primaryOffenceRating = 0, secondaryOffenceRating = 0, engineRating = 0, collateralRating = 0, stealthRating = 0, logisticsRating = 0;
+	public int knowledgeCost = 0, armourRating = 0, primaryOffenceRating = 0, secondaryOffenceRating = 0, engineRating = 0, collateralRating = 0, stealthRating = 0, logisticsRating = 0;
 	public string heroType, techType, techName, prerequisite = null, techDetails;
 	public bool canPurchase = false, isActive = false;
 }

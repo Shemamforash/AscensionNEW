@@ -4,20 +4,20 @@ using System.Collections.Generic;
 
 public static class ShipFunctions
 {
-	public static int stealthValue, primaryWeaponPower, artilleryPower, artilleryCollateral, bombPower, bombCollateral, dropshipPower, 
+	public static int stealthValue, primaryWeaponWealth, artilleryWealth, artilleryCollateral, bombWealth, bombCollateral, dropshipWealth, 
 			   dropshipCollateral, engineValue, armourRating, logisticsRating;
 	public static bool infiltratorEngine, soldierPrimary;
 
 	public static void UpdateShips()
 	{
 		stealthValue = 0;
-		primaryWeaponPower = 20;
+		primaryWeaponWealth = 20;
 		soldierPrimary = false;
-		artilleryPower = 10;
+		artilleryWealth = 10;
 		artilleryCollateral = 10;
-		bombPower = 0;
+		bombWealth = 0;
 		bombCollateral = 0;
-		dropshipPower = 0;
+		dropshipWealth = 0;
 		dropshipCollateral = 0;
 		engineValue = 1;
 		infiltratorEngine = false;
@@ -41,21 +41,21 @@ public static class ShipFunctions
 				}
 
 				stealthValue += HeroTechTree.heroTechList[i].stealthRating;
-				primaryWeaponPower += HeroTechTree.heroTechList[i].primaryOffenceRating;
+				primaryWeaponWealth += HeroTechTree.heroTechList[i].primaryOffenceRating;
 
 				if(HeroTechTree.heroTechList[i].heroType == "Soldier")
 				{
-					artilleryPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					artilleryWealth += HeroTechTree.heroTechList[i].secondaryOffenceRating;
 					artilleryCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
 				if(HeroTechTree.heroTechList[i].heroType == "Infiltrator")
 				{
-					bombPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					bombWealth += HeroTechTree.heroTechList[i].secondaryOffenceRating;
 					bombCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
 				if(HeroTechTree.heroTechList[i].heroType == "Soldier")
 				{
-					dropshipPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					dropshipWealth += HeroTechTree.heroTechList[i].secondaryOffenceRating;
 					dropshipCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
 

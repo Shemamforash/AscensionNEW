@@ -41,7 +41,7 @@ public class PlayerTurn : TurnInfo
 			}
 		}
 
-		if(isOkToColonise == true && capital >= 10.0f)
+		if(isOkToColonise == true && wealth >= 10.0f)
 		{
 			if(checkFirstContact == true)
 			{
@@ -93,9 +93,9 @@ public class PlayerTurn : TurnInfo
 
 			ambientStarRandomiser.AmbientColourChange(system);
 			
-			playerTurnScript.capital -= 10.0f;
+			playerTurnScript.wealth -= 10.0f;
 
-			playerTurnScript.capitalModifier += 0.05f;
+			playerTurnScript.wealthModifier += 0.05f;
 			
 			++turnInfoScript.systemsInPlay;
 

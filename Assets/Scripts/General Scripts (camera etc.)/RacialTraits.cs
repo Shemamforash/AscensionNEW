@@ -15,15 +15,15 @@ public class RacialTraits : MasterScript
 	
 	public void Purge() //Nereides function to produce elation
 	{
-		while(playerTurnScript.science >= 100 && playerTurnScript.industry >= 100)
+		while(playerTurnScript.knowledge >= 100 && playerTurnScript.power >= 100)
 		{
-			playerTurnScript.science -= 100;
-			playerTurnScript.industry -= 100;
+			playerTurnScript.knowledge -= 100;
+			playerTurnScript.power -= 100;
 			++nereidesStacks;
 		}
 	}
 	
-	public float NereidesIndustryModifer (TurnInfo thisPlayer) //Returns industry modifier based on elation
+	public float NereidesPowerModifer (TurnInfo thisPlayer) //Returns power modifier based on elation
 	{
 		if(thisPlayer.playerRace == "Nereides")
 		{

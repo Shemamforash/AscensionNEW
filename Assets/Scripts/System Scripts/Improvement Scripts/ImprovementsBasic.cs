@@ -6,8 +6,8 @@ using System.Xml;
 
 public class ImprovementsBasic : MasterScript 
 {
-	public float sciencePercentBonus, industryPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, scienceBonusModifier, ownershipModifier, maxOwnershipBonus;
-	public float tempSciBonus, tempIndBonus, tempOwnershipBonus, tempCapital, tempSciUnitBonus, tempIndUnitBonus, tempResearchCostReduction, tempImprovementCostReduction, 
+	public float knowledgePercentBonus, powerPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, knowledgeBonusModifier, ownershipModifier, maxOwnershipBonus;
+	public float tempKnwlBonus, tempPowBonus, tempOwnershipBonus, tempWealth, tempKnwlUnitBonus, tempPowUnitBonus, tempResearchCostReduction, tempImprovementCostReduction, 
 			tempOwnershipUnitBonus, tempCount, tempBonusAmbition, tempAmberProductionBonus, tempAmberPointBonus, tempImprovementSlots, tempAmberPenalty;
 	public List<string> planetToBuildOn = new List<string>();
 	public GameObject tooltip;
@@ -18,7 +18,7 @@ public class ImprovementsBasic : MasterScript
 
 	void Start()
 	{
-		sciencePercentBonus = 0; industryPercentBonus = 0;
+		knowledgePercentBonus = 0; powerPercentBonus = 0;
 
 		systemSIMData = gameObject.GetComponent<SystemSIMData>(); //References to scripts again.
 		lineRenderScript = gameObject.GetComponent<LineRenderScript>();
@@ -30,9 +30,9 @@ public class ImprovementsBasic : MasterScript
 
 	public bool ImproveSystem(int improvement) //Occurs if button of tech is clicked.
 	{
-		if(playerTurnScript.industry >= (listOfImprovements[improvement].improvementCost - improvementCostModifier)) //Checks cost of tech and current industry
+		if(playerTurnScript.power >= (listOfImprovements[improvement].improvementCost - improvementCostModifier)) //Checks cost of tech and current power
 		{
-			playerTurnScript.industry -= (listOfImprovements[improvement].improvementCost - improvementCostModifier);
+			playerTurnScript.power -= (listOfImprovements[improvement].improvementCost - improvementCostModifier);
 			listOfImprovements[improvement].hasBeenBuilt = true;
 			return true;
 		}
@@ -61,10 +61,10 @@ public class ImprovementsBasic : MasterScript
 
 	public void ActiveTechnologies(int curSystem, TurnInfo thisPlayer) //Contains reference to all technologies. Will activate relevant functions etc. if tech is built. Should be turned into a switch rather than series of ifs.
 	{
-		sciencePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
-		industryPercentBonus = 1.0f;
+		knowledgePercentBonus = 1.0f; //Resets the percentage modifier for SIM. Is there an easier way?
+		powerPercentBonus = 1.0f;
 		improvementCostModifier = 0;
-		scienceBonusModifier = 1.0f;
+		knowledgeBonusModifier = 1.0f;
 		ownershipModifier = 1.0f;
 		amberPenalty = 1f;
 		amberPointBonus = 0f;
@@ -83,7 +83,7 @@ public class ImprovementsBasic : MasterScript
 			}
 		}
 
-		sciencePercentBonus = sciencePercentBonus * scienceBonusModifier;
+		knowledgePercentBonus = knowledgePercentBonus * knowledgeBonusModifier;
 	}
 	
 	public int CheckDiplomaticStateOfAllPlayers(TurnInfo thisPlayer, string state)

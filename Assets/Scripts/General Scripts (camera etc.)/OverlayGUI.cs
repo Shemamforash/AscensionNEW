@@ -7,7 +7,7 @@ public class OverlayGUI : MasterScript
 	public Camera mainCamera, uiCamera;
 	public GameObject mouseOverSystem, systemOverlay;
 	public UIWidget cornerAnchor;
-	public UILabel scienceOverlay, industryOverlay, colonisationOverlay, nameOverlay, defenceOverlay;
+	public UILabel knowledgeOverlay, powerOverlay, colonisationOverlay, nameOverlay, defenceOverlay;
 	private int system;
 
 	private string UpdateVariables()
@@ -59,9 +59,9 @@ public class OverlayGUI : MasterScript
 			
 			nameOverlay.text = mouseOverSystem.name;
 
-			scienceOverlay.text = (Math.Round(systemSIMData.totalSystemScience,1)).ToString();
+			knowledgeOverlay.text = (Math.Round(systemSIMData.totalSystemKnowledge,1)).ToString();
 
-			industryOverlay.text = (Math.Round(systemSIMData.totalSystemIndustry,1)).ToString();
+			powerOverlay.text = (Math.Round(systemSIMData.totalSystemPower,1)).ToString();
 
 			defenceOverlay.text = systemListConstructor.systemList [system].systemDefence.ToString();
 
