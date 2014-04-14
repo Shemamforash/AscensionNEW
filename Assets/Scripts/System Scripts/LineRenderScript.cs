@@ -126,7 +126,7 @@ public class LineRenderScript : MasterScript
 
 		Vector3 midPoint = (gameObject.transform.position + objectB.transform.position)/2;
 
-		Vector3 scale = new Vector3(0.3f * systemListConstructor.systemScale, distance, 0.0f);
+		Vector3 scale = new Vector3(0.2f * systemListConstructor.systemScale, distance, 0.0f);
 
 		ConnectorLine newLine = new ConnectorLine ();
 

@@ -29,29 +29,32 @@ public class HeroShip : MasterScript
 		}
 	}
 
-	void Update()
+	public void UpdateButtons()
 	{
 		tempChildren = 0;
-
-		if(heroMovement.TestForProximity (gameObject.transform.position, heroMovement.HeroPositionAroundStar(heroScript.heroLocation)) == true)
+	
+		if(heroScript.heroOwnedBy == playerTurnScript.playerRace)
 		{
-			system = RefreshCurrentSystem(heroScript.heroLocation);
-
-			if(systemListConstructor.systemList[system].systemOwnedBy != heroScript.heroOwnedBy && systemListConstructor.systemList[system].systemOwnedBy != null)
+			if(heroMovement.TestForProximity (gameObject.transform.position, heroMovement.HeroPositionAroundStar(heroScript.heroLocation)) == true)
 			{
-				++tempChildren;
+				system = RefreshCurrentSystem(heroScript.heroLocation);
 
-				CheckButtonsAllowed();
+				if(systemListConstructor.systemList[system].systemOwnedBy != heroScript.heroOwnedBy && systemListConstructor.systemList[system].systemOwnedBy != null)
+				{
+					++tempChildren;
 
-				if(canViewSystem == true)
-				{
-					heroGUI.invasionButton.GetComponent<UILabel>().text = "Enter System";
-					NGUITools.SetActive(heroGUI.invasionButton, false);
-				}
-				else
-				{
-					NGUITools.SetActive(heroGUI.invasionButton, true);
-					heroGUI.invasionButton.GetComponent<UILabel>().text = "Invade System";
+					CheckButtonsAllowed();
+
+					if(canViewSystem == true)
+					{
+						heroGUI.invasionButton.GetComponent<UILabel>().text = "Enter System";
+						NGUITools.SetActive(heroGUI.invasionButton, false);
+					}
+					else
+					{
+						NGUITools.SetActive(heroGUI.invasionButton, true);
+						heroGUI.invasionButton.GetComponent<UILabel>().text = "Invade System";
+					}
 				}
 			}
 		}
@@ -88,13 +91,13 @@ public class HeroShip : MasterScript
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
 		ShipFunctions.UpdateShips ();
-		heroScript.primaryWealth = ShipFunctions.primaryWeaponWealth;
+		heroScript.primaryPower = ShipFunctions.primaryWeaponWealth;
 		heroScript.maxArmour = ShipFunctions.armourRating;
 		heroScript.movementSpeed = ShipFunctions.engineValue;
 
 		if(heroScript.heroType == "Diplomat")
 		{
-			heroScript.secondaryWealth = ShipFunctions.dropshipWealth;
+			heroScript.secondaryPower = ShipFunctions.dropshipWealth;
 			heroScript.secondaryCollateral = ShipFunctions.dropshipCollateral;
 
 			int numberOfMerchants = 0;
@@ -114,7 +117,7 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Infiltrator")
 		{
-			heroScript.secondaryWealth = ShipFunctions.bombWealth;
+			heroScript.secondaryPower = ShipFunctions.bombWealth;
 			heroScript.secondaryCollateral = ShipFunctions.bombCollateral;
 
 			canViewSystem = true;
@@ -142,12 +145,12 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Soldier")
 		{
-			heroScript.secondaryWealth = ShipFunctions.artilleryWealth;
+			heroScript.secondaryPower = ShipFunctions.artilleryWealth;
 			heroScript.secondaryCollateral = ShipFunctions.artilleryCollateral;
 
 			if(ShipFunctions.soldierPrimary == true)
 			{
-				heroScript.primaryWealth = heroScript.primaryWealth * 2;
+				heroScript.primaryPower = heroScript.primaryPower * 2;
 			}
 		}
 	}

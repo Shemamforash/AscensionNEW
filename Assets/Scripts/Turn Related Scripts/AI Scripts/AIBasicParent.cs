@@ -32,7 +32,7 @@ public class AIBasicParent : TurnInfo
 			if(saveForHero == true)
 			{
 				string temp = heroBehaviour.SetSpecialisation();
-				heroGUI.CheckIfCanHire(thisPlayer, temp);
+				turnInfoScript.CheckIfCanHire(thisPlayer, temp);
 			}
 		}
 
@@ -360,8 +360,6 @@ public class AIBasicParent : TurnInfo
 				lineRenderScript.SetRaceLineColour(thisPlayer.playerRace);
 				
 				systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
-
-				ambientStarRandomiser.AmbientColourChange(currentSystem);
 
 				++systemsInPlay;
 

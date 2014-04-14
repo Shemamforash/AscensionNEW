@@ -90,8 +90,6 @@ public class PlayerTurn : TurnInfo
 			lineRenderScript.SetRaceLineColour(playerRace);
 			
 			systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
-
-			ambientStarRandomiser.AmbientColourChange(system);
 			
 			playerTurnScript.wealth -= 10.0f;
 
@@ -126,8 +124,6 @@ public class PlayerTurn : TurnInfo
 		systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 
 		systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
-
-		ambientStarRandomiser.AmbientColourChange(i);
 
 		lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
