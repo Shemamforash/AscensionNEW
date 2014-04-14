@@ -42,11 +42,11 @@ public class InvasionGUI : MasterScript
 
 	void Update()
 	{
-		if(heroGUI.selectedHero != null)
+		if(heroGUI.currentHero != null)
 		{
-			heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
+			heroScript = heroGUI.currentHero.GetComponent<HeroScriptParent> ();
 			
-			heroShip = heroGUI.selectedHero.GetComponent<HeroShip>();
+			heroShip = heroGUI.currentHero.GetComponent<HeroShip>();
 			
 			systemDefence = heroScript.heroLocation.GetComponent<SystemDefence> ();
 			
@@ -128,16 +128,8 @@ public class InvasionGUI : MasterScript
 				{
 					planetList[i].GetComponent<UIButton>().isEnabled = false;
 				}
-
-				else if(i == heroScript.planetInvade)
-				{
-					planetList[i].GetComponent<UIButton>().isEnabled = false;
-				}
-
-				else if(i != heroScript.planetInvade)
-				{
-					planetList[i].GetComponent<UIButton>().isEnabled = true;
-				}
+	
+				planetList[i].GetComponent<UIButton>().isEnabled = true;
 
 				if(systemListConstructor.systemList[system].planetsInSystem[i].planetColonised == true)
 				{
@@ -203,7 +195,7 @@ public class InvasionGUI : MasterScript
 	{
 		NGUITools.SetActive (invasionScreen, true);
 
-		heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
+		heroScript = heroGUI.currentHero.GetComponent<HeroScriptParent> ();
 
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
@@ -238,7 +230,7 @@ public class InvasionGUI : MasterScript
 
 	private void BombPlanet(int i, int system)
 	{
-		heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
+		heroScript = heroGUI.currentHero.GetComponent<HeroScriptParent> ();
 		DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (heroScript.heroOwnedBy, systemListConstructor.systemList [system].systemOwnedBy);
 		temp.stateCounter -= 2;
 
@@ -265,22 +257,31 @@ public class InvasionGUI : MasterScript
 
 	public void PlanetInvasionClick()
 	{
-		heroScript = heroGUI.selectedHero.GetComponent<HeroScriptParent> ();
+		heroScript = heroGUI.currentHero.GetComponent<HeroScriptParent> ();
 
 		for(int i = 0; i < 6; ++i)
 		{			
 			if(planetList[i] == UIButton.current.gameObject)
 			{
-				heroScript.planetInvade = i;
-				systemInvasion.hero = heroScript;
-				systemInvasion.PlanetInvasion(heroScript.system, heroScript.planetInvade);
-
-				if(bombSelected != null)
+				if(heroScript.planetInvade == i)
 				{
-					BombPlanet(i, heroScript.system);
+					systemListConstructor.systemList [system].planetsInSystem [i].planetDefence -= heroScript.primaryPower;
+					systemListConstructor.systemList [system].planetsInSystem [i].planetOwnership -= heroScript.primaryPower;
 				}
 
-				break;
+				if(heroScript.planetInvade != i)
+				{
+					heroScript.planetInvade = i;
+					systemInvasion.hero = heroScript;
+					systemInvasion.PlanetInvasion(heroScript.system, heroScript.planetInvade);
+
+					if(bombSelected != null)
+					{
+						BombPlanet(i, heroScript.system);
+					}
+
+					break;
+				}
 			}
 		}
 	}

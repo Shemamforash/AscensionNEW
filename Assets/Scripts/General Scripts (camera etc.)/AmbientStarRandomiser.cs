@@ -5,14 +5,40 @@ using System.Collections.Generic;
 public class AmbientStarRandomiser : MasterScript 
 {
 	public int totalStars;
-	public float maxGenerateDistance;
+	public float maxGenerateDistance, blueRand, redRand, greenRand;
 	public GameObject ambientStar;
 	public Texture starA, starB, starC, starD, starE, starF;
 	private Texture tempTexture;
 	private List<AmbientStar> ambientStarList = new List<AmbientStar> ();
+	private Color randomColor;
 
 	public void GenerateStars () 
 	{
+		int rnd = Random.Range (0, 2);
+
+		greenRand = Random.Range (0.50f, 1.00f);
+
+		if(rnd == 1)
+		{
+			redRand = 0f;
+			blueRand = 1f;
+		}
+
+		if(rnd == 2)
+		{
+			redRand = 1f;
+			blueRand = 0f;
+		}
+
+		float mult = 1f;
+
+		if((1f + greenRand) / 3f < 0.75)
+		{
+			mult = 4f;
+		}
+
+		randomColor = new Color (redRand * mult, greenRand * mult, blueRand * mult);
+
 		int ambientStarsPerSystem = totalStars / systemListConstructor.systemList.Count;
 
 		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
@@ -26,15 +52,24 @@ public class AmbientStarRandomiser : MasterScript
 
 				float xDis = Random.Range(systemX - maxGenerateDistance, systemX + maxGenerateDistance);
 				float yDis = Random.Range(systemY - maxGenerateDistance, systemY + maxGenerateDistance);
-				float zDis = Random.Range(-7.5f, 7.5f);
 
-				float scale = Random.Range(0.65f, 0.85f);
+				int rnd2 = Random.Range(0,3);
+				float heightMult = 1f;
+
+				if(rnd2 == 3)
+				{
+					heightMult = Random.Range(1.5f, 4.0f);
+				}
+
+				float zDis = Random.Range(-15f * heightMult, 15f * heightMult);
+
+				float scale = Random.Range(0.15f, 0.3f);
 		
 				Vector3 location = new Vector3(xDis, yDis, zDis);
 
 				GameObject star = Instantiate(ambientStar, location, Quaternion.identity) as GameObject;
 
-				star.renderer.material.mainTexture = PickTexture(Random.Range (0,99));
+				star.renderer.material.color = randomColor;
 
 				star.transform.localScale = new Vector3(scale, scale, scale);
 
@@ -48,51 +83,6 @@ public class AmbientStarRandomiser : MasterScript
 
 		AmbientStarBatcher batcher = GameObject.Find ("Ambient Star Container").GetComponent<AmbientStarBatcher> ();
 		batcher.BatchChildren ();
-	}
-
-	private Texture PickTexture(int chooseTexture)
-	{
-		if(chooseTexture < 40)
-		{
-			return starA;
-		}
-		else if(chooseTexture >= 40 && chooseTexture < 80)
-		{
-			return starB;
-		}
-		else if(chooseTexture >= 80)
-		{
-			return starF;
-		}
-		return null;
-	}
-	
-	public void AmbientColourChange(int system)
-	{
-		for(int i = 0; i < ambientStarList.Count; ++i)
-		{
-			if(ambientStarList[i].mainStar == systemListConstructor.systemList[system].systemObject)
-			{
-				for(int j = 0; j < ambientStarList[i].nearbyStars.Count; ++j)
-				{
-					switch(systemListConstructor.systemList[system].systemOwnedBy)
-					{
-					case "Humans":
-						ambientStarList[i].nearbyStars[j].renderer.material.mainTexture = starC;
-						break;
-					case "Selkies":
-						ambientStarList[i].nearbyStars[j].renderer.material.mainTexture = starD;
-						break;
-					case "Nereides":
-						ambientStarList[i].nearbyStars[j].renderer.material.mainTexture = starE;
-						break;
-					default:
-						ambientStarList[i].nearbyStars[j].renderer.material.mainTexture = PickTexture(Random.Range(0,99));
-						break;
-					}
-				}
-			}
-		}
 	}
 }
 

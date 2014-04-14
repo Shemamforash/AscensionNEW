@@ -6,13 +6,13 @@ using System;
 public class HeroGUI : MasterScript 
 {
 	public bool openHeroLevellingScreen;
-	public GameObject heroObject, merchantQuad, selectedHero, invasionButton, embargoButton, promoteButton, buttonContainer, turnInfoBar, heroDetailsContainer;
+	public GameObject heroObject, merchantQuad, invasionButton, embargoButton, promoteButton, buttonContainer, turnInfoBar, heroDetailsContainer, currentHero;
 	public UILabel heroHealth, heroName;
-	public int heroCounter = 1;
+	private RaycastHit hit;
 
 	void Update()
 	{
-		RaycastHit hit = new RaycastHit();
+		hit = new RaycastHit();
 		
 		if(Input.GetMouseButtonDown(0)) //Used to start double click events and to identify systems when clicked on. Throws up error if click on a connector object.
 		{
@@ -20,37 +20,53 @@ public class HeroGUI : MasterScript
 			{
 				if(hit.collider.gameObject.tag == "Hero")
 				{
-					selectedHero = hit.collider.gameObject;
-					heroShip = selectedHero.GetComponent<HeroShip>();
-					heroScript = selectedHero.GetComponent<HeroScriptParent>();
+					currentHero = hit.collider.gameObject;
+					heroShip = currentHero.GetComponent<HeroShip>();
+					heroScript = currentHero.GetComponent<HeroScriptParent>();
+
+					if(heroScript.heroOwnedBy != playerTurnScript.playerRace)
+					{
+						currentHero = null;
+					}
 				}
 			}
 		}
-		
-		if(Input.GetMouseButtonDown (1) && selectedHero != null)
+
+		if(Input.GetMouseButtonDown (1) && currentHero != null)
 		{
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
 			{
 				if(hit.collider.gameObject.tag == "StarSystem")
-				{					
-					heroMovement = selectedHero.GetComponent<HeroMovement> ();
+				{
+					heroMovement = currentHero.GetComponent<HeroMovement> ();
 					heroMovement.pathfindTarget = hit.collider.gameObject;
 					heroMovement.FindPath();
+					if(heroScript.invasionObject != null)
+					{
+						Destroy (heroScript.invasionObject);
+					}
 				}
 			}
 		}
+
 		ShowHeroDetails();
+
+		if(currentHero != null)
+		{
+			heroShip.UpdateButtons();
+		}
 	}
 
 	public void ShowHeroDetails()
 	{
-		if(selectedHero != null)
+		if(currentHero != null)
 		{
+			heroScript = currentHero.GetComponent<HeroScriptParent> ();
 			NGUITools.SetActive(heroDetailsContainer, true);
 			heroHealth.text = Math.Round(heroScript.currentArmour, 1) + "/" + Math.Round(heroScript.maxArmour, 1);
 			heroName.text = "Hero Dude/Ette";
 		}
-		if(selectedHero == null)
+		if(currentHero == null)
 		{
 			NGUITools.SetActive(heroDetailsContainer, false);
 		}
@@ -58,6 +74,7 @@ public class HeroGUI : MasterScript
 
 	public void InvasionButtonClick()
 	{
+		heroScript = currentHero.GetComponent<HeroScriptParent> ();
 		systemInvasion.hero = heroScript;
 		systemInvasion.StartSystemInvasion(heroScript.system);
 	}
@@ -76,51 +93,5 @@ public class HeroGUI : MasterScript
 		systemSIMData.embargoedBy = null;
 		systemSIMData.promotedBy = heroScript.heroOwnedBy;
 		systemSIMData.promotionTimer = Time.time;
-	}
-
-	public void CheckIfCanHire(TurnInfo player, string heroType)
-	{
-		if(player.wealth >= 50 && player.playerOwnedHeroes.Count < 7)
-		{
-			int i = RefreshCurrentSystem(GameObject.Find(player.homeSystem));
-
-			GameObject instantiatedHero = (GameObject)Instantiate (heroObject, systemListConstructor.systemList[i].systemObject.transform.position, 
-			                                                       systemListConstructor.systemList[i].systemObject.transform.rotation);
-
-			instantiatedHero.name = "Basic Hero";
-
-			heroScript = instantiatedHero.GetComponent<HeroScriptParent>();
-
-			heroScript.heroType = heroType;
-
-			heroMovement = instantiatedHero.GetComponent<HeroMovement>();
-
-			heroScript.heroLocation = systemListConstructor.systemList[i].systemObject;
-
-			heroScript.heroOwnedBy = player.playerRace;
-
-			heroShip = instantiatedHero.GetComponent<HeroShip>();
-
-			instantiatedHero.transform.position = heroMovement.HeroPositionAroundStar(heroScript.heroLocation);
-
-			++heroCounter;
-
-			player.wealth -= 50;
-
-			player.playerOwnedHeroes.Add (instantiatedHero);
-
-			switch(heroScript.heroType)
-			{
-			case "Soldier":
-				heroScript.classModifier = 1.75f;
-				break;
-			case "Infiltrator":
-				heroScript.classModifier = 1f;
-				break;
-			case "Diplomat":
-				heroScript.classModifier = 1.5f;
-				break;
-			}
-		}
 	}
 }

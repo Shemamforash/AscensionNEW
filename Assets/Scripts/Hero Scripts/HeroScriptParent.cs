@@ -7,7 +7,7 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, invasionObject;
 	public int currentLevel = 1, movementSpeed, planetInvade = -1, system;
-	public int primaryWealth, secondaryWealth, secondaryCollateral, invasionStrength; 
+	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength; 
 	public string heroOwnedBy, heroType;
 	public bool isInvading = false, isBusy;
 	public float heroAge, classModifier, maxArmour, currentArmour;
@@ -80,28 +80,31 @@ public class HeroScriptParent : MasterScript
 			AIHeroFunctions();
 		}
 
-		if(isInvading == true)
+		if(thisPlayer == playerTurnScript)
 		{
-			systemInvasion.hero = this;
-			systemDefence = systemListConstructor.systemList[system].systemObject.GetComponent<SystemDefence>();
-
-			if(systemDefence.canEnter == false)
+			if(isInvading == true)
 			{
-				systemInvasion.ContinueInvasion(system);
+				systemInvasion.hero = this;
+				systemDefence = systemListConstructor.systemList[system].systemObject.GetComponent<SystemDefence>();
+
+				if(systemDefence.canEnter == false)
+				{
+					systemInvasion.ContinueInvasion(system);
+				}
+				if(systemDefence.canEnter == true && planetInvade != -1)
+				{
+					systemInvasion.PlanetInvasion(system, planetInvade);
+				}
 			}
-			if(systemDefence.canEnter == true && planetInvade != -1)
-			{
-				systemInvasion.PlanetInvasion(system, planetInvade);
-			}
-		}
 
-		if(isInvading == false && currentArmour != maxArmour)
-		{
-			currentArmour += maxArmour * 0.02f;
-
-			if(currentArmour >= maxArmour)
+			if(isInvading == false && currentArmour != maxArmour)
 			{
-				currentArmour = maxArmour;
+				currentArmour += maxArmour * 0.02f;
+
+				if(currentArmour >= maxArmour)
+				{
+					currentArmour = maxArmour;
+				}
 			}
 		}
 	}

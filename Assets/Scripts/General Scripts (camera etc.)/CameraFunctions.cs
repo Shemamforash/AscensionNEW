@@ -96,27 +96,30 @@ public class CameraFunctions : MasterScript
 
 						for(int j = 0; j < playerTurnScript.playerOwnedHeroes.Count; ++j)
 						{
-							heroScript = playerTurnScript.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
-
-							if(heroScript.heroLocation == systemListConstructor.systemList[i].systemObject)
+							if(playerTurnScript.playerOwnedHeroes[j] == heroGUI.currentHero)
 							{
-								if(heroScript.heroType == "Infiltrator")
+								heroScript = playerTurnScript.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
+
+								if(heroScript.heroLocation == systemListConstructor.systemList[i].systemObject)
 								{
-									openInvMenu = true;
+									if(heroScript.heroType == "Infiltrator")
+									{
+										openInvMenu = true;
+									}
+
+									if(systemDefence.canEnter == true)
+									{
+										openInvMenu = true;
+									}
+									
+									if(openInvMenu == true)
+									{
+										CloseAllWindows();
+										invasionGUI.openInvasionMenu = true;
+										invasionGUI.OpenPlanetInvasionScreen();
+									}
 								}
 							}
-						}
-
-						if(systemDefence.canEnter == true)
-						{
-							openInvMenu = true;
-						}
-
-						if(openInvMenu == true)
-						{
-							CloseAllWindows();
-							invasionGUI.openInvasionMenu = true;
-							invasionGUI.OpenPlanetInvasionScreen();
 						}
 					}
 				}

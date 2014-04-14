@@ -114,7 +114,7 @@ public class SystemGUI : MasterScript
 	public void ChooseHeroSpecialisation()
 	{
 		string heroToHire = UIButton.current.transform.parent.gameObject.name;
-		heroGUI.CheckIfCanHire(playerTurnScript, heroToHire);
+		turnInfoScript.CheckIfCanHire(playerTurnScript, heroToHire);
 		NGUITools.SetActive (heroChooseScreen, false);
 	}
 
@@ -292,7 +292,7 @@ public class SystemGUI : MasterScript
 		
 		planetElementList[i].improveButton.gameObject.GetComponent<UILabel>().text = CheckPlanetImprovement(i);
 
-		UpdateImprovementGrid (i);
+		UpdateImprovementGrid (i, system);
 	}
 
 	private void UpdateUncolonisedPlanetDetails(int i)
@@ -304,17 +304,17 @@ public class SystemGUI : MasterScript
 		NGUITools.SetActive(planetElementList[i].rareResourceLabel.gameObject, false);
 	}
 
-	private void UpdateImprovementGrid(int i)
+	private void UpdateImprovementGrid(int i, int system)
 	{
 		for(int j = 0; j < 4; ++j)
 		{
-			if(j < systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementSlots)
+			if(j < systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots)
 			{
 				NGUITools.SetActive(planetElementList[i].improvementSlots[j], true);
-				planetElementList[i].improvementSlots[j].gameObject.GetComponent<UILabel>().text = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementsBuilt[j];
-				planetElementList[i].improvementSlots[j].gameObject.name = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementsBuilt[j];
+				planetElementList[i].improvementSlots[j].gameObject.GetComponent<UILabel>().text = systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j];
+				planetElementList[i].improvementSlots[j].gameObject.name = systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j];
 			}
-			if(j >= systemListConstructor.systemList[selectedSystem].planetsInSystem[i].improvementSlots)
+			if(j >= systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots)
 			{
 				NGUITools.SetActive(planetElementList[i].improvementSlots[j], false);
 			}

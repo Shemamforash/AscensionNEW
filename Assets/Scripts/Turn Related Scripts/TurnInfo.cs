@@ -16,7 +16,7 @@ public class TurnInfo : MasterScript
 	public Camera mainCamera;
 	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse, emptyMaterial;
 	public string playerRace, homePlanetType, playerHasWonRace, homeSystem;
-	public int systemsInPlay = 0;
+	public int systemsInPlay = 0, heroCounter = 0;
 	public List<GameObject> playerOwnedHeroes = new List<GameObject> ();
 	public List<EnemyOne> allPlayers = new List<EnemyOne>();
 
@@ -209,6 +209,50 @@ public class TurnInfo : MasterScript
 
 			if(swaps == false)
 			{
+				break;
+			}
+		}
+	}
+
+	public void CheckIfCanHire(TurnInfo player, string heroType)
+	{
+		if(player.wealth >= 50 && player.playerOwnedHeroes.Count < 7)
+		{
+			int i = RefreshCurrentSystem(GameObject.Find(player.homeSystem));
+			
+			GameObject instantiatedHero = (GameObject)Instantiate (heroGUI.heroObject, systemListConstructor.systemList[i].systemObject.transform.position, 
+			                                                       systemListConstructor.systemList[i].systemObject.transform.rotation);
+			
+			instantiatedHero.name = "Basic Hero_" + heroCounter;
+			
+			HeroScriptParent tempHero = instantiatedHero.GetComponent<HeroScriptParent>();
+			
+			tempHero.heroType = heroType;
+			
+			tempHero.heroLocation = systemListConstructor.systemList[i].systemObject;
+			
+			tempHero.heroOwnedBy = player.playerRace;
+			
+			HeroMovement tempMove = instantiatedHero.GetComponent<HeroMovement>();
+			
+			instantiatedHero.transform.position = tempMove.HeroPositionAroundStar(tempHero.heroLocation);
+			
+			++heroCounter;
+			
+			player.wealth -= 50;
+			
+			player.playerOwnedHeroes.Add (instantiatedHero);
+			
+			switch(tempHero.heroType)
+			{
+			case "Soldier":
+				tempHero.classModifier = 1.75f;
+				break;
+			case "Infiltrator":
+				tempHero.classModifier = 1f;
+				break;
+			case "Diplomat":
+				tempHero.classModifier = 1.5f;
 				break;
 			}
 		}
