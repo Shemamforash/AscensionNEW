@@ -91,13 +91,13 @@ public class HeroShip : MasterScript
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
 		ShipFunctions.UpdateShips ();
-		heroScript.primaryPower = ShipFunctions.primaryWeaponWealth;
+		heroScript.primaryPower = ShipFunctions.primaryWeaponPower;
 		heroScript.maxArmour = ShipFunctions.armourRating;
 		heroScript.movementSpeed = ShipFunctions.engineValue;
 
 		if(heroScript.heroType == "Diplomat")
 		{
-			heroScript.secondaryPower = ShipFunctions.dropshipWealth;
+			heroScript.secondaryPower = ShipFunctions.dropshipPower;
 			heroScript.secondaryCollateral = ShipFunctions.dropshipCollateral;
 
 			int numberOfMerchants = 0;
@@ -117,7 +117,7 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Infiltrator")
 		{
-			heroScript.secondaryPower = ShipFunctions.bombWealth;
+			heroScript.secondaryPower = ShipFunctions.bombPower;
 			heroScript.secondaryCollateral = ShipFunctions.bombCollateral;
 
 			canViewSystem = true;
@@ -145,7 +145,7 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Soldier")
 		{
-			heroScript.secondaryPower = ShipFunctions.artilleryWealth;
+			heroScript.secondaryPower = ShipFunctions.artilleryPower;
 			heroScript.secondaryCollateral = ShipFunctions.artilleryCollateral;
 
 			if(ShipFunctions.soldierPrimary == true)

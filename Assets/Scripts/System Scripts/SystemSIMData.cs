@@ -18,6 +18,7 @@ public class SystemSIMData : MasterScript
 
 	public float totalSystemKnowledge, totalSystemPower, totalSystemSIM, totalSystemAmber;
 	public float flResourceModifier, flOwnershipModifier, flOffDefModifier;
+	public float secRecPowerMod, secRecKnowledgeMod, secRecOwnershipMod;
 	public float planetKnowledgeModifier, planetPowerModifier;
 	public float systemKnowledgeModifier, systemPowerModifier, systemOwnershipModifier;
 	private TurnInfo thisPlayer;
@@ -45,11 +46,39 @@ public class SystemSIMData : MasterScript
 		promotedBy = null;
 	}
 
+	private void CheckSecRecBonus(int system)
+	{
+		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
+		{
+			if(systemListConstructor.systemList[system].planetsInSystem[i].rareResourceType != null)
+			{
+				switch(systemListConstructor.systemList[system].planetsInSystem[i].rareResourceType)
+				{
+				case "Antimatter":
+					break;
+				case "Liquid Hydrogen":
+					secRecKnowledgeMod += 0.01f * thisPlayer.liquidH2;
+					break;
+				case "Blue Carbon":
+					secRecOwnershipMod += 0.01f * thisPlayer.blueCarbon;
+					break;
+				case "Radioisotopes":
+					secRecPowerMod += 0.01f * thisPlayer.radioisotopes;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+
 	public void SystemSIMCounter(TurnInfo player) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{
 		float tempTotalSci = 0.0f, tempTotalInd = 0.0f;
+		secRecKnowledgeMod = 1f; secRecKnowledgeMod = 1f; secRecOwnershipMod = 1f;
 		thisPlayer = player;
 		CheckFrontLineBonus ();
+		CheckSecRecBonus(thisSystem);
 
 		for(int j = 0; j < systemListConstructor.systemList[thisSystem].systemSize; ++j)
 		{
@@ -154,8 +183,8 @@ public class SystemSIMData : MasterScript
 		systemDefence.CheckStatusEffects(planet);
 		
 		baseResourceBonus = systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetOwnership / 66.6666f;
-		planetKnowledgeModifier = thisPlayer.raceKnowledge * baseResourceBonus * knowledgeBuffModifier;
-		planetPowerModifier = thisPlayer.racePower * baseResourceBonus * powerBuffModifier;
+		planetKnowledgeModifier = (thisPlayer.raceKnowledge + secRecKnowledgeMod) * baseResourceBonus * knowledgeBuffModifier;
+		planetPowerModifier = (thisPlayer.racePower + secRecPowerMod) * baseResourceBonus * powerBuffModifier;
 		
 		if(improvementsBasic.listOfImprovements[24].hasBeenBuilt == true)
 		{
@@ -182,7 +211,7 @@ public class SystemSIMData : MasterScript
 				if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership < (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus)
 				   && systemDefence.underInvasion == false)
 				{
-					float ownershipToAdd = systemOwnershipModifier;
+					float ownershipToAdd = systemOwnershipModifier * secRecOwnershipMod;
 
 					if(ownershipToAdd > (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus) - systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership)
 					{

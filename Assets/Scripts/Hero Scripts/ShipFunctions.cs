@@ -4,20 +4,20 @@ using System.Collections.Generic;
 
 public static class ShipFunctions
 {
-	public static int stealthValue, primaryWeaponWealth, artilleryWealth, artilleryCollateral, bombWealth, bombCollateral, dropshipWealth, 
+	public static int stealthValue, primaryWeaponPower, artilleryPower, artilleryCollateral, bombPower, bombCollateral, dropshipPower, 
 			   dropshipCollateral, engineValue, armourRating, logisticsRating;
 	public static bool infiltratorEngine, soldierPrimary;
 
 	public static void UpdateShips()
 	{
 		stealthValue = 0;
-		primaryWeaponWealth = 20;
+		primaryWeaponPower = 20;
 		soldierPrimary = false;
-		artilleryWealth = 10;
+		artilleryPower = 10;
 		artilleryCollateral = 10;
-		bombWealth = 0;
+		bombPower = 0;
 		bombCollateral = 0;
-		dropshipWealth = 0;
+		dropshipPower = 0;
 		dropshipCollateral = 0;
 		engineValue = 1;
 		infiltratorEngine = false;
@@ -41,21 +41,21 @@ public static class ShipFunctions
 				}
 
 				stealthValue += HeroTechTree.heroTechList[i].stealthRating;
-				primaryWeaponWealth += HeroTechTree.heroTechList[i].primaryOffenceRating;
+				primaryWeaponPower += HeroTechTree.heroTechList[i].primaryOffenceRating;
 
 				if(HeroTechTree.heroTechList[i].heroType == "Soldier")
 				{
-					artilleryWealth += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					artilleryPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
 					artilleryCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
 				if(HeroTechTree.heroTechList[i].heroType == "Infiltrator")
 				{
-					bombWealth += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					bombPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
 					bombCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
-				if(HeroTechTree.heroTechList[i].heroType == "Soldier")
+				if(HeroTechTree.heroTechList[i].heroType == "Diplomat")
 				{
-					dropshipWealth += HeroTechTree.heroTechList[i].secondaryOffenceRating;
+					dropshipPower += HeroTechTree.heroTechList[i].secondaryOffenceRating;
 					dropshipCollateral += HeroTechTree.heroTechList[i].collateralRating;
 				}
 
