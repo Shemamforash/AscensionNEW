@@ -6,13 +6,16 @@ public class SystemInvasions : MasterScript
 	public GameObject invasionQuad;
 	public HeroScriptParent hero;
 
-	public void PlanetInvasion(int system, int planet)
+	public void PlanetInvasion(HeroScriptParent curHero, int system, int planet, bool click)
 	{
 		if(systemListConstructor.systemList [system].planetsInSystem [planet].underEnemyControl == false)
 		{
-			systemListConstructor.systemList [system].planetsInSystem [planet].planetDefence -= hero.secondaryPower;
-			systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership -= hero.secondaryCollateral;
-			hero.currentArmour -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (hero.currentArmour * hero.classModifier);
+			if(click == false)
+			{
+				systemListConstructor.systemList [system].planetsInSystem [planet].planetDefence -= curHero.secondaryPower / 4f;
+				systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership -= curHero.secondaryCollateral / 4f;
+				curHero.currentArmour -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (curHero.currentArmour * curHero.classModifier);
+			}
 			
 			if(systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership <= 0)
 			{
@@ -20,12 +23,13 @@ public class SystemInvasions : MasterScript
 				systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt.Clear ();
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetImprovementLevel = 0;
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership = 0;
-				hero.planetInvade = -1;
+				curHero.planetInvade = -1;
 			}
+
 			else if(systemListConstructor.systemList [system].planetsInSystem [planet].planetDefence <= 0)
 			{
 				systemListConstructor.systemList [system].planetsInSystem [planet].underEnemyControl = true;
-				hero.planetInvade = -1;
+				curHero.planetInvade = -1;
 			}
 		}
 		
@@ -54,6 +58,7 @@ public class SystemInvasions : MasterScript
 		if(planetsDestroyed == systemListConstructor.systemList [system].systemSize)
 		{
 			DestroySystem(system);
+
 			invasionGUI.openInvasionMenu = false;
 
 			for(int i = 0; i < systemListConstructor.systemList[system].planetsInSystem.Count; ++i)
@@ -65,6 +70,7 @@ public class SystemInvasions : MasterScript
 		else if(planetsDestroyed + planetsEnemyControlled == systemListConstructor.systemList [system].systemSize && planetsDestroyed != systemListConstructor.systemList [system].systemSize)
 		{
 			OwnSystem(system);
+
 			invasionGUI.openInvasionMenu = false;
 
 			for(int i = 0; i < systemListConstructor.systemList[system].planetsInSystem.Count; ++i)
@@ -107,8 +113,23 @@ public class SystemInvasions : MasterScript
 	
 	private void OwnSystem(int system)
 	{
-		systemListConstructor.systemList [system].systemOwnedBy = playerTurnScript.playerRace;
-		systemListConstructor.systemList [system].systemObject.renderer.material = playerTurnScript.materialInUse;
+		systemListConstructor.systemList [system].systemOwnedBy = hero.heroOwnedBy;
+
+		switch(hero.heroOwnedBy)
+		{
+		case "Humans":
+			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.humansMaterial;
+			break;
+		case "Selkies":
+			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.selkiesMaterial;
+			break;
+		case "Nereides":
+			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.nereidesMaterial;
+			break;
+		default:
+			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
+			break;
+		}
 		
 		lineRenderScript = systemListConstructor.systemList [system].systemObject.GetComponent<LineRenderScript> ();
 		improvementsBasic = systemListConstructor.systemList [system].systemObject.GetComponent<ImprovementsBasic> ();
@@ -116,7 +137,7 @@ public class SystemInvasions : MasterScript
 		
 		systemDefence.underInvasion = false;
 		
-		lineRenderScript.SetRaceLineColour (playerTurnScript.playerRace);
+		lineRenderScript.SetRaceLineColour (hero.heroOwnedBy);
 		
 		for(int i = 0; i < systemListConstructor.systemList [system].systemSize; ++i)
 		{
@@ -135,6 +156,7 @@ public class SystemInvasions : MasterScript
 				}
 			}
 		}
+
 		empireBoundaries.ModifyBoundaryCircles ();
 	}
 	

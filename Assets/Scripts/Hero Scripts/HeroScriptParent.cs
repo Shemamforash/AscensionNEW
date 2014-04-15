@@ -63,8 +63,6 @@ public class HeroScriptParent : MasterScript
 		{
 			if(i == aiInvadeTarget && isInvading == false)
 			{
-				systemInvasion = systemListConstructor.systemList[i].systemObject.GetComponent<SystemInvasions>();
-
 				systemInvasion.StartSystemInvasion(i);
 			}
 		}
@@ -93,7 +91,7 @@ public class HeroScriptParent : MasterScript
 				}
 				if(systemDefence.canEnter == true && planetInvade != -1)
 				{
-					systemInvasion.PlanetInvasion(system, planetInvade);
+					systemInvasion.PlanetInvasion(this, system, planetInvade, false);
 				}
 			}
 
