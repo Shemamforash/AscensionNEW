@@ -166,23 +166,25 @@ public class InvasionGUI : MasterScript
 
 					if(HeroTechTree.heroTechList[i].isActive == true)
 					{
-						float wealth = HeroTechTree.heroTechList[i].secondaryOffenceRating;
+						float power = HeroTechTree.heroTechList[i].secondaryOffenceRating;
 
-						if((bombTimers[i] + (wealth / 4f)) <= Time.time || bombTimers[i] == 0.0f)
+						heroScript = heroGUI.currentHero.GetComponent<HeroScriptParent>();
+
+						if((bombTimers[i] + (power / 4f) * heroScript.cooldownMod) <= Time.time || bombTimers[i] == 0.0f)
 						{
 							bombButtons[i].GetComponent<UIButton>().isEnabled = true;
 							bombButtons[i].GetComponent<UISprite>().fillAmount = 1;
 							bombTimers[i] = 0.0f;
 						}
 						
-						if(wealth == 0 || (bombTimers[i] + (wealth / 4f)) > Time.time)
+						if(power == 0 || (bombTimers[i] + (power / 4f)) > Time.time)
 						{
 							bombButtons[i].GetComponent<UIButton>().isEnabled = false;
 						}
 
 						if(bombTimers[i] != 0.0f)
 						{
-							bombButtons[i].GetComponent<UISprite>().fillAmount = ((Time.time - bombTimers[i]) * 4) / wealth;
+							bombButtons[i].GetComponent<UISprite>().fillAmount = ((Time.time - bombTimers[i]) * 4) / power;
 						}
 					}
 				}
@@ -262,7 +264,7 @@ public class InvasionGUI : MasterScript
 		{			
 			if(planetList[i] == UIButton.current.gameObject)
 			{
-				if(heroScript.planetInvade == i)
+				if(UICamera.currentTouchID == -1)
 				{
 					systemListConstructor.systemList [system].planetsInSystem [i].planetDefence -= temp.primaryPower / 5f;
 					systemListConstructor.systemList [system].planetsInSystem [i].planetOwnership -= temp.primaryPower / 5f;
@@ -270,7 +272,7 @@ public class InvasionGUI : MasterScript
 					break;
 				}
 
-				if(heroScript.planetInvade != i)
+				if(UICamera.currentTouchID == -2)
 				{
 					heroScript.planetInvade = i;
 					systemInvasion.hero = temp;

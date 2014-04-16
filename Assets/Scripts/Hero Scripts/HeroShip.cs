@@ -91,14 +91,14 @@ public class HeroShip : MasterScript
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
 		ShipFunctions.UpdateShips ();
-		heroScript.primaryPower = ShipFunctions.primaryWeaponPower;
-		heroScript.maxArmour = ShipFunctions.armourRating;
-		heroScript.movementSpeed = ShipFunctions.engineValue;
+		heroScript.primaryPower = ShipFunctions.primaryWeaponPower * heroScript.primaryMod;
+		heroScript.maxArmour = ShipFunctions.armourRating * heroScript.armourMod;
+		heroScript.movementSpeed = ShipFunctions.engineValue * heroScript.movementMod;
 
 		if(heroScript.heroType == "Diplomat")
 		{
-			heroScript.secondaryPower = ShipFunctions.dropshipPower;
-			heroScript.secondaryCollateral = ShipFunctions.dropshipCollateral;
+			heroScript.secondaryPower = ShipFunctions.dropshipPower * heroScript.secondaryMod;
+			heroScript.secondaryCollateral = ShipFunctions.dropshipCollateral * heroScript.collateralMod;
 
 			int numberOfMerchants = 0;
 
@@ -117,8 +117,8 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Infiltrator")
 		{
-			heroScript.secondaryPower = ShipFunctions.bombPower;
-			heroScript.secondaryCollateral = ShipFunctions.bombCollateral;
+			heroScript.secondaryPower = ShipFunctions.bombPower * heroScript.secondaryMod;
+			heroScript.secondaryCollateral = ShipFunctions.bombCollateral * heroScript.collateralMod;
 
 			canViewSystem = true;
 
@@ -145,8 +145,8 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Soldier")
 		{
-			heroScript.secondaryPower = ShipFunctions.artilleryPower;
-			heroScript.secondaryCollateral = ShipFunctions.artilleryCollateral;
+			heroScript.secondaryPower = ShipFunctions.artilleryPower * heroScript.secondaryMod;
+			heroScript.secondaryCollateral = ShipFunctions.artilleryCollateral * heroScript.collateralMod;
 
 			if(ShipFunctions.soldierPrimary == true)
 			{

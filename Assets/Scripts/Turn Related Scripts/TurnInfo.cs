@@ -79,7 +79,7 @@ public class TurnInfo : MasterScript
 		{
 			raceKnowledge = 1 * gameSpeedModifer;
 			racePower = 1 * gameSpeedModifer;
-			raceWealth = 10.6f;
+			raceWealth = 0.6f;
 			homeSystem = "Midgard";
 			homePlanetType = "Ocean";
 			materialInUse = turnInfoScript.humansMaterial;
@@ -97,7 +97,7 @@ public class TurnInfo : MasterScript
 		{
 			raceKnowledge = 2 * gameSpeedModifer;
 			racePower = 1 * gameSpeedModifer;
-			raceWealth = 0.4f;
+			raceWealth = 10.4f;
 			homeSystem = "Nepthys";
 			homePlanetType = "Boreal";
 			materialInUse = turnInfoScript.nereidesMaterial;

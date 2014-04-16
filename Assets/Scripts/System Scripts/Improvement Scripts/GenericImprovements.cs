@@ -19,9 +19,10 @@ public class GenericImprovements : MasterScript
 
 	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
 	{
-		systemSIMData = systemListConstructor.systemList [improvements.system].systemObject.GetComponent<SystemSIMData> ();
-		
 		improvements = tempImprov;
+
+		systemSIMData = systemListConstructor.systemList [improvements.system].systemObject.GetComponent<SystemSIMData> ();
+
 		checkValue = check;
 		thisPlayer = player;
 

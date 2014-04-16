@@ -82,7 +82,7 @@ public class CameraFunctions : MasterScript
 					coloniseMenu = true; //Shows the colonise button on single click
 				}
 
-				if(doubleClick == true)
+				if(doubleClick == true && heroResource.improvementScreen.activeInHierarchy == false)
 				{
 					if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
 					{
