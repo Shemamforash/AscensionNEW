@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class GalaxyGUI : MasterScript 
 {
-	public GameObject coloniseButton, planetSelectionWindow, purgeButton;
+	public GameObject coloniseButton, snapColoniseButton, planetSelectionWindow, purgeButton;
 	private List<GameObject> planetSelectionList = new List<GameObject>();
 	private int selectedSystem;
 	private string tempRace, knowledgeString, powerString, wealthString, turnNumber;
@@ -37,6 +37,24 @@ public class GalaxyGUI : MasterScript
 			if(systemListConstructor.systemList[selectedSystem].systemOwnedBy == null)
 			{
 				NGUITools.SetActive(coloniseButton, true);
+
+				if(playerTurnScript.playerRace == "Nereides")
+				{
+					float totalPower = 20;
+					float totalWealth = 10;
+					
+					for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
+					{
+						totalWealth += systemListConstructor.systemList[selectedSystem].planetsInSystem[i].wealthValue;
+						totalPower += ((float)systemListConstructor.systemList[selectedSystem].planetsInSystem[i].wealthValue / 3f) * 20f;
+					}
+
+					string cost = "Power: " + totalPower + "\nWealth: " + totalWealth;
+
+					snapColoniseButton.GetComponent<UILabel>().text = cost;
+
+					NGUITools.SetActive(snapColoniseButton, true);
+				}
 			}
 		}
 	}
@@ -115,6 +133,34 @@ public class GalaxyGUI : MasterScript
 			playerTurnScript.FindSystem (selectedSystem);
 			SelectFirstPlanet();
 			NGUITools.SetActive(coloniseButton, false);
+			NGUITools.SetActive(snapColoniseButton, false);
+		}
+	}
+
+	public void SnapColonise()
+	{
+		float totalPower = 20;
+		float totalWealth = 10;
+
+		for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
+		{
+			totalWealth += systemListConstructor.systemList[selectedSystem].planetsInSystem[i].wealthValue;
+			totalPower += ((float)systemListConstructor.systemList[selectedSystem].planetsInSystem[i].wealthValue / 3f) * 20f;
+		}
+
+		if(playerTurnScript.wealth >= totalWealth && playerTurnScript.power > totalPower)
+		{
+			playerTurnScript.FindSystem (selectedSystem);
+			playerTurnScript.wealth -= totalWealth;
+			playerTurnScript.power -= totalPower;
+
+			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
+			{
+				systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised = true;
+			}
+
+			NGUITools.SetActive(coloniseButton, false);
+			NGUITools.SetActive(snapColoniseButton, false);
 		}
 	}
 

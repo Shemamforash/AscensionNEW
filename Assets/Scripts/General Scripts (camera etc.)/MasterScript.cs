@@ -61,6 +61,8 @@ public class MasterScript : MonoBehaviour
 	public InvasionGUI invasionGUI;
 	[HideInInspector]
 	public EmpireBoundaries empireBoundaries;
+	[HideInInspector]
+	public HeroResourceImprovement heroResource;
 
 	private void Awake() //Assigns script references
 	{
@@ -82,6 +84,7 @@ public class MasterScript : MonoBehaviour
 		uiObjects = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<UIObjects> ();
 		ambientStarRandomiser = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AmbientStarRandomiser> ();
 		empireBoundaries = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<EmpireBoundaries> ();
+		heroResource = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<HeroResourceImprovement> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem) //Returns the systemList enumerator of a system gameobject

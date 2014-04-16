@@ -345,7 +345,8 @@ public class StarSystem
 	public Vector3 systemPosition;
 	public GameObject systemObject, allyHero, enemyHero;
 	public GameObject tradeRoute;
-	public int systemSize, numberOfConnections, systemDefence, systemOffence;
+	public int systemSize, numberOfConnections;
+	public float systemDefence, systemOffence;
 	public List<Planet> planetsInSystem = new List<Planet> ();
 	public List<Node> tempConnections = new List<Node>();
 	public List<GameObject> permanentConnections = new List<GameObject>();

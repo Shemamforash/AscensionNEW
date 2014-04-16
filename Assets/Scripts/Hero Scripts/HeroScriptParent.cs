@@ -6,12 +6,13 @@ public class HeroScriptParent : MasterScript
 {
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, invasionObject;
-	public int currentLevel = 1, movementSpeed, planetInvade = -1, system;
-	public int primaryPower, secondaryPower, secondaryCollateral, invasionStrength; 
+	public int currentLevel = 1, planetInvade = -1, system;
+	public int lH2Spent, antiSpent, radioSpent, blueCSpent; 
 	public string heroOwnedBy, heroType;
 	public bool isInvading = false, isBusy;
-	public float heroAge, classModifier, maxArmour, currentArmour;
+	public float heroAge, classModifier, maxArmour, currentArmour, primaryPower, secondaryPower, secondaryCollateral, invasionStrength, movementSpeed;
 	public int aiInvadeTarget = -1, aiProtectTarget = -1;
+	public float armourMod = 1f, resourceMod = 1f, movementMod = 1f, collateralMod = 1f, cloakMod = 1f, primaryMod = 1f, cooldownMod = 1f, secondaryMod = 1f;
 
 	void Start()
 	{

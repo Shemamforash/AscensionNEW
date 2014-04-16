@@ -9,9 +9,10 @@ public class NereidesImprovements : MasterScript
 	
 	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
 	{
+		improvements = tempImprov;
+
 		systemSIMData = systemListConstructor.systemList [improvements.system].systemObject.GetComponent<SystemSIMData> ();
 
-		improvements = tempImprov;
 		checkValue = check;
 		thisPlayer = player;
 		
