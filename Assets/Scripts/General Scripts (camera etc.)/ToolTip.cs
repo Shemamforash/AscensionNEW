@@ -35,9 +35,9 @@ public class ToolTip : MasterScript
 		
 		Vector3 position = new Vector3(Input.mousePosition.x + xDif, Input.mousePosition.y + yDif, 0.0f); //TODO
 		
-		position = overlayGUI.mainCamera.ScreenToViewportPoint(position);
+		position = systemPopup.mainCamera.ScreenToViewportPoint(position);
 		
-		position = overlayGUI.uiCamera.ViewportToWorldPoint (position);
+		position = systemPopup.uiCamera.ViewportToWorldPoint (position);
 		
 		tooltip.transform.position = new Vector3(position.x, position.y, tooltip.transform.position.z);
 	}

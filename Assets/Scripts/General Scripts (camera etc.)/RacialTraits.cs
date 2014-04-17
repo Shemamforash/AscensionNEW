@@ -10,7 +10,7 @@ public class RacialTraits : MasterScript
 	
 	void Start()
 	{
-		ambitionCounter = 0;
+		ambitionCounter = 10f;
 	}
 	
 	public void Purge() //Nereides function to produce elation

@@ -144,14 +144,4 @@ public class LineRenderScript : MasterScript
 		public Quaternion rotation;
 		public Vector3 scale, midPoint;
 	}
-		
-	void OnMouseEnter()
-	{
-		overlayGUI.mouseOverSystem = gameObject;
-	}
-	
-	void OnMouseExit()
-	{
-		overlayGUI.mouseOverSystem = null;
-	}
 }

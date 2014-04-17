@@ -327,7 +327,7 @@ public class AIBasicParent : TurnInfo
 	{
 		if(thisPlayer.wealth > 1)
 		{
-			turnInfoScript.RefreshPlanetWealth();
+			turnInfoScript.RefreshPlanetPower();
 
 			currentPlanet = -1;
 			currentSystem = -1;
@@ -480,18 +480,18 @@ public class AIBasicParent : TurnInfo
 
 	public void CheckToImprovePlanet(TurnInfo thisPlayer)
 	{
-		for(int i = 0; i < turnInfoScript.mostWealthfulPlanets.Count - 1; i++)
+		for(int i = 0; i < turnInfoScript.mostPowerfulPlanets.Count - 1; i++)
 		{
 			if(thisPlayer.power < 0.8f && thisPlayer.wealth < 1.0f)
 			{
 				break;
 			}
 
-			int j = RefreshCurrentSystem(turnInfoScript.mostWealthfulPlanets[i].system);
+			int j = RefreshCurrentSystem(turnInfoScript.mostPowerfulPlanets[i].system);
 
 			if(systemListConstructor.systemList[j].systemOwnedBy == thisPlayer.playerRace)
 			{
-				ImprovePlanet(turnInfoScript.mostWealthfulPlanets[i].planetPosition, j, thisPlayer);
+				ImprovePlanet(turnInfoScript.mostPowerfulPlanets[i].planetPosition, j, thisPlayer);
 			}
 		}
 	}
