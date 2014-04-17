@@ -327,11 +327,11 @@ public class SystemSIMData : MasterScript
 		return 1;
 	}
 
-	public void UpdatePlanetWealthArray()
+	public void UpdatePlanetPowerArray()
 	{
 		for(int i = 0; i < systemListConstructor.systemList[thisSystem].systemSize; ++i)
 		{
-			PlanetWealth planet = new PlanetWealth();
+			PlanetPower planet = new PlanetPower();
 
 			planet.system = gameObject;
 
@@ -346,7 +346,7 @@ public class SystemSIMData : MasterScript
 
 			planet.planetPosition = i;
 				
-			turnInfoScript.mostWealthfulPlanets.Add (planet);
+			turnInfoScript.mostPowerfulPlanets.Add (planet);
 
 			++turnInfoScript.savedIterator;
 		}

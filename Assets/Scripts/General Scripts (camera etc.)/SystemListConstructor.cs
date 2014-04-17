@@ -50,6 +50,8 @@ public class SystemListConstructor : MasterScript
 			lineRenderScript.StartUp();
 		}
 
+		systemPopup.LoadOverlays ();
+
 		galaxyGUI.SelectRace(PlayerPrefs.GetString ("Player Race"));
 	}
 

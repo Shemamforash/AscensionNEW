@@ -47,9 +47,9 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public RacialTraits racialTraitScript;
 	[HideInInspector]
-	public OverlayGUI overlayGUI;
-	[HideInInspector]
 	public UIObjects uiObjects;
+	[HideInInspector]
+	public SystemInfoPopup systemPopup;
 
 	[HideInInspector]
 	public SystemGUI systemGUI;
@@ -75,7 +75,6 @@ public class MasterScript : MonoBehaviour
 		heroGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<HeroGUI>();
 		racialTraitScript = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<RacialTraits> ();
 		galaxyGUI = GameObject.FindGameObjectWithTag("GUIContainer").GetComponent<GalaxyGUI>();
-		overlayGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<OverlayGUI> ();
 		invasionGUI = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<InvasionGUI> ();
 		mapConstructor = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<MapConstructor> ();
 		winConditions = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<WinConditions> ();
@@ -85,6 +84,7 @@ public class MasterScript : MonoBehaviour
 		ambientStarRandomiser = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AmbientStarRandomiser> ();
 		empireBoundaries = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<EmpireBoundaries> ();
 		heroResource = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<HeroResourceImprovement> ();
+		systemPopup = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<SystemInfoPopup> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem) //Returns the systemList enumerator of a system gameobject

@@ -10,7 +10,7 @@ public class TurnInfo : MasterScript
 	public float raceKnowledge, racePower, knowledge, power, wealth, raceWealth, turn = 0, wealthModifier;
 	[HideInInspector]
 	public string[,] planetRIM = new string[12,5];
-	public List<PlanetWealth> mostWealthfulPlanets = new List<PlanetWealth>();
+	public List<PlanetPower> mostPowerfulPlanets = new List<PlanetPower>();
 	[HideInInspector]
 	public bool playerHasWon, startSteps, isPlayer;
 	public Camera mainCamera;
@@ -29,9 +29,9 @@ public class TurnInfo : MasterScript
 		}
 	}
 
-	public void RefreshPlanetWealth()
+	public void RefreshPlanetPower()
 	{
-		mostWealthfulPlanets.Clear ();
+		mostPowerfulPlanets.Clear ();
 
 		turnInfoScript.savedIterator = 0;
 
@@ -44,10 +44,10 @@ public class TurnInfo : MasterScript
 
 			systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
 			
-			systemSIMData.UpdatePlanetWealthArray();
+			systemSIMData.UpdatePlanetPowerArray();
 		}
 
-		SortSystemWealth ();
+		SortSystemPower ();
 	}
 
 	public void CreateEnemyAI()
@@ -88,7 +88,7 @@ public class TurnInfo : MasterScript
 		{
 			raceKnowledge = 1 * gameSpeedModifer;
 			racePower = 1.4f * gameSpeedModifer;
-			raceWealth = 10.5f;
+			raceWealth = 0.5f;
 			homeSystem = "Samael";
 			homePlanetType = "Prairie";
 			materialInUse = turnInfoScript.selkiesMaterial;
@@ -97,7 +97,7 @@ public class TurnInfo : MasterScript
 		{
 			raceKnowledge = 2 * gameSpeedModifer;
 			racePower = 1 * gameSpeedModifer;
-			raceWealth = 10.4f;
+			raceWealth = 0.4f;
 			homeSystem = "Nepthys";
 			homePlanetType = "Boreal";
 			materialInUse = turnInfoScript.nereidesMaterial;
@@ -163,7 +163,7 @@ public class TurnInfo : MasterScript
 		
 		racialTraitScript.RacialBonus (selectedPlayer);
 
-		turnInfoScript.SortSystemWealth();
+		turnInfoScript.SortSystemPower();
 		
 		selectedPlayer.wealth += (selectedPlayer.wealthModifier + 1f) * selectedPlayer.raceWealth;
 
@@ -177,31 +177,31 @@ public class TurnInfo : MasterScript
 		selectedPlayer.systemsColonisedThisTurn = 0;
 	}
 
-	public void SortSystemWealth()
+	public void SortSystemPower()
 	{
 		GameObject tempObject;
 		float tempFloat;
 		int tempInt;
 
-		for(int i = turnInfoScript.mostWealthfulPlanets.Count - 1; i >= 0; --i)
+		for(int i = turnInfoScript.mostPowerfulPlanets.Count - 1; i >= 0; --i)
 		{
 			bool swaps = false;
 
 			for(int j = 1; j <= i; ++j)
 			{
-				if(mostWealthfulPlanets[j-1].simOutput < mostWealthfulPlanets[j].simOutput)
+				if(mostPowerfulPlanets[j-1].simOutput < mostPowerfulPlanets[j].simOutput)
 				{
-					tempObject = mostWealthfulPlanets[j-1].system;
-					tempFloat = mostWealthfulPlanets[j-1].simOutput;
-					tempInt = mostWealthfulPlanets[j-1].planetPosition;
+					tempObject = mostPowerfulPlanets[j-1].system;
+					tempFloat = mostPowerfulPlanets[j-1].simOutput;
+					tempInt = mostPowerfulPlanets[j-1].planetPosition;
 
-					mostWealthfulPlanets[j-1].system = mostWealthfulPlanets[j].system;
-					mostWealthfulPlanets[j-1].simOutput = mostWealthfulPlanets[j].simOutput;
-					mostWealthfulPlanets[j-1].planetPosition = mostWealthfulPlanets[j].planetPosition;
+					mostPowerfulPlanets[j-1].system = mostPowerfulPlanets[j].system;
+					mostPowerfulPlanets[j-1].simOutput = mostPowerfulPlanets[j].simOutput;
+					mostPowerfulPlanets[j-1].planetPosition = mostPowerfulPlanets[j].planetPosition;
 
-					mostWealthfulPlanets[j].system = tempObject;
-					mostWealthfulPlanets[j].simOutput = tempFloat;
-					mostWealthfulPlanets[j].planetPosition = tempInt;
+					mostPowerfulPlanets[j].system = tempObject;
+					mostPowerfulPlanets[j].simOutput = tempFloat;
+					mostPowerfulPlanets[j].planetPosition = tempInt;
 
 					swaps = true;
 				}
@@ -259,7 +259,7 @@ public class TurnInfo : MasterScript
 	}
 }
 
-public class PlanetWealth
+public class PlanetPower
 {
 	public GameObject system;
 	public float simOutput;
