@@ -24,7 +24,7 @@ public class SystemInfoPopup : MasterScript
 			tempObj.name = tempObj.container.transform.Find ("Name").GetComponent<UILabel>();
 			tempObj.planets = tempObj.container.transform.Find ("Planets Colonised").GetComponent<UISprite>();
 
-			tempObj.name.text = systemListConstructor.systemList[i].systemName;
+			tempObj.name.text = systemListConstructor.systemList[i].systemName.ToUpper();
 			tempObj.planets.spriteName = systemSize[systemListConstructor.systemList[i].systemSize - 1];
 
 			TweenAlpha.Begin(tempObj.container, 0f, 0f);
@@ -42,6 +42,10 @@ public class SystemInfoPopup : MasterScript
 		Vector3 newPosition = new Vector3(position.x, position.y, -37.0f);
 		
 		overlayObjectList[i].container.transform.position = newPosition;
+
+		float scale = (0.015f * mainCamera.transform.position.z) + 1.5f;
+
+		overlayObjectList [i].container.transform.localScale = new Vector3 (scale, scale, 0f);
 	}
 
 	private void UpdateVariables(int i)
@@ -66,7 +70,7 @@ public class SystemInfoPopup : MasterScript
 
 	void Update () 
 	{
-		if(mainCamera.transform.position.z > -50f)
+		if(mainCamera.transform.position.z > -65f)
 		{
 			for(int i = 0; i < overlayObjectList.Count; ++i)
 			{
@@ -86,7 +90,7 @@ public class SystemInfoPopup : MasterScript
 			allfade = true;
 		}
 
-		else if(mainCamera.transform.position.z <= -50f && allfade == true)
+		else if(mainCamera.transform.position.z <= -65f && allfade == true)
 		{
 			for(int i = 0; i < overlayObjectList.Count; ++i)
 			{
@@ -94,6 +98,9 @@ public class SystemInfoPopup : MasterScript
 				{
 					TweenAlpha.Begin(overlayObjectList[i].container, 0.25f, 0f);
 					overlayObjectList[i].fade = false;
+
+					UpdatePosition(i);
+					UpdateVariables(i);
 				}
 			}
 

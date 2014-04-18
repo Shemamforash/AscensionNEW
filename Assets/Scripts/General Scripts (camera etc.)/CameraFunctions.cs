@@ -7,17 +7,19 @@ public class CameraFunctions : MasterScript
 	//It also includes mouse functions (double click).
 	
 	public Camera cameraMain;
-	public float zoomSpeed, minZoom, maxZoom, panSpeed, zPosition;
+	public float zoomSpeed, minZoom, maxZoom, panSpeed, zPosition, t;
 	[HideInInspector]
 	public GameObject selectedSystem;
 	[HideInInspector]
-	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false, lightFading;
+	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false, lightFading, zoom;
 	
 	private float leftBound = 0.0f, rightBound = 90.0f, upperBound = 90.0f, lowerBound = 0.0f;
 	private float timer = 0.0f;
 	private float updatedX, updatedY;
 	private GameObject thisObject;
 	private TechTreeGUI techTreeGUI;
+
+	private Vector3 initPos, finalPos;
 
 	void Start()
 	{
@@ -26,7 +28,21 @@ public class CameraFunctions : MasterScript
 
 	void Update()
 	{
-		if(openMenu != true)
+		if(zoom == true)
+		{
+			gameObject.transform.position = Vector3.Lerp(initPos, finalPos, t);
+			t += Time.deltaTime / 0.2f;
+
+			if(timer < Time.time)
+			{
+				transform.position = finalPos;
+				t = 0f;
+				zoom = false;
+				timer = 0f;
+			}
+		}
+
+		if(openMenu != true && zoom == false)
 		{
 			ZoomCamera();
 
@@ -197,28 +213,34 @@ public class CameraFunctions : MasterScript
 		{
 			moveCamera = false;
 
-			zPosition -= zoomSpeed * Time.deltaTime;
+			zPosition -= zoomSpeed;
 		
 			if(zPosition < maxZoom)
 			{
 				zPosition = maxZoom;
 			}
 
-			cameraMain.transform.position = new Vector3(transform.position.x, transform.position.y, zPosition);
+			initPos = transform.position;
+			finalPos = new Vector3(transform.position.x, transform.position.y, zPosition);
+			timer = Time.time + 0.2f;
+			zoom = true;
 		}
 
 		if(Input.GetAxis ("Mouse ScrollWheel") > 0) //Zoom in
 		{
 			moveCamera = false;
 
-			zPosition += zoomSpeed * Time.deltaTime;
+			zPosition += zoomSpeed;
 			
 			if(zPosition > minZoom)
 			{
 				zPosition = minZoom;
 			}
 
-			cameraMain.transform.position = new Vector3(transform.position.x, transform.position.y, zPosition);
+			initPos = transform.position;
+			finalPos = new Vector3(transform.position.x, transform.position.y, zPosition);
+			timer = Time.time + 0.2f;
+			zoom = true;
 		}
 	}
 
