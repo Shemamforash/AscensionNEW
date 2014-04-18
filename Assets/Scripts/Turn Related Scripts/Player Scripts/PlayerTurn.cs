@@ -139,5 +139,9 @@ public class PlayerTurn : TurnInfo
 		}
 
 		empireBoundaries.ModifyBoundaryCircles ();
+
+		Vector3 temp = systemListConstructor.systemList [i].systemObject.transform.position;
+
+		systemPopup.mainCamera.transform.position = new Vector3(temp.x, temp.y, -45f);
 	}
 }
