@@ -24,6 +24,9 @@ public class CameraFunctions : MasterScript
 	void Start()
 	{
 		techTreeGUI = GameObject.Find ("GUIContainer").GetComponent<TechTreeGUI> ();
+		minZoom = (0.1333333f * systemListConstructor.mapSize) - 29f;
+		zoomSpeed = (maxZoom - minZoom) / -5f;
+		zPosition = minZoom;
 	}
 
 	void Update()
@@ -95,7 +98,12 @@ public class CameraFunctions : MasterScript
 
 				if(systemListConstructor.systemList[i].systemOwnedBy == null)
 				{
-					coloniseMenu = true; //Shows the colonise button on single click
+					systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
+
+					if(systemSIMData.guardedBy == playerTurnScript.playerRace)
+					{
+						coloniseMenu = true; //Shows the colonise button on single click
+					}
 				}
 
 				if(doubleClick == true && heroResource.improvementScreen.activeInHierarchy == false)
@@ -104,7 +112,7 @@ public class CameraFunctions : MasterScript
 					{
 						openMenu = true; //Opens system menu on double click
 					}
-					if(systemListConstructor.systemList[i].systemOwnedBy != playerTurnScript.playerRace)
+					if(systemListConstructor.systemList[i].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[i].systemOwnedBy != null)
 					{
 						systemDefence = selectedSystem.GetComponent<SystemDefence>();
 

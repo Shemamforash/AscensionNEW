@@ -147,7 +147,7 @@ public class SystemListConstructor : MasterScript
 
 			systemClone.transform.parent = systemContainer;
 		
-			systemClone.transform.localScale = new Vector3(systemScale, systemScale, systemScale);
+			systemClone.transform.localScale = new Vector3(systemScale / 1.5f, systemScale / 1.5f, systemScale / 1.5f);
 
 			systemClone.name = systemList[i].systemName;
 		
@@ -155,12 +155,68 @@ public class SystemListConstructor : MasterScript
 		}
 	}
 
+	private string RandomPlanet()
+	{
+		int rnd = Random.Range (0, 100);
+
+		if(rnd < 8)
+		{
+			return "Waste";
+		}
+		if(rnd >= 8 && rnd < 16)
+		{
+			return "Desolate";
+		}
+		if(rnd >= 16 && rnd < 21)
+		{
+			return "Gas Giant";
+		}
+		if(rnd >= 21 && rnd < 34)
+		{
+			return "Chasm";
+		}
+		if(rnd >= 34 && rnd < 43)
+		{
+			return "Prairie";
+		}
+		if(rnd >= 43 && rnd < 56)
+		{
+			return "Tundra";
+		}
+		if(rnd >= 56 && rnd < 71)
+		{
+			return "Cold Giant";
+		}
+		if(rnd >= 71 && rnd < 79)
+		{
+			return "Molten";
+		}
+		if(rnd >= 79 && rnd < 85)
+		{
+			return "Ocean";
+		}
+		if(rnd >= 85 && rnd < 93)
+		{
+			return "Boreal";
+		}
+		if(rnd >= 93 && rnd < 97)
+		{
+			return "Forest";
+		}
+		if(rnd >= 97)
+		{
+			return "Chthonic";
+		}
+
+		return "Null";
+	}
+
 	public void SystemRead()
 	{
 		string[] planetLocations = new string[6]{"C","D","E","F","G","H"};
 		string planetName;
 
-		using(XmlReader reader = XmlReader.Create ("SystemData.xml"))
+		using(XmlReader reader = XmlReader.Create ("System Data New.xml"))
 		{
 			while(reader.Read ())
 			{
@@ -185,7 +241,16 @@ public class SystemListConstructor : MasterScript
 						Planet newPlanet = new Planet();
 						
 						newPlanet.planetName = planetName;
-						newPlanet.planetType = reader.GetAttribute(planetLocations[j]);
+
+						if(reader.GetAttribute(planetLocations[j]) != null)
+						{
+							newPlanet.planetType = reader.GetAttribute(planetLocations[j]);
+						}
+						else
+						{
+							newPlanet.planetType = RandomPlanet();
+						}
+
 						newPlanet.planetCategory = FindPlanetCategory(newPlanet.planetType);
 						newPlanet.planetImprovementLevel = 0;
 						newPlanet.planetColonised = false;

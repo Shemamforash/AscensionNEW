@@ -6,7 +6,7 @@ using System;
 public class HeroGUI : MasterScript 
 {
 	public bool openHeroLevellingScreen;
-	public GameObject heroObject, merchantQuad, invasionButton, embargoButton, promoteButton, buttonContainer, turnInfoBar, heroDetailsContainer, currentHero;
+	public GameObject heroObject, merchantQuad, invasionButton, embargoButton, promoteButton, buttonContainer, turnInfoBar, heroDetailsContainer, currentHero, guardButton;
 	public UILabel heroHealth, heroName;
 	private RaycastHit hit;
 
@@ -81,6 +81,7 @@ public class HeroGUI : MasterScript
 
 	public void Embargo()
 	{
+		heroScript = currentHero.GetComponent<HeroScriptParent> ();
 		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData> ();
 		systemSIMData.promotedBy = null;
 		systemSIMData.embargoedBy = heroScript.heroOwnedBy;
@@ -89,9 +90,23 @@ public class HeroGUI : MasterScript
 
 	public void Promote()
 	{
+		heroScript = currentHero.GetComponent<HeroScriptParent> ();
 		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData> ();
 		systemSIMData.embargoedBy = null;
 		systemSIMData.promotedBy = heroScript.heroOwnedBy;
 		systemSIMData.promotionTimer = Time.time;
+	}
+
+	public void GuardProtectSwitch()
+	{
+		systemSIMData = heroScript.heroLocation.GetComponent<SystemSIMData> ();
+		if(guardButton.GetComponent<UILabel>().text == "Guard")
+		{
+			systemSIMData.guardedBy = heroScript.heroOwnedBy;
+		}
+		if(guardButton.GetComponent<UILabel>().text == "Protect")
+		{
+			systemSIMData.protectedBy = heroScript.gameObject;
+		}
 	}
 }

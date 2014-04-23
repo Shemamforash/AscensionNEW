@@ -10,11 +10,12 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public float knowledgeUnitBonus, powerUnitBonus, improvementCost, baseResourceBonus, adjacencyBonus, powerBuffModifier, knowledgeBuffModifier, embargoTimer, promotionTimer;
 	[HideInInspector]
-	public string improvementLevel, promotedBy = null, embargoedBy = null;
+	public string improvementLevel, promotedBy = null, embargoedBy = null, guardedBy = null;
 	[HideInInspector]
 	public List<PlanetUIInfo> allPlanetsInfo = new List<PlanetUIInfo>();	//Unique to object
 	[HideInInspector]
 	public bool canImprove, foundPlanetData;
+	public GameObject protectedBy = null;
 
 	public float totalSystemKnowledge, totalSystemPower, totalSystemSIM, totalSystemAmber;
 	public float flResourceModifier, flOwnershipModifier, flOffDefModifier;

@@ -23,9 +23,7 @@ public class PlayerTurn : TurnInfo
 	}
 
 	public void FindSystem(int system) //This function is used to check if the highlighted system can be colonised, and if it can, to colonise it
-	{		
-		lineRenderScript = systemListConstructor.systemList[system].systemObject.GetComponent<LineRenderScript>();
-		
+	{				
 		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
 		{			
 			int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
@@ -41,71 +39,76 @@ public class PlayerTurn : TurnInfo
 			}
 		}
 
-		if(isOkToColonise == true && wealth >= 10.0f)
+		if(systemSIMData.guardedBy == "" || systemSIMData.guardedBy == playerTurnScript.playerRace)
 		{
-			if(checkFirstContact == true)
+			if(isOkToColonise == true && wealth >= 10.0f)
 			{
-				for(int i = 0; i < diplomacyScript.relationsList.Count; ++i)
-				{
-					checkFirstContact = false;
-					
-					if(diplomacyScript.relationsList[i].firstContact == false)
-					{
-						checkFirstContact = true;
-					}
-				}
+				systemSIMData = systemListConstructor.systemList[system].systemObject.GetComponent<SystemSIMData>();
 
-				for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
+				if(checkFirstContact == true)
 				{
-					int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
-
-					for(int k = 0; k < diplomacyScript.relationsList.Count; ++k)
+					for(int i = 0; i < diplomacyScript.relationsList.Count; ++i)
 					{
-						if(diplomacyScript.relationsList[k].playerOne.playerRace == systemListConstructor.systemList[system].systemOwnedBy)
+						checkFirstContact = false;
+						
+						if(diplomacyScript.relationsList[i].firstContact == false)
 						{
-							if(diplomacyScript.relationsList[k].playerTwo.playerRace == systemListConstructor.systemList[j].systemOwnedBy)
+							checkFirstContact = true;
+						}
+					}
+
+					for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
+					{
+						int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
+
+						for(int k = 0; k < diplomacyScript.relationsList.Count; ++k)
+						{
+							if(diplomacyScript.relationsList[k].playerOne.playerRace == systemListConstructor.systemList[system].systemOwnedBy)
 							{
-								if(diplomacyScript.relationsList[k].firstContact == false)
+								if(diplomacyScript.relationsList[k].playerTwo.playerRace == systemListConstructor.systemList[j].systemOwnedBy)
 								{
-									diplomacyScript.relationsList[k].firstContact = true;
+									if(diplomacyScript.relationsList[k].firstContact == false)
+									{
+										diplomacyScript.relationsList[k].firstContact = true;
+									}
+								}
+							}
+							if(diplomacyScript.relationsList[k].playerTwo.playerRace == systemListConstructor.systemList[system].systemOwnedBy)
+							{
+								if(diplomacyScript.relationsList[k].playerOne.playerRace == systemListConstructor.systemList[j].systemOwnedBy)
+								{
+									if(diplomacyScript.relationsList[k].firstContact == false)
+									{
+										diplomacyScript.relationsList[k].firstContact = true;
+									}
 								}
 							}
 						}
-						if(diplomacyScript.relationsList[k].playerTwo.playerRace == systemListConstructor.systemList[system].systemOwnedBy)
-						{
-							if(diplomacyScript.relationsList[k].playerOne.playerRace == systemListConstructor.systemList[j].systemOwnedBy)
-							{
-								if(diplomacyScript.relationsList[k].firstContact == false)
-								{
-									diplomacyScript.relationsList[k].firstContact = true;
-								}
-							}
-						}
 					}
 				}
+		
+				systemSIMData.guardedBy = null;
+
+				systemListConstructor.systemList[system].systemOwnedBy = playerRace;
+				
+				systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
+				
+				playerTurnScript.wealth -= 10.0f;
+
+				playerTurnScript.wealthModifier += 0.05f;
+				
+				++turnInfoScript.systemsInPlay;
+
+				++systemsColonisedThisTurn;
+				
+				cameraFunctionsScript.coloniseMenu = false;
+				
+				isOkToColonise = false;
+
+				systemHasBeenColonised = true;
+
+				empireBoundaries.ModifyBoundaryCircles ();
 			}
-
-			systemListConstructor.systemList[system].systemOwnedBy = playerRace;
-
-			lineRenderScript.SetRaceLineColour(playerRace);
-			
-			systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
-			
-			playerTurnScript.wealth -= 10.0f;
-
-			playerTurnScript.wealthModifier += 0.05f;
-			
-			++turnInfoScript.systemsInPlay;
-
-			++systemsColonisedThisTurn;
-			
-			cameraFunctionsScript.coloniseMenu = false;
-			
-			isOkToColonise = false;
-
-			systemHasBeenColonised = true;
-
-			empireBoundaries.ModifyBoundaryCircles ();
 		}
 	}
 
@@ -124,10 +127,6 @@ public class PlayerTurn : TurnInfo
 		systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 
 		systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
-
-		lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
-
-		lineRenderScript.SetRaceLineColour(playerRace);
 
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{

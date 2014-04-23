@@ -22,6 +22,7 @@ public class HeroShip : MasterScript
 			NGUITools.SetActive(heroGUI.embargoButton, true);
 			tempChildren = tempChildren + 2;
 		}
+
 		else
 		{
 			NGUITools.SetActive(heroGUI.promoteButton, false);
@@ -38,6 +39,20 @@ public class HeroShip : MasterScript
 			if(heroMovement.TestForProximity (gameObject.transform.position, heroMovement.HeroPositionAroundStar(heroScript.heroLocation)) == true)
 			{
 				system = RefreshCurrentSystem(heroScript.heroLocation);
+
+				if(heroScript.heroType == "Soldier")
+				{
+					NGUITools.SetActive(heroGUI.guardButton, true);
+					if(systemListConstructor.systemList[system].systemOwnedBy == null)
+					{
+						heroGUI.guardButton.GetComponent<UILabel>().text = "Guard";
+					}
+					if(systemListConstructor.systemList[system].systemOwnedBy == heroScript.heroOwnedBy)
+					{
+						heroGUI.guardButton.GetComponent<UILabel>().text = "Protect";
+					}
+					++tempChildren;
+				}
 
 				if(systemListConstructor.systemList[system].systemOwnedBy != heroScript.heroOwnedBy && systemListConstructor.systemList[system].systemOwnedBy != null)
 				{
@@ -61,6 +76,7 @@ public class HeroShip : MasterScript
 
 		else
 		{
+			NGUITools.SetActive(heroGUI.guardButton, false);
 			NGUITools.SetActive(heroGUI.embargoButton, false);
 			NGUITools.SetActive(heroGUI.promoteButton, false);
 			NGUITools.SetActive(heroGUI.invasionButton, false);
@@ -77,7 +93,7 @@ public class HeroShip : MasterScript
 			
 			float gridWidth = (gridChildren * heroGUI.buttonContainer.GetComponent<UIGrid>().cellWidth) / 2 - (heroGUI.buttonContainer.GetComponent<UIGrid>().cellWidth/2);
 			
-			heroGUI.buttonContainer.transform.localPosition = new Vector3(systemGUI.playerSystemInfoScreen.transform.localPosition.x - gridWidth, 
+			heroGUI.buttonContainer.transform.localPosition = new Vector3(systemGUI.playerSystemInfoScreen.transform.localPosition.x - gridWidth / 2,  //Check
 			                                                              heroGUI.turnInfoBar.transform.localPosition.y + 50.0f, 
 			                                                              systemGUI.planetListGrid.transform.localPosition.z);
 			

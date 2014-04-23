@@ -101,11 +101,7 @@ public class SystemInvasions : MasterScript
 		turnInfoScript = GameObject.Find ("ScriptsContainer").GetComponent<TurnInfo> ();
 		
 		systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
-		
-		lineRenderScript = systemListConstructor.systemList [system].systemObject.GetComponent<LineRenderScript> ();
-		
-		lineRenderScript.SetRaceLineColour ("None");
-		
+
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
 		systemDefence.underInvasion = false;
 		empireBoundaries.ModifyBoundaryCircles ();
@@ -130,14 +126,11 @@ public class SystemInvasions : MasterScript
 			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
 			break;
 		}
-		
-		lineRenderScript = systemListConstructor.systemList [system].systemObject.GetComponent<LineRenderScript> ();
+
 		improvementsBasic = systemListConstructor.systemList [system].systemObject.GetComponent<ImprovementsBasic> ();
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
 		
 		systemDefence.underInvasion = false;
-		
-		lineRenderScript.SetRaceLineColour (hero.heroOwnedBy);
 		
 		for(int i = 0; i < systemListConstructor.systemList [system].systemSize; ++i)
 		{
