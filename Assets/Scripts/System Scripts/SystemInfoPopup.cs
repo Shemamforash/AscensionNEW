@@ -23,9 +23,22 @@ public class SystemInfoPopup : MasterScript
 			tempObj.knowledge = tempObj.container.transform.Find ("Knowledge").GetComponent<UILabel>();
 			tempObj.name = tempObj.container.transform.Find ("Name").GetComponent<UILabel>();
 			tempObj.planets = tempObj.container.transform.Find ("Planets Colonised").GetComponent<UISprite>();
+			tempObj.overlayOuter = tempObj.container.transform.Find ("Overlay Outer").transform;
 
 			tempObj.name.text = systemListConstructor.systemList[i].systemName.ToUpper();
 			tempObj.planets.spriteName = systemSize[systemListConstructor.systemList[i].systemSize - 1];
+			tempObj.rotSpeed = UnityEngine.Random.Range (2f, 6f);
+
+			int rnd = UnityEngine.Random.Range(0,2);
+
+			if(rnd == 0)
+			{
+				tempObj.rotDir = Vector3.forward;
+			}
+			if(rnd == 1)
+			{
+				tempObj.rotDir = Vector3.back;
+			}
 
 			TweenAlpha.Begin(tempObj.container, 0f, 0f);
 
@@ -43,9 +56,9 @@ public class SystemInfoPopup : MasterScript
 		
 		overlayObjectList[i].container.transform.position = newPosition;
 
-		float scale = (0.015f * mainCamera.transform.position.z) + 1.5f;
+		float scale = ((0.025f / systemListConstructor.systemScale) * mainCamera.transform.position.z) + 1.5f; //Orig 1.5f 
 
-		overlayObjectList [i].container.transform.localScale = new Vector3 (scale, scale, 0f);
+		overlayObjectList [i].container.transform.localScale = new Vector3 (scale / 1.5f, scale / 1.5f, 0f);
 	}
 
 	private void UpdateVariables(int i)
@@ -82,6 +95,8 @@ public class SystemInfoPopup : MasterScript
 						overlayObjectList[i].fade = true;
 					}
 
+					overlayObjectList[i].overlayOuter.Rotate(overlayObjectList[i].rotDir * Time.deltaTime * overlayObjectList[i].rotSpeed, Space.World);
+
 					UpdatePosition(i);
 					UpdateVariables(i);
 				}
@@ -114,5 +129,8 @@ public class OverlayObject
 	public GameObject container;
 	public UILabel name, power, knowledge;
 	public UISprite planets;
+	public Transform overlayOuter;
 	public bool fade;
+	public float rotSpeed;
+	public Vector3 rotDir;
 }

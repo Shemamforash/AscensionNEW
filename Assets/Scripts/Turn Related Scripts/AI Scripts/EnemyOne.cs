@@ -23,10 +23,6 @@ public class EnemyOne : AIBasicParent
 
 				systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
 
-				lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
-
-				lineRenderScript.SetRaceLineColour(playerRace);
-
 				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 				{
 					if(systemListConstructor.systemList[i].planetsInSystem[j].planetType == homePlanetType)

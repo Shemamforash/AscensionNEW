@@ -1,70 +1,134 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class LineRenderScript : MasterScript 
 {
 	[HideInInspector]
-	public bool showText;
-	[HideInInspector]
-	public GUIText activeGUI;
-	[HideInInspector]
-	public List<GameObject> connectedSystems = new List<GameObject>();
-	[HideInInspector]
 	public List<ConnectorLine> connectorLines = new List<ConnectorLine>();
-	public GameObject quadA, humansOwnedQuad, selkiesOwnedQuad, nereidesOwnedQuad;
+	public GameObject line, clone;
 	[HideInInspector]
 	public int thisSystem;
 	[HideInInspector]
-	private GameObject objectB;
 	public Material opaqueMaterial;
 	private Transform connectorLineContainer;
+	private Quaternion rotation;
+	private Vector3 midPoint, scale;
+	private float pixelWidth, pixelHeight;
 
 	public void StartUp()
 	{	
-		connectorLineContainer = GameObject.Find ("Connector Lines Container").transform;
+		connectorLineContainer = GameObject.Find ("LineContainer").transform;
 		systemSIMData = gameObject.GetComponent<SystemSIMData>();
 		thisSystem = RefreshCurrentSystem (gameObject);
 
-		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
-		{
-			objectB = systemListConstructor.systemList[thisSystem].permanentConnections[i];
-
-			OrientationBuild();
-		}
-
-		BuildLine(quadA);
-
-		thisSystem = RefreshCurrentSystem(gameObject);
+		CreateLines ();
 	}
 
-	public void SetRaceLineColour(string thisRace)
+	void Update()
 	{
-		GameObject quad = null;
-
-		if(thisRace == "Humans")
-		{
-			quad = humansOwnedQuad;
-		}
-		if(thisRace == "Selkies")
-		{
-			quad = selkiesOwnedQuad;
-		}
-		if(thisRace == "Nereides")
-		{
-			quad = nereidesOwnedQuad;
-		}
-		if(thisRace == "None")
-		{
-			quad = quadA;
-		}
-	
-		BuildLine(quad);
-
-		if(thisRace == playerTurnScript.playerRace)
+		if(systemListConstructor.systemList[thisSystem].systemOwnedBy == playerTurnScript.playerRace)
 		{
 			ViewNearbySystems();
 		}
+
+		for(int i = 0; i < connectorLines.Count; ++i)
+		{
+			UpdateLine(connectorLines[i].thisLine, i);
+		}
+	}
+
+	private void CreateLines()
+	{
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
+		{
+			ConnectorLine newLine = new ConnectorLine ();
+
+			GameObject clone = NGUITools.AddChild(connectorLineContainer.gameObject, line);
+
+			newLine.thisLine = clone;
+			
+			newLine.sprite = newLine.thisLine.transform.Find ("Sprite").GetComponent<UISprite>();
+
+			newLine.widget = newLine.thisLine.GetComponent<UIWidget>();
+
+			connectorLines.Add (newLine);
+		}
+	}
+
+	private void SetPosition(GameObject target, int i)
+	{
+		midPoint = (gameObject.transform.position + target.transform.position) / 2;
+		
+		midPoint = new Vector3 (midPoint.x, midPoint.y, 0.0f);
+		
+		Vector3 position = systemPopup.mainCamera.WorldToViewportPoint (midPoint);
+		
+		position = systemPopup.uiCamera.ViewportToWorldPoint (position);
+		
+		position = new Vector3(position.x, position.y, -37.0f);
+		
+		connectorLines[i].thisLine.transform.position = position;
+	}
+
+	private void SetRotation(GameObject target, int i)
+	{
+		float distance = Vector3.Distance (gameObject.transform.position, target.transform.position);
+
+		float rotationZRad = Mathf.Acos ((target.transform.position.y - gameObject.transform.position.y) / distance);
+		
+		float rotationZ = rotationZRad * Mathf.Rad2Deg;
+		
+		if(gameObject.transform.position.x < target.transform.position.x)
+		{
+			rotationZ = -rotationZ;
+		}
+		
+		Vector3 vectRotation = new Vector3(0.0f, 0.0f, rotationZ);
+		
+		rotation.eulerAngles = vectRotation;
+
+		Debug.Log (rotation);
+		
+		connectorLines[i].thisLine.transform.rotation = rotation;
+	}
+
+
+	private void UpdateLine(GameObject target, int i)
+	{
+		SetPosition (target, i);
+		SetRotation (target, i);
+		
+		connectorLines[i].sprite.spriteName = SetRaceLineColour();
+
+		Vector3 start = systemPopup.mainCamera.WorldToScreenPoint (gameObject.transform.position);
+		Vector3 end = systemPopup.mainCamera.WorldToScreenPoint (target.transform.position);
+		
+		pixelHeight = Vector3.Distance(start, end);
+		
+		pixelWidth = (-0.1f * systemPopup.mainCamera.transform.position.z) + 15;
+		
+		connectorLines[i].widget.width = Convert.ToInt32(pixelWidth);
+		connectorLines[i].widget.height = Convert.ToInt32(pixelHeight);
+	}
+
+	public string SetRaceLineColour()
+	{
+		if(systemListConstructor.systemList[thisSystem].systemOwnedBy == "Humans")
+		{
+			return "PlayerOwnedLineMaterial";
+		}
+		if(systemListConstructor.systemList[thisSystem].systemOwnedBy == "Selkies")
+		{
+			return "EnemyOwnedLineMaterial";
+		}
+		if(systemListConstructor.systemList[thisSystem].systemOwnedBy == "Nereides")
+		{
+			return "SelkiesOwnedLine";
+		}
+
+		return "Empty Line";
 	}
 
 	private void ViewNearbySystems()
@@ -82,66 +146,95 @@ public class LineRenderScript : MasterScript
 		}
 	}
 
-	void BuildLine(GameObject aQuad)
+	/*
+	void BuildLine()
 	{
-		int system = RefreshCurrentSystem (gameObject);
-
-		for(int i = 0; i < connectedSystems.Count; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
 		{
-			Destroy (connectedSystems[i]);
-		}
+			GameObject clone = NGUITools.AddChild(connectorLineContainer.gameObject, line);
 
-		connectedSystems.Clear ();
+			clone.transform.Find ("Sprite").gameObject.GetComponent<UISprite>().spriteName = SetRaceLineColour();
 
-		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
-		{
-			GameObject clone = (GameObject)Instantiate (aQuad, connectorLines[i].midPoint, connectorLines[i].rotation);
+			Vector3 position = systemPopup.mainCamera.WorldToViewportPoint (connectorLines[i].midPoint);
+			
+			position = systemPopup.uiCamera.ViewportToWorldPoint (position);
+			
+			position = new Vector3(position.x, position.y, -37.0f);
 
-			clone.transform.parent = connectorLineContainer;
+			clone.transform.position = position;
 
-			clone.transform.localScale = connectorLines[i].scale;
+			clone.transform.rotation = connectorLines[i].rotation;
 
-			connectedSystems.Add(clone);
+			//clone.transform.localScale = connectorLines[i].scale;
+
+			connectorLines[i].thisLine = clone;
+
+			connectorLines[i].sprite = connectorLines[i].thisLine.transform.Find ("Sprite").GetComponent<UISprite>();
+
+			connectorLines[i].thisLine.GetComponent<UIWidget>().width = Convert.ToInt32(pixelWidth);
+			connectorLines[i].thisLine.GetComponent<UIWidget>().height = Convert.ToInt32(pixelHeight);
 		}
 	}
 
-	void OrientationBuild()
+	private void UpdateRotScalePos(GameObject target)
 	{
-		float distance = Vector3.Distance(gameObject.transform.position, objectB.transform.position);
+		float distance = Vector3.Distance(gameObject.transform.position, target.transform.position);
 		
-		float rotationZRad = Mathf.Acos ((objectB.transform.position.y-gameObject.transform.position.y)/distance);
+		float rotationZRad = Mathf.Acos ((target.transform.position.y - gameObject.transform.position.y)/distance);
 		
 		float rotationZ = rotationZRad * Mathf.Rad2Deg;
 		
-		if(gameObject.transform.position.x < objectB.transform.position.x)
+		if(gameObject.transform.position.x < target.transform.position.x)
 		{
 			rotationZ = -rotationZ;
 		}
 		
 		Vector3 vectRotation = new Vector3(0.0f, 0.0f, rotationZ);
 
-		Quaternion rotation = new Quaternion ();
-
 		rotation.eulerAngles = vectRotation;
+		
+		midPoint = (gameObject.transform.position + target.transform.position) / 2;
 
-		Vector3 midPoint = (gameObject.transform.position + objectB.transform.position)/2;
+		midPoint = new Vector3 (midPoint.x, midPoint.y, 0.0f);
 
-		Vector3 scale = new Vector3(0.2f * systemListConstructor.systemScale, distance, 0.0f);
+		scale = new Vector3(0.15f * systemListConstructor.systemScale, distance);
+
+		//Calculating width;
+
+		Vector3 b;
+
+		//calculating height
+
+		Vector3 start = systemPopup.mainCamera.WorldToScreenPoint (gameObject.transform.position);
+		Vector3 end = systemPopup.mainCamera.WorldToScreenPoint (target.transform.position);
+
+		pixelHeight = Vector3.Distance(start, end);
+
+		pixelWidth = (-0.1f * systemPopup.mainCamera.transform.position.z) + 15;
+	}
+
+	void OrientationBuild(GameObject target)
+	{
+		UpdateRotScalePos (target);
 
 		ConnectorLine newLine = new ConnectorLine ();
 
 		newLine.rotation = rotation;
 		
-		newLine.scale = scale;
-		
 		newLine.midPoint = midPoint;
+
+		newLine.thisLine = null;
 
 		connectorLines.Add (newLine);
 	}
+	*/
 
 	public class ConnectorLine
 	{
 		public Quaternion rotation;
-		public Vector3 scale, midPoint;
+		public Vector3 midPoint;
+		public GameObject thisLine;
+		public UISprite sprite;
+		public UIWidget widget;
 	}
 }

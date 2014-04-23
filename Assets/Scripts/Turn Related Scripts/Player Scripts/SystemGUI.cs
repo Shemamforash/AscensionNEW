@@ -139,7 +139,14 @@ public class SystemGUI : MasterScript
 			planet.wealthCost = planet.improveButton.transform.Find("Wealth Cost").gameObject.GetComponent<UILabel>();
 			planet.powerCost = planet.improveButton.transform.Find("Power Cost").gameObject.GetComponent<UILabel>();
 			planet.rareResourceLabel = planet.spriteObject.transform.Find("Rare Resource Output").gameObject.GetComponent<UILabel>();
-			
+			planet.sabotageButton = planet.spriteObject.transform.Find("Sabotage").gameObject.GetComponent<UIButton>();
+
+			float scale = (Screen.width * 0.0893f) + 28.557f;
+
+			scale = 1f/200f * (float)Math.Round((double)scale, 2);
+
+			planet.spriteObject.GetComponent<Transform>().localScale = new Vector3(scale, 1f, 1f);
+
 			Transform[] tempTransform = planet.spriteObject.GetComponentsInChildren<Transform>();
 			
 			for(int j = 0; j < tempTransform.Length; ++j)
@@ -320,12 +327,23 @@ public class SystemGUI : MasterScript
 			}
 		}
 	}
+
+	private void SabotageButton()
+	{
+		for(int i = 0; i < planetElementList.Count; ++i)
+		{
+			if(UIButton.current == planetElementList[i].sabotageButton)
+			{
+
+			}
+		}
+	}
 }
 
 public class PlanetUIElements
 {
 	public GameObject spriteObject, knowledgeProductionSprite, powerProductionSprite;
 	public UILabel infoLabel, powerProduction, knowledgeProduction, powerCost, wealthCost, rareResourceLabel;
-	public UIButton improveButton;
+	public UIButton improveButton, sabotageButton;
 	public List<GameObject> improvementSlots = new List<GameObject>();
 }

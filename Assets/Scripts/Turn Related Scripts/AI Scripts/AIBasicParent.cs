@@ -352,12 +352,12 @@ public class AIBasicParent : TurnInfo
 				currentPlanet = tempPlanetB;
 				
 				currentSystem = tempSystemB;
+
+				systemSIMData = systemListConstructor.systemList[currentSystem].systemObject.GetComponent<SystemSIMData>();
+
+				systemSIMData.guardedBy = null;
 				
 				systemListConstructor.systemList[currentSystem].systemOwnedBy = thisPlayer.playerRace;
-				
-				lineRenderScript = systemListConstructor.systemList[currentSystem].systemObject.GetComponent<LineRenderScript>();
-				
-				lineRenderScript.SetRaceLineColour(thisPlayer.playerRace);
 				
 				systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
 
@@ -439,36 +439,41 @@ public class AIBasicParent : TurnInfo
 
 					int k = RefreshCurrentSystem(systemListConstructor.systemList[i].permanentConnections[j]);
 
+					systemSIMData = systemListConstructor.systemList[k].systemObject.GetComponent<SystemSIMData>();
+
 					if(systemListConstructor.systemList[k].systemOwnedBy == null)
 					{
-						float tempPlanetSIM = 0.0f;
-						int tempPlanet = -1;
-						float tempHighestPlanetSIM = 0.0f;
-
-						for(int l = 0; l < systemListConstructor.systemList[k].systemSize; ++l)
+						if(systemSIMData.guardedBy == "" || systemSIMData.guardedBy == thisPlayer.playerRace || systemSIMData.guardedBy == null)
 						{
-							tempPlanetSIM = (systemListConstructor.systemList[k].planetsInSystem[l].planetKnowledge + systemListConstructor.systemList[k].planetsInSystem[l].planetPower)  
-								* (systemListConstructor.systemList[k].planetsInSystem[l].improvementSlots);
+							float tempPlanetSIM = 0.0f;
+							int tempPlanet = -1;
+							float tempHighestPlanetSIM = 0.0f;
 
-							if(tempPlanetSIM > tempHighestPlanetSIM)
+							for(int l = 0; l < systemListConstructor.systemList[k].systemSize; ++l)
 							{
-								tempHighestPlanetSIM = tempPlanetSIM;
+								tempPlanetSIM = (systemListConstructor.systemList[k].planetsInSystem[l].planetKnowledge + systemListConstructor.systemList[k].planetsInSystem[l].planetPower)  
+									* (systemListConstructor.systemList[k].planetsInSystem[l].improvementSlots);
 
-								tempPlanet = l;
+								if(tempPlanetSIM > tempHighestPlanetSIM)
+								{
+									tempHighestPlanetSIM = tempPlanetSIM;
+
+									tempPlanet = l;
+								}
+
+								tempSIM += tempPlanetSIM;
 							}
 
-							tempSIM += tempPlanetSIM;
-						}
+							tempSIM = (tempSIM / systemListConstructor.systemList[k].systemSize);
 
-						tempSIM = (tempSIM / systemListConstructor.systemList[k].systemSize);
+							if(tempSIM > highestSIM)
+							{
+								highestSIM = tempSIM;
 
-						if(tempSIM > highestSIM)
-						{
-							highestSIM = tempSIM;
+								tempSystemB = k;
 
-							tempSystemB = k;
-
-							tempPlanetB = tempPlanet;
+								tempPlanetB = tempPlanet;
+							}
 						}
 					}
 				}
