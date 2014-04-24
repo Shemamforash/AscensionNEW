@@ -35,7 +35,7 @@ public class LineRenderScript : MasterScript
 
 		for(int i = 0; i < connectorLines.Count; ++i)
 		{
-			UpdateLine(connectorLines[i].thisLine, i);
+			UpdateLine(systemListConstructor.systemList[thisSystem].permanentConnections[i], i);
 		}
 	}
 
@@ -88,8 +88,6 @@ public class LineRenderScript : MasterScript
 		Vector3 vectRotation = new Vector3(0.0f, 0.0f, rotationZ);
 		
 		rotation.eulerAngles = vectRotation;
-
-		Debug.Log (rotation);
 		
 		connectorLines[i].thisLine.transform.rotation = rotation;
 	}
@@ -107,10 +105,11 @@ public class LineRenderScript : MasterScript
 		
 		pixelHeight = Vector3.Distance(start, end);
 		
-		pixelWidth = (-0.1f * systemPopup.mainCamera.transform.position.z) + 15;
+		pixelWidth = (0.16f * systemPopup.mainCamera.transform.position.z) + 12;
 		
 		connectorLines[i].widget.width = Convert.ToInt32(pixelWidth);
-		connectorLines[i].widget.height = Convert.ToInt32(pixelHeight);
+	
+		connectorLines[i].widget.height = Convert.ToInt32(pixelHeight - ((systemListConstructor.systemScale / 1.5f) * 10f));
 	}
 
 	public string SetRaceLineColour()
