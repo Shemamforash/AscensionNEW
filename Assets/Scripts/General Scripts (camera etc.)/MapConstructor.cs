@@ -21,6 +21,15 @@ public class MapConstructor : MasterScript
 
 		for (int i = 0; i < coordinateList.Count; ++i) 
 		{
+			if(coordinateList[i].systemA == thisSystem && coordinateList[i].systemB == targetSystem)
+			{
+				continue;
+			}
+			if(coordinateList[i].systemB == thisSystem && coordinateList[i].systemA == targetSystem)
+			{
+				continue;
+			}
+
 			float A2 = coordinateList [i].systemB.y - coordinateList [i].systemA.y;
 			float B2 = coordinateList [i].systemA.x - coordinateList [i].systemB.x;
 			float C2 = (A2 * coordinateList [i].systemA.x) + (B2 * coordinateList [i].systemA.y);

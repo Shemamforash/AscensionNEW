@@ -20,6 +20,7 @@ public class HeroScriptParent : MasterScript
 	
 		heroScript = gameObject.GetComponent<HeroScriptParent> ();
 		heroShip = gameObject.GetComponent<HeroShip> ();
+		heroMovement = gameObject.GetComponent<HeroMovement> ();
 
 		system = RefreshCurrentSystem (heroLocation);
 
@@ -30,6 +31,11 @@ public class HeroScriptParent : MasterScript
 	void Update()
 	{
 		system = RefreshCurrentSystem (heroLocation);
+
+		if(heroMovement.heroIsMoving == false)
+		{
+			gameObject.transform.position = heroMovement.HeroPositionAroundStar(heroLocation);
+		}
 	}
 
 	public DiplomaticPosition FindDiplomaticConnection()

@@ -433,7 +433,7 @@ public class AIBasicParent : TurnInfo
 			{
 				lineRenderScript = systemListConstructor.systemList[i].systemObject.GetComponent<LineRenderScript>();
 
-				for(int j = 0; j < systemListConstructor.systemList[i].numberOfConnections; ++j)
+				for(int j = 0; j < systemListConstructor.systemList[i].permanentConnections.Count; ++j)
 				{
 					tempSIM = 0.0f;
 

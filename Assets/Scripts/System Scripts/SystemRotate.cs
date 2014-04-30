@@ -1,68 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
-public class SystemRotate : MonoBehaviour
+public class SystemRotate : MasterScript
 {
-	private Vector3 galacticCentre = new Vector3(45f, 45f, 0f);
-	private float radius, xPos, yPos, bound = 400f;
-	private bool skip;
+	public Vector3 galacticCentre = new Vector3(45f, 45f, 0f);
+	public float radius, xPos, yPos, speed;
+	private int system;
 
-	void Start()
+	public void Start()
 	{
+		system = RefreshCurrentSystem (gameObject);
 		radius = Vector3.Distance (gameObject.transform.position, galacticCentre);
+		speed = UnityEngine.Random.Range (0.009f, 0.011f);
 	}
 
-	void Update () //Need to work out gradient from angle
+	void Update () //FIXED PLS DONT CHANGE THIS FUTURE SAM
+	{
+		UpdateRotation ();
+	}
+
+	public void UpdateRotation()
 	{
 		Vector3 direction = new Vector3(gameObject.transform.position.y - galacticCentre.y, gameObject.transform.position.x - galacticCentre.x);
 
-		float angle = Vector3.Angle (Vector3.up, direction);
+		double angle = -speed * Mathf.Deg2Rad;
 
-		if(gameObject.transform.position.y < galacticCentre.y)
-		{
-			angle = -angle; //Angle is okay
-		}
-
-		angle = (float)Math.Round ((double)(angle + 0.1f),  1);
-
-		skip = false;
-
-		if(angle == 90f)
-		{
-			xPos = 45f;
-			yPos = 45f + radius;
-			skip = true;
-		}
-		if(angle == -90f)
-		{
-			xPos = 45f;
-			yPos = 45f - radius;
-			skip = true;
-		}
-
-		float gradient = Mathf.Tan (angle * Mathf.Deg2Rad);
-
-		if(skip == false)
-		{
-			float yIntersect = galacticCentre.y - (gradient * galacticCentre.x);
-
-			float A = (gradient * gradient) + 1f;
-			float B = 2 * ((gradient * yIntersect) - (gradient * 45f) - 45f);
-			float C = (yIntersect * yIntersect) + (45f * 45f) + (45f * 45f) 
-				- (2 * 45f * yIntersect) - (radius * radius);
-
-			if(angle > 90f || angle < -90f)
-			{
-				xPos = (-B - Mathf.Sqrt ((B * B) - (4 * A * C))) / (2 * A);
-			}
-			else
-			{
-				xPos = (-B + Mathf.Sqrt ((B * B) - (4 * A * C))) / (2 * A);
-			}
-
-			yPos = (gradient * xPos) + yIntersect;
-		}
+		xPos = (float)(Math.Cos(angle) * (gameObject.transform.position.x - galacticCentre.x) - Math.Sin(angle) * (gameObject.transform.position.y - galacticCentre.y) + galacticCentre.x);
+		yPos = (float)(Math.Sin(angle) * (gameObject.transform.position.x - galacticCentre.x) + Math.Cos(angle) * (gameObject.transform.position.y - galacticCentre.y) + galacticCentre.y);
 
 		Vector3 newPos = new Vector3 (xPos, yPos, gameObject.transform.position.z);
 

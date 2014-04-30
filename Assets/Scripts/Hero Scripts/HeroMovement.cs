@@ -14,7 +14,7 @@ public class HeroMovement : MasterScript
 	private List<GameObject> pathVertices = new List<GameObject>();
 	private List<PathFindingNodes> nodeTiers = new List<PathFindingNodes> ();
 
-	private Vector3 targetPosition, currentPosition;
+	private Vector3 targetPosition = Vector3.zero, currentPosition;
 
 	void Start () 
 	{
@@ -106,6 +106,8 @@ public class HeroMovement : MasterScript
 
 			targetPosition = HeroPositionAroundStar (pathVertices[currentVertex + 1]); //Target position is set
 
+			Vector3 dir = targetPosition - currentPosition;
+
 			if(TestForProximity(currentPosition, targetPosition) == true) //If current hero position is equal to the next system on route
 			{	
 				systemSIMData = pathVertices[currentVertex].GetComponent<SystemSIMData>();
@@ -121,9 +123,16 @@ public class HeroMovement : MasterScript
 				heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system
 
 				heroShip = gameObject.GetComponent<HeroShip>();
+
+				targetPosition = Vector3.zero;
 			}
 
-			gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, (10 * heroScript.movementSpeed) * Time.deltaTime);
+			else
+			{
+				gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, (10 * heroScript.movementSpeed) * Time.deltaTime);
+
+				Debug.Log ((10 * heroScript.movementSpeed) * Time.deltaTime);
+			}
 		}
 
 		if(TestForProximity(currentPosition, HeroPositionAroundStar(pathfindTarget)) == true)
@@ -156,15 +165,15 @@ public class HeroMovement : MasterScript
 		{
 		case "Humans":
 			position.x = location.transform.position.x;
-			position.y = location.transform.position.y + 1.5f;
+			position.y = location.transform.position.y + 2.5f;
 			break;
 		case "Selkies":
-			position.x = location.transform.position.x + 1.5f;
-			position.y = location.transform.position.y - 1.0f;
+			position.x = location.transform.position.x + 2.5f;
+			position.y = location.transform.position.y - 1.66f;
 			break;
 		case "Nereides":
-			position.x = location.transform.position.x - 1.5f;
-			position.y = location.transform.position.y - 1.0f;
+			position.x = location.transform.position.x - 2.5f;
+			position.y = location.transform.position.y - 1.66f;
 			break;
 		default:
 			break;
