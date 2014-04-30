@@ -102,23 +102,23 @@ public class MainMenu : MonoBehaviour
 
 			switch(size.text)
 			{
-			case "Very Small (30 Systems)":
+			case "Very Small (15 Systems)":
+				PlayerPrefs.SetInt ("Map Size", 15);
+				break;
+			case "Small (30 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 30);
 				break;
-			case "Small (60 Systems)":
+			case "Medium (45 Systems)":
+				PlayerPrefs.SetInt ("Map Size", 45);
+				break;
+			case "Large (60 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 60);
 				break;
-			case "Medium (90 Systems)":
+			case "Very Large (75 Systems)":
+				PlayerPrefs.SetInt ("Map Size", 75);
+				break;
+			case "Massive (90 Systems)":
 				PlayerPrefs.SetInt ("Map Size", 90);
-				break;
-			case "Large (120 Systems)":
-				PlayerPrefs.SetInt ("Map Size", 120);
-				break;
-			case "Very Large (150 Systems)":
-				PlayerPrefs.SetInt ("Map Size", 150);
-				break;
-			case "Massive (180 Systems)":
-				PlayerPrefs.SetInt ("Map Size", 180);
 				break;
 			default:
 				break;

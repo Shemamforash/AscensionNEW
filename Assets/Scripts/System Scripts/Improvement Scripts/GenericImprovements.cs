@@ -129,7 +129,7 @@ public class GenericImprovements : MasterScript
 
 	private void T0I2()
 	{
-		for(int i = 0; i < systemListConstructor.systemList[improvements.system].numberOfConnections; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].permanentConnections.Count; ++i)
 		{
 			int k = RefreshCurrentSystem(systemListConstructor.systemList[improvements.system].permanentConnections[i]);
 			

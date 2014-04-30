@@ -53,6 +53,10 @@ public class SystemListConstructor : MasterScript
 		systemPopup.LoadOverlays ();
 
 		galaxyGUI.SelectRace(PlayerPrefs.GetString ("Player Race"));
+
+		AStarPathfinding path = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AStarPathfinding> ();
+
+		path.Pathfind (systemList [0].systemObject, systemList [7].systemObject);
 	}
 
 	public int RefreshCurrentSystemA(GameObject thisSystem)

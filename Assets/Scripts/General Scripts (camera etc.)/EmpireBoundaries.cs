@@ -14,7 +14,18 @@ public class EmpireBoundaries : MasterScript
 	{
 		boundRings = new GameObject[systemListConstructor.systemList.Count];
 	}
-	
+
+	void Update()
+	{
+		for(int i = 0; i < boundRings.Length; ++i)
+		{
+			if(boundRings[i] != null)
+			{
+				boundRings[i].transform.position = systemListConstructor.systemList[i].systemObject.transform.position;
+			}
+		}
+	}
+
 	public void CalculateRadius(int system)
 	{
 		float tempRadius = 100f;
@@ -77,7 +88,7 @@ public class EmpireBoundaries : MasterScript
 			default:
 				if(boundRings[i] != null)
 				{
-					Destroy(boundRings[i]);
+					boundRings[i].renderer.material = null;
 				}
 				break;
 			}

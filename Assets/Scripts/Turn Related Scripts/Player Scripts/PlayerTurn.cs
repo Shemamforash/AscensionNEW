@@ -24,7 +24,7 @@ public class PlayerTurn : TurnInfo
 
 	public void FindSystem(int system) //This function is used to check if the highlighted system can be colonised, and if it can, to colonise it
 	{				
-		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 		{			
 			int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
 			
@@ -57,7 +57,7 @@ public class PlayerTurn : TurnInfo
 						}
 					}
 
-					for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i)
+					for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 					{
 						int j = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
 

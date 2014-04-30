@@ -240,7 +240,7 @@ public class SystemSIMData : MasterScript
 
 		int noSystems = 0;
 
-		for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
 		{
 			int neighbour = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[i]);
 
@@ -269,7 +269,7 @@ public class SystemSIMData : MasterScript
 
 		if(promotedBy == null)
 		{
-			for(int i = 0; i < systemListConstructor.systemList[thisSystem].numberOfConnections; ++i)
+			for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
 			{
 				int j = RefreshCurrentSystem(systemListConstructor.systemList[thisSystem].permanentConnections[i]);
 
