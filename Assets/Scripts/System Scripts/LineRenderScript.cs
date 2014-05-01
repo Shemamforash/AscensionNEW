@@ -140,7 +140,7 @@ public class LineRenderScript : MasterScript
 			return "SelkiesOwnedLine";
 		}
 
-		return "Empty Line";
+		return "UnownedMat"; //Should be "Empty Line"
 	}
 
 	private void ViewNearbySystems()

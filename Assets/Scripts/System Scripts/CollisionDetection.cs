@@ -8,6 +8,11 @@ public class CollisionDetection : MasterScript
 	private Vector2 startA, endA, startB, endB, mp1, mp2;
 	int startNo;
 
+	private List<GameObject> unvisitedSystems = new List<GameObject> ();
+	private List<GameObject> firmSystems = new List<GameObject> ();
+	private List<GameObject> visitedSystems = new List<GameObject> ();
+	private List<GameObject> currentSystems = new List<GameObject>();
+	
 	void Start()
 	{
 		t = 0f;
@@ -16,6 +21,12 @@ public class CollisionDetection : MasterScript
 
 	void Update () //FIXED PLS DONT CHANGE THIS FUTURE SAM
 	{
+		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
+		{
+			UpdateConnections (i);
+		}
+
+		/*
 		t += Time.deltaTime;
 
 		if(t >= 0.3f)
@@ -33,6 +44,95 @@ public class CollisionDetection : MasterScript
 			t = 0f;
 
 			startNo += 5;
+		}
+		*/
+	}
+
+	private void CheckVisitedSystems()
+	{
+		bool foundSystem = false;
+		
+		for(int i = 0; i < visitedSystems.Count; ++i) //For all current systems
+		{
+			firmSystems.Add (visitedSystems[i]);
+			
+			int sys = RefreshCurrentSystem (visitedSystems [i]);
+			
+			for(int j = 0; j < systemListConstructor.systemList[sys].permanentConnections.Count; ++j) //Check the systems permanent connections
+			{
+				if(visitedSystems.Contains(systemListConstructor.systemList[sys].permanentConnections[j]) || firmSystems.Contains(systemListConstructor.systemList[sys].permanentConnections[j])) //If the system is already in checked systems, ignore it
+				{
+					continue;
+				}
+				
+				currentSystems.Add (systemListConstructor.systemList[sys].permanentConnections[j]);
+				unvisitedSystems.Remove (systemListConstructor.systemList[sys].permanentConnections[j]);
+				
+				foundSystem = true;
+			}
+		}
+
+		visitedSystems = currentSystems;
+		currentSystems.Clear ();
+
+		if(foundSystem == true)
+		{
+			CheckVisitedSystems();
+		}
+	}
+
+	private void CheckForGraphComplete()
+	{
+		unvisitedSystems.Clear ();
+		visitedSystems.Clear ();
+		firmSystems.Clear ();
+		currentSystems.Clear ();
+
+		for(int i = 1; i < systemListConstructor.systemList.Count; ++i)
+		{
+			unvisitedSystems.Add (systemListConstructor.systemList[i].systemObject);
+		}
+
+		visitedSystems.Add (systemListConstructor.systemList[0].systemObject);
+
+		CheckVisitedSystems ();
+
+		if(firmSystems.Count != systemListConstructor.systemList.Count)
+		{
+			float distance = 10000f;
+			int sysToJoinA = -1, sysToJoinB = -1;
+
+			for(int i = 0; i < firmSystems.Count; ++i)
+			{
+				for(int j = 0; j < unvisitedSystems.Count; ++j)
+				{
+					float tempDistance = Vector3.Distance (firmSystems[i].transform.position, unvisitedSystems[j].transform.position);
+
+					if(tempDistance < distance)
+					{
+						if(mapConstructor.TestForIntersection(firmSystems[i].transform.position, unvisitedSystems[j].transform.position, false) == false)
+						{
+							distance = tempDistance;
+							sysToJoinA = i;
+							sysToJoinB = j;
+						}
+					}
+				}
+			}
+
+			Debug.Log (firmSystems.Count + " | " + unvisitedSystems.Count);
+
+			sysToJoinA = RefreshCurrentSystem(firmSystems[sysToJoinA]);
+			sysToJoinB = RefreshCurrentSystem(unvisitedSystems[sysToJoinB]);
+
+			systemListConstructor.systemList[sysToJoinA].permanentConnections.Add (systemListConstructor.systemList[sysToJoinB].systemObject);
+			systemListConstructor.systemList[sysToJoinA].numberOfConnections = systemListConstructor.systemList[sysToJoinA].permanentConnections.Count;
+			systemListConstructor.systemList[sysToJoinB].permanentConnections.Add (systemListConstructor.systemList[sysToJoinA].systemObject);
+			systemListConstructor.systemList[sysToJoinB].numberOfConnections = systemListConstructor.systemList[sysToJoinB].permanentConnections.Count;
+			CreateNewLine(sysToJoinA);
+			CreateNewLine(sysToJoinB);
+
+			CheckForGraphComplete();
 		}
 	}
 
@@ -81,7 +181,9 @@ public class CollisionDetection : MasterScript
 							
 							ReconnectSystems(systemListConstructor.systemList[system].systemObject, target);
 							ReconnectSystems(target, systemListConstructor.systemList[system].systemObject);
+							CheckForGraphComplete();
 						}
+
 						if(distanceB >= distanceA)
 						{
 							continue;
@@ -115,7 +217,7 @@ public class CollisionDetection : MasterScript
 		float yOne = (M1 * xIntersect) + C1;
 		float yTwo = (M2 * xIntersect) + C2;
 		
-		if(yOne == yTwo || Mathf.Abs((yOne - yTwo) / 2) <= 2.0f)
+		if(yOne == yTwo /*|| Mathf.Abs((yOne - yTwo) / 2) <= 2.0f*/)
 		{
 			if(yOne > 95f || yOne < 0f)
 			{
@@ -138,6 +240,23 @@ public class CollisionDetection : MasterScript
 		}
 		
 		return false;
+	}
+
+	private void CreateNewLine(int system)
+	{
+		lineRenderScript = systemListConstructor.systemList[system].systemObject.GetComponent<LineRenderScript>();
+		
+		ConnectorLine newLine = new ConnectorLine ();
+		
+		GameObject clone = NGUITools.AddChild(lineRenderScript.connectorLineContainer.gameObject, lineRenderScript.line);
+		
+		newLine.thisLine = clone;
+		
+		newLine.sprite = newLine.thisLine.transform.Find ("Sprite").GetComponent<UISprite>();
+		
+		newLine.widget = newLine.thisLine.GetComponent<UIWidget>();
+		
+		lineRenderScript.connectorLines.Add (newLine);
 	}
 	
 	public void ReconnectSystems(GameObject systemA, GameObject systemB)
@@ -179,19 +298,7 @@ public class CollisionDetection : MasterScript
 					systemListConstructor.systemList[thisSystem].permanentConnections[i] = systemListConstructor.systemList[newConnection].systemObject; //The connection that was system b is now the new connection
 					systemListConstructor.systemList[newConnection].permanentConnections.Add(systemListConstructor.systemList[thisSystem].systemObject); //The new connection is now connected to this system
 					
-					lineRenderScript = systemListConstructor.systemList[newConnection].systemObject.GetComponent<LineRenderScript>();
-					
-					ConnectorLine newLine = new ConnectorLine ();
-					
-					GameObject clone = NGUITools.AddChild(lineRenderScript.connectorLineContainer.gameObject, lineRenderScript.line);
-					
-					newLine.thisLine = clone;
-					
-					newLine.sprite = newLine.thisLine.transform.Find ("Sprite").GetComponent<UISprite>();
-					
-					newLine.widget = newLine.thisLine.GetComponent<UIWidget>();
-					
-					lineRenderScript.connectorLines.Add (newLine);
+					CreateNewLine(newConnection);
 					
 					systemListConstructor.systemList[thisSystem].numberOfConnections = systemListConstructor.systemList[thisSystem].permanentConnections.Count;
 					systemListConstructor.systemList[newConnection].numberOfConnections = systemListConstructor.systemList[newConnection].permanentConnections.Count;

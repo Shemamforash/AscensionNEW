@@ -53,10 +53,6 @@ public class SystemListConstructor : MasterScript
 		systemPopup.LoadOverlays ();
 
 		galaxyGUI.SelectRace(PlayerPrefs.GetString ("Player Race"));
-
-		AStarPathfinding path = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AStarPathfinding> ();
-
-		path.Pathfind (systemList [0].systemObject, systemList [7].systemObject);
 	}
 
 	public int RefreshCurrentSystemA(GameObject thisSystem)
@@ -93,9 +89,22 @@ public class SystemListConstructor : MasterScript
 			if(CheckWithinMinMaxDistance(uncheckedSystems[randomInt]) == true)
 			{
 				firmSystems.Add(uncheckedSystems[randomInt]);
+				uncheckedSystems.RemoveAt(randomInt);
 			}
+		}
 
-			uncheckedSystems.RemoveAt(randomInt);
+		if(firmSystems.Count < mapSize)
+		{
+			difference = mapSize - firmSystems.Count;
+
+			for(int i = 0; i < difference; ++i)
+			{
+				randomInt = Random.Range (0, uncheckedSystems.Count - 1);
+
+				firmSystems.Add(uncheckedSystems[randomInt]);
+				
+				uncheckedSystems.RemoveAt(randomInt);
+			}
 		}
 	}
 

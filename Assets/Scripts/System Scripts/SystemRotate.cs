@@ -13,7 +13,7 @@ public class SystemRotate : MasterScript
 	{
 		system = RefreshCurrentSystem (gameObject);
 		radius = Vector3.Distance (gameObject.transform.position, galacticCentre);
-		speed = UnityEngine.Random.Range (0.009f, 0.011f);
+		speed = UnityEngine.Random.Range (0.07f, 0.13f);
 	}
 
 	void Update () //FIXED PLS DONT CHANGE THIS FUTURE SAM
