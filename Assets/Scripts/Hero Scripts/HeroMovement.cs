@@ -5,14 +5,12 @@ using System.Collections.Generic;
 public class HeroMovement : MasterScript 
 {
 	public bool heroIsMoving;
-	public GameObject pathfindTarget;
 	private int currentVertex;
 
-	private Queue<GameObject> queuedVertices = new Queue<GameObject> ();
-	private List<GameObject> visitedVertices = new List<GameObject> ();
-	private List<GameObject> tempRoute = new List<GameObject> ();
-	private List<GameObject> pathVertices = new List<GameObject>();
-	private List<PathFindingNodes> nodeTiers = new List<PathFindingNodes> ();
+	private List<AStarNode> openList = new List<AStarNode> ();
+	private List<AStarNode> closedList = new List<AStarNode> ();
+	private List<GameObject> finalPath = new List<GameObject> ();
+	private GameObject start, target;
 
 	private Vector3 targetPosition = Vector3.zero, currentPosition;
 
@@ -23,95 +21,157 @@ public class HeroMovement : MasterScript
 
 	void Update()
 	{
-		if(pathfindTarget != null)
+		if(target != null)
 		{
 			heroIsMoving = true;
 			RefreshHeroLocation();
 		}
 
-		if(pathfindTarget == null)
+		if(target == null)
 		{
 			heroIsMoving = false;
 		}
 	}
 
-	public void FindPath()
+	public void FindPath(GameObject begin, GameObject end)
 	{
-		pathVertices.Clear ();
-		queuedVertices.Clear ();
-		visitedVertices.Clear ();
-		tempRoute.Clear ();
-		nodeTiers.Clear ();
+		openList.Clear ();
+		closedList.Clear ();
+		finalPath.Clear ();
 
-		queuedVertices.Enqueue (heroScript.heroLocation); //Add hero's current location
+		start = begin;
+		target = end;
 		
-		while(queuedVertices.Count > 0) //While queue has contents
-		{
-			GameObject currentObject = queuedVertices.Dequeue (); //Current object is first queue object
-			
-			if(currentObject == pathfindTarget) //If the current object is equal to the target
-			{
-				tempRoute.Add (pathfindTarget); //Add it to the temproute
-				
-				while(currentObject != heroScript.heroLocation) //While the current object doesnt equal the hero's location
-				{
-					for(int i = 0; i < nodeTiers.Count; ++i) //Recursively add the nodes to a list to form a route
-					{
-						if(nodeTiers[i].thisNode == currentObject)
-						{
-							tempRoute.Add (nodeTiers[i].precededBy);
-							currentObject = nodeTiers[i].precededBy;
-							break;
-						}
-					}
-				}
-				
-				break;
-			}
-			
-			int k = RefreshCurrentSystem(currentObject);
-			
-			for(int j = 0; j < systemListConstructor.systemList[k].permanentConnections.Count; ++j) //For all systems connected to this system
-			{
-				GameObject tempObject = systemListConstructor.systemList[k].permanentConnections[j]; //Get a reference to the system
-				
-				if(visitedVertices.Contains(tempObject) == false) //If the system has not been visited
-				{
-					visitedVertices.Add (tempObject); //Set it to visitied
-					queuedVertices.Enqueue(tempObject); //Queue it up
-					
-					PathFindingNodes node = new PathFindingNodes(); //Add new pathfinding node
-					
-					node.precededBy = currentObject; //Set up node
-					node.thisNode = tempObject;
-					
-					nodeTiers.Add (node);
-				}
-			}	
-		}
+		AStarNode node = new AStarNode ();
 		
-		for(int i = tempRoute.Count - 1; i >= 0; --i)
+		node.system = start;
+		node.parent = null;
+		node.g = 0f; 
+		node.h = Vector3.Distance(start.transform.position, target.transform.position);
+		node.f = node.g;
+		
+		closedList.Add (node);
+		finalPath.Add (start);
+		
+		int i = 0;
+		
+		while(finalPath.Contains(target) == false)
 		{
-			pathVertices.Add (tempRoute[i]);
+			GetNearestNode(i);
+			++i;
 		}
+
+		finalPath.Clear ();
+
+		node = closedList[closedList.Count - 1];
+
+		while(finalPath.Contains(start) == false)
+		{
+			finalPath.Add (node.system);
+			node = node.parent;
+		}
+
+		finalPath.Reverse ();
 
 		currentVertex = 0;
 	}
 
+	private void GetNearestNode(int curNode)
+	{
+		int sys = RefreshCurrentSystem (closedList [curNode].system); //Current system is the last node on the closed list
+		
+		for(int i = 0; i < systemListConstructor.systemList[sys].permanentConnections.Count; ++i) //For all permanent connections
+		{
+			bool skip = false;
+			
+			for(int j = 0; j < closedList.Count; ++j) //If system is already on the closed list, continue
+			{
+				if(systemListConstructor.systemList[sys].permanentConnections[i] == closedList[j].system)
+				{
+					skip = true;
+				}
+			}
+			
+			if(skip == false)
+			{
+				AStarNode node = new AStarNode (); //New node
+				
+				node.system = systemListConstructor.systemList[sys].permanentConnections[i]; //Node system is connected to this system
+
+				float tempG = 0f, tempH = 0f;
+				int replaceNode = -1;
+				bool containsNode = false;
+
+				for(int j = 0; j < openList.Count; ++j) //For all other nodes in the open list
+				{
+					if(openList[j].system == node.system && node.parent != null) //If the selected node is already on the open list
+					{
+						float gToParent = openList[j].g; //Get it's g distance to parent
+						float gThroughCurrent = closedList[curNode].g + Vector3.Distance(node.system.transform.position, closedList[curNode].system.transform.position); //And it's g through the current node
+						
+						if(gThroughCurrent < gToParent) //If the route through the current node is less than its current g
+						{
+							tempG = gThroughCurrent; 
+							tempH = Vector3.Distance(node.system.transform.position, target.transform.position); 
+							replaceNode = j;
+						}
+
+						containsNode = true;
+					}
+				}
+
+				if(replaceNode != -1)
+				{
+					node.g = tempG; //Change it's g value
+					node.h = tempH; //And it's h value
+					node.f = node.g + node.h; //And f value
+					node.parent = closedList[curNode];  //Set it's parent to the current node
+					openList[replaceNode] = node; //Replace it in the open list
+					continue;
+				}
+
+				if(containsNode == false)
+				{
+					node.parent = closedList[curNode]; //Set the parent to the current node
+					node.g = closedList[curNode].g + Vector3.Distance(node.system.transform.position, closedList[curNode].system.transform.position); //Calculate g
+					node.h = Vector3.Distance(node.system.transform.position, target.transform.position); //Calculate h
+					node.f = node.g + node.h; //Calculate f
+					openList.Add (node); //Add it to the open list
+				}
+			}
+		}
+		
+		float temp = 10000f;
+		int nodeToPick = -1;
+		
+		for(int i = 0; i < openList.Count; ++i) //For all the nodes in the open list
+		{
+			if(openList[i].f < temp) //If the node's f value is less than the temp f value
+			{
+				temp = openList[i].f; //Set the temp f to this node's f
+				nodeToPick = i; //Set this node to be the next to join the closed list
+			}
+		}
+		
+		closedList.Add (openList [nodeToPick]); //Add node to closed list
+		finalPath.Add (openList [nodeToPick].system); //You can also add it to the final path as the closed list does not change
+		openList.RemoveAt (nodeToPick); //Remove it from the open list- we will not be backtracking to already assigned nodes
+	}
+
 	public void RefreshHeroLocation()
 	{
-		if(pathVertices[currentVertex] != pathfindTarget) //If current system does not equal the destination system
+		if(finalPath[currentVertex] != target) //If current system does not equal the destination system
 		{
 			currentPosition = gameObject.transform.position; //Current hero position is updated
 
-			targetPosition = HeroPositionAroundStar (pathVertices[currentVertex + 1]); //Target position is set
+			targetPosition = HeroPositionAroundStar (finalPath[currentVertex + 1]); //Target position is set
 
 			Vector3 dir = targetPosition - currentPosition;
 
 			if(TestForProximity(currentPosition, targetPosition) == true) //If current hero position is equal to the next system on route
 			{	
-				systemSIMData = pathVertices[currentVertex].GetComponent<SystemSIMData>();
-				systemDefence = pathVertices[currentVertex].GetComponent<SystemDefence>();
+				systemSIMData = finalPath[currentVertex].GetComponent<SystemSIMData>();
+				systemDefence = finalPath[currentVertex].GetComponent<SystemDefence>();
 
 				systemDefence.underInvasion = false;
 				systemDefence.regenerateTimer = 3;
@@ -120,7 +180,7 @@ public class HeroMovement : MasterScript
 
 				++currentVertex; //Update current system
 				
-				heroScript.heroLocation = pathVertices [currentVertex]; //Set herolocation to current system
+				heroScript.heroLocation = finalPath[currentVertex]; //Set herolocation to current system
 
 				heroShip = gameObject.GetComponent<HeroShip>();
 
@@ -130,15 +190,13 @@ public class HeroMovement : MasterScript
 			else
 			{
 				gameObject.transform.position = Vector3.MoveTowards (currentPosition, targetPosition, (10 * heroScript.movementSpeed) * Time.deltaTime);
-
-				Debug.Log ((10 * heroScript.movementSpeed) * Time.deltaTime);
 			}
 		}
 
-		if(TestForProximity(currentPosition, HeroPositionAroundStar(pathfindTarget)) == true)
+		if(TestForProximity(currentPosition, HeroPositionAroundStar(target)) == true)
 		{
-			heroScript.heroLocation = pathfindTarget;
-			pathfindTarget = null;
+			heroScript.heroLocation = target;
+			target = null;
 		}
 	}
 
@@ -183,9 +241,13 @@ public class HeroMovement : MasterScript
 		
 		return position;
 	}
+
+	private class AStarNode
+	{
+		public GameObject system;
+		public AStarNode parent;
+		public float f, g, h;
+	}
 }
 
-public class PathFindingNodes
-{
-	public GameObject precededBy, thisNode;
-}
+
