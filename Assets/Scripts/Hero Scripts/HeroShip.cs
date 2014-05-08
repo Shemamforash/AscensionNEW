@@ -95,7 +95,7 @@ public class HeroShip : MasterScript
 			
 			heroGUI.buttonContainer.transform.localPosition = new Vector3(systemGUI.playerSystemInfoScreen.transform.localPosition.x - gridWidth / 2,  //Check
 			                                                              heroGUI.turnInfoBar.transform.localPosition.y + 50.0f, 
-			                                                              systemGUI.planetListGrid.transform.localPosition.z);
+			                                                              0.0f);
 			
 			heroGUI.buttonContainer.GetComponent<UIGrid>().repositionNow = true;
 		}

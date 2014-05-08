@@ -54,6 +54,7 @@ public class MapConstructor : MasterScript
 					{
 						allIntersections.Add (i);
 					}
+
 					intersects = true;
 				}
 			}

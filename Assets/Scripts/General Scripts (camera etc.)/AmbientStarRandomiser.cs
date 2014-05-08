@@ -4,40 +4,46 @@ using System.Collections.Generic;
 
 public class AmbientStarRandomiser : MasterScript 
 {
-	public int totalStars;
+	public int totalStars, pointIterator = 0;
 	public float maxGenerateDistance, blueRand, redRand, greenRand;
 	public GameObject ambientStar;
-	public Texture starA, starB, starC, starD, starE, starF;
 	private Texture tempTexture;
 	private List<AmbientStar> ambientStarList = new List<AmbientStar> ();
-	private Color randomColor;
+	public Material sharedMat;
+	private float scale = 0.1f;
+	private List<GameObject> rotatePoints = new List<GameObject>();
+	private bool startup = false;
+	public GameObject[] starPrefabs = new GameObject[2];
+
+	private void LoadPoints()
+	{
+		rotatePoints.Add (GameObject.Find ("Galaxy Anchor One"));
+		rotatePoints.Add (GameObject.Find ("Galaxy Anchor Two"));
+		rotatePoints.Add (GameObject.Find ("Galaxy Anchor Three"));
+		rotatePoints.Add (GameObject.Find ("Galaxy Anchor Four"));
+		rotatePoints.Add (GameObject.Find ("Galaxy Anchor Five"));
+	}
+
+	private void Update()
+	{
+		if(startup == true)
+		{
+			for(int j = 0; j < rotatePoints.Count; ++j)
+			{
+				float speed = (j * 0.04f) + 0.12f;
+				
+				rotatePoints[j].transform.Rotate(0f, 0f, -Time.deltaTime * speed);
+			}
+		}
+	}
 
 	public void GenerateStars () 
 	{
-		int rnd = Random.Range (0, 2);
-
-		greenRand = Random.Range (0.50f, 1.00f);
-
-		if(rnd == 1)
+		if(startup == false)
 		{
-			redRand = 0f;
-			blueRand = 1f;
+			LoadPoints();
+			startup = true;
 		}
-
-		if(rnd == 2)
-		{
-			redRand = 1f;
-			blueRand = 0f;
-		}
-
-		float mult = 1f;
-
-		if((1f + greenRand) / 3f < 0.75)
-		{
-			mult = 4f;
-		}
-
-		randomColor = new Color (redRand * mult, greenRand * mult, blueRand * mult);
 
 		int ambientStarsPerSystem = totalStars / systemListConstructor.systemList.Count;
 
@@ -62,27 +68,27 @@ public class AmbientStarRandomiser : MasterScript
 				}
 
 				float zDis = Random.Range(-15f * heightMult, 15f * heightMult);
-
-				float scale = Random.Range(0.15f, 0.3f);
 		
 				Vector3 location = new Vector3(xDis, yDis, zDis);
 
-				GameObject star = Instantiate(ambientStar, location, Quaternion.identity) as GameObject;
+				int rnd = Random.Range (0,2);
 
-				star.renderer.material.color = randomColor;
+				GameObject star = Instantiate(starPrefabs[rnd], location, Quaternion.identity) as GameObject;
 
-				star.transform.localScale = new Vector3(scale, scale, scale);
+				star.renderer.sharedMaterial = sharedMat;
 
-				tempObj.nearbyStars.Add(star);
+				star.transform.parent = rotatePoints[pointIterator].transform;
 
-				star.transform.parent = GameObject.Find ("Ambient Star Container").transform;
+				++pointIterator;
+
+				if(pointIterator == rotatePoints.Count)
+				{
+					pointIterator = 0;
+				}
 			}
 
 			ambientStarList.Add(tempObj);
 		}
-
-		AmbientStarBatcher batcher = GameObject.Find ("Ambient Star Container").GetComponent<AmbientStarBatcher> ();
-		batcher.BatchChildren ();
 	}
 }
 
