@@ -16,9 +16,11 @@ public class LineRenderScript : MasterScript
 	private Quaternion rotation;
 	private Vector3 midPoint, scale;
 	private float pixelWidth, pixelHeight, systemPixelSize;
+	private CollisionDetection collisionDetection;
 
 	public void StartUp()
 	{	
+		collisionDetection = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<CollisionDetection> ();
 		connectorLineContainer = GameObject.Find ("LineContainer").transform;
 		systemSIMData = gameObject.GetComponent<SystemSIMData>();
 		thisSystem = RefreshCurrentSystem (gameObject);
@@ -140,7 +142,7 @@ public class LineRenderScript : MasterScript
 			return "SelkiesOwnedLine";
 		}
 
-		return "UnownedMat"; //Should be "Empty Line"
+		return "Empty Line"; //Should be "Empty Line"
 	}
 
 	private void ViewNearbySystems()

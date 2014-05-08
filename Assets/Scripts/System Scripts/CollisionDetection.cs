@@ -10,8 +10,6 @@ public class CollisionDetection : MasterScript
 
 	private List<GameObject> unvisitedSystems = new List<GameObject> ();
 	private List<GameObject> firmSystems = new List<GameObject> ();
-	private List<GameObject> visitedSystems = new List<GameObject> ();
-	private List<GameObject> currentSystems = new List<GameObject>();
 	
 	void Start()
 	{
@@ -23,8 +21,10 @@ public class CollisionDetection : MasterScript
 	{
 		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
 		{
-			UpdateConnections (i);
+			UpdateConnections(i);
 		}
+
+		CheckForGraphComplete ();
 
 		/*
 		t += Time.deltaTime;
@@ -52,52 +52,45 @@ public class CollisionDetection : MasterScript
 	{
 		bool foundSystem = false;
 		
-		for(int i = 0; i < visitedSystems.Count; ++i) //For all current systems
+		for(int i = 0; i < firmSystems.Count; ++i) //For all current systems
 		{
-			firmSystems.Add (visitedSystems[i]);
-			
-			int sys = RefreshCurrentSystem (visitedSystems [i]);
+			int sys = RefreshCurrentSystem (firmSystems [i]);
 			
 			for(int j = 0; j < systemListConstructor.systemList[sys].permanentConnections.Count; ++j) //Check the systems permanent connections
 			{
-				if(visitedSystems.Contains(systemListConstructor.systemList[sys].permanentConnections[j]) || firmSystems.Contains(systemListConstructor.systemList[sys].permanentConnections[j])) //If the system is already in checked systems, ignore it
+				if(firmSystems.Contains(systemListConstructor.systemList[sys].permanentConnections[j])) //If the system is already in firm systems, ignore it
 				{
 					continue;
 				}
 				
-				currentSystems.Add (systemListConstructor.systemList[sys].permanentConnections[j]);
-				unvisitedSystems.Remove (systemListConstructor.systemList[sys].permanentConnections[j]);
+				firmSystems.Add (systemListConstructor.systemList[sys].permanentConnections[j]); //Add systems to firm systems
+				unvisitedSystems.Remove (systemListConstructor.systemList[sys].permanentConnections[j]); //Remove the system from unvisited systems
 				
-				foundSystem = true;
+				foundSystem = true; //Found a system
 			}
 		}
 
-		visitedSystems = currentSystems;
-		currentSystems.Clear ();
-
-		if(foundSystem == true)
+		if(foundSystem == true) //If system is found
 		{
-			CheckVisitedSystems();
+			CheckVisitedSystems(); //Repeat
 		}
 	}
 
 	private void CheckForGraphComplete()
 	{
-		unvisitedSystems.Clear ();
-		visitedSystems.Clear ();
+		unvisitedSystems.Clear (); //Clear lists
 		firmSystems.Clear ();
-		currentSystems.Clear ();
 
-		for(int i = 1; i < systemListConstructor.systemList.Count; ++i)
+		for(int i = 1; i < systemListConstructor.systemList.Count; ++i) //For all systems
 		{
-			unvisitedSystems.Add (systemListConstructor.systemList[i].systemObject);
+			unvisitedSystems.Add (systemListConstructor.systemList[i].systemObject); //Add them to the unvisited systems
 		}
 
-		visitedSystems.Add (systemListConstructor.systemList[0].systemObject);
+		firmSystems.Add (systemListConstructor.systemList[0].systemObject); //Add the first system to firm systems
 
-		CheckVisitedSystems ();
+		CheckVisitedSystems (); //Start the cycle of checking for systems
 
-		if(firmSystems.Count != systemListConstructor.systemList.Count)
+		if(firmSystems.Count != systemListConstructor.systemList.Count) //If the size of firm systems is not equal to the systemlist, this means that not all systems are connected
 		{
 			float distance = 10000f;
 			int sysToJoinA = -1, sysToJoinB = -1;
@@ -120,26 +113,47 @@ public class CollisionDetection : MasterScript
 				}
 			}
 
-			Debug.Log (firmSystems.Count + " | " + unvisitedSystems.Count);
+			if(sysToJoinA != -1 && sysToJoinB != -1)
+			{
+				sysToJoinA = RefreshCurrentSystem(firmSystems[sysToJoinA]);
+				sysToJoinB = RefreshCurrentSystem(unvisitedSystems[sysToJoinB]);
 
-			sysToJoinA = RefreshCurrentSystem(firmSystems[sysToJoinA]);
-			sysToJoinB = RefreshCurrentSystem(unvisitedSystems[sysToJoinB]);
-
-			systemListConstructor.systemList[sysToJoinA].permanentConnections.Add (systemListConstructor.systemList[sysToJoinB].systemObject);
-			systemListConstructor.systemList[sysToJoinA].numberOfConnections = systemListConstructor.systemList[sysToJoinA].permanentConnections.Count;
-			systemListConstructor.systemList[sysToJoinB].permanentConnections.Add (systemListConstructor.systemList[sysToJoinA].systemObject);
-			systemListConstructor.systemList[sysToJoinB].numberOfConnections = systemListConstructor.systemList[sysToJoinB].permanentConnections.Count;
-			CreateNewLine(sysToJoinA);
-			CreateNewLine(sysToJoinB);
-
-			CheckForGraphComplete();
+				systemListConstructor.systemList[sysToJoinA].permanentConnections.Add (systemListConstructor.systemList[sysToJoinB].systemObject);
+				systemListConstructor.systemList[sysToJoinA].numberOfConnections = systemListConstructor.systemList[sysToJoinA].permanentConnections.Count;
+				systemListConstructor.systemList[sysToJoinB].permanentConnections.Add (systemListConstructor.systemList[sysToJoinA].systemObject);
+				systemListConstructor.systemList[sysToJoinB].numberOfConnections = systemListConstructor.systemList[sysToJoinB].permanentConnections.Count;
+				CreateNewLine(sysToJoinA);
+				CreateNewLine(sysToJoinB);
+			}
 		}
 	}
 
 	private void UpdateConnections(int system)
 	{
-		startA = new Vector2(systemListConstructor.systemList[system].systemObject.transform.position.x, systemListConstructor.systemList[system].systemObject.transform.position.y);
-		
+		startA = new Vector2(systemListConstructor.systemList[system].systemObject.transform.position.x, systemListConstructor.systemList[system].systemObject.transform.position.y); //Start vector is this system
+
+		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i) //For all connections
+		{
+			float dist = Vector3.Distance (gameObject.transform.position, systemListConstructor.systemList[system].permanentConnections[i].transform.position);
+			
+			if(dist > 15f) //If distance is greater than 15
+			{
+				for(int j = 0; j < systemListConstructor.systemList.Count; ++j) //Look through all systems
+				{
+					if(j == system) //Ignore self
+					{
+						continue;
+					}
+					
+					if(Vector3.Distance (systemListConstructor.systemList[j].systemObject.transform.position, gameObject.transform.position) <= 15) //If distance between this system and other system is under 15
+					{
+						ReconnectSystems(gameObject, systemListConstructor.systemList[system].permanentConnections[i]); //Reconnect the system
+						ReconnectSystems(systemListConstructor.systemList[system].permanentConnections[i], gameObject); //Reconnect the system
+					}
+				}
+			}
+		}
+
 		for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 		{
 			endA = new Vector2(systemListConstructor.systemList[system].permanentConnections[i].transform.position.x, systemListConstructor.systemList[system].permanentConnections[i].transform.position.y);
@@ -181,7 +195,6 @@ public class CollisionDetection : MasterScript
 							
 							ReconnectSystems(systemListConstructor.systemList[system].systemObject, target);
 							ReconnectSystems(target, systemListConstructor.systemList[system].systemObject);
-							CheckForGraphComplete();
 						}
 
 						if(distanceB >= distanceA)
@@ -192,6 +205,8 @@ public class CollisionDetection : MasterScript
 				}
 			}
 		}
+
+		CheckForGraphComplete();
 	}
 
 	private bool LineIntersection (Vector2 a, Vector2 b, Vector2 c, Vector2 d)
@@ -261,25 +276,26 @@ public class CollisionDetection : MasterScript
 	
 	public void ReconnectSystems(GameObject systemA, GameObject systemB)
 	{
-		int thisSystem = RefreshCurrentSystem (systemA);
+		int thisSystem = RefreshCurrentSystem (systemA); //Get this system
 		
-		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i) //For all permanent connections in target
+		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i) //For all permanent connections in this system
 		{
-			if(systemListConstructor.systemList[thisSystem].permanentConnections[i] == systemB) //If connection equals original system
+			if(systemListConstructor.systemList[thisSystem].permanentConnections[i] == systemB) //If connection equals target
 			{
 				float distance = 100f; //Set max distance
 				int newConnection = -1;
 				
 				for(int j = 0; j < systemListConstructor.systemList.Count; ++j) //For all other systems
 				{
-					if(systemListConstructor.systemList[j].systemObject == systemA) //If system equals this system, continue
+					if(systemListConstructor.systemList[j].systemObject == systemA || systemListConstructor.systemList[j].systemObject == systemB) //If system equals either of original systems, continue
 					{
 						continue;
 					}
-					if(systemListConstructor.systemList[j].numberOfConnections > 7 && systemListConstructor.systemList[thisSystem].numberOfConnections > 0)
+
+					/*if(systemListConstructor.systemList[j].numberOfConnections > 7 && systemListConstructor.systemList[thisSystem].numberOfConnections > 0) //If system has more than 7 connections
 					{
 						continue;
-					}
+					}*/
 					
 					if(mapConstructor.TestForIntersection(systemA.transform.position, systemListConstructor.systemList[j].systemObject.transform.position, false) == false) //If there is no intersection between this system and other system
 					{
@@ -334,4 +350,82 @@ public class CollisionDetection : MasterScript
 			}
 		}
 	}
+
+	/*
+	private void ToBeNamed(int system)
+	{
+		for(int i = 0; i < systemListConstructor.systemList[system].numberOfConnections; ++i) //For all connections in system
+		{
+			float distance = 1000f;
+			int newSystem = -1;
+
+			for(int j = 0; j < systemListConstructor.systemList.Count; ++j) //For all other systems
+			{
+				if(systemListConstructor.systemList[j].numberOfConnections < 7) //If target system has fewer than 7 other connections
+				{
+					float tempDistance = Vector3.Distance (systemListConstructor.systemList[system].systemObject.transform.position, systemListConstructor.systemList[j].systemObject.transform.position); //Get distance to target
+
+					if(tempDistance < distance) //If distance is shorter than current minimum distance
+					{
+						if(systemListConstructor.systemList[system].permanentConnections.Contains(systemListConstructor.systemList[j].systemObject)) //If target is already in the connections
+						{
+							distance = tempDistance; //Assign it anyway
+							newSystem = j;
+							continue;
+						}
+
+						else if(mapConstructor.TestForIntersection(systemListConstructor.systemList[system].systemObject.transform.position, systemListConstructor.systemList[j].systemObject.transform.position, false) == false)
+						{
+							distance = tempDistance; //Else if target does not intersect with existing lines, assign it
+							newSystem = j;
+							continue;
+						}
+					}
+				}
+			}
+		
+			if(i < systemListConstructor.systemList[system].permanentConnections.Count)
+			{
+				int targetConnection = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]); //Get connection number
+
+				for(int j = 0; j < systemListConstructor.systemList[targetConnection].permanentConnections.Count; ++j) //For all connections in target connection
+				{
+					if(systemListConstructor.systemList[targetConnection].permanentConnections[j] == systemListConstructor.systemList[system].systemObject) //If target's connection equals this system
+					{
+						lineRenderScript = systemListConstructor.systemList[targetConnection].systemObject.GetComponent<LineRenderScript>();
+
+						lineRenderScript.connectorLines.RemoveAt(j);
+
+						systemListConstructor.systemList[targetConnection].permanentConnections.RemoveAt (j); //Remove the connection- it is to be reassigned
+						break;
+					}
+				}
+			}
+
+			if(newSystem == -1 && i >= systemListConstructor.systemList[system].permanentConnections.Count)
+			{
+				systemListConstructor.systemList[system].permanentConnections.RemoveAt(i);
+
+				lineRenderScript = systemListConstructor.systemList[system].systemObject.GetComponent<LineRenderScript>();
+
+				lineRenderScript.connectorLines.RemoveAt (i);
+			}
+
+			if(newSystem != -1)
+			{
+				if(systemListConstructor.systemList[system].permanentConnections.Count == systemListConstructor.systemList[system].numberOfConnections) //If the number of actual connections equals the maximum number
+				{
+					systemListConstructor.systemList[system].permanentConnections[i] = systemListConstructor.systemList[newSystem].systemObject; //Simply reassign the connection
+				}
+
+				if(systemListConstructor.systemList[system].permanentConnections.Count < systemListConstructor.systemList[system].numberOfConnections) //If it is less
+				{
+					systemListConstructor.systemList[system].permanentConnections.Add (systemListConstructor.systemList[newSystem].systemObject); //Add a new system
+
+					CreateNewLine(system);
+				}
+			}
+		}
+	}
+	*/
 }

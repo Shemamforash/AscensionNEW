@@ -142,8 +142,6 @@ public class SystemSIMData : MasterScript
 		
 		float tempSci = 0, tempInd = 0;
 		
-		string planetType = systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetType;
-		
 		improvementNumber = systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetImprovementLevel;
 		
 		systemFunctions.CheckImprovement(thisSystem, planet);
@@ -159,11 +157,10 @@ public class SystemSIMData : MasterScript
 		
 		if(systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetColonised == true)
 		{
-			string sOut = Math.Round(tempSci, 1) + "\n(" + Math.Round (planetKnowledgeModifier, 1) + ")";
-			string iOut = Math.Round (tempInd,1) + "\n(" + Math.Round (planetPowerModifier, 1) + ")";
+			string sOut = Math.Round(tempSci, 1) + " (" + Math.Round (planetKnowledgeModifier, 1) + ")";
+			string iOut = Math.Round (tempInd,1) + " (" + Math.Round (planetPowerModifier, 1) + ")";
 
-			allPlanetsInfo[planet].generalInfo = gameObject.name + " " + (planet+1) + "\n" + planetType + "\n" + improvementLevel + "\n" 
-				+ Math.Round(systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetOwnership, 1) + "% Owned\n";
+			allPlanetsInfo[planet].generalInfo = improvementLevel;
 			allPlanetsInfo[planet].knowledgeOutput = sOut;
 			allPlanetsInfo[planet].powerOutput = iOut;
 		}
