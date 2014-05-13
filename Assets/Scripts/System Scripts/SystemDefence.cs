@@ -65,16 +65,19 @@ public class SystemDefence : MasterScript
 
 	public void CalculatePlanetDefence(int planet)
 	{
-		float maxPlanetDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership * systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel;
+		float maxPlanetDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership * (systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel + 1) * 5f;
 		systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence = maxPlanetDefence;
 
-		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence != maxPlanetDefence)
-		{
-			systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence += defenceRegenerator;
+		systemListConstructor.systemList[system].planetsInSystem[planet].defenceRegeneration = defenceRegenerator/10f;
+		systemListConstructor.systemList [system].planetsInSystem [planet].planetMaxDefence = maxPlanetDefence;
 
-			if(systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence > maxPlanetDefence)
+		if(systemListConstructor.systemList[system].planetsInSystem[planet].planetColonised == true && systemListConstructor.systemList[system].planetsInSystem[planet].planetCurrentDefence != maxPlanetDefence)
+		{
+			systemListConstructor.systemList[system].planetsInSystem[planet].planetCurrentDefence += defenceRegenerator/10f;
+
+			if(systemListConstructor.systemList[system].planetsInSystem[planet].planetCurrentDefence > maxPlanetDefence)
 			{
-				systemListConstructor.systemList[system].planetsInSystem[planet].planetDefence = maxPlanetDefence;
+				systemListConstructor.systemList[system].planetsInSystem[planet].planetCurrentDefence = maxPlanetDefence;
 			}
 		}
 	}
@@ -140,8 +143,8 @@ public class SystemDefence : MasterScript
 				{
 					if(systemListConstructor.systemList[system].planetsInSystem[k].virusActive == false)
 					{
-						float ratio = Mathf.Max(systemListConstructor.systemList[system].planetsInSystem[k].planetDefence, maxSystemDefence) / 
-										Mathf.Min (systemListConstructor.systemList[system].planetsInSystem[k].planetDefence, maxSystemDefence);
+						float ratio = Mathf.Max(systemListConstructor.systemList[system].planetsInSystem[k].planetCurrentDefence, maxSystemDefence) / 
+										Mathf.Min (systemListConstructor.systemList[system].planetsInSystem[k].planetCurrentDefence, maxSystemDefence);
 
 						if(ratio * 2 < sinDifference)
 						{

@@ -282,16 +282,16 @@ public class SystemListConstructor : MasterScript
 							switch(newPlanet.planetCategory)
 							{
 							case "Hot":
-								newPlanet.rareResourceType = "Radioisotopes";
+								newPlanet.rareResourceType = "RADIOISOTOPES";
 								break;
 							case "Cold":
-								newPlanet.rareResourceType = "Liquid Hydrogen";
+								newPlanet.rareResourceType = "LIQUID HYDROGEN";
 								break;
 							case "Terran":
-								newPlanet.rareResourceType = "Blue Carbon";
+								newPlanet.rareResourceType = "BLUE CARBON";
 								break;
 							case "Gas Giant":
-								newPlanet.rareResourceType = "Antimatter";
+								newPlanet.rareResourceType = "ANTIMATTER";
 								break;
 							default:
 								newPlanet.rareResourceType = null;
@@ -390,6 +390,8 @@ public class SystemListConstructor : MasterScript
 
 	public void LoadBasicTechTree()
 	{
+		int j = 0;
+
 		using(XmlReader reader = XmlReader.Create ("ImprovementList.xml"))
 		{
 			while(reader.Read ())
@@ -436,7 +438,7 @@ public class Planet
 {
 	public string planetName, planetType, planetCategory, rareResourceType;
 	public List<string> improvementsBuilt = new List<string> ();
-	public float planetKnowledge, planetPower, planetOwnership, planetDefence, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxOwnership;
+	public float planetKnowledge, planetPower, planetOwnership, planetCurrentDefence, planetMaxDefence, defenceRegeneration, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxOwnership;
 	public bool planetColonised, underEnemyControl, virusActive, chillActive, poisonActive;
 	public int planetImprovementLevel, improvementSlots, wealthValue;
 }
