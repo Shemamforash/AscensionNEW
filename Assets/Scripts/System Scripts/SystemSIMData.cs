@@ -8,7 +8,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public int improvementNumber, antiStealthWealth, thisSystem;
 	[HideInInspector]
-	public float knowledgeUnitBonus, powerUnitBonus, improvementCost, baseResourceBonus, adjacencyBonus, powerBuffModifier, knowledgeBuffModifier, embargoTimer, promotionTimer;
+	public float knowledgeUnitBonus, powerUnitBonus, improvementCost, baseResourceBonus, adjacencyBonus, powerBuffModifier, knowledgeBuffModifier, embargoTimer, promotionTimer, ownershipToAdd;
 	[HideInInspector]
 	public string improvementLevel, promotedBy = null, embargoedBy = null, guardedBy = null;
 	[HideInInspector]
@@ -39,6 +39,7 @@ public class SystemSIMData : MasterScript
 			planetInfo.generalInfo = null;
 			planetInfo.knowledgeOutput = null;
 			planetInfo.powerOutput = null;
+			planetInfo.population = null;
 
 			allPlanetsInfo.Add(planetInfo);
 		}
@@ -157,12 +158,14 @@ public class SystemSIMData : MasterScript
 		
 		if(systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetColonised == true)
 		{
-			string sOut = Math.Round(tempSci, 1) + " (" + Math.Round (planetKnowledgeModifier, 1) + ")";
-			string iOut = Math.Round (tempInd,1) + " (" + Math.Round (planetPowerModifier, 1) + ")";
+			string sOut = Math.Round(tempSci, 1).ToString();
+			string iOut = Math.Round (tempInd,1).ToString();
+			string curPop = Math.Round (systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetOwnership, 1).ToString () + "%";
 
 			allPlanetsInfo[planet].generalInfo = improvementLevel;
 			allPlanetsInfo[planet].knowledgeOutput = sOut;
 			allPlanetsInfo[planet].powerOutput = iOut;
+			allPlanetsInfo[planet].population = curPop;
 		}
 		
 		switch(resource)
@@ -209,7 +212,7 @@ public class SystemSIMData : MasterScript
 				if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership < (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus)
 				   && systemDefence.underInvasion == false)
 				{
-					float ownershipToAdd = systemOwnershipModifier * secRecOwnershipMod;
+					ownershipToAdd = systemOwnershipModifier * secRecOwnershipMod;
 
 					if(ownershipToAdd > (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus) - systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership)
 					{
@@ -353,5 +356,5 @@ public class SystemSIMData : MasterScript
 
 public class PlanetUIInfo
 {
-	public string generalInfo, knowledgeOutput, powerOutput;
+	public string generalInfo, knowledgeOutput, powerOutput, population;
 }

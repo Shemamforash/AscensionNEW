@@ -12,7 +12,7 @@ public class SystemInvasions : MasterScript
 		{
 			if(click == false)
 			{
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetDefence -= curHero.secondaryPower / 4f;
+				systemListConstructor.systemList [system].planetsInSystem [planet].planetCurrentDefence -= curHero.secondaryPower / 4f;
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership -= curHero.secondaryCollateral / 4f;
 				curHero.currentArmour -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (curHero.currentArmour * curHero.classModifier);
 			}
@@ -26,7 +26,7 @@ public class SystemInvasions : MasterScript
 				curHero.planetInvade = -1;
 			}
 
-			else if(systemListConstructor.systemList [system].planetsInSystem [planet].planetDefence <= 0)
+			else if(systemListConstructor.systemList [system].planetsInSystem [planet].planetCurrentDefence <= 0)
 			{
 				systemListConstructor.systemList [system].planetsInSystem [planet].underEnemyControl = true;
 				curHero.planetInvade = -1;
