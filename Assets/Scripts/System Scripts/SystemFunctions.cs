@@ -10,28 +10,28 @@ public class SystemFunctions : MasterScript
 		if(systemSIMData.improvementNumber == 0)
 		{
 			systemSIMData.improvementLevel = "Poor";
-			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 25;
+			systemListConstructor.systemList[system].planetsInSystem[planet].maxPopulation = 25;
 			systemSIMData.canImprove = true;
 			systemSIMData.improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].wealthValue / 3;
 		}
 		if(systemSIMData.improvementNumber == 1)
 		{
 			systemSIMData.improvementLevel = "Normal";
-			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 50;
+			systemListConstructor.systemList[system].planetsInSystem[planet].maxPopulation = 50;
 			systemSIMData.canImprove = true;
 			systemSIMData.improvementCost = (systemListConstructor.systemList[system].planetsInSystem[planet].wealthValue * 2) / 3;
 		}
 		if(systemSIMData.improvementNumber == 2)
 		{
 			systemSIMData.improvementLevel = "Good";
-			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 75;
+			systemListConstructor.systemList[system].planetsInSystem[planet].maxPopulation = 75;
 			systemSIMData.canImprove = true;
 			systemSIMData.improvementCost = systemListConstructor.systemList[system].planetsInSystem[planet].wealthValue + (systemListConstructor.systemList[system].planetsInSystem[planet].wealthValue / 3);
 		}
 		if(systemSIMData.improvementNumber == 3)
 		{
 			systemSIMData.improvementLevel = "Superb";
-			systemListConstructor.systemList[system].planetsInSystem[planet].maxOwnership = 100;
+			systemListConstructor.systemList[system].planetsInSystem[planet].maxPopulation = 100;
 			systemSIMData.canImprove = false;
 		}
 	}

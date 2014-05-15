@@ -110,8 +110,12 @@ public class CameraFunctions : MasterScript
 				{
 					if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
 					{
-						openMenu = true; //Opens system menu on double click
+						if(galaxyGUI.planetSelectionWindow.activeInHierarchy == false)
+						{
+							openMenu = true; //Opens system menu on double click
+						}
 					}
+
 					if(systemListConstructor.systemList[i].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[i].systemOwnedBy != null)
 					{
 						systemDefence = selectedSystem.GetComponent<SystemDefence>();

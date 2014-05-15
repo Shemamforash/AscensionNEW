@@ -7,11 +7,9 @@ public class SystemRotate : MasterScript
 {
 	public Vector3 galacticCentre = new Vector3(45f, 45f, 0f);
 	public float radius, xPos, yPos, speed;
-	private int system;
 
 	public void Start()
 	{
-		system = RefreshCurrentSystem (gameObject);
 		radius = Vector3.Distance (gameObject.transform.position, galacticCentre);
 		speed = UnityEngine.Random.Range (0.0009f, 0.0011f);
 	}
@@ -23,8 +21,6 @@ public class SystemRotate : MasterScript
 
 	public void UpdateRotation()
 	{
-		Vector3 direction = new Vector3(gameObject.transform.position.y - galacticCentre.y, gameObject.transform.position.x - galacticCentre.x);
-
 		double angle = -speed * Mathf.Deg2Rad;
 
 		xPos = (float)(Math.Cos(angle) * (gameObject.transform.position.x - galacticCentre.x) - Math.Sin(angle) * (gameObject.transform.position.y - galacticCentre.y) + galacticCentre.x);

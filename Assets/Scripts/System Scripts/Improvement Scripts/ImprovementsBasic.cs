@@ -6,10 +6,10 @@ using System.Xml;
 
 public class ImprovementsBasic : MasterScript 
 {
-	public float knowledgePercentBonus, powerPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, knowledgeBonusModifier, ownershipModifier, maxOwnershipBonus;
-	public float tempKnwlBonus, tempPowBonus, tempOwnershipBonus, tempWealth, tempKnwlUnitBonus, tempPowUnitBonus, tempResearchCostReduction, tempImprovementCostReduction, 
-			tempOwnershipUnitBonus, tempCount, tempBonusAmbition, tempAmberProductionBonus, tempAmberPointBonus, tempImprovementSlots, tempAmberPenalty;
-	public List<string> planetToBuildOn = new List<string>();
+	public float knowledgePercentBonus, powerPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, knowledgeBonusModifier, populationModifier, maxPopulationBonus;
+	public float tempKnwlBonus, tempPowBonus, tempPopulationBonus, tempWealth, tempKnwlUnitBonus, tempPowUnitBonus, tempResearchCostReduction, tempImprovementCostReduction, 
+			tempPopulationUnitBonus, tempCount, tempBonusAmbition, tempAmberProductionBonus, tempAmberPointBonus, tempImprovementSlots, tempAmberPenalty;
+	public List<string> planetToBuildOn;
 	public GameObject tooltip;
 	public int techTier = 0, improvementCostModifier = 0, researchCost, system;
 	private GenericImprovements genericImprovements;
@@ -18,6 +18,8 @@ public class ImprovementsBasic : MasterScript
 
 	void Start()
 	{
+		planetToBuildOn = new List<string>();
+
 		knowledgePercentBonus = 0; powerPercentBonus = 0;
 
 		systemSIMData = gameObject.GetComponent<SystemSIMData>(); //References to scripts again.
@@ -65,12 +67,12 @@ public class ImprovementsBasic : MasterScript
 		powerPercentBonus = 1.0f;
 		improvementCostModifier = 0;
 		knowledgeBonusModifier = 1.0f;
-		ownershipModifier = 1.0f;
+		populationModifier = 1.0f;
 		amberPenalty = 1f;
 		amberPointBonus = 0f;
 		amberProductionBonus = 1f;
 		researchCost = 0;
-		maxOwnershipBonus = 0f;
+		maxPopulationBonus = 0f;
 
 		tempCount = 0.0f;
 		system = curSystem;

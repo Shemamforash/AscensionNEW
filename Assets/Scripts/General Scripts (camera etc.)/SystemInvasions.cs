@@ -13,16 +13,16 @@ public class SystemInvasions : MasterScript
 			if(click == false)
 			{
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetCurrentDefence -= curHero.secondaryPower / 4f;
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership -= curHero.secondaryCollateral / 4f;
+				systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation -= curHero.secondaryCollateral / 4f;
 				curHero.currentArmour -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (curHero.currentArmour * curHero.classModifier);
 			}
 			
-			if(systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership <= 0)
+			if(systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation <= 0)
 			{
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetColonised = false;
 				systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt.Clear ();
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetImprovementLevel = 0;
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetOwnership = 0;
+				systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation = 0;
 				curHero.planetInvade = -1;
 			}
 

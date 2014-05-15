@@ -5,15 +5,13 @@ public class HumanImprovements : MasterScript
 {
 	private ImprovementsBasic improvements;
 	private bool checkValue;
-	private TurnInfo thisPlayer;
 
 	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
 	{
-		systemSIMData = systemListConstructor.systemList [improvements.system].systemObject.GetComponent<SystemSIMData> ();
+		systemSIMData = systemListConstructor.systemList [tempImprov.system].systemObject.GetComponent<SystemSIMData> ();
 
 		improvements = tempImprov;
 		checkValue = check;
-		thisPlayer = player;
 		
 		switch (tech)
 		{
@@ -52,16 +50,16 @@ public class HumanImprovements : MasterScript
 		{
 			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetColonised == true)
 			{
-				if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership < systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxOwnership)
+				if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation < systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxPopulation)
 				{
-					float tempFloat = systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxOwnership - systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership;
+					float tempFloat = systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxPopulation - systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation;
 
 					improvements.tempKnwlUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetKnowledge * ((tempFloat * 2f) / 66.666f);
 					improvements.tempPowUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPower * ((tempFloat * 2f) / 66.666f);
 
 					if(checkValue == false)
 					{
-						++systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership;
+						++systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation;
 					}
 				}
 			}
@@ -69,7 +67,7 @@ public class HumanImprovements : MasterScript
 
 		if(checkValue == false)
 		{
-			improvements.listOfImprovements[12].improvementMessage = ("+1 Ownership per turn");
+			improvements.listOfImprovements[12].improvementMessage = ("+1 Population per turn");
 		}
 	}
 
@@ -81,34 +79,34 @@ public class HumanImprovements : MasterScript
 			{
 				float oToAdd = 0;
 
-				if(5 > systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxOwnership - systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership)
+				if(5 > systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxPopulation - systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation)
 				{
-					oToAdd = systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxOwnership - 
-						systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership;
+					oToAdd = systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxPopulation - 
+						systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation;
 				}
 				else
 				{
 					oToAdd = 5;
 				}
 
-				improvements.tempOwnershipUnitBonus += oToAdd;
+				improvements.tempPopulationUnitBonus += oToAdd;
 
 				if(checkValue == false)
 				{
-					systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership += oToAdd;
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation += oToAdd;
 				}
 			}
 		}
 
 		improvements.planetToBuildOn.Add ("Forest");
-		improvements.planetToBuildOn.Add("Ocean");
+		improvements.planetToBuildOn.Add ("Ocean");
 		improvements.planetToBuildOn.Add ("Prairie");
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempPopulationBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempPopulationBonus / 66.666f);
 
 		if(checkValue == false)
 		{
-			improvements.listOfImprovements[13].improvementMessage = ("+5 Ownership on Terran");
+			improvements.listOfImprovements[13].improvementMessage = ("+5 Population on Terran");
 		}
 	}
 
@@ -123,14 +121,14 @@ public class HumanImprovements : MasterScript
 
 				if(checkValue == false)
 				{
-					improvements.maxOwnershipBonus = 20;
+					improvements.maxPopulationBonus = 20;
 				}
 			}
 		}
 
 		if(checkValue == false)
 		{
-			improvements.listOfImprovements[14].improvementMessage = ("+20% Max Ownership on Fully Improved Systems");
+			improvements.listOfImprovements[14].improvementMessage = ("+20% Max Population on Fully Improved Systems");
 		}
 	}
 
@@ -156,21 +154,21 @@ public class HumanImprovements : MasterScript
 	{
 		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
 		{
-			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership < 33)
+			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation < 33)
 			{
 				improvements.tempKnwlUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetKnowledge * (33f / 66.666f);
 				improvements.tempPowUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPower * (33f / 66.666f);
 
 				if(checkValue == false)
 				{
-					systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetOwnership = 33;
+					systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation = 33;
 				}
 			}
 		}
 
 		if(checkValue == false)
 		{
-			improvements.listOfImprovements[16].improvementMessage = ("Minimum Ownership of 33%");
+			improvements.listOfImprovements[16].improvementMessage = ("Minimum Population of 33%");
 		}
 	}
 
@@ -198,14 +196,14 @@ public class HumanImprovements : MasterScript
 
 	private void TH4I1()
 	{
-		improvements.tempOwnershipBonus = racialTraitScript.ambitionCounter / 40.0f;
+		improvements.tempPopulationBonus = racialTraitScript.ambitionCounter / 40.0f;
 
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempPopulationBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempPopulationBonus / 66.666f);
 
 		if(checkValue == false)
 		{
-			improvements.listOfImprovements[18].improvementMessage = ("Ambition has no effect on planet Ownership");
+			improvements.listOfImprovements[18].improvementMessage = ("Ambition has no effect on planet Population");
 		}
 	}
 

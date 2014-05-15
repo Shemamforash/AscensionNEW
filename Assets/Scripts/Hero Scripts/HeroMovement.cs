@@ -166,8 +166,6 @@ public class HeroMovement : MasterScript
 
 			targetPosition = HeroPositionAroundStar (finalPath[currentVertex + 1]); //Target position is set
 
-			Vector3 dir = targetPosition - currentPosition;
-
 			if(TestForProximity(currentPosition, targetPosition) == true) //If current hero position is equal to the next system on route
 			{	
 				systemSIMData = finalPath[currentVertex].GetComponent<SystemSIMData>();

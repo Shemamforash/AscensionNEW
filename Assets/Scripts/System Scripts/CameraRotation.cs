@@ -3,12 +3,10 @@ using System.Collections;
 
 public class CameraRotation : SystemRotate 
 {	
-	private CameraFunctions cameraFunctions;
 	public AudioClip clickNoise;
 
-	void Start()
+	new void Start()
 	{
-		cameraFunctions = gameObject.GetComponent<CameraFunctions>();
 		galacticCentre = new Vector3(45f, 45f, 0f);
 		speed = 0.001f;
 	}

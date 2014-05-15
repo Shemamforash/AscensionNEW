@@ -191,7 +191,7 @@ public class GalaxyGUI : MasterScript
 				
 				string planetInfo = systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetType + " " + planetSIM.ToString() + " SIM";
 
-				planetSelectionList[i].transform.Find ("Label").gameObject.GetComponent<UILabel>().text = planetInfo;
+				planetSelectionList[i].transform.Find ("Label").gameObject.GetComponent<UILabel>().text = planetInfo.ToUpper();
 
 				NGUITools.SetActive(planetSelectionList[i], true);
 			}
