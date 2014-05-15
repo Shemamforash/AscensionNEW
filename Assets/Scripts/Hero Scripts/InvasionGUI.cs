@@ -110,7 +110,7 @@ public class InvasionGUI : MasterScript
 				NGUITools.SetActive(planetList[i], true);
 				
 				if(systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetColonised == false || systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetCurrentDefence <= 0
-				   || systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetOwnership <= 0)
+				   || systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetPopulation <= 0)
 				{
 					planetList[i].GetComponent<UIButton>().isEnabled = false;
 					
@@ -132,8 +132,8 @@ public class InvasionGUI : MasterScript
 					if(systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetColonised == true)
 					{
 						invasionInfo = systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetName + "\n"
-							+ systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetType + "\nOwnership: "
-								+ systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetOwnership + "\nDefence: "
+							+ systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetType + "\nPopulation: "
+								+ systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetPopulation + "\nDefence: "
 								+ systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetCurrentDefence;
 					}
 				}
@@ -243,7 +243,7 @@ public class InvasionGUI : MasterScript
 			break;
 		case "Fusion":
 			bombTimers[1] = Time.time;
-			systemListConstructor.systemList[system].planetsInSystem[i].maxOwnership -= 20;
+			systemListConstructor.systemList[system].planetsInSystem[i].maxPopulation -= 20;
 			break;
 		case "Antimatter":
 			bombTimers[2] = Time.time;
@@ -267,7 +267,7 @@ public class InvasionGUI : MasterScript
 				if(UICamera.currentTouchID == -1)
 				{
 					systemListConstructor.systemList [system].planetsInSystem [i].planetCurrentDefence -= temp.primaryPower / 5f;
-					systemListConstructor.systemList [system].planetsInSystem [i].planetOwnership -= temp.primaryPower / 5f;
+					systemListConstructor.systemList [system].planetsInSystem [i].planetPopulation -= temp.primaryPower / 5f;
 					systemInvasion.PlanetInvasion(temp, system, i, true);
 					break;
 				}

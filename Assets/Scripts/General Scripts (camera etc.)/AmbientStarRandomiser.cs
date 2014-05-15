@@ -10,7 +10,6 @@ public class AmbientStarRandomiser : MasterScript
 	private Texture tempTexture;
 	private List<AmbientStar> ambientStarList = new List<AmbientStar> ();
 	public Material sharedMat;
-	private float scale = 0.1f;
 	private List<GameObject> rotatePoints = new List<GameObject>();
 	private bool startup = false;
 	public GameObject[] starPrefabs = new GameObject[2];

@@ -58,6 +58,14 @@ public class MapConstructor : MasterScript
 					intersects = true;
 				}
 			}
+
+			if(intersection.x < 60f && intersection.x > 45f)
+			{
+				if(intersection.y < 60f && intersection.y > 45f)
+				{
+					intersects = true;
+				}
+			}
 		}
 
 		if(intersects == true)

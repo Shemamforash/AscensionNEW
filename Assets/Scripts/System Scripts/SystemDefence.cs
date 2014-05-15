@@ -20,7 +20,7 @@ public class SystemDefence : MasterScript
 
 		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
 		{
-			maxSystemDefence += systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
+			maxSystemDefence += systemListConstructor.systemList[system].planetsInSystem[i].planetPopulation;
 		}
 
 		maxSystemDefence = (maxSystemDefence / systemListConstructor.systemList [system].systemSize) * 20f;
@@ -65,7 +65,7 @@ public class SystemDefence : MasterScript
 
 	public void CalculatePlanetDefence(int planet)
 	{
-		float maxPlanetDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetOwnership * (systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel + 1) * 5f;
+		float maxPlanetDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetPopulation * (systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel + 1) * 5f;
 		systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence = maxPlanetDefence;
 
 		systemListConstructor.systemList[system].planetsInSystem[planet].defenceRegeneration = defenceRegenerator/10f;
@@ -196,9 +196,9 @@ public class SystemDefence : MasterScript
 
 			for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
 			{
-				float ownership = systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership;
+				float population = systemListConstructor.systemList[system].planetsInSystem[i].planetPopulation;
 
-				systemListConstructor.systemList[system].planetsInSystem[i].planetOwnership -= (ownership / 40f) + 0.5f;
+				systemListConstructor.systemList[system].planetsInSystem[i].planetPopulation -= (population / 40f) + 0.5f;
 			}
 		}
 	}

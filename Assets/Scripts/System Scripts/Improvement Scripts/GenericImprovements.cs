@@ -21,21 +21,21 @@ public class GenericImprovements : MasterScript
 	{
 		improvements = tempImprov;
 
-		systemSIMData = systemListConstructor.systemList [improvements.system].systemObject.GetComponent<SystemSIMData> ();
+		systemSIMData = systemListConstructor.systemList [tempImprov.system].systemObject.GetComponent<SystemSIMData> ();
 
 		checkValue = check;
 		thisPlayer = player;
 
-		improvements.planetToBuildOn = null;
+		improvements.planetToBuildOn.Clear ();
 
 		improvements.tempKnwlUnitBonus = 0f;  
 		improvements.tempPowUnitBonus = 0f; 
 
 		improvements.tempKnwlBonus = 0f; //To Unit
 		improvements.tempPowBonus = 0f; //To Unit
-		improvements.tempOwnershipBonus = 0f; //To Unit
+		improvements.tempPopulationBonus = 0f; //To Unit
 		improvements.tempAmberPenalty = 0f; //To Unit
-		improvements.tempOwnershipUnitBonus = 0f; //To Unit
+		improvements.tempPopulationUnitBonus = 0f; //To Unit
 
 		improvements.tempBonusAmbition = 0f; 
 		improvements.tempAmberProductionBonus = 0f; 
@@ -199,17 +199,17 @@ public class GenericImprovements : MasterScript
 		
 		if(j != 0)
 		{
-			improvements.tempOwnershipBonus += 20f;
+			improvements.tempPopulationBonus += 20f;
 			improvements.tempCount = 20f;
 		}
 
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempPopulationBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempPopulationBonus / 66.666f);
 
 		if(checkValue == false)
 		{
-			improvements.maxOwnershipBonus += improvements.tempOwnershipBonus;
-			improvements.listOfImprovements[5].improvementMessage = ("+" + improvements.tempCount + "% Max Ownership on Planets from War");
+			improvements.maxPopulationBonus += improvements.tempPopulationBonus;
+			improvements.listOfImprovements[5].improvementMessage = ("+" + improvements.tempCount + "% Max Population on Planets from War");
 		}
 	}
 

@@ -146,15 +146,15 @@ public class SelkiesImprovements : MasterScript
 
 	private void TS4I1()
 	{
-		improvements.tempOwnershipBonus += systemSIMData.totalSystemAmber;
+		improvements.tempPopulationBonus += systemSIMData.totalSystemAmber;
 
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempPopulationBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempPopulationBonus / 66.666f);
 
 		if(checkValue == false)
 		{
-			improvements.maxOwnershipBonus += improvements.tempOwnershipBonus;
-			improvements.listOfImprovements[35].improvementMessage = ("+" + systemSIMData.totalSystemAmber + "% Ownership Cap from Amber production");
+			improvements.maxPopulationBonus += improvements.tempPopulationBonus;
+			improvements.listOfImprovements[35].improvementMessage = ("+" + systemSIMData.totalSystemAmber + "% Population Cap from Amber production");
 		}
 	}
 

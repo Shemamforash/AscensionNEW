@@ -185,9 +185,9 @@ public class NereidesImprovements : MasterScript
 			improvements.tempCount = 0.15f;
 		}
 
-		improvements.tempOwnershipBonus = improvements.tempCount * racialTraitScript.nereidesStacks;
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempOwnershipBonus / 66.666f);
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempOwnershipBonus / 66.666f);
+		improvements.tempPopulationBonus = improvements.tempCount * racialTraitScript.nereidesStacks;
+		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempPopulationBonus / 66.666f);
+		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempPopulationBonus / 66.666f);
 
 		improvements.planetToBuildOn.Add ("Boreal");
 		improvements.planetToBuildOn.Add ("Tundra");
@@ -195,8 +195,8 @@ public class NereidesImprovements : MasterScript
 
 		if(checkValue == false)
 		{
-			improvements.ownershipModifier += improvements.tempOwnershipBonus;
-			improvements.listOfImprovements[26].improvementMessage = ("+" + improvements.tempCount * racialTraitScript.nereidesStacks + "Ownership from Elation");
+			improvements.populationModifier += improvements.tempPopulationBonus;
+			improvements.listOfImprovements[26].improvementMessage = ("+" + improvements.tempCount * racialTraitScript.nereidesStacks + "Population from Elation");
 		}
 	}
 

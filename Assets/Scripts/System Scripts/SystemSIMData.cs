@@ -8,7 +8,7 @@ public class SystemSIMData : MasterScript
 	[HideInInspector]
 	public int improvementNumber, antiStealthWealth, thisSystem;
 	[HideInInspector]
-	public float knowledgeUnitBonus, powerUnitBonus, improvementCost, baseResourceBonus, adjacencyBonus, powerBuffModifier, knowledgeBuffModifier, embargoTimer, promotionTimer, ownershipToAdd;
+	public float knowledgeUnitBonus, powerUnitBonus, improvementCost, baseResourceBonus, adjacencyBonus, powerBuffModifier, knowledgeBuffModifier, embargoTimer, promotionTimer, populationToAdd;
 	[HideInInspector]
 	public string improvementLevel, promotedBy = null, embargoedBy = null, guardedBy = null;
 	[HideInInspector]
@@ -18,10 +18,10 @@ public class SystemSIMData : MasterScript
 	public GameObject protectedBy = null;
 
 	public float totalSystemKnowledge, totalSystemPower, totalSystemSIM, totalSystemAmber;
-	public float flResourceModifier, flOwnershipModifier, flOffDefModifier;
-	public float secRecPowerMod, secRecKnowledgeMod, secRecOwnershipMod;
+	public float flResourceModifier, flPopulationModifier, flOffDefModifier;
+	public float secRecPowerMod, secRecKnowledgeMod, secRecPopulationMod;
 	public float planetKnowledgeModifier, planetPowerModifier;
-	public float systemKnowledgeModifier, systemPowerModifier, systemOwnershipModifier;
+	public float systemKnowledgeModifier, systemPowerModifier, systemPopulationModifier;
 	private TurnInfo thisPlayer;
 
 	void Start()
@@ -62,7 +62,7 @@ public class SystemSIMData : MasterScript
 					secRecKnowledgeMod += 0.01f * thisPlayer.liquidH2;
 					break;
 				case "Blue Carbon":
-					secRecOwnershipMod += 0.01f * thisPlayer.blueCarbon;
+					secRecPopulationMod += 0.01f * thisPlayer.blueCarbon;
 					break;
 				case "Radioisotopes":
 					secRecPowerMod += 0.01f * thisPlayer.radioisotopes;
@@ -77,7 +77,7 @@ public class SystemSIMData : MasterScript
 	public void SystemSIMCounter(TurnInfo player) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{
 		float tempTotalSci = 0.0f, tempTotalInd = 0.0f;
-		secRecKnowledgeMod = 1f; secRecKnowledgeMod = 1f; secRecOwnershipMod = 1f;
+		secRecKnowledgeMod = 1f; secRecKnowledgeMod = 1f; secRecPopulationMod = 1f;
 		thisPlayer = player;
 		CheckFrontLineBonus ();
 		CheckSecRecBonus(thisSystem);
@@ -127,14 +127,14 @@ public class SystemSIMData : MasterScript
 			racialTraitScript.IncreaseAmber(thisSystem);
 		}
 
-		IncreaseOwnership ();
+		IncreasePopulation ();
 	}
 
 	private void CalculateSystemModifierValues()
 	{
 		systemKnowledgeModifier =  improvementsBasic.knowledgePercentBonus * EmbargoPenalty() * PromoteBonus() * improvementsBasic.amberPenalty * flResourceModifier;
 		systemPowerModifier =  improvementsBasic.powerPercentBonus * racialTraitScript.NereidesPowerModifer (thisPlayer) * EmbargoPenalty () * PromoteBonus () * improvementsBasic.amberPenalty * flResourceModifier;
-		systemOwnershipModifier = racialTraitScript.HumanTrait (thisPlayer, improvementsBasic) * improvementsBasic.amberPenalty * flOwnershipModifier * improvementsBasic.ownershipModifier;
+		systemPopulationModifier = racialTraitScript.HumanTrait (thisPlayer, improvementsBasic) * improvementsBasic.amberPenalty * flPopulationModifier * improvementsBasic.populationModifier;
 	}
 
 	public float CheckPlanetValues(int planet, string resource)
@@ -160,7 +160,7 @@ public class SystemSIMData : MasterScript
 		{
 			string sOut = Math.Round(tempSci, 1).ToString();
 			string iOut = Math.Round (tempInd,1).ToString();
-			string curPop = Math.Round (systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetOwnership, 1).ToString () + "%";
+			string curPop = Math.Round (systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetPopulation, 1).ToString () + "%";
 
 			allPlanetsInfo[planet].generalInfo = improvementLevel;
 			allPlanetsInfo[planet].knowledgeOutput = sOut;
@@ -183,7 +183,7 @@ public class SystemSIMData : MasterScript
 	{
 		systemDefence.CheckStatusEffects(planet);
 		
-		baseResourceBonus = systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetOwnership / 66.6666f;
+		baseResourceBonus = systemListConstructor.systemList[thisSystem].planetsInSystem[planet].planetPopulation / 66.6666f;
 		planetKnowledgeModifier = (thisPlayer.raceKnowledge + secRecKnowledgeMod) * baseResourceBonus * knowledgeBuffModifier;
 		planetPowerModifier = (thisPlayer.racePower + secRecPowerMod) * baseResourceBonus * powerBuffModifier;
 		
@@ -199,7 +199,7 @@ public class SystemSIMData : MasterScript
 		}
 	}	
 
-	public void IncreaseOwnership()
+	public void IncreasePopulation()
 	{
 		for(int j = 0; j < systemListConstructor.systemList[thisSystem].systemSize; ++j)
 		{
@@ -209,23 +209,28 @@ public class SystemSIMData : MasterScript
 				
 				systemFunctions.CheckImprovement(thisSystem, j);
 
-				if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership < (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus)
+				if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation < (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation + improvementsBasic.maxPopulationBonus)
 				   && systemDefence.underInvasion == false)
 				{
-					ownershipToAdd = systemOwnershipModifier * secRecOwnershipMod;
+					populationToAdd = systemPopulationModifier * secRecPopulationMod;
 
-					if(ownershipToAdd > (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus) - systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership)
+					if(populationToAdd > (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation + improvementsBasic.maxPopulationBonus) - systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation)
 					{
-						ownershipToAdd = (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxOwnership + improvementsBasic.maxOwnershipBonus)
-							- systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership;
+						populationToAdd = (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation + improvementsBasic.maxPopulationBonus)
+							- systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation;
 					}
 
-					systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership += ownershipToAdd;
+					systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation += populationToAdd;
 
-					if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership < 0)
+					if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation < 0)
 					{
-						systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetOwnership = 0;
+						systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation = 0;
 						WipePlanetInfo(thisSystem, j);
+					}
+
+					if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation > systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation)
+					{
+						systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation = systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation;
 					}
 				}
 			}
@@ -235,7 +240,7 @@ public class SystemSIMData : MasterScript
 	private void CheckFrontLineBonus()
 	{
 		flResourceModifier = 1f;
-		flOwnershipModifier = 1f;
+		flPopulationModifier = 1f;
 		flOffDefModifier = 1f;
 
 		int noSystems = 0;
@@ -249,7 +254,7 @@ public class SystemSIMData : MasterScript
 				DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation(systemListConstructor.systemList[thisSystem].systemOwnedBy, systemListConstructor.systemList[neighbour].systemOwnedBy);
 
 				flResourceModifier += temp.resourceModifier;
-				flOwnershipModifier += temp.ownershipModifier;
+				flPopulationModifier += temp.populationModifier;
 				flOffDefModifier += temp.offDefModifier;
 				++noSystems;
 			}
@@ -258,7 +263,7 @@ public class SystemSIMData : MasterScript
 		if(noSystems != 0)
 		{
 			flResourceModifier = flResourceModifier / noSystems;
-			flOwnershipModifier = flOwnershipModifier / noSystems;
+			flPopulationModifier = flPopulationModifier / noSystems;
 			flOffDefModifier = flOffDefModifier / noSystems;
 		}
 	}
@@ -341,7 +346,7 @@ public class SystemSIMData : MasterScript
 			systemFunctions.CheckImprovement(thisSystem, i);
 
 			float tempSIM = (systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetKnowledge + systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetPower)
-							* systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetOwnership / 66.6666f;
+							* systemListConstructor.systemList[thisSystem].planetsInSystem[i].planetPopulation / 66.6666f;
 
 			planet.simOutput = tempSIM;
 

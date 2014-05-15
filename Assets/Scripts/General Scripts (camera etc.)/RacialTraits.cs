@@ -4,7 +4,7 @@ using System;
 
 public class RacialTraits : MasterScript 
 {
-	public float ambitionCounter, ambitionOwnershipModifier, amber;
+	public float ambitionCounter, ambitionPopulationModifier, amber;
 	public int nereidesStacks;
 	public UILabel racialLabel;
 	
@@ -39,9 +39,9 @@ public class RacialTraits : MasterScript
 		{
 			if(improvements.listOfImprovements[18].hasBeenBuilt == false)
 			{
-				ambitionOwnershipModifier = ambitionCounter / 40.0f;
+				ambitionPopulationModifier = ambitionCounter / 40.0f;
 				
-				return ambitionOwnershipModifier;
+				return ambitionPopulationModifier;
 			}
 		}
 		

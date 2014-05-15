@@ -68,6 +68,8 @@ public class SystemGUI : MasterScript
 	{
 		if(cameraFunctionsScript.openMenu == true)
 		{
+			NGUITools.SetActive(systemPopup.overlayContainer, false);
+
 			if(playerTurnScript.tempObject != null)
 			{
 				selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
@@ -82,6 +84,8 @@ public class SystemGUI : MasterScript
 
 		if(cameraFunctionsScript.openMenu == false)
 		{
+			NGUITools.SetActive(systemPopup.overlayContainer, true);
+
 			if(playerSystemInfoScreen.activeInHierarchy == true)
 			{
 				NGUITools.SetActive(playerSystemInfoScreen, false);
@@ -203,6 +207,7 @@ public class SystemGUI : MasterScript
 			if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
 			{
 				systemScrollviews.selectedPlanet = selectedPlanet;
+				systemScrollviews.selectedSlot = -1;
 			}
 
 			if(playerTurnScript.wealth >= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].wealthValue)
@@ -256,9 +261,9 @@ public class SystemGUI : MasterScript
 		planetElementList [i].knowledgeOP.text = systemSIMData.allPlanetsInfo [i].knowledgeOutput;
 		planetElementList [i].population.text = systemSIMData.allPlanetsInfo [i].population;
 
-		population.text = Math.Round (systemListConstructor.systemList [system].planetsInSystem [i].planetOwnership, 1).ToString () + "%/" + 
-			Math.Round (systemListConstructor.systemList [system].planetsInSystem [i].maxOwnership, 1).ToString () + "% COLONISED";
-		growth.text = Math.Round (systemSIMData.ownershipToAdd, 1).ToString() + "% GROWTH";
+		population.text = Math.Round (systemListConstructor.systemList [system].planetsInSystem [i].planetPopulation, 1).ToString () + "%/" + 
+			Math.Round (systemListConstructor.systemList [system].planetsInSystem [i].maxPopulation, 1).ToString () + "% COLONISED";
+		growth.text = Math.Round (systemSIMData.populationToAdd, 1).ToString() + "% GROWTH";
 
 		defence.text = Math.Round (systemListConstructor.systemList [system].planetsInSystem [i].planetCurrentDefence, 0).ToString () + "/" +
 						Math.Round (systemListConstructor.systemList [system].planetsInSystem [i].planetMaxDefence, 0).ToString () + " DEFENCE (+" + 
@@ -310,25 +315,6 @@ public class SystemGUI : MasterScript
 		planetElementList [i].population.text = "";
 	}
 
-	/*
-	private void UpdateImprovementGrid(int i, int system)
-	{
-		for(int j = 0; j < 4; ++j)
-		{
-			if(j < systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots)
-			{
-				NGUITools.SetActive(planetElementList[i].improvementSlots[j], true);
-				planetElementList[i].improvementSlots[j].gameObject.GetComponent<UILabel>().text = systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j];
-				planetElementList[i].improvementSlots[j].gameObject.name = systemListConstructor.systemList[system].planetsInSystem[i].improvementsBuilt[j];
-			}
-			if(j >= systemListConstructor.systemList[system].planetsInSystem[i].improvementSlots)
-			{
-				NGUITools.SetActive(planetElementList[i].improvementSlots[j], false);
-			}
-		}
-	}
-	*/
-
 	private void SabotageButton()
 	{
 		for(int i = 0; i < planetElementList.Count; ++i)
@@ -361,53 +347,6 @@ public class SystemGUI : MasterScript
 		public UILabel knowledgeOP, powerOP, quality, name, population, uncolonised;
 		public UISprite power, knowledge;
 	}
-
-	/*
-	private void SetUpPlanets()
-	{
-		string[] tempString = new string[6] {"Planet 1", "Planet 2", "Planet 3", "Planet 4", "Planet 5", "Planet 6"};
-		
-		for(int i = 0; i < 6; ++i)
-		{
-			PlanetUIElements planet = new PlanetUIElements();
-			
-			planet.spriteObject = NGUITools.AddChild(planetListGrid, planetPrefab);
-			planet.spriteObject.name = tempString[i];
-			EventDelegate.Add (planet.spriteObject.GetComponent<UIButton>().onClick, PlanetInterfaceClick);
-			planet.infoLabel = planet.spriteObject.transform.Find ("General Output Label").gameObject.GetComponent<UILabel>();
-			EventDelegate.Add (planet.spriteObject.transform.Find ("Improve Button").gameObject.GetComponent<UIButton>().onClick, ImprovePlanet);
-			planet.knowledgeProductionSprite = planet.spriteObject.transform.Find ("Knowledge Output").gameObject;
-			planet.knowledgeProduction = planet.knowledgeProductionSprite.transform.Find("Knowledge Label").gameObject.GetComponent<UILabel>();
-			planet.powerProductionSprite = planet.spriteObject.transform.Find("Power Output").gameObject;
-			planet.powerProduction = planet.powerProductionSprite.transform.Find("Power Label").gameObject.GetComponent<UILabel>();
-			planet.improveButton = planet.spriteObject.transform.Find("Improve Button").gameObject.GetComponent<UIButton>();
-			planet.wealthCost = planet.improveButton.transform.Find("Wealth Cost").gameObject.GetComponent<UILabel>();
-			planet.powerCost = planet.improveButton.transform.Find("Power Cost").gameObject.GetComponent<UILabel>();
-			planet.rareResourceLabel = planet.spriteObject.transform.Find("Rare Resource Output").gameObject.GetComponent<UILabel>();
-			planet.sabotageButton = planet.spriteObject.transform.Find("Sabotage").gameObject.GetComponent<UIButton>();
-
-			float scale = (Screen.width * 0.0893f) + 28.557f;
-
-			scale = 1f/200f * (float)Math.Round((double)scale, 2);
-
-			planet.spriteObject.GetComponent<Transform>().localScale = new Vector3(scale, 1f, 1f);
-
-			Transform[] tempTransform = planet.spriteObject.GetComponentsInChildren<Transform>();
-			
-			for(int j = 0; j < tempTransform.Length; ++j)
-			{
-				if(tempTransform[j].gameObject.tag == "Improvement Slot")
-				{
-					planet.improvementSlots.Add(tempTransform[j].gameObject);
-					tempTransform[j].GetComponent<UILabel>().depth = 1;
-					NGUITools.SetActive(tempTransform[j].gameObject, false);
-				}
-			}
-			
-			planetElementList.Add (planet);
-		}
-	}
-	*/
 }
 
 public class PlanetUIElements

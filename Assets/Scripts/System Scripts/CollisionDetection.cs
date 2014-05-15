@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class CollisionDetection : MasterScript 
 {
-	float t;
+	private float t;
 	private Vector2 startA, endA, startB, endB, mp1, mp2;
-	int startNo;
+	private int startNo;
 
 	private List<GameObject> unvisitedSystems = new List<GameObject> ();
 	private List<GameObject> firmSystems = new List<GameObject> ();
@@ -19,14 +19,6 @@ public class CollisionDetection : MasterScript
 
 	void Update () //FIXED PLS DONT CHANGE THIS FUTURE SAM
 	{
-		for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
-		{
-			UpdateConnections(i);
-		}
-
-		CheckForGraphComplete ();
-
-		/*
 		t += Time.deltaTime;
 
 		if(t >= 0.3f)
@@ -39,13 +31,13 @@ public class CollisionDetection : MasterScript
 			for(int i = startNo; i < startNo + 5; ++i)
 			{
 				UpdateConnections (i);
+				CheckForGraphComplete ();
 			}
 
 			t = 0f;
 
 			startNo += 5;
 		}
-		*/
 	}
 
 	private void CheckVisitedSystems()

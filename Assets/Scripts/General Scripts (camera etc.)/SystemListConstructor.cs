@@ -267,11 +267,11 @@ public class SystemListConstructor : MasterScript
 						newPlanet.planetCategory = FindPlanetCategory(newPlanet.planetType);
 						newPlanet.planetImprovementLevel = 0;
 						newPlanet.planetColonised = false;
-						newPlanet.planetOwnership = 0;
+						newPlanet.planetPopulation = 0;
 						newPlanet.planetKnowledge = FindPlanetSIM(newPlanet.planetType, "Knowledge");
 						newPlanet.planetPower = FindPlanetSIM(newPlanet.planetType, "Power");
 						newPlanet.wealthValue = (int)FindPlanetSIM(newPlanet.planetType, "Wealth");
-						newPlanet.maxOwnership = 0;
+						newPlanet.maxPopulation = 0;
 						newPlanet.improvementSlots = (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots");
 						newPlanet.underEnemyControl = false;
 
@@ -390,8 +390,6 @@ public class SystemListConstructor : MasterScript
 
 	public void LoadBasicTechTree()
 	{
-		int j = 0;
-
 		using(XmlReader reader = XmlReader.Create ("ImprovementList.xml"))
 		{
 			while(reader.Read ())
@@ -438,7 +436,7 @@ public class Planet
 {
 	public string planetName, planetType, planetCategory, rareResourceType;
 	public List<string> improvementsBuilt = new List<string> ();
-	public float planetKnowledge, planetPower, planetOwnership, planetCurrentDefence, planetMaxDefence, defenceRegeneration, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxOwnership;
+	public float planetKnowledge, planetPower, planetPopulation, planetCurrentDefence, planetMaxDefence, defenceRegeneration, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxPopulation;
 	public bool planetColonised, underEnemyControl, virusActive, chillActive, poisonActive;
 	public int planetImprovementLevel, improvementSlots, wealthValue;
 }
