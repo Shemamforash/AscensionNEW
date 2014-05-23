@@ -103,6 +103,7 @@ public class MasterScript : MonoBehaviour
 	public void WipePlanetInfo(int system, int planet) //Used to reset planets to default
 	{
 		systemListConstructor.systemList [system].planetsInSystem [planet].planetColonised = false;
+		systemListConstructor.systemList [system].planetsInSystem [planet].expansionPenaltyTimer = 0f;
 		systemListConstructor.systemList [system].planetsInSystem [planet].planetImprovementLevel = 0;
 
 		for(int i = 0; i < systemListConstructor.systemList [system].planetsInSystem [planet].improvementSlots; ++i)

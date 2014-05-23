@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+using System;
 
 public class SystemScrollviews : MasterScript 
 {
@@ -9,7 +10,7 @@ public class SystemScrollviews : MasterScript
 	public int techTierToShow, selectedPlanet, selectedSystem, selectedSlot;
 	public GameObject[] tabs = new GameObject[4];
 	private string improvementText, currentImprovement;
-	public UILabel improvementLabel, improvementWealthCost, improvementPowerCost, systemEffects;
+	public UILabel improvementLabel, improvementWealthCost, improvementPowerCost, systemEffects, improvementWealthUpkeep, improvementPowerUpkeep, systemUpkeepPower, systemUpkeepWealth;
 
 	public GameObject[] unbuiltImprovementList = new GameObject[10];
 	public GameObject[] improvementsList = new GameObject[8];
@@ -73,8 +74,6 @@ public class SystemScrollviews : MasterScript
 			}
 		}
 		
-		Debug.Log (selectedSlot);
-		
 		NGUITools.SetActive(improvementsWindow, true);
 	}
 
@@ -85,14 +84,14 @@ public class SystemScrollviews : MasterScript
 			if(UIButton.current.gameObject == unbuiltImprovementList[i])
 			{
 				unbuiltImprovementList[i].GetComponent<UIButton>().enabled = false;
-				unbuiltImprovementList[i].GetComponent<UISprite>().spriteName = "Button Click";
+				unbuiltImprovementList[i].GetComponent<UISprite>().spriteName = "Button Hover (Orange)";
 				currentImprovement = UIButton.current.transform.Find ("Label").gameObject.GetComponent<UILabel>().text;
 				continue;
 			}
 
 			else
 			{
-				unbuiltImprovementList[i].GetComponent<UISprite>().spriteName = "Button Normal";
+				unbuiltImprovementList[i].GetComponent<UISprite>().spriteName = "Button Click";
 				unbuiltImprovementList[i].GetComponent<UIButton>().enabled = true;
 			}
 		}
@@ -105,11 +104,13 @@ public class SystemScrollviews : MasterScript
 		{
 			if(systemListConstructor.basicImprovementsList[i].name.ToUpper() == UIButton.current.transform.Find ("Label").GetComponent<UILabel>().text)
 			{
-				improvementLabel.text = systemListConstructor.basicImprovementsList[i].details.ToUpper();
+				improvementLabel.text = systemListConstructor.basicImprovementsList[i].details;
 
 				improvementPowerCost.text = systemListConstructor.basicImprovementsList[i].cost.ToString();
 				improvementWealthCost.text = (systemListConstructor.basicImprovementsList[i].cost / 25).ToString();
 
+				improvementPowerUpkeep.text = "-" + systemListConstructor.basicImprovementsList[i].powerUpkeep.ToString();
+				improvementWealthUpkeep.text = "-" + systemListConstructor.basicImprovementsList[i].wealthUpkeep.ToString();
 			}
 		}
 
@@ -129,7 +130,8 @@ public class SystemScrollviews : MasterScript
 		{
 			if(improvementsBasic.listOfImprovements[i].improvementLevel == level)
 			{
-				if(improvementsBasic.listOfImprovements[i].improvementCategory == "Generic" || improvementsBasic.listOfImprovements[i].improvementCategory == playerTurnScript.playerRace)
+				if(improvementsBasic.listOfImprovements[i].improvementCategory == "Generic" || improvementsBasic.listOfImprovements[i].improvementCategory == "Defence" 
+				   || improvementsBasic.listOfImprovements[i].improvementCategory == playerTurnScript.playerRace)
 				{
 					if(improvementsBasic.listOfImprovements[i].hasBeenBuilt == false)
 					{
@@ -244,6 +246,32 @@ public class SystemScrollviews : MasterScript
 		}
 	}
 
+	private void UpdateUpkeep()
+	{
+		float upkeepWealth = 0, upkeepPower = 0;
+		
+		for(int i = 0; i < systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt.Count; ++i)
+		{
+			for(int j = 0; j < systemListConstructor.basicImprovementsList.Count; ++j)
+			{
+				if(improvementsBasic.listOfImprovements[j].hasBeenBuilt == false)
+				{
+					continue;
+				}
+				
+				if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementsBuilt[i] == systemListConstructor.basicImprovementsList[j].name)
+				{
+					upkeepWealth += systemListConstructor.basicImprovementsList[j].wealthUpkeep;
+					upkeepPower += systemListConstructor.basicImprovementsList[j].powerUpkeep;
+					continue;
+				}
+			}
+		}
+		
+		systemUpkeepPower.text = upkeepPower.ToString();
+		systemUpkeepWealth.text = upkeepWealth.ToString ();
+	}
+	
 	void Update()
 	{
 		if(systemGUI.selectedSystem != selectedSystem)
@@ -264,9 +292,10 @@ public class SystemScrollviews : MasterScript
 
 				UpdateBuiltImprovements();
 				UpdateSystemEffects ();
+				UpdateUpkeep();
 			}
 		}
-
+		
 		if(Input.GetKeyDown("c"))
 		{
 			NGUITools.SetActive(availableImprovements, false);
@@ -278,6 +307,96 @@ public class SystemScrollviews : MasterScript
 		improvementsBasic = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<ImprovementsBasic>();
 
 		string temp = "";
+
+		if(improvementsBasic.knowledgePercentBonus != 1f)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n+";
+			}
+
+			temp = temp + Math.Round((improvementsBasic.knowledgePercentBonus - 1) * 100, 1) + "% Knowledge from Improvements";
+		}
+		if(improvementsBasic.powerPercentBonus != 1f)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n+";
+			}
+
+			temp = temp + Math.Round((improvementsBasic.powerPercentBonus - 1) * 100, 1) + "% Power from Improvements";
+		}
+		if(improvementsBasic.populationModifier != 1f)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n+";
+			}
+
+			temp = temp + Math.Round((improvementsBasic.populationModifier - 1) * 100, 1) + "% Growth from Improvements";
+		}
+		if(improvementsBasic.maxPopulationBonus != 0f)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n+";
+			}
+
+			temp = temp + Math.Round(improvementsBasic.maxPopulationBonus, 1) + "% Population from Improvements";
+		}
+
+		int standardSize = (int)systemListConstructor.FindPlanetSIM (systemListConstructor.systemList [selectedSystem].planetsInSystem [selectedPlanet].planetType, "Improvement Slots");
+
+		if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementSlots > standardSize)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n+";
+			}
+
+			temp = temp + (systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].improvementSlots - standardSize).ToString() + " Improvement Slots on Planet";
+		}
+		if(improvementsBasic.amberPenalty != 1f)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n+";
+			}
+
+			temp = temp + Math.Round ((improvementsBasic.amberPenalty - 1) * 100, 1) + "% Amber Penalty on System";
+		}
+		if(improvementsBasic.amberProductionBonus != 1f)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n+";
+			}
+
+			temp = temp + Math.Round ((improvementsBasic.amberProductionBonus - 1) * 100, 1) + "% Amber Production on System";
+		}
+		if(improvementsBasic.improvementCostModifier != 0f)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n";
+			}
+
+			temp = temp + improvementsBasic.improvementCostModifier + " less Power required for Improvements";
+		}
+		if(improvementsBasic.researchCost != 0f)
+		{
+			if(temp != "")
+			{
+				temp = temp + "\n";
+			}
+
+			temp = temp + improvementsBasic.researchCost + " less Knowledge required for Research";
+		}
+
+		/*
+		amberPointBonus;
+		public float tempWealth, tempKnwlUnitBonus, tempPowUnitBonus, tempResearchCostReduction, tempImprovementCostReduction, 
+		tempBonusAmbition;
 
 		for(int i = 0; i < improvementsBasic.listOfImprovements.Count; ++i)
 		{
@@ -294,6 +413,7 @@ public class SystemScrollviews : MasterScript
 				}
 			}
 		}
+		*/
 
 		if(temp == "")
 		{

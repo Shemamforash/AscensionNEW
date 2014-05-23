@@ -6,7 +6,8 @@ using System;
 public class SystemGUI : MasterScript 
 { 
 	private SystemScrollviews systemScrollviews;
-	public UILabel systemPower, systemKnowledge, systemName, systemSize, planetHeaderName, planetHeaderClass, planetHeaderOwner, improveButtonPower, improveButtonWealth, rareResourceLabel, population, growth, defence, offence;
+	public UILabel systemPower, systemKnowledge, systemWealth, systemName, systemSize, planetHeaderName, planetHeaderClass, planetHeaderOwner, improveButtonPower, improveButtonWealth, rareResourceLabel, population, 
+		growth, defence, offence;
 	
 	public int selectedSystem, selectedPlanet, numberOfHeroes;
 	private List<PlanetElementDetails> planetElementList = new List<PlanetElementDetails>();
@@ -34,7 +35,14 @@ public class SystemGUI : MasterScript
 
 		else if(selectedPlanet != -1)
 		{
-			NGUITools.SetActive(planetInfoWindow, true);
+			if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == true)
+			{
+				NGUITools.SetActive(planetInfoWindow, true);
+			}
+			else
+			{
+				NGUITools.SetActive(planetInfoWindow, false);
+			}
 		}
 	}
 
@@ -165,6 +173,7 @@ public class SystemGUI : MasterScript
 			{
 				systemPower.text = Math.Round (systemSIMData.totalSystemPower, 1).ToString();
 				systemKnowledge.text = Math.Round (systemSIMData.totalSystemKnowledge, 1).ToString();  
+				systemWealth.text = Math.Round (systemSIMData.totalSystemWealth, 1).ToString();
 			}
 		}
 	}
@@ -197,8 +206,20 @@ public class SystemGUI : MasterScript
 		{
 			if(planetObjects[i] == UIButton.current.gameObject)
 			{
+				if(systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised == true)
+				{
+					NGUITools.SetActive(systemScrollviews.improvementsWindow, false);
+					planetObjects[i].GetComponent<UIButton>().enabled = false;
+					planetObjects[i].GetComponent<UISprite>().spriteName = "Button Hover (Orange)";
+				}
+
 				selectedPlanet = i;
-				break;
+				continue;
+			}
+			else
+			{
+				planetObjects[i].GetComponent<UIButton>().enabled = true;
+				planetObjects[i].GetComponent<UISprite>().spriteName = "Button Click";
 			}
 		}
 
@@ -215,10 +236,10 @@ public class SystemGUI : MasterScript
 				if(systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised == false)
 				{
 					systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].planetColonised = true;
+					systemListConstructor.systemList [selectedSystem].planetsInSystem [selectedPlanet].expansionPenaltyTimer = Time.time;
 					++playerTurnScript.planetsColonisedThisTurn;
 					systemSIMData.CheckPlanetValues(selectedPlanet, "None");
 					playerTurnScript.wealth -= systemListConstructor.systemList[selectedSystem].planetsInSystem[selectedPlanet].wealthValue;
-					playerTurnScript.wealthModifier += 0.1f;
 				}
 			}
 		}
@@ -285,7 +306,11 @@ public class SystemGUI : MasterScript
 				
 		if(systemSIMData.improvementNumber < 3)
 		{
-			improveButton.GetComponent<UIButton>().isEnabled = true;
+			if(improveButton.GetComponent<UIButton>().isEnabled == false)
+			{
+				improveButton.GetComponent<UIButton>().isEnabled = true;
+			}
+
 			float temp = systemFunctions.PowerCost(systemSIMData.improvementNumber, selectedSystem, i);
 			improveButtonPower.text = Math.Round (temp, 1).ToString();
 			improveButtonWealth.text = systemSIMData.improvementCost.ToString();
@@ -347,12 +372,4 @@ public class SystemGUI : MasterScript
 		public UILabel knowledgeOP, powerOP, quality, name, population, uncolonised;
 		public UISprite power, knowledge;
 	}
-}
-
-public class PlanetUIElements
-{
-	public GameObject spriteObject, knowledgeProductionSprite, powerProductionSprite;
-	public UILabel infoLabel, powerProduction, knowledgeProduction, powerCost, wealthCost, rareResourceLabel, populationLabel;
-	public UIButton improveButton, sabotageButton;
-	public List<GameObject> improvementSlots = new List<GameObject>();
 }

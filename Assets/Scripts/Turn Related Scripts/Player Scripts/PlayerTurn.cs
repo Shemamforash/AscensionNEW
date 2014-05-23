@@ -95,8 +95,6 @@ public class PlayerTurn : TurnInfo
 				
 				playerTurnScript.wealth -= 10.0f;
 
-				playerTurnScript.wealthModifier += 0.05f;
-				
 				++turnInfoScript.systemsInPlay;
 
 				++systemsColonisedThisTurn;

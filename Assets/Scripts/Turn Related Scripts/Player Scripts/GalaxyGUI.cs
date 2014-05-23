@@ -91,19 +91,19 @@ public class GalaxyGUI : MasterScript
 
 		if(playerTurnScript.antimatter > 0)
 		{
-			resources = "Antimatter: " + playerTurnScript.antimatter + "  ";
+			resources = "ANTIMATTER: " + playerTurnScript.antimatter + "  ";
 		}
 		if(playerTurnScript.blueCarbon > 0)
 		{
-			resources = resources + "Blue Carbon: " + playerTurnScript.blueCarbon + "  ";
+			resources = resources + "BLUE CARBON: " + playerTurnScript.blueCarbon + "  ";
 		}
 		if(playerTurnScript.radioisotopes > 0)
 		{
-			resources = resources + "Radioisotopes: " + playerTurnScript.radioisotopes + "  ";
+			resources = resources + "RADIOISOTOPES: " + playerTurnScript.radioisotopes + "  ";
 		}
 		if(playerTurnScript.liquidH2 > 0)
 		{
-			resources = resources + "Liquid Hydrogen: " + playerTurnScript.liquidH2 + "  ";
+			resources = resources + "LIQUID HYDROGEN: " + playerTurnScript.liquidH2 + "  ";
 		}
 
 		rareResources.text = resources;
@@ -157,6 +157,7 @@ public class GalaxyGUI : MasterScript
 			for(int i = 0; i < systemListConstructor.systemList[selectedSystem].systemSize; ++i)
 			{
 				systemListConstructor.systemList[selectedSystem].planetsInSystem[i].planetColonised = true;
+				systemListConstructor.systemList [selectedSystem].planetsInSystem [i].expansionPenaltyTimer = Time.time;
 			}
 
 			NGUITools.SetActive(coloniseButton, false);
@@ -169,6 +170,8 @@ public class GalaxyGUI : MasterScript
 		int planet = planetSelectionList.IndexOf (UIButton.current.gameObject);
 
 		systemListConstructor.systemList[selectedSystem].planetsInSystem[planet].planetColonised = true;
+
+		systemListConstructor.systemList [selectedSystem].planetsInSystem [planet].expansionPenaltyTimer = Time.time;
 		
 		++playerTurnScript.planetsColonisedThisTurn;
 		

@@ -20,6 +20,7 @@ public class SystemInvasions : MasterScript
 			if(systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation <= 0)
 			{
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetColonised = false;
+				systemListConstructor.systemList [system].planetsInSystem [planet].expansionPenaltyTimer = 0f;
 				systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt.Clear ();
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetImprovementLevel = 0;
 				systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation = 0;

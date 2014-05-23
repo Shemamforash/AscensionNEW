@@ -13,13 +13,16 @@ public class CameraFunctions : MasterScript
 	[HideInInspector]
 	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false, lightFading, zoom;
 	
-	private float leftBound = 0.0f, rightBound = 90.0f, upperBound = 90.0f, lowerBound = 0.0f;
+	private float leftBound = 0f, rightBound = 90f, upperBound = 90f, lowerBound = 0f;
 	private float timer = 0.0f;
 	private float updatedX, updatedY;
 	private GameObject thisObject;
 	private TechTreeGUI techTreeGUI;
 
 	private Vector3 initPos, finalPos;
+
+	public GameObject invasionButton, invasionLine, currentPointer = null, currentLine;
+	private Vector3 anchorPoint, currentPoint;
 
 	void Start()
 	{
@@ -29,8 +32,98 @@ public class CameraFunctions : MasterScript
 		zPosition = minZoom;
 	}
 
+	private void RotateLine()
+	{
+		float distance = Vector3.Distance (anchorPoint, currentPoint);
+
+		if(distance != 0)
+		{
+			float rotationZRad = Mathf.Acos ((currentPoint.y - anchorPoint.y) / distance);
+			
+			float rotationZ = rotationZRad * Mathf.Rad2Deg;
+			
+			if(anchorPoint.x < currentPoint.x)
+			{
+				rotationZ = -rotationZ;
+			}
+			
+			Vector3 vectRotation = new Vector3(0.0f, 0.0f, rotationZ);
+
+			Quaternion rotation = new Quaternion ();
+
+			rotation.eulerAngles = vectRotation;
+
+			currentLine.transform.rotation = rotation;
+		}
+	}
+
+	private void ResizeLine()
+	{
+		Vector3 midpoint = (currentPoint + anchorPoint) / 2;
+
+		float distance = Vector3.Distance (anchorPoint, currentPoint);
+
+		currentLine.transform.localScale = new Vector3 (0.2f, distance, 0f);
+
+		currentLine.transform.position = midpoint;
+	}
+
+	private void UpdateInvadeLine()
+	{
+		if(Input.GetKeyDown("i") && selectedSystem != null)
+		{
+			if(systemListConstructor.systemList[RefreshCurrentSystem(selectedSystem)].systemOwnedBy == playerTurnScript.playerRace)
+			{
+				bool ignore = false;
+
+				if(currentPointer != null)
+				{
+					GameObject.Destroy (currentPointer);
+					GameObject.Destroy (currentLine);
+					ignore = true;
+				}
+
+				if(currentPointer == null && ignore == false)
+				{
+					anchorPoint = selectedSystem.transform.position;
+					currentPointer = (GameObject)GameObject.Instantiate(invasionButton, anchorPoint, Quaternion.identity);
+					currentLine = (GameObject)GameObject.Instantiate(invasionLine, anchorPoint, Quaternion.identity);
+				}
+			}
+		}
+
+		if(currentPointer != null)
+		{
+			Ray temp = Camera.main.ScreenPointToRay(Input.mousePosition);
+			float angle = Vector3.Angle (Vector3.forward, temp.direction);
+			float hyp = Camera.main.transform.position.z / (Mathf.Cos(angle * Mathf.Deg2Rad));
+			currentPoint = temp.origin - temp.direction * hyp;
+			currentPoint = new Vector3(currentPoint.x, currentPoint.y, 0f);
+
+			for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
+			{
+				Vector3 sysPos = systemListConstructor.systemList[i].systemObject.transform.position;
+
+				if(currentPoint.x < sysPos.x + 3f && currentPoint.x > sysPos.x - 3f)
+				{
+					if(currentPoint.y < sysPos.y + 3f && currentPoint.y > sysPos.y - 3f)
+					{
+						currentPoint = sysPos;
+						break;
+					}
+				}
+			}
+
+			currentPointer.transform.position = currentPoint;
+			ResizeLine();
+			RotateLine();
+		}
+	}
+
 	void Update()
 	{
+		UpdateInvadeLine ();
+
 		if(zoom == true)
 		{
 			gameObject.transform.position = Vector3.Lerp(initPos, finalPos, t);

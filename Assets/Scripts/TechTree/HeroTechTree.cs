@@ -41,11 +41,11 @@ public static class HeroTechTree
 
 					if(tech.primaryOffenceRating != 0)
 					{
-						tech.techDetails += "\nPrimary Weapon Wealth: " + tech.primaryOffenceRating;
+						tech.techDetails += "\nPrimary Weapon Power: " + tech.primaryOffenceRating;
 					}
 					if(tech.secondaryOffenceRating != 0)
 					{
-						tech.techDetails += "\nInvasion Weapon Wealth: " + tech.secondaryOffenceRating;
+						tech.techDetails += "\nInvasion Weapon Power: " + tech.secondaryOffenceRating;
 					}
 					if(tech.collateralRating != 0)
 					{
@@ -53,7 +53,7 @@ public static class HeroTechTree
 					}
 					if(tech.engineRating != 0)
 					{
-						tech.techDetails += "\nEngine Wealth: " + tech.engineRating;
+						tech.techDetails += "\nEngine Power: " + tech.engineRating;
 					}
 					if(tech.armourRating != 0)
 					{
