@@ -6,13 +6,14 @@ using System.Xml;
 
 public class ImprovementsBasic : MasterScript 
 {
-	public float knowledgePercentBonus, powerPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, knowledgeBonusModifier, populationModifier, maxPopulationBonus;
+	public float knowledgePercentBonus, powerPercentBonus, amberPenalty, amberProductionBonus, amberPointBonus, knowledgeBonusModifier, populationModifier, maxPopulationBonus, resourceYieldBonus;
 	public float tempKnwlBonus, tempPowBonus, tempPopulationBonus, tempWealth, tempKnwlUnitBonus, tempPowUnitBonus, tempResearchCostReduction, tempImprovementCostReduction, 
 			tempPopulationUnitBonus, tempCount, tempBonusAmbition, tempAmberProductionBonus, tempAmberPointBonus, tempImprovementSlots, tempAmberPenalty;
 	public List<string> planetToBuildOn;
 	public GameObject tooltip;
 	public int techTier = 0, improvementCostModifier = 0, researchCost, system;
 	private GenericImprovements genericImprovements;
+	public float upkeepPower, upkeepWealth;
 
 	public List<ImprovementClass> listOfImprovements = new List<ImprovementClass>();
 
@@ -73,6 +74,9 @@ public class ImprovementsBasic : MasterScript
 		amberProductionBonus = 1f;
 		researchCost = 0;
 		maxPopulationBonus = 0f;
+		upkeepPower = 0f;
+		upkeepWealth = 0f;
+		resourceYieldBonus = 0f;
 
 		tempCount = 0.0f;
 		system = curSystem;
@@ -82,8 +86,13 @@ public class ImprovementsBasic : MasterScript
 			if(listOfImprovements[i].hasBeenBuilt == true)
 			{
 				genericImprovements.TechSwitch(i, this, thisPlayer, false);
+				upkeepPower += systemListConstructor.basicImprovementsList[i].powerUpkeep;
+				upkeepWealth += systemListConstructor.basicImprovementsList[i].wealthUpkeep;
 			}
 		}
+
+		thisPlayer.wealth -= upkeepWealth;
+		thisPlayer.power -= upkeepPower;
 
 		knowledgePercentBonus = knowledgePercentBonus * knowledgeBonusModifier;
 	}

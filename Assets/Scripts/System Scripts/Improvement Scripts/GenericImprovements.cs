@@ -104,15 +104,15 @@ public class GenericImprovements : MasterScript
 		}
 	}
 
-	private void T0I1()
+	private void T0I1() //Amplification
 	{
 		for(int i = 0; i < improvements.listOfImprovements.Count; ++i)
 		{
 			if(improvements.listOfImprovements[i].hasBeenBuilt == true)
 			{
-				improvements.tempKnwlBonus += 0.05f;
-				improvements.tempPowBonus += 0.05f;
-				improvements.tempCount += 0.05f;
+				improvements.tempKnwlBonus += 0.025f;
+				improvements.tempPowBonus += 0.025f;
+				improvements.tempCount += 0.025f;
 			}
 		}
 
@@ -127,7 +127,7 @@ public class GenericImprovements : MasterScript
 		}
 	}
 
-	private void T0I2()
+	private void T0I2() //Fertile Link
 	{
 		for(int i = 0; i < systemListConstructor.systemList[improvements.system].permanentConnections.Count; ++i)
 		{
@@ -149,14 +149,12 @@ public class GenericImprovements : MasterScript
 		}
 	}
 
-	private void T0I3()
+	private void T0I3() //Fortune
 	{
-		improvements.tempWealth += thisPlayer.playerOwnedHeroes.Count * 0.02f;
-
 		if(checkValue == false)
 		{
-			thisPlayer.wealth += improvements.tempWealth;
-			improvements.listOfImprovements[2].improvementMessage = ("+" + (thisPlayer.playerOwnedHeroes.Count * 2f) + "% Wealth from active Heroes");
+			improvements.resourceYieldBonus += 3f;
+			improvements.listOfImprovements[2].improvementMessage = ("+50% Yield on Secondary Resources");
 		}
 	}
 
@@ -179,11 +177,11 @@ public class GenericImprovements : MasterScript
 		}
 	}
 
-	private void T1I2()
+	private void T1I2() //Custodians
 	{
 		int tempCount = CheckNumberOfPlanetsWithImprovement(4, thisPlayer, improvements);
 		
-		improvements.tempPowBonus = (tempCount * 0.05f);
+		improvements.tempPowBonus = (tempCount * 0.005f);
 		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
 
 		if(checkValue == false)
@@ -193,23 +191,18 @@ public class GenericImprovements : MasterScript
 		}
 	}
 
-	private void T1I3()
+	private void T1I3() //Isolation
 	{
-		int j = improvements.CheckDiplomaticStateOfAllPlayers(thisPlayer, "War");
-		
-		if(j != 0)
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].planetsInSystem.Count; ++i)
 		{
-			improvements.tempPopulationBonus += 20f;
-			improvements.tempCount = 20f;
-		}
+			float basePop = (systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetImprovementLevel + 1) * 25f;
 
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * (improvements.tempPopulationBonus / 66.666f);
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * (improvements.tempPopulationBonus / 66.666f);
+			systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxPopulation = basePop + systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetImprovementLevel * 10f;
+		}
 
 		if(checkValue == false)
 		{
-			improvements.maxPopulationBonus += improvements.tempPopulationBonus;
-			improvements.listOfImprovements[5].improvementMessage = ("+" + improvements.tempCount + "% Max Population on Planets from War");
+			improvements.listOfImprovements[5].improvementMessage = ("+" + improvements.tempCount + "10% * Planet Quality Max Population on Planets");
 		}
 	}
 

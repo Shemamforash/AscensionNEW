@@ -20,7 +20,7 @@ public class SystemDefence : MasterScript
 
 		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i)
 		{
-			maxSystemDefence += systemListConstructor.systemList[system].planetsInSystem[i].planetPopulation;
+			maxSystemDefence += systemListConstructor.systemList[system].planetsInSystem[i].planetImprovementLevel + 1 * 50f;
 		}
 
 		maxSystemDefence = (maxSystemDefence / systemListConstructor.systemList [system].systemSize) * 20f;
@@ -65,7 +65,7 @@ public class SystemDefence : MasterScript
 
 	public void CalculatePlanetDefence(int planet)
 	{
-		float maxPlanetDefence = systemListConstructor.systemList[system].planetsInSystem[planet].planetPopulation * (systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel + 1) * 5f;
+		float maxPlanetDefence = ((systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel) * (systemListConstructor.systemList[system].planetsInSystem[planet].planetImprovementLevel) * 20) + 50f;
 		systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence = maxPlanetDefence;
 
 		systemListConstructor.systemList[system].planetsInSystem[planet].defenceRegeneration = defenceRegenerator/10f;

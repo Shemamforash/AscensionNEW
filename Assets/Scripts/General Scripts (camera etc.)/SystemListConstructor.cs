@@ -274,6 +274,7 @@ public class SystemListConstructor : MasterScript
 						newPlanet.maxPopulation = 0;
 						newPlanet.improvementSlots = (int)FindPlanetSIM(newPlanet.planetType, "Improvement Slots");
 						newPlanet.underEnemyControl = false;
+						newPlanet.expansionPenaltyTimer = 0.0f;
 
 						int hasResources = Random.Range (0, 3);
 
@@ -363,7 +364,7 @@ public class SystemListConstructor : MasterScript
 		return null;
 	}
 
-	private float FindPlanetSIM(string planetType, string resourceType)
+	public float FindPlanetSIM(string planetType, string resourceType)
 	{
 		for(int i = 0; i < 12; ++i)
 		{
@@ -399,10 +400,12 @@ public class SystemListConstructor : MasterScript
 					BasicImprovement improvement = new BasicImprovement();
 					
 					improvement.name = reader.GetAttribute("A");
-					improvement.category = reader.GetAttribute("B");
-					improvement.level = int.Parse (reader.GetAttribute("C"));
+					improvement.level = int.Parse (reader.GetAttribute("B"));
+					improvement.category = reader.GetAttribute("C");
 					improvement.cost = float.Parse(reader.GetAttribute("D"));
-					improvement.details = reader.GetAttribute("E");
+					improvement.wealthUpkeep = float.Parse (reader.GetAttribute("E"));
+					improvement.powerUpkeep = float.Parse (reader.GetAttribute("F"));
+					improvement.details = reader.GetAttribute("G") + "\n" + reader.GetAttribute("H");
 					
 					basicImprovementsList.Add (improvement);
 				}
@@ -436,7 +439,7 @@ public class Planet
 {
 	public string planetName, planetType, planetCategory, rareResourceType;
 	public List<string> improvementsBuilt = new List<string> ();
-	public float planetKnowledge, planetPower, planetPopulation, planetCurrentDefence, planetMaxDefence, defenceRegeneration, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxPopulation;
+	public float planetKnowledge, planetPower, planetPopulation, planetCurrentDefence, planetMaxDefence, defenceRegeneration, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxPopulation, expansionPenaltyTimer;
 	public bool planetColonised, underEnemyControl, virusActive, chillActive, poisonActive;
 	public int planetImprovementLevel, improvementSlots, wealthValue;
 }
@@ -444,7 +447,7 @@ public class Planet
 public class BasicImprovement
 {
 	public string name, category, details;
-	public float cost;
+	public float cost, wealthUpkeep, powerUpkeep;
 	public int level;
 }
 

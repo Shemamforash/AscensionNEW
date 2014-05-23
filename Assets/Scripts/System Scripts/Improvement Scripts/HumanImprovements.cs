@@ -59,6 +59,7 @@ public class HumanImprovements : MasterScript
 
 					if(checkValue == false)
 					{
+						++improvements.tempPopulationUnitBonus;
 						++systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPopulation;
 					}
 				}

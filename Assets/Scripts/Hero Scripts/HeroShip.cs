@@ -142,7 +142,7 @@ public class HeroShip : MasterScript
 
 			if(systemListConstructor.systemList[system].systemOwnedBy != thisPlayer.playerRace)
 			{
-				if(ShipFunctions.stealthValue >= systemSIMData.antiStealthWealth)
+				if(ShipFunctions.stealthValue >= systemSIMData.antiStealthPower)
 				{
 					hasStealth = true;
 				}

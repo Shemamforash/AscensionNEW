@@ -6,7 +6,7 @@ using System;
 public class SystemSIMData : MasterScript
 {
 	[HideInInspector]
-	public int improvementNumber, antiStealthWealth, thisSystem;
+	public int improvementNumber, antiStealthPower, thisSystem;
 	[HideInInspector]
 	public float knowledgeUnitBonus, powerUnitBonus, improvementCost, baseResourceBonus, adjacencyBonus, powerBuffModifier, knowledgeBuffModifier, embargoTimer, promotionTimer, populationToAdd;
 	[HideInInspector]
@@ -17,7 +17,7 @@ public class SystemSIMData : MasterScript
 	public bool canImprove, foundPlanetData;
 	public GameObject protectedBy = null;
 
-	public float totalSystemKnowledge, totalSystemPower, totalSystemSIM, totalSystemAmber;
+	public float totalSystemKnowledge, totalSystemPower, totalSystemSIM, totalSystemAmber, totalSystemWealth;
 	public float flResourceModifier, flPopulationModifier, flOffDefModifier;
 	public float secRecPowerMod, secRecKnowledgeMod, secRecPopulationMod;
 	public float planetKnowledgeModifier, planetPowerModifier;
@@ -81,16 +81,19 @@ public class SystemSIMData : MasterScript
 		thisPlayer = player;
 		CheckFrontLineBonus ();
 		CheckSecRecBonus(thisSystem);
+		int planetsColonised = 0;
 
 		for(int j = 0; j < systemListConstructor.systemList[thisSystem].systemSize; ++j)
 		{
 			if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetColonised == true)
 			{
+				++planetsColonised;
+		
 				if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].rareResourceType != null)
 				{
-					int rnd = UnityEngine.Random.Range (0, 25);
+					int rnd = UnityEngine.Random.Range (0, 100);
 					
-					if(rnd == 0)
+					if(rnd < 4 + improvementsBasic.resourceYieldBonus)
 					{
 						switch(systemListConstructor.systemList[thisSystem].planetsInSystem[j].rareResourceType)
 						{
@@ -117,10 +120,14 @@ public class SystemSIMData : MasterScript
 			}
 		}
 
+		totalSystemWealth = player.raceWealth * planetsColonised * turnInfoScript.expansionPenaltyModifier;
+		
+		player.wealth += totalSystemWealth;
+
 		CalculateSystemModifierValues ();
 
-		totalSystemKnowledge = (tempTotalSci + knowledgeUnitBonus) * systemKnowledgeModifier;
-		totalSystemPower = (tempTotalInd + powerUnitBonus) * systemPowerModifier;
+		totalSystemKnowledge = (tempTotalSci + knowledgeUnitBonus) * systemKnowledgeModifier * turnInfoScript.expansionPenaltyModifier;
+		totalSystemPower = (tempTotalInd + powerUnitBonus) * systemPowerModifier * turnInfoScript.expansionPenaltyModifier;
 
 		if(thisPlayer.playerRace == "Selkies")
 		{

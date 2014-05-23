@@ -343,8 +343,6 @@ public class AIBasicParent : TurnInfo
 				currentSystem = tempSystem;
 
 				thisPlayer.wealth -= systemListConstructor.systemList[tempSystem].planetsInSystem[tempPlanet].wealthValue;
-
-				thisPlayer.wealthModifier += 0.05f;
 			}
 			
 			if(systemSIM > planetSIM && thisPlayer.wealth >= 20.0f)
@@ -367,14 +365,14 @@ public class AIBasicParent : TurnInfo
 
 				thisPlayer.wealth -= 20.0f;
 
-				thisPlayer.wealthModifier += 0.1f;
-
 				empireBoundaries.ModifyBoundaryCircles ();
 			}
 
 			if(currentPlanet != -1 && currentSystem != -1)
 			{
 				systemListConstructor.systemList[currentSystem].planetsInSystem[currentPlanet].planetColonised = true;
+				systemListConstructor.systemList [currentSystem].planetsInSystem [currentPlanet].expansionPenaltyTimer = Time.time;
+
 				
 				++thisPlayer.planetsColonisedThisTurn;
 			}
