@@ -14,6 +14,19 @@ public class SystemDefence : MasterScript
 		system = RefreshCurrentSystem (gameObject);
 	}
 
+	public void TakeDamage(float primaryDamage, float collateralDamage, int planet)
+	{
+		if(planet == -1)
+		{
+			systemListConstructor.systemList[system].systemDefence -= primaryDamage;
+		}
+		else
+		{
+			systemListConstructor.systemList[system].planetsInSystem[planet].planetCurrentDefence -= primaryDamage;
+			systemListConstructor.systemList[system].planetsInSystem[planet].planetPopulation -= collateralDamage;
+		}
+	}
+
 	public void CalculateSystemDefence() 
 	{
 		maxSystemDefence = 0f;

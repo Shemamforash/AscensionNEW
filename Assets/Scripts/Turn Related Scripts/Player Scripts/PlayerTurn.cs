@@ -91,7 +91,7 @@ public class PlayerTurn : TurnInfo
 
 				systemListConstructor.systemList[system].systemOwnedBy = playerRace;
 				
-				systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
+				//systemListConstructor.systemList[system].systemObject.renderer.material = materialInUse;
 				
 				playerTurnScript.wealth -= 10.0f;
 
@@ -117,14 +117,14 @@ public class PlayerTurn : TurnInfo
 		PickRace ();
 
 		cameraFunctionsScript.selectedSystem = GameObject.Find (homeSystem); //Set the selected system
-
+		cameraFunctionsScript.selectedSystemNumber = RefreshCurrentSystem (cameraFunctionsScript.selectedSystem);
 		turnInfoScript.systemsInPlay++;
 		
 		int i = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 
 		systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 
-		systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
+		//systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
 
 		for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 		{

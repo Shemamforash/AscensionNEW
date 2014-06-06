@@ -10,19 +10,17 @@ public class CameraFunctions : MasterScript
 	public float zoomSpeed, minZoom, maxZoom, panSpeed, zPosition, t;
 	[HideInInspector]
 	public GameObject selectedSystem;
+	public int selectedSystemNumber;
 	[HideInInspector]
-	public bool doubleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false, lightFading, zoom;
+	public bool doubleClick = false, singleClick = false, coloniseMenu = false, openMenu = false, moveCamera = false, zoom;
 	
 	private float leftBound = 0f, rightBound = 90f, upperBound = 90f, lowerBound = 0f;
-	private float timer = 0.0f;
+	private float timer = 0.0f, clickTimer;
 	private float updatedX, updatedY;
 	private GameObject thisObject;
 	private TechTreeGUI techTreeGUI;
 
 	private Vector3 initPos, finalPos;
-
-	public GameObject invasionButton, invasionLine, currentPointer = null, currentLine;
-	private Vector3 anchorPoint, currentPoint;
 
 	void Start()
 	{
@@ -30,100 +28,11 @@ public class CameraFunctions : MasterScript
 		minZoom = (0.1333333f * systemListConstructor.mapSize) - 29f;
 		zoomSpeed = (maxZoom - minZoom) / -5f;
 		zPosition = minZoom;
-	}
-
-	private void RotateLine()
-	{
-		float distance = Vector3.Distance (anchorPoint, currentPoint);
-
-		if(distance != 0)
-		{
-			float rotationZRad = Mathf.Acos ((currentPoint.y - anchorPoint.y) / distance);
-			
-			float rotationZ = rotationZRad * Mathf.Rad2Deg;
-			
-			if(anchorPoint.x < currentPoint.x)
-			{
-				rotationZ = -rotationZ;
-			}
-			
-			Vector3 vectRotation = new Vector3(0.0f, 0.0f, rotationZ);
-
-			Quaternion rotation = new Quaternion ();
-
-			rotation.eulerAngles = vectRotation;
-
-			currentLine.transform.rotation = rotation;
-		}
-	}
-
-	private void ResizeLine()
-	{
-		Vector3 midpoint = (currentPoint + anchorPoint) / 2;
-
-		float distance = Vector3.Distance (anchorPoint, currentPoint);
-
-		currentLine.transform.localScale = new Vector3 (0.2f, distance, 0f);
-
-		currentLine.transform.position = midpoint;
-	}
-
-	private void UpdateInvadeLine()
-	{
-		if(Input.GetKeyDown("i") && selectedSystem != null)
-		{
-			if(systemListConstructor.systemList[RefreshCurrentSystem(selectedSystem)].systemOwnedBy == playerTurnScript.playerRace)
-			{
-				bool ignore = false;
-
-				if(currentPointer != null)
-				{
-					GameObject.Destroy (currentPointer);
-					GameObject.Destroy (currentLine);
-					ignore = true;
-				}
-
-				if(currentPointer == null && ignore == false)
-				{
-					anchorPoint = selectedSystem.transform.position;
-					currentPointer = (GameObject)GameObject.Instantiate(invasionButton, anchorPoint, Quaternion.identity);
-					currentLine = (GameObject)GameObject.Instantiate(invasionLine, anchorPoint, Quaternion.identity);
-				}
-			}
-		}
-
-		if(currentPointer != null)
-		{
-			Ray temp = Camera.main.ScreenPointToRay(Input.mousePosition);
-			float angle = Vector3.Angle (Vector3.forward, temp.direction);
-			float hyp = Camera.main.transform.position.z / (Mathf.Cos(angle * Mathf.Deg2Rad));
-			currentPoint = temp.origin - temp.direction * hyp;
-			currentPoint = new Vector3(currentPoint.x, currentPoint.y, 0f);
-
-			for(int i = 0; i < systemListConstructor.systemList.Count; ++i)
-			{
-				Vector3 sysPos = systemListConstructor.systemList[i].systemObject.transform.position;
-
-				if(currentPoint.x < sysPos.x + 3f && currentPoint.x > sysPos.x - 3f)
-				{
-					if(currentPoint.y < sysPos.y + 3f && currentPoint.y > sysPos.y - 3f)
-					{
-						currentPoint = sysPos;
-						break;
-					}
-				}
-			}
-
-			currentPointer.transform.position = currentPoint;
-			ResizeLine();
-			RotateLine();
-		}
+		clickTimer = 0f;
 	}
 
 	void Update()
 	{
-		UpdateInvadeLine ();
-
 		if(zoom == true)
 		{
 			gameObject.transform.position = Vector3.Lerp(initPos, finalPos, t);
@@ -140,6 +49,8 @@ public class CameraFunctions : MasterScript
 
 		if(openMenu != true && zoom == false)
 		{
+			DoubleClick(); //Checks for double click
+
 			ZoomCamera();
 
 			PanCamera();
@@ -158,6 +69,7 @@ public class CameraFunctions : MasterScript
 		coloniseMenu = false;
 		openMenu = false;
 		doubleClick = false;
+		clickTimer = -1f;
 		heroGUI.openHeroLevellingScreen = false;
 		invasionGUI.openInvasionMenu = false;
 		
@@ -172,12 +84,7 @@ public class CameraFunctions : MasterScript
 	private void ClickSystem()
 	{
 		if(Input.GetMouseButtonDown(0)) //Used to start double click events and to identify systems when clicked on. Throws up error if click on a connector object.
-		{
-			if(doubleClick == false)
-			{
-				DoubleClick ();
-			}
-			
+		{				
 			RaycastHit hit = new RaycastHit();
 			
 			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
@@ -185,13 +92,12 @@ public class CameraFunctions : MasterScript
 				if(hit.collider.gameObject.tag == "StarSystem")
 				{
 					selectedSystem = hit.collider.gameObject;
+					selectedSystemNumber = RefreshCurrentSystem(selectedSystem);
 				}
-
-				int i = RefreshCurrentSystem(selectedSystem);
-
-				if(systemListConstructor.systemList[i].systemOwnedBy == null)
+			
+				if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy == null)
 				{
-					systemSIMData = systemListConstructor.systemList[i].systemObject.GetComponent<SystemSIMData>();
+					systemSIMData = systemListConstructor.systemList[selectedSystemNumber].systemObject.GetComponent<SystemSIMData>();
 
 					if(systemSIMData.guardedBy == playerTurnScript.playerRace)
 					{
@@ -201,7 +107,9 @@ public class CameraFunctions : MasterScript
 
 				if(doubleClick == true && heroResource.improvementScreen.activeInHierarchy == false)
 				{
-					if(systemListConstructor.systemList[i].systemOwnedBy == playerTurnScript.playerRace)
+					doubleClick = false;
+					
+					if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy == playerTurnScript.playerRace)
 					{
 						if(galaxyGUI.planetSelectionWindow.activeInHierarchy == false)
 						{
@@ -209,7 +117,7 @@ public class CameraFunctions : MasterScript
 						}
 					}
 
-					if(systemListConstructor.systemList[i].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[i].systemOwnedBy != null)
+					if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy != null)
 					{
 						systemDefence = selectedSystem.GetComponent<SystemDefence>();
 
@@ -221,7 +129,7 @@ public class CameraFunctions : MasterScript
 							{
 								heroScript = playerTurnScript.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
 
-								if(heroScript.heroLocation == systemListConstructor.systemList[i].systemObject)
+								if(heroScript.heroLocation == systemListConstructor.systemList[selectedSystemNumber].systemObject)
 								{
 									if(heroScript.heroType == "Infiltrator")
 									{
@@ -385,20 +293,27 @@ public class CameraFunctions : MasterScript
 		}
 	}
 	
-	void DoubleClick() //Function for detecting double click
+	private void DoubleClick() //Function for detecting double click
 	{
-		float delay = 0.2f;
-
-		if(Input.GetMouseButtonDown (0))
+		if(Input.GetMouseButtonDown(0))
 		{
-			if(Time.time < (timer + delay))
+			if(singleClick == false)
 			{
-				doubleClick = true;
+				singleClick = true;
+				clickTimer = Time.time;
 			}
-			
 			else
 			{
-				timer = Time.time;
+				singleClick = false;
+				doubleClick = true;
+			}
+		}
+
+		if(singleClick == true)
+		{
+			if(Time.time - clickTimer > 0.2f)
+			{
+				singleClick = false;
 			}
 		}
 	}

@@ -357,7 +357,7 @@ public class AIBasicParent : TurnInfo
 				
 				systemListConstructor.systemList[currentSystem].systemOwnedBy = thisPlayer.playerRace;
 				
-				systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
+				//systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
 
 				++systemsInPlay;
 

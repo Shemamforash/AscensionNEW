@@ -20,7 +20,7 @@ public class SystemListConstructor : MasterScript
 
 	private int connections;
 	public int mapSize;
-	public GameObject systemClone, originalSystem;
+	public GameObject systemClone, kType, gType, rGiant, wDwarf, binary;
 	private float xPos, yPos, distanceXY;
 	public float systemScale = 0.0f, sysDistMin;
 	public Transform systemContainer;
@@ -73,7 +73,7 @@ public class SystemListConstructor : MasterScript
 		int randomInt = -1;
 		mapConstructor.distanceMax = (mapSize - 260) / -8f;
 
-		systemScale = (mapSize - 300.0f) / -160.0f;
+		systemScale = (mapSize - 300.0f) / -320.0f;
 
 		int difference = systemList.Count - firmSystems.Count;
 
@@ -152,15 +152,67 @@ public class SystemListConstructor : MasterScript
 		}
 	}
 
+	private GameObject FindStarType(int system)
+	{
+		switch(systemList[system].starType)
+		{
+		case "G-Type":
+				return gType;
+		case "K-Type":
+				return kType;
+		case "Red Giant":
+				return rGiant;
+		case "White Dwarf":
+				return wDwarf;
+		case "Binary":
+				return binary;
+		default:
+				break;
+		}
+
+		return null;
+	}
+
+	private float StarScale(int system)
+	{
+		switch(systemList[system].starType)
+		{
+		case "G-Type":
+			return systemScale / 2f;
+		case "K-Type":
+			return systemScale / 2f;
+		case "Red Giant":
+			return systemScale / 1.5f;
+		case "White Dwarf":
+			return systemScale / 3f;
+		case "Binary":
+			return systemScale / 3.5f;
+		default:
+			break;
+		}
+
+		return 0f;
+	}
+
 	private void CreateObjects()
 	{
 		for(int i = 0; i < systemList.Count; ++i)
 		{
-			systemClone = (GameObject)Instantiate(originalSystem, systemList[i].systemPosition, Quaternion.identity);
+			Quaternion rot = new Quaternion();
+
+			float randomRot = Random.Range(-180f, 180f);
+
+			rot.eulerAngles = new Vector3(0f, -180f, randomRot);
+
+			systemClone = (GameObject)Instantiate(FindStarType(i), systemList[i].systemPosition, rot);
 
 			systemClone.transform.parent = systemContainer;
+
+			float scale = StarScale(i);
+
+			float tempScale = Random.Range (scale - scale / 5f, scale + scale / 5f);
 		
-			systemClone.transform.localScale = new Vector3(systemScale / 1.5f, systemScale / 1.5f, systemScale / 1.5f);
+			systemClone.transform.localScale = new Vector3(tempScale, tempScale, tempScale);
 
 			systemClone.name = systemList[i].systemName;
 		
@@ -310,6 +362,8 @@ public class SystemListConstructor : MasterScript
 					
 					xPos = float.Parse (reader.GetAttribute("I"));
 					yPos = float.Parse (reader.GetAttribute("J"));
+
+					system.starType = reader.GetAttribute("K");
 					
 					system.systemPosition = new Vector3(xPos, yPos, 0.0f);
 					
@@ -424,7 +478,7 @@ public class PlanetInfo
 
 public class StarSystem
 {
-	public string systemName, systemOwnedBy;
+	public string systemName, systemOwnedBy, starType;
 	public Vector3 systemPosition;
 	public GameObject systemObject, allyHero, enemyHero;
 	public GameObject tradeRoute;
