@@ -150,11 +150,11 @@ public class SystemGUI : MasterScript
 	{
 		if(playerTurnScript.playerRace != null && cameraFunctionsScript.selectedSystem != null)
 		{
+			selectedSystem = cameraFunctionsScript.selectedSystemNumber;
+
 			systemName.text = systemListConstructor.systemList[selectedSystem].systemName.ToUpper();
 
 			systemSize.text = ReturnSystemSize(systemListConstructor.systemList[selectedSystem].systemSize).ToUpper();
-
-			selectedSystem = RefreshCurrentSystem(cameraFunctionsScript.selectedSystem);
 
 			systemSIMData = systemListConstructor.systemList[selectedSystem].systemObject.GetComponent<SystemSIMData>();
 			

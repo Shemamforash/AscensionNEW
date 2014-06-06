@@ -71,7 +71,7 @@ public class AmbientStarRandomiser : MasterScript
 				Vector3 location = new Vector3(xDis, yDis, zDis);
 
 				int rnd = Random.Range (0,2);
-
+			
 				GameObject star = Instantiate(starPrefabs[rnd], location, Quaternion.identity) as GameObject;
 
 				star.renderer.sharedMaterial = sharedMat;

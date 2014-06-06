@@ -7,12 +7,13 @@ public class EmpireBoundaries : MasterScript
 	private GameObject[] boundRings;
 	public GameObject blankCircle;
 	public Transform boundaryContainer;
-	private float radius;
+	public float[] radius;
 	public Material humansMat, selkiesMat, nereidesMat;
 	
 	public void SetArrSize()
 	{
 		boundRings = new GameObject[systemListConstructor.systemList.Count];
+		radius = new float[systemListConstructor.mapSize];
 	}
 
 	void Update()
@@ -36,15 +37,15 @@ public class EmpireBoundaries : MasterScript
 			
 			if(tempDistance < tempRadius)
 			{
-				tempRadius = tempDistance;
+				tempRadius = tempDistance / 2;
 			}
 		}
 		
-		radius = tempRadius;
+		radius[system] = tempRadius;
 		
-		if(radius > 8f)
+		if(radius[system] > 3f)
 		{
-			radius = 8f;
+			radius[system] = 3f;
 		}
 	}
 	
@@ -63,7 +64,7 @@ public class EmpireBoundaries : MasterScript
 		
 		temp.transform.parent = boundaryContainer;
 		
-		temp.transform.localScale = new Vector3 (radius, radius, radius);
+		temp.transform.localScale = new Vector3 (radius[system], radius[system], radius[system]);
 		
 		temp.renderer.material = material;
 		

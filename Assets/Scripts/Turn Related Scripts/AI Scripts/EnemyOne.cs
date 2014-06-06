@@ -21,7 +21,7 @@ public class EnemyOne : AIBasicParent
 			{
 				systemListConstructor.systemList[i].systemOwnedBy = playerRace;
 
-				systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
+				//systemListConstructor.systemList[i].systemObject.renderer.material = materialInUse;
 
 				for(int j = 0; j < systemListConstructor.systemList[i].systemSize; ++j)
 				{

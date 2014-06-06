@@ -56,9 +56,16 @@ public class SystemInfoPopup : MasterScript
 		
 		overlayObjectList[i].container.transform.position = newPosition;
 
-		float scale = ((0.025f / systemListConstructor.systemScale) * mainCamera.transform.position.z) + 1.5f; //Orig 1.5f 
+		float tempScale = systemListConstructor.systemScale;
 
-		overlayObjectList [i].container.transform.localScale = new Vector3 (scale / 1.5f, scale / 1.5f, 0f);
+		if(tempScale < 0f)
+		{
+			tempScale = 0f;
+		}
+
+		float scale = ((0.0125f / tempScale) * mainCamera.transform.position.z) + 1.5f; //Orig 1.5f 
+
+		overlayObjectList [i].container.transform.localScale = new Vector3 (scale, scale, 0f);
 	}
 
 	private void UpdateVariables(int i)

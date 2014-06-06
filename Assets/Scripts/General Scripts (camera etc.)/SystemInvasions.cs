@@ -101,7 +101,7 @@ public class SystemInvasions : MasterScript
 		
 		turnInfoScript = GameObject.Find ("ScriptsContainer").GetComponent<TurnInfo> ();
 		
-		systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
+		//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
 
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
 		systemDefence.underInvasion = false;
@@ -115,16 +115,16 @@ public class SystemInvasions : MasterScript
 		switch(hero.heroOwnedBy)
 		{
 		case "Humans":
-			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.humansMaterial;
+			//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.humansMaterial;
 			break;
 		case "Selkies":
-			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.selkiesMaterial;
+			//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.selkiesMaterial;
 			break;
 		case "Nereides":
-			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.nereidesMaterial;
+			//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.nereidesMaterial;
 			break;
 		default:
-			systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
+			//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
 			break;
 		}
 

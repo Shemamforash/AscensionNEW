@@ -108,8 +108,8 @@ public class LineRenderScript : MasterScript
 		Vector3 start = systemPopup.mainCamera.WorldToScreenPoint (gameObject.transform.position);
 		Vector3 end = systemPopup.mainCamera.WorldToScreenPoint (target.transform.position);
 
-		Vector3 left = new Vector3 (gameObject.transform.position.x - systemListConstructor.systemScale / 1.5f, 0f, 0f);
-		Vector3 right = new Vector3 (gameObject.transform.position.x + systemListConstructor.systemScale / 1.5f, 0f, 0f);
+		Vector3 left = new Vector3 (gameObject.transform.position.x - empireBoundaries.radius[thisSystem], 0f, 0f);
+		Vector3 right = new Vector3 (gameObject.transform.position.x + empireBoundaries.radius[thisSystem], 0f, 0f);
 
 		left = systemPopup.mainCamera.WorldToScreenPoint (left);
 		right = systemPopup.mainCamera.WorldToScreenPoint (right);
@@ -153,7 +153,7 @@ public class LineRenderScript : MasterScript
 
 			if(systemListConstructor.systemList[tempSystem].systemOwnedBy == null)
 			{
-				systemListConstructor.systemList[system].permanentConnections[i].renderer.material = opaqueMaterial;
+				//systemListConstructor.systemList[system].permanentConnections[i].renderer.material = opaqueMaterial;
 			}
 		}
 	}
