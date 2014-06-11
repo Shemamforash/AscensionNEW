@@ -75,9 +75,9 @@ public class Missiles : MasterScript
 				float m = (colliderCentre.y - start.y) / (colliderCentre.x - start.x); //Get gradient from collider to start
 				m = -1 / m; //Get inverse reciprocal of the gradient
 				float c = colliderCentre.y - (m * colliderCentre.x); //Find y intercept
-				float xIntersectOne = colliderCentre.x + systemListConstructor.systemScale * 2.0f / Mathf.Sqrt(1 + m * m); //Find first x intersection of boundary of collider with line
+				float xIntersectOne = colliderCentre.x + systemListConstructor.systemScale * 4.0f / Mathf.Sqrt(1 + m * m); //Find first x intersection of boundary of collider with line
 				float yIntersectOne = m * xIntersectOne + c; //And the corresponding y, these lie on the same line so share the same y intercept
-				float xIntersectTwo = colliderCentre.x - systemListConstructor.systemScale * 2.0f / Mathf.Sqrt(1 + m * m); //Find second x intersection of boundary of collider with line
+				float xIntersectTwo = colliderCentre.x - systemListConstructor.systemScale * 4.0f / Mathf.Sqrt(1 + m * m); //Find second x intersection of boundary of collider with line
 				float yIntersectTwo = m * xIntersectTwo + c; //Corresponding y
 
 				Vector3 pointA = new Vector3(xIntersectOne, yIntersectOne, 0.0f); //Create point to represent first intersection
@@ -154,7 +154,9 @@ public class Missiles : MasterScript
 			{
 				curveBuilder.pathToFollow.Add (new Vector3(tempPath[i].x, tempPath[i].y, 0f));
 			}
-			//curveBuilder.FollowBezierCurve(tempPath);
+
+			curveBuilder.FollowBezierCurve(tempPath);
+
 			curveBuilder.moving = true;
 		}
 	}

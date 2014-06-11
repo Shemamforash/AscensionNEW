@@ -21,13 +21,13 @@ public class QuadraticBezierCurve : MasterScript
 			{
 				bool reachedPoint = false;
 			
-				if(gameObject.transform.position.x < pathToFollow[j].x + 0.01f)
+				if(gameObject.transform.position.x < pathToFollow[j].x + 0.001f)
 				{
-					if(gameObject.transform.position.x > pathToFollow[j].x - 0.01f)
+					if(gameObject.transform.position.x > pathToFollow[j].x - 0.001f)
 					{
-						if(gameObject.transform.position.y < pathToFollow[j].y + 0.01f)
+						if(gameObject.transform.position.y < pathToFollow[j].y + 0.001f)
 						{
-							if(gameObject.transform.position.y > pathToFollow[j].y - 0.01f)
+							if(gameObject.transform.position.y > pathToFollow[j].y - 0.001f)
 							{
 								reachedPoint = true; //Check to see if it has reached the next point on its path
 							}
@@ -48,7 +48,7 @@ public class QuadraticBezierCurve : MasterScript
 				}
 				else if (reachedPoint == false) //If it has not reached a point
 				{
-					gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pathToFollow[currentVertex], 10f * Time.deltaTime); //Move towards next point
+					gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pathToFollow[currentVertex], 0.5f * Time.deltaTime); //Move towards next point
 				}
 			}
 		}
@@ -60,14 +60,18 @@ public class QuadraticBezierCurve : MasterScript
 
 		GetCurveControlPoints ();
 
-		for(int i = 0; i < knots.Count - 1; ++i)
+		for(int i = 1; i < knots.Count - 1; ++i)
 		{
-			Vector3 finalPos = new Vector3(knots[i].x, knots[i].y, 0f);
+			//Vector3 finalPos = new Vector3(knots[i].x, knots[i].y, 0f);
+
+			float dist = Vector2.Distance(knots[i], knots[i - 1]);
+			numberOfPoints = dist / 0.1f;
 
 			if(firstControlPoints.Count > 1)
 			{
 				for(int j = 0; j < numberOfPoints; ++j)
 				{
+					/*
 					float t = j / (firstControlPoints.Count - 1);
 					Vector2 argOne = (1 - t) * (1 - t) * (1 - t) * knots[i];
 					Vector2 argTwo = 3 * ((1 - t) * (1 - t)) * t * firstControlPoints[i];
@@ -77,18 +81,18 @@ public class QuadraticBezierCurve : MasterScript
 					Vector2 tempPos = argOne + argTwo + argThree + argFour;
 					finalPos = new Vector3(tempPos.x, tempPos.y, 0f);
 					pathToFollow.Add (finalPos);
+					*/
+
+					float t = i / (numberOfPoints - 1f);
+					Vector2 position = (1 - t) * (1 - t) * knots[i - 1] + 2 * (1 - t) * t * knots[i] + t * t * knots[i + 1];
+					pathToFollow.Add (new Vector3(position.x, position.y, 0f));
 				}
 			}
 
-			pathToFollow.Add (finalPos);
+			//pathToFollow.Add (finalPos);
 		}
 
 		pathToFollow.Add (new Vector3(knots[knots.Count - 1].x, knots[knots.Count - 1].y, 0f));
-
-		for(int i = 0; i < pathToFollow.Count; ++i)
-		{
-			Debug.Log (pathToFollow[i]);
-		}
 	}
 
 	public void GetCurveControlPoints()
