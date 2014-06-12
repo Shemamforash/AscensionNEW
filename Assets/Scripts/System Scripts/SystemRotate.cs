@@ -33,7 +33,6 @@ public class SystemRotate : MasterScript
 			corona2.transform.Rotate (Vector3.forward, Time.deltaTime * -rndSpd2);
 			corona2.transform.Rotate (Vector3.forward, Time.deltaTime * rndSpd3);
 			gameObject.transform.Rotate (Vector3.forward, Time.deltaTime * 5f);
-
 		}
 
 		UpdateRotation ();

@@ -1,39 +1,60 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class QuadraticBezierCurve : MasterScript
 {
-	private List<Vector2> firstControlPoints = new List<Vector2>();
-	private List<Vector2> secondControlPoints = new List<Vector2>();
-	private List<Vector2> knots = new List<Vector2>();
-	public List<Vector3> pathToFollow = new List<Vector3>();
-	private float numberOfPoints = 50f;
 	public bool moving = false;
-	private int currentVertex = 0;
-	public int target;
+	public int target, currentVertex = 0;
+	public List<Vector3> pathToFollow = new List<Vector3> ();
+	private SystemRotate rotate;
+
+	void Start()
+	{
+		rotate = systemListConstructor.systemList [target].systemObject.GetComponent<SystemRotate> ();
+	}
+
+	private void AdjustPathValues()
+	{
+		double angle = -rotate.speed * Mathf.Deg2Rad;
+		
+		float xPos = (float)(Math.Cos(angle) * (pathToFollow[currentVertex].x - 45f) - Math.Sin(angle) * (pathToFollow[currentVertex].y - 45f) + 45f);
+		float yPos = (float)(Math.Sin(angle) * (pathToFollow[currentVertex].x - 45f) + Math.Cos(angle) * (pathToFollow[currentVertex].y - 45f) + 45f);
+		
+		pathToFollow[currentVertex] = new Vector3 (xPos, yPos, 0f);
+	}
+
+	private bool ReachedNextVertex(int vertex)
+	{
+		if(gameObject.transform.position.x < pathToFollow[vertex].x + 0.1f)
+		{
+			if(gameObject.transform.position.x > pathToFollow[vertex].x - 0.1f)
+			{
+				if(gameObject.transform.position.y < pathToFollow[vertex].y + 0.1f)
+				{
+					if(gameObject.transform.position.y > pathToFollow[vertex].y - 0.1f)
+					{
+						return true; //Check to see if it has reached the next point on its path
+					}
+				}
+			}
+		}
+
+		return false;
+	}
 
 	public void Update()
 	{
 		if(moving == true)
 		{
+			//FaceTarget();
+			gameObject.transform.LookAt(pathToFollow[currentVertex]);
+			AdjustPathValues();
+
 			for(int j = currentVertex; j < pathToFollow.Count; ++j)
 			{
-				bool reachedPoint = false;
-			
-				if(gameObject.transform.position.x < pathToFollow[j].x + 0.001f)
-				{
-					if(gameObject.transform.position.x > pathToFollow[j].x - 0.001f)
-					{
-						if(gameObject.transform.position.y < pathToFollow[j].y + 0.001f)
-						{
-							if(gameObject.transform.position.y > pathToFollow[j].y - 0.001f)
-							{
-								reachedPoint = true; //Check to see if it has reached the next point on its path
-							}
-						}
-					}
-				}
+				bool reachedPoint = ReachedNextVertex(j);	
 				
 				if(j + 1 == pathToFollow.Count && reachedPoint == true) //If it has reached final point
 				{
@@ -48,138 +69,10 @@ public class QuadraticBezierCurve : MasterScript
 				}
 				else if (reachedPoint == false) //If it has not reached a point
 				{
-					gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pathToFollow[currentVertex], 0.5f * Time.deltaTime); //Move towards next point
+					gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pathToFollow[currentVertex], 2f * Time.deltaTime); //Move towards next point
 				}
 			}
 		}
-	}
-	
-	public void FollowBezierCurve(List<Vector2> temp)
-	{
-		knots = temp;
-
-		GetCurveControlPoints ();
-
-		for(int i = 1; i < knots.Count - 1; ++i)
-		{
-			//Vector3 finalPos = new Vector3(knots[i].x, knots[i].y, 0f);
-
-			float dist = Vector2.Distance(knots[i], knots[i - 1]);
-			numberOfPoints = dist / 0.1f;
-
-			if(firstControlPoints.Count > 1)
-			{
-				for(int j = 0; j < numberOfPoints; ++j)
-				{
-					/*
-					float t = j / (firstControlPoints.Count - 1);
-					Vector2 argOne = (1 - t) * (1 - t) * (1 - t) * knots[i];
-					Vector2 argTwo = 3 * ((1 - t) * (1 - t)) * t * firstControlPoints[i];
-					Vector2 argThree = 3 * (1 - t) * t * t * secondControlPoints[i];
-					Vector2 argFour = t * t * t * knots[i + 1];
-
-					Vector2 tempPos = argOne + argTwo + argThree + argFour;
-					finalPos = new Vector3(tempPos.x, tempPos.y, 0f);
-					pathToFollow.Add (finalPos);
-					*/
-
-					float t = i / (numberOfPoints - 1f);
-					Vector2 position = (1 - t) * (1 - t) * knots[i - 1] + 2 * (1 - t) * t * knots[i] + t * t * knots[i + 1];
-					pathToFollow.Add (new Vector3(position.x, position.y, 0f));
-				}
-			}
-
-			//pathToFollow.Add (finalPos);
-		}
-
-		pathToFollow.Add (new Vector3(knots[knots.Count - 1].x, knots[knots.Count - 1].y, 0f));
-	}
-
-	public void GetCurveControlPoints()
-	{
-		int n = knots.Count - 1;
-	
-		if (n == 1)
-		{
-			Vector2 tempVect = new Vector2();
-			tempVect.y = (2 * knots[0].x + knots[1].x) / 3;
-			tempVect.x = (2 * knots[0].y + knots[1].y) / 3;
-			firstControlPoints.Add (tempVect);
-
-			tempVect.x = 2 * firstControlPoints[0].x - knots[0].x;
-			tempVect.y = 2 * firstControlPoints[0].y - knots[0].y;
-			secondControlPoints.Add (tempVect);
-			return;
-		}
-		
-		// Calculate first Bezier control points
-		// Right hand side vector
-		float[] rhs = new float[n];
-		
-		// Set right hand side X values
-		for (int i = 1; i < n - 1; ++i)
-		{
-			rhs[i] = 4 * knots[i].x + 2 * knots[i + 1].x;
-			rhs[0] = knots[0].x + 2 * knots[1].x;
-			rhs[n - 1] = (8 * knots[n - 1].x + knots[n].x) / 2.0f;
-		}
-		// Get first control points X-values
-		float[] x = GetFirstControlPoints(rhs);
-
-		for (int i = 1; i < n - 1; ++i)
-		{
-			rhs[i] = 4 * knots[i].y + 2 * knots[i + 1].y;
-			rhs[0] = knots[0].y + 2 * knots[1].y;
-			rhs[n - 1] = (8f * knots[n - 1].y + knots[n].y) / 2.0f;
-		}
-		
-		float[] y = GetFirstControlPoints(rhs);
-
-		for (int i = 0; i < n; ++i)
-		{
-			firstControlPoints.Add(new Vector2(x[i], y[i]));
-			
-			if (i < n - 1)
-			{
-				secondControlPoints.Add (new Vector2(2 * knots[i + 1].x - x[i + 1], 2 * knots[i + 1].y - y[i + 1]));
-			}
-			else
-			{
-				secondControlPoints.Add (new Vector2((knots[n].x + x[n - 1]) / 2, (knots[n].y + y[n - 1]) / 2));
-			}
-		}
-	}
-
-	private static float[] GetFirstControlPoints(float[] rhs)
-	{
-		int n = rhs.Length;
-		float[] x = new float[n]; 
-		float[] tmp = new float[n]; 
-		
-		float b = 2.0f;
-
-		x[0] = rhs[0] / b;
-
-		for (int i = 1; i < n; i++) 
-		{
-			tmp[i] = 1 / b;
-
-			if(i < n - 1)
-			{
-				b = 4.0f - tmp[i];
-			}
-			else
-			{
-				b = 3.5f - tmp[i];
-			}
-		}
-
-		for (int i = 1; i < n; i++)
-		{
-			x[n - i - 1] -= tmp[n - i] * x[n - i]; 
-		}
-
-		return x;
 	}
 }
 

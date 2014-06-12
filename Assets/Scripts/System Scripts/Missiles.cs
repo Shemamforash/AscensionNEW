@@ -155,8 +155,6 @@ public class Missiles : MasterScript
 				curveBuilder.pathToFollow.Add (new Vector3(tempPath[i].x, tempPath[i].y, 0f));
 			}
 
-			curveBuilder.FollowBezierCurve(tempPath);
-
 			curveBuilder.moving = true;
 		}
 	}
