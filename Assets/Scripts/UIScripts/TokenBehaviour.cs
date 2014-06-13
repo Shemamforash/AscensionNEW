@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class TokenBehaviour : MonoBehaviour 
+public class TokenBehaviour : MasterScript
 {
-	public GameObject tokenPrefab, currentToken;
+	private List<GameObject> tokens = new List<GameObject>();
+	public bool followingMouse = false;
 
-	public void ButtonClicked()
+	void Update () 
 	{
-		if(currentToken == null)
-		{
-			currentToken = (GameObject)GameObject.Instantiate(tokenPrefab, gameObject.transform.position, Quaternion.identity);
-		}
+
 	}
 }
