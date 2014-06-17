@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public class InvasionGUI : MasterScript
 {
 	public GameObject invasionScreen, grid, fissionBombButton, fusionBombButton, antimatterBombButton;
-	private List<GameObject> planetList = new List<GameObject>();
+	public GameObject planetContainer;
+	public GameObject[] planetList = new GameObject[6];
 	private int system, activeButtons;
 	private string invasionInfo, bombSelected;
 	public bool openInvasionMenu = false;
@@ -25,14 +26,34 @@ public class InvasionGUI : MasterScript
 		bombTimers.Add (fusionBombTimer);
 		bombTimers.Add (antimatterBombTimer);
 
-		for(int i = 0; i < planetList.Count; ++i)
+		LayoutPlanets (6);
+	}
+
+	private void LayoutPlanets(int size)
+	{
+		float maxHeight = ((size - 1) * 10f) + (65f * size);
+		maxHeight = maxHeight / 2f;
+
+		for(int i = 0; i < 6; ++i)
 		{
-			NGUITools.SetActive (planetList[i], false);
+			if(i < size)
+			{
+				NGUITools.SetActive(planetList[i], true);
+				float y = ((i * 65) + 32.5f) + (i * 10f);
+				y = maxHeight - y;
+				Vector3 temp = new Vector3(40f, y, 0f);
+				planetList[i].transform.localPosition = temp;
+			}
+			else
+			{
+				NGUITools.SetActive(planetList[i], false);
+			}
 		}
 	}
 
 	void Update()
 	{
+		/*
 		if(heroGUI.currentHero != null)
 		{
 			heroScript = heroGUI.currentHero.GetComponent<HeroScriptParent> ();
@@ -71,9 +92,9 @@ public class InvasionGUI : MasterScript
 			
 			if(systemDefence.underInvasion == false)
 			{
-				for(int i = 0; i < planetList.Count; ++i)
+				for(int i = 0; i < planetList.Length; ++i)
 				{
-					NGUITools.SetActive (planetList[i], false);
+					//NGUITools.SetActive (planetList[i], false);
 				}
 			}
 		}
@@ -85,11 +106,12 @@ public class InvasionGUI : MasterScript
 				NGUITools.SetActive(bombButtons[i], false);
 			}
 
-			for(int i = 0; i < planetList.Count; ++i)
+			for(int i = 0; i < planetList.Length; ++i)
 			{
-				NGUITools.SetActive (planetList[i], false);
+				//NGUITools.SetActive (planetList[i], false);
 			}
 		}
+		*/
 	}
 
 	private void UpdatePlanetInvasionValues(int thisSystem)
