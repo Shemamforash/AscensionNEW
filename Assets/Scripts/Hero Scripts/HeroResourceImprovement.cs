@@ -143,11 +143,11 @@ public class HeroResourceImprovement : MasterScript
 					}
 					if(heroScript.heroType == "Soldier")
 					{
-						heroScript.armourMod += 0.03f;
+						heroScript.healthMod += 0.03f;
 					}
 					if(heroScript.heroType == "Diplomat")
 					{
-						heroScript.armourMod += 0.01f;
+						heroScript.healthMod += 0.01f;
 					}
 
 					break;
@@ -157,11 +157,11 @@ public class HeroResourceImprovement : MasterScript
 
 					if(heroScript.heroType == "Infiltrator")
 					{
-						heroScript.primaryMod += 0.01f;
+						heroScript.assaultMod += 0.01f;
 					}
 					if(heroScript.heroType == "Soldier")
 					{
-						heroScript.primaryMod += 0.025f;
+						heroScript.assaultMod += 0.025f;
 					}
 					if(heroScript.heroType == "Diplomat")
 					{
@@ -179,7 +179,7 @@ public class HeroResourceImprovement : MasterScript
 					}
 					if(heroScript.heroType == "Soldier")
 					{
-						heroScript.secondaryMod += 0.025f;
+						heroScript.auxiliaryMod += 0.025f;
 					}
 					if(heroScript.heroType == "Diplomat")
 					{
@@ -197,11 +197,11 @@ public class HeroResourceImprovement : MasterScript
 					}
 					if(heroScript.heroType == "Soldier")
 					{
-						heroScript.collateralMod -= 0.01f;
+						heroScript.auxiliaryMod -= 0.01f;
 					}
 					if(heroScript.heroType == "Diplomat")
 					{
-						heroScript.collateralMod += 0.02f;
+						heroScript.auxiliaryMod += 0.02f;
 					}
 
 					break;

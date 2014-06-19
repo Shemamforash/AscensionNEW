@@ -33,28 +33,11 @@ public class CameraFunctions : MasterScript
 
 	void Update()
 	{
-		if(zoom == true)
-		{
-			gameObject.transform.position = Vector3.Lerp(initPos, finalPos, t);
-			t += Time.deltaTime / 0.2f;
-
-			if(timer < Time.time)
-			{
-				transform.position = finalPos;
-				t = 0f;
-				zoom = false;
-				timer = 0f;
-			}
-		}
-
-		if(openMenu != true && zoom == false)
+		if(openMenu != true)
 		{
 			DoubleClick(); //Checks for double click
-
 			ZoomCamera();
-
 			PanCamera();
-
 			ClickSystem ();
 		}
 		
@@ -83,71 +66,74 @@ public class CameraFunctions : MasterScript
 	{
 		if(Input.GetMouseButtonDown(0)) //Used to start double click events and to identify systems when clicked on. Throws up error if click on a connector object.
 		{				
-			RaycastHit hit = new RaycastHit();
+			RaycastHit hit = new RaycastHit(); //Create a raycast
 			
-			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit))
+			if(Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit)) //Send it out in direction of mouse
 			{
-				if(hit.collider.gameObject.tag == "StarSystem")
+				if(hit.collider.gameObject.tag == "StarSystem") //If it collides with a star system
 				{
-					selectedSystem = hit.collider.gameObject;
-					selectedSystemNumber = RefreshCurrentSystem(selectedSystem);
+					selectedSystem = hit.collider.gameObject; //Set the selected system
+					selectedSystemNumber = RefreshCurrentSystem(selectedSystem); //And get it's number
 				}
 			
-				if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy == null)
-				{
-					systemSIMData = systemListConstructor.systemList[selectedSystemNumber].systemObject.GetComponent<SystemSIMData>();
+				SingleClickFunctions();
+				DoubleClickFunctions();
+			}
+		}
+	}
 
-					if(systemSIMData.guardedBy == playerTurnScript.playerRace)
-					{
-						coloniseMenu = true; //Shows the colonise button on single click
-					}
+	private void SingleClickFunctions()
+	{
+		if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy == null) //If it is owned by nobody
+		{
+			systemSIMData = systemListConstructor.systemList[selectedSystemNumber].systemObject.GetComponent<SystemSIMData>();
+			
+			if(systemSIMData.guardedBy == playerTurnScript.playerRace || systemSIMData.guardedBy == null) //If the system is guarded by you or nobody
+			{
+				coloniseMenu = true; //Show the colonise button
+			}
+		}
+	}
+
+	private void DoubleClickFunctions()
+	{
+		if(doubleClick == true && heroResource.improvementScreen.activeInHierarchy == false) //If a double cick has occured and the improvement screen is not visible
+		{
+			doubleClick = false; //Reset double click
+			
+			if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy == playerTurnScript.playerRace) //If the system is owned by you
+			{
+				if(galaxyGUI.planetSelectionWindow.activeInHierarchy == false) //And the first planet colonise window is not open
+				{
+					openMenu = true; //View the system
 				}
-
-				if(doubleClick == true && heroResource.improvementScreen.activeInHierarchy == false)
+			}
+			
+			if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy != null) //If it's owned by another player
+			{
+				systemDefence = selectedSystem.GetComponent<SystemDefence>(); //Get it's defence script
+				
+				bool openInvMenu = false;
+				
+				heroScript = heroGUI.currentHero.GetComponent<HeroScriptParent>();
+				
+				if(heroScript.heroLocation == systemListConstructor.systemList[selectedSystemNumber].systemObject) //If the current heroes location is equal to this sytem
 				{
-					doubleClick = false;
-					
-					if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy == playerTurnScript.playerRace)
+					if(heroScript.heroType == "Infiltrator") //If it's an infiltrator
 					{
-						if(galaxyGUI.planetSelectionWindow.activeInHierarchy == false)
-						{
-							openMenu = true; //Opens system menu on double click
-						}
+						openInvMenu = true; //Open the invasion menu
 					}
-
-					if(systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy != playerTurnScript.playerRace && systemListConstructor.systemList[selectedSystemNumber].systemOwnedBy != null)
+					
+					if(systemDefence.canEnter == true) //If it has destroyed the system defences
 					{
-						systemDefence = selectedSystem.GetComponent<SystemDefence>();
-
-						bool openInvMenu = false;
-
-						for(int j = 0; j < playerTurnScript.playerOwnedHeroes.Count; ++j)
-						{
-							if(playerTurnScript.playerOwnedHeroes[j] == heroGUI.currentHero)
-							{
-								heroScript = playerTurnScript.playerOwnedHeroes[j].GetComponent<HeroScriptParent>();
-
-								if(heroScript.heroLocation == systemListConstructor.systemList[selectedSystemNumber].systemObject)
-								{
-									if(heroScript.heroType == "Infiltrator")
-									{
-										openInvMenu = true;
-									}
-
-									if(systemDefence.canEnter == true)
-									{
-										openInvMenu = true;
-									}
-									
-									if(openInvMenu == true)
-									{
-										CloseAllWindows();
-										invasionGUI.openInvasionMenu = true;
-										invasionGUI.OpenPlanetInvasionScreen();
-									}
-								}
-							}
-						}
+						openInvMenu = true; //Open the invasion menu
+					}
+					
+					if(openInvMenu == true) //If open invasion menu is true
+					{
+						CloseAllWindows(); //Close all the open windows
+						invasionGUI.openInvasionMenu = true; //Open the invasion window through script
+						invasionGUI.OpenPlanetInvasionScreen();
 					}
 				}
 			}
@@ -217,41 +203,57 @@ public class CameraFunctions : MasterScript
 	}
 	
 	public void ZoomCamera() //Changes height of camera
-	{		
-		zPosition = transform.position.z;
-
-		if(Input.GetAxis ("Mouse ScrollWheel") < 0) //Zoom out
+	{	
+		if(zoom == true) //If camera is currently zooming
 		{
-			moveCamera = false;
-
-			zPosition -= zoomSpeed;
-		
-			if(zPosition < maxZoom)
+			gameObject.transform.position = Vector3.Lerp(initPos, finalPos, t); //Lerp the camera position to target
+			t += Time.deltaTime / 0.2f;
+			
+			if(timer < Time.time) //If timer is less than current time
 			{
-				zPosition = maxZoom;
+				transform.position = finalPos; //Auto set to final position
+				t = 0f; //Reset t value
+				zoom = false; //Camera is no longer zooming
+				timer = 0f; //Rest timer
 			}
-
-			initPos = transform.position;
-			finalPos = new Vector3(transform.position.x, transform.position.y, zPosition);
-			timer = Time.time + 0.2f;
-			zoom = true;
 		}
 
-		if(Input.GetAxis ("Mouse ScrollWheel") > 0) //Zoom in
+		else //If it isn't currently zooming
 		{
-			moveCamera = false;
+			zPosition = transform.position.z; //Get the z position
 
-			zPosition += zoomSpeed;
-			
-			if(zPosition > minZoom)
+			float moveDistance = 0f;
+
+			if(Input.GetAxis ("Mouse ScrollWheel") < 0) //Zoom out
 			{
-				zPosition = minZoom;
+				moveDistance = -zoomSpeed;
+			}
+			if(Input.GetAxis ("Mouse ScrollWheel") > 0) //Zoom in
+			{
+				moveDistance = zoomSpeed;
 			}
 
-			initPos = transform.position;
-			finalPos = new Vector3(transform.position.x, transform.position.y, zPosition);
-			timer = Time.time + 0.2f;
-			zoom = true;
+			if(moveDistance != 0f)
+			{
+				moveCamera = false; //Prevent camera from being centered
+				
+				zPosition += moveDistance; //Move the z position by zoomspeed in +/- direction
+
+				if(zPosition > minZoom) //If zposition is greater than min zoom
+				{
+					zPosition = minZoom; //Set zposition to min zoom
+				}
+
+				if(zPosition < maxZoom) //Same with max zoom
+				{
+					zPosition = maxZoom;
+				}
+				
+				initPos = transform.position; //Set initial position to current position
+				finalPos = new Vector3(transform.position.x, transform.position.y, zPosition); //Set final position to target zposition
+				timer = Time.time + 0.2f; //Set timer to time plus 1/5th second
+				zoom = true; //Camera is now zooming
+			}
 		}
 	}
 
