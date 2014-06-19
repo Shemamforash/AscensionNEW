@@ -107,14 +107,13 @@ public class HeroShip : MasterScript
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
 		ShipFunctions.UpdateShips ();
-		heroScript.primaryPower = ShipFunctions.primaryWeaponPower * heroScript.primaryMod;
-		heroScript.maxArmour = ShipFunctions.armourRating * heroScript.armourMod;
+		heroScript.assaultDamage = ShipFunctions.primaryWeaponPower * heroScript.assaultMod;
+		heroScript.maxHealth = ShipFunctions.armourRating * heroScript.healthMod;
 		heroScript.movementSpeed = ShipFunctions.engineValue * heroScript.movementMod;
 
 		if(heroScript.heroType == "Diplomat")
 		{
-			heroScript.secondaryPower = ShipFunctions.dropshipPower * heroScript.secondaryMod;
-			heroScript.secondaryCollateral = ShipFunctions.dropshipCollateral * heroScript.collateralMod;
+			heroScript.auxiliaryDamage = ShipFunctions.dropshipPower * heroScript.auxiliaryDamage;
 
 			int numberOfMerchants = 0;
 
@@ -133,8 +132,7 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Infiltrator")
 		{
-			heroScript.secondaryPower = ShipFunctions.bombPower * heroScript.secondaryMod;
-			heroScript.secondaryCollateral = ShipFunctions.bombCollateral * heroScript.collateralMod;
+			heroScript.auxiliaryDamage = ShipFunctions.bombPower * heroScript.auxiliaryMod;
 
 			canViewSystem = true;
 
@@ -161,12 +159,11 @@ public class HeroShip : MasterScript
 
 		if(heroScript.heroType == "Soldier")
 		{
-			heroScript.secondaryPower = ShipFunctions.artilleryPower * heroScript.secondaryMod;
-			heroScript.secondaryCollateral = ShipFunctions.artilleryCollateral * heroScript.collateralMod;
+			heroScript.auxiliaryDamage = ShipFunctions.artilleryPower * heroScript.auxiliaryMod;
 
 			if(ShipFunctions.soldierPrimary == true)
 			{
-				heroScript.primaryPower = heroScript.primaryPower * 2;
+				heroScript.assaultDamage = heroScript.assaultDamage * 2;
 			}
 		}
 	}

@@ -7,12 +7,12 @@ public class HeroScriptParent : MasterScript
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, invasionObject;
 	public int currentLevel = 1, planetInvade = -1, system;
-	public int lH2Spent, antiSpent, radioSpent, blueCSpent, primaryTokens = 2, secondaryTokens = 2, defenceTokens = 2; 
+	public int lH2Spent, antiSpent, radioSpent, blueCSpent, assaultTokens = 2, auxiliaryTokens = 2, defenceTokens = 2; 
 	public string heroOwnedBy, heroType;
 	public bool isInvading = false, isBusy;
-	public float heroAge, classModifier, maxArmour, currentArmour, primaryPower, secondaryPower, secondaryCollateral, invasionStrength, movementSpeed;
+	public float heroAge, classModifier, maxHealth, currentHealth, assaultDamage, auxiliaryDamage, invasionStrength, movementSpeed, defence;
 	public int aiInvadeTarget = -1, aiProtectTarget = -1;
-	public float armourMod = 1f, resourceMod = 1f, movementMod = 1f, collateralMod = 1f, cloakMod = 1f, primaryMod = 1f, cooldownMod = 1f, secondaryMod = 1f;
+	public float healthMod = 1f, resourceMod = 1f, movementMod = 1f, cloakMod = 1f, assaultMod = 1f, cooldownMod = 1f, auxiliaryMod = 1f;
 
 	void Start()
 	{
@@ -25,7 +25,7 @@ public class HeroScriptParent : MasterScript
 		system = RefreshCurrentSystem (heroLocation);
 
 		movementSpeed = 1;
-		currentArmour = 100;
+		currentHealth = 100;
 	}
 
 	void Update()
@@ -102,13 +102,13 @@ public class HeroScriptParent : MasterScript
 				}
 			}
 
-			if(isInvading == false && currentArmour != maxArmour)
+			if(isInvading == false && currentHealth != maxHealth)
 			{
-				currentArmour += maxArmour * 0.02f;
+				currentHealth += maxHealth * 0.02f;
 
-				if(currentArmour >= maxArmour)
+				if(currentHealth >= maxHealth)
 				{
-					currentArmour = maxArmour;
+					currentHealth = maxHealth;
 				}
 			}
 		}

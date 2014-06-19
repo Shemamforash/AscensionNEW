@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SystemInvasions : MasterScript
 {
 	public GameObject invasionQuad;
 	public HeroScriptParent hero;
+	private List<SystemInvasionInfo> currentInvasions = new List<SystemInvasionInfo>();
 
 	public void PlanetInvasion(HeroScriptParent curHero, int system, int planet, bool click)
 	{
@@ -12,9 +14,8 @@ public class SystemInvasions : MasterScript
 		{
 			if(click == false)
 			{
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetCurrentDefence -= curHero.secondaryPower / 4f;
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation -= curHero.secondaryCollateral / 4f;
-				curHero.currentArmour -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (curHero.currentArmour * curHero.classModifier);
+				systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation -= curHero.auxiliaryDamage / 4f;
+				curHero.currentHealth -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (curHero.currentHealth * curHero.classModifier);
 			}
 			
 			if(systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation <= 0)
@@ -171,8 +172,8 @@ public class SystemInvasions : MasterScript
 	public void ContinueInvasion(int system)
 	{		
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
-		hero.currentArmour -= systemListConstructor.systemList [system].systemOffence / (hero.currentArmour * hero.classModifier);
-		systemListConstructor.systemList [system].systemDefence -= hero.primaryPower;
+		hero.currentHealth -= systemListConstructor.systemList [system].systemOffence / (hero.currentHealth * hero.classModifier);
+		systemListConstructor.systemList [system].systemDefence -= hero.assaultDamage;
 
 		DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation (hero.heroOwnedBy, systemListConstructor.systemList[system].systemOwnedBy);
 		temp.stateCounter -= 1;
@@ -184,4 +185,13 @@ public class SystemInvasions : MasterScript
 			Destroy(hero.invasionObject);
 		}
 	}
+}
+
+public class SystemInvasionInfo
+{
+	public int system;
+	public List<int> assaultTokenAllocation = new List<int>();
+	public List<int> auxiliaryTokenAllocation = new List<int>();
+	public List<int> defenceTokenAllocation = new List<int>();
+	public List<Vector3> tokenPositions = new List<Vector3> ();
 }

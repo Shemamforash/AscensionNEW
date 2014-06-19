@@ -67,7 +67,7 @@ public class HeroGUI : MasterScript
 				heroName[i].transform.Find("Button").GetComponent<UIButton>().isEnabled = true;
 				heroName[i].transform.Find("Button").GetComponent<UISprite>().spriteName = "Button Click";
 				heroScript = playerTurnScript.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
-				heroHealth[i].text = Math.Round(heroScript.currentArmour, 1) + "/" + Math.Round(heroScript.maxArmour, 1);
+				heroHealth[i].text = Math.Round(heroScript.currentHealth, 1) + "/" + Math.Round(heroScript.maxHealth, 1);
 				heroName[i].text = "Hero Dude/Ette";
 			}
 			else
