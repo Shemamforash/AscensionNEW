@@ -73,12 +73,12 @@ public class TurnInfo : MasterScript
 
 	public void PickRace() //Start of turn function. Race choice dictates starting planet and inherent bonuses as well as racial technologies.
 	{
-		float gameSpeedModifer = 30 / systemListConstructor.mapSize;
+		float gameSpeedModifer = 30f / systemListConstructor.mapSize;
 
 		if(playerRace == "Humans")
 		{
-			raceKnowledge = 1 * gameSpeedModifer;
-			racePower = 1 * gameSpeedModifer;
+			raceKnowledge = gameSpeedModifer;
+			racePower = gameSpeedModifer;
 			raceWealth = 0.6f;
 			homeSystem = "Midgard";
 			homePlanetType = "Ocean";
@@ -86,7 +86,7 @@ public class TurnInfo : MasterScript
 		}
 		if(playerRace == "Selkies")
 		{
-			raceKnowledge = 1 * gameSpeedModifer;
+			raceKnowledge = gameSpeedModifer;
 			racePower = 1.4f * gameSpeedModifer;
 			raceWealth = 0.5f;
 			homeSystem = "Samael";
@@ -95,8 +95,8 @@ public class TurnInfo : MasterScript
 		}
 		if(playerRace == "Nereides")
 		{
-			raceKnowledge = 2 * gameSpeedModifer;
-			racePower = 1 * gameSpeedModifer;
+			raceKnowledge = 2f * gameSpeedModifer;
+			racePower = gameSpeedModifer;
 			raceWealth = 0.4f;
 			homeSystem = "Nepthys";
 			homePlanetType = "Boreal";

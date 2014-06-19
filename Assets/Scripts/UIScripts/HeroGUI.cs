@@ -7,7 +7,8 @@ public class HeroGUI : MasterScript
 {
 	public bool openHeroLevellingScreen;
 	public GameObject heroObject, merchantQuad, invasionButton, embargoButton, promoteButton, buttonContainer, turnInfoBar, heroDetailsContainer, currentHero, guardButton;
-	public UILabel heroHealth, heroName;
+	public UILabel[] heroHealth = new UILabel[3];
+	public UILabel[] heroName = new UILabel[3];
 	private RaycastHit hit;
 
 	void Update()
@@ -58,16 +59,25 @@ public class HeroGUI : MasterScript
 
 	public void ShowHeroDetails()
 	{
-		if(currentHero != null)
+		for(int i = 0; i < 3; ++i)
 		{
-			heroScript = currentHero.GetComponent<HeroScriptParent> ();
-			NGUITools.SetActive(heroDetailsContainer, true);
-			heroHealth.text = Math.Round(heroScript.currentArmour, 1) + "/" + Math.Round(heroScript.maxArmour, 1);
-			heroName.text = "Hero Dude/Ette";
-		}
-		if(currentHero == null)
-		{
-			NGUITools.SetActive(heroDetailsContainer, false);
+			if(i < playerTurnScript.playerOwnedHeroes.Count)
+			{
+				heroName[i].transform.parent.GetComponent<UISprite>().spriteName = "Button Normal";
+				heroName[i].transform.Find("Button").GetComponent<UIButton>().isEnabled = true;
+				heroName[i].transform.Find("Button").GetComponent<UISprite>().spriteName = "Button Click";
+				heroScript = playerTurnScript.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
+				heroHealth[i].text = Math.Round(heroScript.currentArmour, 1) + "/" + Math.Round(heroScript.maxArmour, 1);
+				heroName[i].text = "Hero Dude/Ette";
+			}
+			else
+			{
+				heroHealth[i].text = "";
+				heroName[i].text = "";
+				heroName[i].transform.parent.GetComponent<UISprite>().spriteName = "Button Deactivated";
+				heroName[i].transform.Find("Button").GetComponent<UIButton>().isEnabled = false;
+				heroName[i].transform.Find("Button").GetComponent<UISprite>().spriteName = "Empty Line";
+			}
 		}
 	}
 

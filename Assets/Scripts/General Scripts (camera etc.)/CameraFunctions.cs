@@ -72,9 +72,7 @@ public class CameraFunctions : MasterScript
 		clickTimer = -1f;
 		heroGUI.openHeroLevellingScreen = false;
 		invasionGUI.openInvasionMenu = false;
-		
-		NGUITools.SetActive (heroGUI.heroDetailsContainer, false);
-		
+
 		if(techTreeGUI.techTree.activeInHierarchy == true)
 		{
 			techTreeGUI.ShowTechTree();
