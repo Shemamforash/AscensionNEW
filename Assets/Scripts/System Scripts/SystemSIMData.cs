@@ -77,7 +77,7 @@ public class SystemSIMData : MasterScript
 	public void SystemSIMCounter(TurnInfo player) //This functions is used to add up all resources outputted by planets within a system, with improvement and tech modifiers applied
 	{
 		float tempTotalSci = 0.0f, tempTotalInd = 0.0f;
-		secRecKnowledgeMod = 1f; secRecKnowledgeMod = 1f; secRecPopulationMod = 1f;
+		secRecPowerMod = 1f; secRecKnowledgeMod = 1f; secRecPopulationMod = 1f;
 		thisPlayer = player;
 		CheckFrontLineBonus ();
 		CheckSecRecBonus(thisSystem);
@@ -206,39 +206,35 @@ public class SystemSIMData : MasterScript
 		}
 	}	
 
-	public void IncreasePopulation()
+	public void IncreasePopulation() //Used to increase the population of planets by their growth rate
 	{
-		for(int j = 0; j < systemListConstructor.systemList[thisSystem].systemSize; ++j)
+		for(int j = 0; j < systemListConstructor.systemList[thisSystem].systemSize; ++j) //For all planets in system
 		{
-			if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetColonised == true)
+			if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetColonised == true) //If it has been colonised
 			{
-				improvementNumber = systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetImprovementLevel;
-				
-				systemFunctions.CheckImprovement(thisSystem, j);
-
-				if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation < (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation + improvementsBasic.maxPopulationBonus)
-				   && systemDefence.underInvasion == false)
+				if(systemDefence.underInvasion == false) //If system is not being invaded allow growth
 				{
-					populationToAdd = systemPopulationModifier * secRecPopulationMod;
+					improvementNumber = systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetImprovementLevel; //Get the planets current improvement number
+					
+					systemFunctions.CheckImprovement(thisSystem, j); //Check the planets max ownership level
 
-					if(populationToAdd > (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation + improvementsBasic.maxPopulationBonus) - systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation)
+					if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation >= systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation 
+					   + improvementsBasic.maxPopulationBonus) //If the current population is greater than the maximum allowed population
 					{
-						populationToAdd = (systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation + improvementsBasic.maxPopulationBonus)
-							- systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation;
+						systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation = systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation; //Set the current population to equal max
+						continue;
 					}
 
-					systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation += populationToAdd;
+					populationToAdd = systemPopulationModifier * secRecPopulationMod; //Growth is the standard growth rate for the planets in the system multiplied by secondary resource modifiers
 
-					if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation < 0)
+					if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation < 0) //If population is less than 0, the planet must be reset
 					{
 						systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation = 0;
 						WipePlanetInfo(thisSystem, j);
+						continue;
 					}
 
-					if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation > systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation)
-					{
-						systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation = systemListConstructor.systemList[thisSystem].planetsInSystem[j].maxPopulation;
-					}
+					systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation += populationToAdd; //Add the growth to the population
 				}
 			}
 		}
