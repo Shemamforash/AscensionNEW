@@ -5,7 +5,7 @@ using System;
 
 public class InvasionGUI : MasterScript
 {
-	public GameObject invasionScreen, background, summary, token;
+	public GameObject invasionScreen, background, summary, token, tokenContainer;
 	public GameObject[] planetList = new GameObject[6];
 	public GameObject[] heroInterfaces = new GameObject[3];
 	public bool openInvasionMenu = false;
@@ -13,9 +13,11 @@ public class InvasionGUI : MasterScript
 	private List<HeroInvasionLabel> heroInvasionLabels = new List<HeroInvasionLabel>();
 	private List<PlanetInvasionLabels> planetInvasionLabels = new List<PlanetInvasionLabels>();
 	private List<float> bombTimers = new List<float>();
-	private List<GameObject> activeTokens = new List<GameObject> ();
 	private int system;
 	private float fissionBombTimer = 0, fusionBombTimer = 0, antimatterBombTimer = 0;
+	private TokenBehaviour behaviour;
+	private bool createdTokens;
+
 
 	private void SetUpHeroesAndPlanets()
 	{
@@ -25,12 +27,13 @@ public class InvasionGUI : MasterScript
 
 			HeroInvasionLabel temp = new HeroInvasionLabel();
 			
-			temp.assaultTokens = heroInterfaces[i].transform.Find("Assault Tokens").gameObject;
-			temp.auxiliaryTokens = heroInterfaces[i].transform.Find("Auxiliary Tokens").gameObject;
-			temp.defenceTokens = heroInterfaces[i].transform.Find("Defence Tokens").gameObject;
-			
+			temp.assaultTokenContainer = heroInterfaces[i].transform.Find("Assault Tokens").gameObject;
+			temp.auxiliaryTokenContainer = heroInterfaces[i].transform.Find("Auxiliary Tokens").gameObject;
+			temp.defenceTokenContainer = heroInterfaces[i].transform.Find("Defence Tokens").gameObject;
+
 			Transform summary = heroInterfaces[i].transform.Find("Summary");
-			
+
+			temp.reset = summary.transform.Find ("Buttons").transform.Find("Reset").gameObject;
 			temp.assaultDamage = summary.Find ("Assault Damage").GetComponent<UILabel>();
 			temp.assaultDamagePerToken = temp.assaultDamage.transform.Find ("Per Token").GetComponent<UILabel>();
 			temp.auxiliaryDamage = summary.Find ("Auxiliary Damage").GetComponent<UILabel>();
@@ -61,8 +64,46 @@ public class InvasionGUI : MasterScript
 		}
 	}
 
+	public void ResetTokens() //Method activated when reset buttons are pressed
+	{
+		for(int i = 0; i < heroInvasionLabels.Count; ++i) //For all active heroes
+		{
+			if(heroInvasionLabels[i].reset == UIButton.current.gameObject || UIButton.current.gameObject.name == "Reset All") //If button pressed corresponds to this hero, or the button was reset all
+			{
+				ResetTokenPositions(heroInvasionLabels[i].assaultTokensList, false); //Call the reset function with the gameobject lists containing the tokens
+				ResetTokenPositions(heroInvasionLabels[i].auxiliaryTokensList, false);
+				ResetTokenPositions(heroInvasionLabels[i].defenceTokensList, false);
+			}
+		}
+	}
+
+	private void ResetTokenPositions(List<GameObject> tokenList, bool remove) //Method used to reset the token parent and position
+	{
+		for(int i = 0; i < tokenList.Count; ++i) //For all the tokens in the token list
+		{
+			if(remove == false)
+			{
+				TokenUI token = tokenList[i].GetComponent<TokenUI>(); //Get a reference to the attached script
+				
+				tokenList[i].transform.position = token.originalPosition; //Set the position to the original position
+				tokenList[i].transform.parent = token.originalParent.transform; //Set the parent to the original parent
+			}
+			if(remove == true)
+			{
+				NGUITools.Destroy(tokenList[i]);
+			}
+		}
+
+		if(remove == true)
+		{
+			tokenList.Clear ();
+		}
+	}
+
 	void Start () 
 	{
+		behaviour = tokenContainer.GetComponent<TokenBehaviour>();
+
 		NGUITools.SetActive (invasionScreen, true);
 
 		bombTimers.Add (fissionBombTimer);
@@ -119,14 +160,19 @@ public class InvasionGUI : MasterScript
 
 		for(int i = 0; i < 6; ++i)
 		{
-			GameObject parent = heroInterfaces[0].transform.Find (container).GetChild(i).gameObject;
+			GameObject parent = heroInterfaces[0].transform.Find (container).gameObject;
+			GameObject tokenPositionObject = parent.transform.GetChild(i).gameObject;
 
 			if(i < tokenCount)
 			{
-				NGUITools.SetActive(parent, true);
+				NGUITools.SetActive(tokenPositionObject, true);
 				GameObject tempToken = NGUITools.AddChild(parent, token);
-				tempToken.transform.position = parent.transform.position;
-				activeTokens.Add (tempToken);
+				EventDelegate.Add (tempToken.GetComponent<UIButton>().onClick, behaviour.ButtonClicked); //Add button clicked
+				tempToken.transform.position = parent.transform.GetChild(i).transform.position;
+
+				TokenUI tokenUI = tempToken.GetComponent<TokenUI>();
+				tokenUI.originalPosition = tempToken.transform.position;
+				tokenUI.originalParent = parent;
 
 				UIButton tokenButton = tempToken.GetComponent<UIButton>();
 
@@ -137,26 +183,30 @@ public class InvasionGUI : MasterScript
 					tokenButton.hoverSprite = "Primary Weapon Hover";
 					tokenButton.pressedSprite = "Primary Weapon Pressed";
 					tokenButton.disabledSprite = "Primary Weapon Pressed";
+					heroInvasionLabels[0].assaultTokensList.Add (tempToken);
 					break;
 				case "Auxiliary":
 					tokenButton.normalSprite = "Secondary Weapon Normal";
 					tokenButton.hoverSprite = "Secondary Weapon Hover";
 					tokenButton.pressedSprite = "Secondary Weapon Pressed";
 					tokenButton.disabledSprite = "Secondary Weapon Pressed";
+					heroInvasionLabels[0].auxiliaryTokensList.Add (tempToken);
 					break;
 				case "Defence":
 					tokenButton.normalSprite = "Defence Normal";
 					tokenButton.hoverSprite = "Defence Hover";
 					tokenButton.pressedSprite = "Defence Pressed";
 					tokenButton.disabledSprite = "Defence Pressed";
+					heroInvasionLabels[0].defenceTokensList.Add (tempToken);
 					break;
 				default:
 					break;
 				}
 			}
+
 			else
 			{
-				NGUITools.SetActive(parent, false);
+				NGUITools.SetActive(tokenPositionObject, false);
 			}
 		}
 	}
@@ -184,25 +234,28 @@ public class InvasionGUI : MasterScript
 				UpdatePlanetInvasionValues(system);
 				UpdateHeroInterfaces();
 
-				if(activeTokens.Count == 0)
+				if(createdTokens == false)
 				{
 					SystemInvasionInfo temp = new SystemInvasionInfo();
 
 					CreateTokens("Assault", temp);
 					CreateTokens("Auxiliary", temp);
 					CreateTokens("Defence", temp);
+
+					createdTokens = true;
 				}
 			}
 		}
 		
 		if(openInvasionMenu == false)
 		{
-			activeTokens.Clear ();
-
 			NGUITools.SetActive(heroGUI.heroDetailsContainer, true);
 
 			for(int i = 0; i < 3; ++i)
 			{
+				ResetTokenPositions(heroInvasionLabels[i].assaultTokensList, true); //Call the reset function with the gameobject lists containing the tokens
+				ResetTokenPositions(heroInvasionLabels[i].auxiliaryTokensList, true);
+				ResetTokenPositions(heroInvasionLabels[i].defenceTokensList, true);
 				NGUITools.SetActive(heroInterfaces[i], false);
 			}
 
@@ -381,7 +434,10 @@ public class InvasionGUI : MasterScript
 	}
 	private class HeroInvasionLabel
 	{
-		public GameObject defenceTokens, assaultTokens, auxiliaryTokens;
+		public GameObject defenceTokenContainer, assaultTokenContainer, auxiliaryTokenContainer, reset;
+		public List<GameObject> defenceTokensList = new List<GameObject>();
+		public List<GameObject> assaultTokensList = new List<GameObject>();
+		public List<GameObject> auxiliaryTokensList = new List<GameObject>();
 		public UILabel defence, defencePerToken, assaultDamage, assaultDamagePerToken, auxiliaryDamage, auxiliaryDamagePerToken, health, type, name;
 	}
 }

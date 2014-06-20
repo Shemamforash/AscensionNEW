@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class TokenBehaviour : MasterScript
 {
 	private List<GameObject> tokens = new List<GameObject>();
-	private List<Vector3> tokenPosition = new List<Vector3> ();
 	public bool followingMouse = false;
 	private GameObject currentContainer;
 	public Transform[] tokenContainers = new Transform[6];
@@ -83,11 +82,13 @@ public class TokenBehaviour : MasterScript
 			}
 		}
 
-		if(Input.GetKeyDown("escape"))
+		if(Input.GetKeyDown("x"))
 		{
 			for(int i = 0; i < tokens.Count; ++i)
 			{
-				tokens[i].transform.position = tokenPosition[i];
+				TokenUI token = tokens[i].GetComponent<TokenUI>();
+				tokens[i].transform.position = token.originalPosition;
+				tokens[i].transform.parent = token.originalParent.transform;
 				tokens[i].GetComponent<UIButton>().isEnabled = true;
 			}
 
@@ -115,7 +116,6 @@ public class TokenBehaviour : MasterScript
 					if(tokens[0].name == UIButton.current.gameObject.name) //Check the clicked token's name matches the name of the other tokens in the list
 					{
 						tokens.Add(UIButton.current.gameObject); //Add it to the list if it does
-						tokenPosition.Add (UIButton.current.gameObject.transform.position); //Add it's original position too
 					}
 				}
 				else //If the list is empty
@@ -123,8 +123,6 @@ public class TokenBehaviour : MasterScript
 					tokens.Add(UIButton.current.gameObject); //Add the token to the list
 				}
 			}
-
-			EventDelegate.Remove(UIButton.current.gameObject.GetComponent<UIButton>().onClick, ButtonClicked); //Remove button clicked
 		}
 	}
 	
@@ -132,11 +130,10 @@ public class TokenBehaviour : MasterScript
 	{
 		for(int i = 0; i < tokens.Count; ++i)
 		{
-			tokens[i].transform.parent = container.transform; //And to set it's parent
+			tokens[0].transform.parent = container.transform;
 			UILabel label = container.transform.Find ("Label").gameObject.GetComponent<UILabel>();
 			int j = int.Parse (label.text);
 			label.text = (j + 1).ToString();
-			EventDelegate.Add (tokens[i].GetComponent<UIButton>().onClick, ButtonClicked); //Add button clicked
 			tokens[i].GetComponent<UIButton> ().isEnabled = true;
 		}
 
