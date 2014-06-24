@@ -5,7 +5,7 @@ using System;
 
 public class InvasionGUI : MasterScript
 {
-	public GameObject invasionScreen, background, summary, token, tokenContainer;
+	public GameObject invasionScreen, background, summary, token, tokenContainer, includeHero2, includeHero3;
 	public GameObject[] planetList = new GameObject[6];
 	public GameObject[] heroInterfaces = new GameObject[3];
 	public bool openInvasionMenu = false;
@@ -135,7 +135,7 @@ public class InvasionGUI : MasterScript
 		}
 	}
 
-	private void CreateTokens(string tokenType)
+	private void CreateTokens(string tokenType, HeroScriptParent hero)
 	{
 		int tokenCount = 0;
 		string container = null;
@@ -143,15 +143,15 @@ public class InvasionGUI : MasterScript
 		switch (tokenType)
 		{
 		case "Assault":
-			tokenCount = heroScript.assaultTokens;
+			tokenCount = hero.assaultTokens;
 			container = "Assault Tokens";
 			break;
 		case "Auxiliary":
-			tokenCount = heroScript.auxiliaryTokens;
+			tokenCount = hero.auxiliaryTokens;
 			container = "Auxiliary Tokens";
 			break;
 		case "Defence":
-			tokenCount = heroScript.defenceTokens;
+			tokenCount = hero.defenceTokens;
 			container = "Defence Tokens";
 			break;
 		default:
@@ -291,20 +291,44 @@ public class InvasionGUI : MasterScript
 				NGUITools.SetActive(heroGUI.heroDetailsContainer, false); //Close the hero details window
 				NGUITools.SetActive(summary, true);
 
+				for(int i = 0; i < playerTurnScript.playerOwnedHeroes.Count; ++i)
+				{
+					if(playerTurnScript.playerOwnedHeroes[i] == heroGUI.currentHero)
+					{
+						continue;
+					}
+
+					heroScript = playerTurnScript.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
+
+					if(heroScript.heroLocation == systemListConstructor.systemList[system].systemObject)
+					{
+						if(includeHero2.activeInHierarchy == false)
+						{
+							NGUITools.SetActive(includeHero2, true);
+							includeHero2.transform.Find ("Label").GetComponent<UILabel>().text = heroScript.heroType;
+						}
+						if(includeHero2.activeInHierarchy == true)
+						{
+							NGUITools.SetActive(includeHero3, true);
+							includeHero3.transform.Find ("Label").GetComponent<UILabel>().text = heroScript.heroType;
+						}
+					}
+				}
+
 				if(background.activeInHierarchy == false) //Set the background to active
 				{
 					NGUITools.SetActive(background, true);
 				}
-
+				
 				UpdatePlanetInvasionValues(system);
 				UpdateHeroInterfaces();
-
+				
 				if(createdTokens == false)
 				{
-					CreateTokens("Assault");
-					CreateTokens("Auxiliary");
-					CreateTokens("Defence");
-
+					CreateTokens("Assault", heroGUI.currentHero.GetComponent<HeroScriptParent>());
+					CreateTokens("Auxiliary", heroGUI.currentHero.GetComponent<HeroScriptParent>());
+					CreateTokens("Defence", heroGUI.currentHero.GetComponent<HeroScriptParent>());
+					
 					createdTokens = true;
 				}
 			}
@@ -313,6 +337,8 @@ public class InvasionGUI : MasterScript
 		if(openInvasionMenu == false)
 		{
 			NGUITools.SetActive(heroGUI.heroDetailsContainer, true);
+			NGUITools.SetActive(includeHero2, false);
+			NGUITools.SetActive(includeHero3, false);
 
 			for(int i = 0; i < 3; ++i)
 			{
@@ -334,20 +360,60 @@ public class InvasionGUI : MasterScript
 		}
 	}
 
+	public void IncludeHero()
+	{
+		for(int i = 0; i < playerTurnScript.playerOwnedHeroes.Count; ++i)
+		{
+			if(playerTurnScript.playerOwnedHeroes[i] == heroGUI.currentHero)
+			{
+				continue;
+			}
+
+			heroScript = playerTurnScript.playerOwnedHeroes[i].GetComponent<HeroScriptParent>();
+			
+			if(heroScript.heroLocation == systemListConstructor.systemList[system].systemObject)
+			{
+				if(UIButton.current.gameObject == includeHero2)
+				{
+					NGUITools.SetActive(includeHero2, true);
+					includeHero2.transform.Find ("Label").GetComponent<UILabel>().text = heroScript.heroType;
+				}
+				if(UIButton.current.gameObject == includeHero3)
+				{
+					NGUITools.SetActive(includeHero3, true);
+					includeHero3.transform.Find ("Label").GetComponent<UILabel>().text = heroScript.heroType;
+				}
+
+				CreateTokens("Assault", heroScript);
+				CreateTokens("Auxiliary", heroScript);
+				CreateTokens("Defence", heroScript);
+				break;
+			}
+		}
+
+		NGUITools.SetActive (UIButton.current.gameObject, false);
+	}
+
 	private void UpdateHeroInterfaces()
 	{
-		NGUITools.SetActive (heroInterfaces [0], true);
-
-		heroInvasionLabels [0].health.text = heroScript.currentHealth + "/" + heroScript.maxHealth + " HEALTH";
-		heroInvasionLabels [0].name.text = "A HERO";
-		heroInvasionLabels [0].type.text = heroScript.heroType;
-
-		heroInvasionLabels [0].assaultDamage.text = Math.Round (heroScript.assaultDamage, 0) + " ASSAULT DAMAGE";
-		heroInvasionLabels [0].assaultDamagePerToken.text = Math.Round (heroScript.assaultDamage / (float)heroScript.assaultTokens, 0) + " PER";
-		heroInvasionLabels [0].auxiliaryDamage.text = Math.Round (heroScript.auxiliaryDamage, 0) + " AUXILIARY DAMAGE";
-		heroInvasionLabels [0].auxiliaryDamagePerToken.text = Math.Round (heroScript.auxiliaryDamage / (float)heroScript.auxiliaryTokens, 0) + " PER";
-		heroInvasionLabels [0].defence.text = Math.Round (heroScript.defence, 0) + " DEFENCE";
-		heroInvasionLabels [0].defencePerToken.text = Math.Round (heroScript.defence / (float)heroScript.defenceTokens, 0) + " PER";
+		for(int i = 0; i < 3; ++i)
+		{
+			if(includeHero2.activeInHierarchy == false && i == 1 || includeHero3.activeInHierarchy == false && i == 2)
+			{
+				NGUITools.SetActive (heroInterfaces [i], true);
+				
+				heroInvasionLabels [i].health.text = heroScript.currentHealth + "/" + heroScript.maxHealth + " HEALTH";
+				heroInvasionLabels [i].name.text = "A HERO";
+				heroInvasionLabels [i].type.text = heroScript.heroType;
+				
+				heroInvasionLabels [i].assaultDamage.text = Math.Round (heroScript.assaultDamage, 0) + " ASSAULT DAMAGE";
+				heroInvasionLabels [i].assaultDamagePerToken.text = Math.Round (heroScript.assaultDamage / (float)heroScript.assaultTokens, 0) + " PER";
+				heroInvasionLabels [i].auxiliaryDamage.text = Math.Round (heroScript.auxiliaryDamage, 0) + " AUXILIARY DAMAGE";
+				heroInvasionLabels [i].auxiliaryDamagePerToken.text = Math.Round (heroScript.auxiliaryDamage / (float)heroScript.auxiliaryTokens, 0) + " PER";
+				heroInvasionLabels [i].defence.text = Math.Round (heroScript.defence, 0) + " DEFENCE";
+				heroInvasionLabels [i].defencePerToken.text = Math.Round (heroScript.defence / (float)heroScript.defenceTokens, 0) + " PER";
+			}
+		}
 	}
 
 	private void UpdatePlanetInvasionValues(int thisSystem) //Used to update the labels of the planets

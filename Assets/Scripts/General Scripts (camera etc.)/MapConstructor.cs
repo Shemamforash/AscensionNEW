@@ -305,7 +305,7 @@ public class MapConstructor : MasterScript
 		{
 			int randomInt = WeightedConnectionFinder(Random.Range (0,100)); //Generate number
 			
-			if(systemListConstructor.systemList[i].systemName == "Samael" || systemListConstructor.systemList[i].systemName == "Midgard" || systemListConstructor.systemList[i].systemName == "Nepthys")
+			if(systemListConstructor.systemList[i].systemName == "Samael" || systemListConstructor.systemList[i].systemName == "Midgard" || systemListConstructor.systemList[i].systemName == "Nephthys")
 			{
 				randomInt = WeightedConnectionFinder(Random.Range (49, 99));
 			}

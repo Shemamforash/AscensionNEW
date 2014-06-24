@@ -6,7 +6,7 @@ public class WinConditions : MasterScript
 {
 	private bool hasWon;
 	private string winCondition, winPlayer;
-	private string[] homeSystems = new string[3] {"Midgard", "Nepthys", "Samael"};
+	private string[] homeSystems = new string[3] {"Midgard", "Nephthys", "Samael"};
 	private int expansionPercentage;
 	private TurnInfo player;
 

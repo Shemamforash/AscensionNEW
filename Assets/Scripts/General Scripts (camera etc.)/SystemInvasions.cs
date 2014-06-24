@@ -50,38 +50,40 @@ public class SystemInvasions : MasterScript
 		}
 	}
 
-	private void CheckSystemStatus(int system, string player)
+	private void CheckSystemStatus(int system, string player) //Used to check if system has been defeated
 	{
-		int planetsDestroyed = 0;
+		int planetsDestroyed = 0; //Counter for number of planets destroyed
 
-		for(int i = 0; i < systemListConstructor.systemList [system].systemSize; ++i)
+		for(int i = 0; i < systemListConstructor.systemList [system].systemSize; ++i) //For all planets in system
 		{
-			if(systemListConstructor.systemList [system].planetsInSystem [i].planetColonised == false)
+			if(systemListConstructor.systemList [system].planetsInSystem [i].planetColonised == false) //If it has not been colonised
 			{
-				++planetsDestroyed;
+				++planetsDestroyed; //Add it to destroyed counter
 				continue;
 			}
 		}
 		
-		if(planetsDestroyed == systemListConstructor.systemList [system].systemSize)
+		if(planetsDestroyed == systemListConstructor.systemList [system].systemSize) //If the number of destroyed planets is equal to the system size
 		{
 			bool captured = false;
 
-			for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
+			for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i) //For all systems connected to this one
 			{
-				int sys = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
+				int sys = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]); //Get the connections number
 
-				if(systemListConstructor.systemList[sys].systemOwnedBy == player)
+				if(systemListConstructor.systemList[sys].systemOwnedBy == player) //If it is owned by the player
 				{
-					OwnSystem(system);
-					captured = true;
+					OwnSystem(system); //Capture this system
+					invasionGUI.openInvasionMenu = false; //Close the invasion screen
+					captured = true; //Prevent the system from being destroyed
 					break;
 				}
 			}
 
-			if(captured == false)
+			if(captured == false) //If it has no friendly neighbours
 			{
-				DestroySystem(system);
+				DestroySystem(system); //Destroy the system
+				invasionGUI.openInvasionMenu = false; //Close the invasion screen
 			}
 		}
 	}
