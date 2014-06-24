@@ -369,7 +369,7 @@ public class SystemListConstructor : MasterScript
 					
 					systemList.Add (system);
 
-					if(system.systemName == "Nepthys" || system.systemName == "Midgard" || system.systemName == "Samael")
+					if(system.systemName == "Nephthys" || system.systemName == "Midgard" || system.systemName == "Samael")
 					{
 						if(PlayerPrefs.GetString("Planet One") == system.systemName || PlayerPrefs.GetString("Planet Two") == system.systemName || PlayerPrefs.GetString("Planet Three") == system.systemName)
 						{

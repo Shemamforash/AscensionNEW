@@ -107,7 +107,7 @@ public class HeroShip : MasterScript
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
 		ShipFunctions.UpdateShips ();
-		heroScript.assaultDamage = ShipFunctions.primaryWeaponPower * heroScript.assaultMod;
+		heroScript.assaultDamage = ShipFunctions.primaryWeaponPower * heroScript.assaultMod * 100;
 		heroScript.maxHealth = ShipFunctions.armourRating * heroScript.healthMod;
 		heroScript.movementSpeed = ShipFunctions.engineValue * heroScript.movementMod;
 

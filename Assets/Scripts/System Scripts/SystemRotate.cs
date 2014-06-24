@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class SystemRotate : MasterScript
 {
-	public Vector3 galacticCentre = new Vector3(45f, 45f, 0f);
+	public Vector3 galacticCentre = new Vector3(50f, 50f, 0f);
 	public float radius, xPos, yPos, speed, rndSpd1, rndSpd2, rndSpd3;
 	public GameObject corona1, corona2, corona3;
 

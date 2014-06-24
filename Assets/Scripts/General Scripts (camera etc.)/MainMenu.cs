@@ -139,7 +139,7 @@ public class MainMenu : MonoBehaviour
 					objectList[i].currentPlanet = "Samael";
 					break;
 				case "Nereides":
-					objectList[i].currentPlanet = "Nepthys";
+					objectList[i].currentPlanet = "Nephthys";
 					break;
 				default:
 					objectList[i].currentPlanet = "None";
