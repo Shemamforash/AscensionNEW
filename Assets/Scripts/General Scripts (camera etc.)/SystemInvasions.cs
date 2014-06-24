@@ -6,43 +6,54 @@ public class SystemInvasions : MasterScript
 {
 	public GameObject invasionQuad;
 	public HeroScriptParent hero;
-	private List<SystemInvasionInfo> currentInvasions = new List<SystemInvasionInfo>();
+	public List<SystemInvasionInfo> currentInvasions = new List<SystemInvasionInfo>();
 
-	public void PlanetInvasion(HeroScriptParent curHero, int system, int planet, bool click)
+	private float CalculateTotalTokenValue(List<GameObject> tokenList)
 	{
-		if(systemListConstructor.systemList [system].planetsInSystem [planet].underEnemyControl == false)
+		float total = 0;
+		
+		for(int k = 0; k < tokenList.Count; ++k)
 		{
-			if(click == false)
-			{
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation -= curHero.auxiliaryDamage / 4f;
-				curHero.currentHealth -= systemListConstructor.systemList [system].planetsInSystem[planet].planetOffence / (curHero.currentHealth * curHero.classModifier);
-			}
+			heroScript = tokenList[k].GetComponent<HeroScriptParent>();
 			
-			if(systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation <= 0)
+			total += heroScript.assaultDamage / heroScript.assaultTokens;
+		}
+
+		return total;
+	}
+
+	public void UpdateInvasions()
+	{
+		for(int i = 0; i < currentInvasions.Count; ++i)
+		{
+			systemDefence = currentInvasions[i].system.GetComponent<SystemDefence>();
+			int system = RefreshCurrentSystem(currentInvasions[i].system);
+
+			for(int j = 0; j < systemListConstructor.systemList[system].systemSize; ++j)
 			{
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetColonised = false;
-				systemListConstructor.systemList [system].planetsInSystem [planet].expansionPenaltyTimer = 0f;
-				systemListConstructor.systemList [system].planetsInSystem [planet].improvementsBuilt.Clear ();
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetImprovementLevel = 0;
-				systemListConstructor.systemList [system].planetsInSystem [planet].planetPopulation = 0;
-				curHero.planetInvade = -1;
+				float assaultDamage = CalculateTotalTokenValue(currentInvasions[i].tokenAllocation[j].assaultTokenAllocation);
+				float auxiliaryDamage = CalculateTotalTokenValue(currentInvasions[i].tokenAllocation[j].auxiliaryTokenAllocation) - systemListConstructor.systemList[system].planetsInSystem[j].planetCurrentDefence / 10f;
+
+				systemDefence.TakeDamage(assaultDamage, auxiliaryDamage, j);
+
+				if(systemListConstructor.systemList [system].planetsInSystem [j].planetPopulation <= 0)
+				{
+					systemListConstructor.systemList [system].planetsInSystem [j].planetColonised = false;
+					systemListConstructor.systemList [system].planetsInSystem [j].expansionPenaltyTimer = 0f;
+					systemListConstructor.systemList [system].planetsInSystem [j].improvementsBuilt.Clear ();
+					systemListConstructor.systemList [system].planetsInSystem [j].planetImprovementLevel = 0;
+					systemListConstructor.systemList [system].planetsInSystem [j].planetPopulation = 0;
+				}
 			}
 
-			else if(systemListConstructor.systemList [system].planetsInSystem [planet].planetCurrentDefence <= 0)
-			{
-				systemListConstructor.systemList [system].planetsInSystem [planet].underEnemyControl = true;
-				curHero.planetInvade = -1;
-			}
+			CheckSystemStatus (system, currentInvasions[i].player);
 		}
-		
-		CheckSystemStatus (system, planet);
 	}
-	
-	private void CheckSystemStatus(int system, int planet)
+
+	private void CheckSystemStatus(int system, string player)
 	{
 		int planetsDestroyed = 0;
-		int planetsEnemyControlled = 0;
-		
+
 		for(int i = 0; i < systemListConstructor.systemList [system].systemSize; ++i)
 		{
 			if(systemListConstructor.systemList [system].planetsInSystem [i].planetColonised == false)
@@ -50,45 +61,27 @@ public class SystemInvasions : MasterScript
 				++planetsDestroyed;
 				continue;
 			}
-			
-			if(systemListConstructor.systemList [system].planetsInSystem [i].underEnemyControl == true)
-			{
-				++planetsEnemyControlled;
-			}
 		}
 		
 		if(planetsDestroyed == systemListConstructor.systemList [system].systemSize)
 		{
-			DestroySystem(system);
+			bool captured = false;
 
-			invasionGUI.openInvasionMenu = false;
-
-			for(int i = 0; i < systemListConstructor.systemList[system].planetsInSystem.Count; ++i)
+			for(int i = 0; i < systemListConstructor.systemList[system].permanentConnections.Count; ++i)
 			{
-				systemListConstructor.systemList[system].planetsInSystem[i].underEnemyControl = false;
-			}
-		}
-		
-		else if(planetsDestroyed + planetsEnemyControlled == systemListConstructor.systemList [system].systemSize && planetsDestroyed != systemListConstructor.systemList [system].systemSize)
-		{
-			OwnSystem(system);
+				int sys = RefreshCurrentSystem(systemListConstructor.systemList[system].permanentConnections[i]);
 
-			invasionGUI.openInvasionMenu = false;
-
-			for(int i = 0; i < systemListConstructor.systemList[system].planetsInSystem.Count; ++i)
-			{
-				systemListConstructor.systemList[system].planetsInSystem[i].underEnemyControl = false;
-			}
-		}
-
-		if(planetsDestroyed + planetsEnemyControlled == systemListConstructor.systemList[system].systemSize)
-		{
-			for(int i = 0; i < turnInfoScript.allPlayers.Count; ++i)
-			{
-				if(turnInfoScript.allPlayers[i].playerRace == hero.heroOwnedBy)
+				if(systemListConstructor.systemList[sys].systemOwnedBy == player)
 				{
-					hero.aiInvadeTarget = -1;
+					OwnSystem(system);
+					captured = true;
+					break;
 				}
+			}
+
+			if(captured == false)
+			{
+				DestroySystem(system);
 			}
 		}
 	}
@@ -138,17 +131,7 @@ public class SystemInvasions : MasterScript
 		{
 			for(int j = 0; j < systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt.Count; ++j)
 			{
-				for(int k = 0; k < improvementsBasic.listOfImprovements.Count; ++k)
-				{
-					if(systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt[j] == improvementsBasic.listOfImprovements[k].improvementName)
-					{
-						if(improvementsBasic.listOfImprovements[k].improvementCategory != "Generic" || improvementsBasic.listOfImprovements[k].improvementCategory != playerTurnScript.playerRace)
-						{
-							systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt.RemoveAt(j);
-							improvementsBasic.listOfImprovements[k].hasBeenBuilt = false;
-						}
-					}
-				}
+				systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt.Clear ();
 			}
 		}
 
@@ -189,9 +172,14 @@ public class SystemInvasions : MasterScript
 
 public class SystemInvasionInfo
 {
-	public int system;
-	public List<int> assaultTokenAllocation = new List<int>();
-	public List<int> auxiliaryTokenAllocation = new List<int>();
-	public List<int> defenceTokenAllocation = new List<int>();
-	public List<Vector3> tokenPositions = new List<Vector3> ();
+	public GameObject system;
+	public string player;
+	public List<PlanetInvasionInfo> tokenAllocation = new List<PlanetInvasionInfo> ();
+}
+
+public class PlanetInvasionInfo
+{
+	public List<GameObject> assaultTokenAllocation = new List<GameObject>();
+	public List<GameObject> auxiliaryTokenAllocation = new List<GameObject>();
+	public List<GameObject> defenceTokenAllocation = new List<GameObject>();
 }

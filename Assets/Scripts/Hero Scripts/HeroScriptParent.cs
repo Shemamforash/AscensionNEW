@@ -6,7 +6,7 @@ public class HeroScriptParent : MasterScript
 {
 	//This is the basic hero level, with general effects
 	public GameObject heroLocation, invasionObject;
-	public int currentLevel = 1, planetInvade = -1, system;
+	public int system;
 	public int lH2Spent, antiSpent, radioSpent, blueCSpent, assaultTokens = 2, auxiliaryTokens = 2, defenceTokens = 2; 
 	public string heroOwnedBy, heroType;
 	public bool isInvading = false, isBusy;
@@ -95,10 +95,6 @@ public class HeroScriptParent : MasterScript
 				if(systemDefence.canEnter == false)
 				{
 					systemInvasion.ContinueInvasion(system);
-				}
-				if(systemDefence.canEnter == true && planetInvade != -1)
-				{
-					systemInvasion.PlanetInvasion(this, system, planetInvade, false);
 				}
 			}
 

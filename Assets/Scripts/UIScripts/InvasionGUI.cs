@@ -135,7 +135,7 @@ public class InvasionGUI : MasterScript
 		}
 	}
 
-	private void CreateTokens(string tokenType, SystemInvasionInfo temp)
+	private void CreateTokens(string tokenType)
 	{
 		int tokenCount = 0;
 		string container = null;
@@ -173,6 +173,7 @@ public class InvasionGUI : MasterScript
 				TokenUI tokenUI = tempToken.GetComponent<TokenUI>();
 				tokenUI.originalPosition = tempToken.transform.position;
 				tokenUI.originalParent = parent;
+				tokenUI.hero = heroGUI.currentHero;
 
 				UIButton tokenButton = tempToken.GetComponent<UIButton>();
 
@@ -211,6 +212,70 @@ public class InvasionGUI : MasterScript
 		}
 	}
 
+	public void CacheInvasionInfo() //Used to cache the invasion info
+	{
+		SystemInvasionInfo cachedInvasion = new SystemInvasionInfo (); //Create a new invasion object
+
+		int invasionLoc = -1; //Set a counter
+
+		for(int i = 0; i < systemInvasion.currentInvasions.Count; ++i) //For all current cached invasions
+		{
+			if(systemInvasion.currentInvasions[i].system == systemListConstructor.systemList[system].systemObject) //If this system already has an invasion underway
+			{
+				invasionLoc = i; //Set the counter
+			}
+		}
+
+		cachedInvasion.system = systemListConstructor.systemList[system].systemObject; //Set the system to equal this system
+		cachedInvasion.player = heroGUI.currentHero.GetComponent<HeroScriptParent> ().heroOwnedBy;
+
+		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i) //For all planets in the system
+		{
+			PlanetInvasionInfo cachedPlanet = new PlanetInvasionInfo(); //Create object for planet
+
+			foreach(Transform child in behaviour.tokenContainers[i]) //For all the containers within each planet
+			{
+				foreach(Transform subChild in child) //For all children within the container
+				{
+					if(subChild.name == "Label") //If the name of the child is not label
+					{
+						continue;
+					}
+					else //It must be a token
+					{
+						TokenUI tokenScript = subChild.GetComponent<TokenUI>(); //So get a reference to it's script
+
+						switch(child.name) //Switch based on name of container
+						{
+						case "Defence Token":
+							cachedPlanet.defenceTokenAllocation.Add (tokenScript.hero); //If it's a defence token cache the token's hero into the planet list
+							break;
+						case "Assault Token":
+							cachedPlanet.assaultTokenAllocation.Add (tokenScript.hero); //Same for assault token
+							break;
+						case "Auxiliary Token":
+							cachedPlanet.auxiliaryTokenAllocation.Add (tokenScript.hero); //And for auxiliary token
+							break;
+						default:
+							break;
+						}
+					}
+				}
+			}
+
+			cachedInvasion.tokenAllocation.Add (cachedPlanet);
+		}
+
+		if(invasionLoc == -1) //If this invasion is not already cached
+		{
+			systemInvasion.currentInvasions.Add (cachedInvasion); //Cache it
+		}
+		else //If it is
+		{
+			systemInvasion.currentInvasions[invasionLoc] = cachedInvasion; //Replace it with the updated one
+		}
+	}
+
 	void Update()
 	{
 		if(heroGUI.currentHero != null) //If a hero is selected
@@ -236,11 +301,9 @@ public class InvasionGUI : MasterScript
 
 				if(createdTokens == false)
 				{
-					SystemInvasionInfo temp = new SystemInvasionInfo();
-
-					CreateTokens("Assault", temp);
-					CreateTokens("Auxiliary", temp);
-					CreateTokens("Defence", temp);
+					CreateTokens("Assault");
+					CreateTokens("Auxiliary");
+					CreateTokens("Defence");
 
 					createdTokens = true;
 				}

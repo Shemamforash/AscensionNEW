@@ -112,6 +112,7 @@ public class TurnInfo : MasterScript
 			turnInfoScript.turn += 1.0f;
 			turnInfoScript.TurnEnd (playerTurnScript);
 			winConditions.CheckWin(playerTurnScript);
+			systemInvasion.UpdateInvasions();
 
 			for(int i = 0; i < allPlayers.Count; ++i)
 			{

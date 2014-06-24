@@ -153,13 +153,13 @@ public class TokenBehaviour : MasterScript
 					UpdateParent(currentContainer); //UpdateParent
 				}
 				break;
-			case "Secondary Token":
+			case "Auxiliary Token":
 				if(tokens[0].GetComponent<UISprite>().spriteName == "Secondary Weapon Pressed")
 				{
 					UpdateParent(currentContainer);
 				}
 				break;
-			case "Primary Token":
+			case "Assault Token":
 				if(tokens[0].GetComponent<UISprite>().spriteName == "Primary Weapon Pressed")
 				{
 					UpdateParent(currentContainer);
