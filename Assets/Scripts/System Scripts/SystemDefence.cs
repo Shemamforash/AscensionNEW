@@ -14,16 +14,16 @@ public class SystemDefence : MasterScript
 		system = RefreshCurrentSystem (gameObject);
 	}
 
-	public void TakeDamage(float primaryDamage, float collateralDamage, int planet)
+	public void TakeDamage(float assaultDamage, float auxiliaryDamage, int planet)
 	{
 		if(planet == -1)
 		{
-			systemListConstructor.systemList[system].systemDefence -= primaryDamage;
+			systemListConstructor.systemList[system].systemDefence -= assaultDamage;
 		}
 		else
 		{
-			systemListConstructor.systemList[system].planetsInSystem[planet].planetCurrentDefence -= primaryDamage;
-			systemListConstructor.systemList[system].planetsInSystem[planet].planetPopulation -= collateralDamage;
+			systemListConstructor.systemList[system].planetsInSystem[planet].planetCurrentDefence -= assaultDamage;
+			systemListConstructor.systemList[system].planetsInSystem[planet].planetPopulation -= auxiliaryDamage;
 		}
 	}
 
