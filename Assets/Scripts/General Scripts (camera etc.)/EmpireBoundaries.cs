@@ -89,7 +89,7 @@ public class EmpireBoundaries : MasterScript
 			default:
 				if(boundRings[i] != null)
 				{
-					boundRings[i].renderer.material = null;
+					Destroy (boundRings[i]);
 				}
 				break;
 			}
