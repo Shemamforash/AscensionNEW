@@ -102,7 +102,7 @@ public class TokenBehaviour : MasterScript
 		{
 			UIButton.current.gameObject.GetComponent<UIButton> ().isEnabled = false;
 			
-			if(UIButton.current.transform.parent.name == "Defence Token" || UIButton.current.transform.parent.name == "Secondary Token" || UIButton.current.transform.parent.name == "Primary Token") //If it already has a parent (is already in a container)
+			if(UIButton.current.transform.parent.name == "Defence Token" || UIButton.current.transform.parent.name == "Auxiliary Token" || UIButton.current.transform.parent.name == "Assault Token") //If it already has a parent (is already in a container)
 			{
 				UILabel label = UIButton.current.transform.parent.Find ("Label").gameObject.GetComponent<UILabel>(); //Decrease the container's value
 				int j = int.Parse (label.text);
@@ -130,7 +130,7 @@ public class TokenBehaviour : MasterScript
 	{
 		for(int i = 0; i < tokens.Count; ++i)
 		{
-			tokens[0].transform.parent = container.transform;
+			tokens[i].transform.parent = container.transform;
 			UILabel label = container.transform.Find ("Label").gameObject.GetComponent<UILabel>();
 			int j = int.Parse (label.text);
 			label.text = (j + 1).ToString();
