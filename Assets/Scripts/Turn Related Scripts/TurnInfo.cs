@@ -97,7 +97,7 @@ public class TurnInfo : MasterScript
 		{
 			raceKnowledge = 2f * gameSpeedModifer;
 			racePower = gameSpeedModifer;
-			raceWealth = 10.4f;
+			raceWealth = 0.4f;
 			homeSystem = "Nephthys";
 			homePlanetType = "Boreal";
 			materialInUse = turnInfoScript.nereidesMaterial;
