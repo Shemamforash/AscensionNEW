@@ -10,14 +10,49 @@ public class MapConstructor : MasterScript
 	public bool connected = false;
 	public List<int> allIntersections = new List<int>();
 
+	public Vector3 IntersectionOfTwoLines (Vector3 lineA, Vector3 lineB)
+	{
+		float determinant = (lineA.x * lineB.y) - (lineB.x * lineA.y);
+
+		if(determinant == 0f)
+		{
+			return new Vector3(-1000f, -1000f, -1000f);
+		}
+		
+		float x = (lineB.y * lineA.z - lineA.y * lineB.z) / determinant;
+		float y = (lineA.x * lineB.z - lineB.x * lineA.z) / determinant;
+		
+		Vector3 intersection = new Vector3(x, y, 0f);
+		
+		return intersection;
+	}
+
+	public Vector3 ABCLineEquation(Vector3 pointA, Vector3 pointB)
+	{
+		float A = pointB.y - pointA.y;
+		float B = pointA.x - pointB.x;
+		float C = (A * pointA.x) + (B * pointA.y);
+
+		return new Vector3 (A, B, C);
+	}
+
+	public Vector3 PerpendicularLineEquation(Vector3 systemA, Vector3 systemB)
+	{
+		Vector3 midpoint = (systemA + systemB) / 2;
+		float gradient = (systemB.y - systemA.y) / (systemB.x - systemA.x);
+		float perpGradient = -1/gradient;
+		float yIntersect = midpoint.y - (perpGradient * midpoint.x);
+		Vector3 perpSecondPoint = new Vector3(0, yIntersect, midpoint.z);
+		
+		return ABCLineEquation(midpoint, perpSecondPoint);
+	}
+
 	public bool TestForIntersection(Vector3 thisSystem, Vector3 targetSystem, bool includeIntersections)
 	{
 		allIntersections.Clear ();
 		bool intersects = false;
 
-		float A1 = targetSystem.y - thisSystem.y;
-		float B1 = thisSystem.x - targetSystem.x;
-		float C1 = (A1 * thisSystem.x) + (B1 * thisSystem.y);
+		Vector3 lineA = ABCLineEquation(thisSystem, targetSystem);
 
 		for (int i = 0; i < coordinateList.Count; ++i) 
 		{
@@ -30,25 +65,13 @@ public class MapConstructor : MasterScript
 				continue;
 			}
 
-			float A2 = coordinateList [i].systemB.y - coordinateList [i].systemA.y;
-			float B2 = coordinateList [i].systemA.x - coordinateList [i].systemB.x;
-			float C2 = (A2 * coordinateList [i].systemA.x) + (B2 * coordinateList [i].systemA.y);
+			Vector3 lineB = ABCLineEquation(coordinateList[i].systemA, coordinateList[i].systemB);
 
-			float determinant = (A1 * B2) - (A2 * B1);
+			Vector3 intersection = IntersectionOfTwoLines(lineA, lineB);
 
-			if (determinant == 0.0f) 
+			if(PointLiesOnLine(new Vector2(thisSystem.x, thisSystem.y), new Vector2(targetSystem.x, targetSystem.y), new Vector2(intersection.x, intersection.y)))
 			{
-				continue;
-			}
-
-			float x = (B2 * C1 - B1 * C2) / determinant;
-			float y = (A1 * C2 - A2 * C1) / determinant;
-
-			Vector2 intersection = new Vector2(x, y);
-
-			if(PointLiesOnLine(thisSystem, targetSystem, intersection))
-			{
-				if(PointLiesOnLine(coordinateList[i].systemA, coordinateList[i].systemB, intersection))
+				if(PointLiesOnLine(new Vector2(coordinateList[i].systemA.x, coordinateList[i].systemA.y), new Vector2(coordinateList[i].systemB.x, coordinateList[i].systemB.y), new Vector2(intersection.x, intersection.y)))
 				{
 					if(includeIntersections == true)
 					{
@@ -110,12 +133,10 @@ public class MapConstructor : MasterScript
 		return true;
 	}
 
-	public bool PointLiesOnLine(Vector3 systemA, Vector3 systemB, Vector2 intersection)
+	public bool PointLiesOnLine(Vector2 pointA, Vector2 pointB, Vector2 intersection)
 	{
-		Vector2 point1 = new Vector2(systemA.x, systemA.y);
-		Vector2 point2 = new Vector2(systemB.x, systemB.y);
-		Vector2 lineVector = point2.normalized - point1.normalized;
-		Vector2 pointVector = intersection.normalized - point1.normalized;
+		Vector2 lineVector = pointA.normalized - pointB.normalized;
+		Vector2 pointVector = intersection.normalized - pointA.normalized;
 		
 		float dotProduct = Vector2.Dot (pointVector, lineVector);
 		

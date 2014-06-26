@@ -151,7 +151,7 @@ public class InvasionGUI : MasterScript
 
 	void Update()
 	{
-		if(heroGUI.currentHero != null && systemDefence.underInvasion == true) //If a hero is selected
+		if(heroGUI.currentHero != null) //If a hero is selected
 		{
 			heroScript = heroGUI.currentHero.GetComponent<HeroScriptParent> (); //Get references to hero scripts
 			
@@ -282,9 +282,12 @@ public class InvasionGUI : MasterScript
 		
 		system = RefreshCurrentSystem(heroScript.heroLocation);
 
-		if(loadInvasion.CheckForExistingInvasion(system) == true)
+		int loadSystem = loadInvasion.CheckForExistingInvasion (system);
+
+		if(loadSystem != -1)
 		{
-			loadInvasion.ReloadInvasionScreen();
+			loadInvasion.ReloadInvasionScreen(loadSystem);
+			createdTokens = true;
 		}
 		
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
@@ -294,10 +297,11 @@ public class InvasionGUI : MasterScript
 		LayoutPlanets(systemListConstructor.systemList[system].systemSize);
 	}
 
-	private class PlanetInvasionLabels
+	public class PlanetInvasionLabels
 	{
 		public UILabel offence, defence, name, population, type; 
 	}
+
 	public class HeroInvasionLabel
 	{
 		public GameObject defenceTokenContainer, assaultTokenContainer, auxiliaryTokenContainer, reset;
