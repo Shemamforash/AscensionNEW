@@ -5,13 +5,11 @@ using System.Collections.Generic;
 public class TokenManagement : MasterScript 
 {
 	private TokenBehaviour behaviour;
-	private LoadInvasionScreen loadScreen;
 	public GameObject token;
 
 	void Start()
 	{
 		behaviour = invasionGUI.tokenContainer.GetComponent<TokenBehaviour> ();
-		loadScreen = invasionGUI.tokenContainer.GetComponent<LoadInvasionScreen> ();
 	}
 
 	public void CacheInvasionInfo() //Used to cache the invasion info
@@ -47,17 +45,25 @@ public class TokenManagement : MasterScript
 					else //It must be a token
 					{
 						TokenUI tokenScript = subChild.GetComponent<TokenUI>(); //So get a reference to it's script
-						
+
+						TokenInfo temp = new TokenInfo();
+
+						temp.originalPosition = tokenScript.originalPosition;
+						temp.currentPosition = subChild.transform.position;
+						temp.heroOwner = tokenScript.hero;
+						temp.originalParent = tokenScript.originalParent;
+						temp.currentParent = subChild.parent.gameObject;
+
 						switch(child.name) //Switch based on name of container
 						{
 						case "Defence Token":
-							cachedPlanet.defenceTokenAllocation.Add (tokenScript.hero); //If it's a defence token cache the token's hero into the planet list
+							cachedPlanet.defenceTokenAllocation.Add (temp); //If it's a defence token cache the token's hero into the planet list
 							break;
 						case "Assault Token":
-							cachedPlanet.assaultTokenAllocation.Add (tokenScript.hero); //Same for assault token
+							cachedPlanet.assaultTokenAllocation.Add (temp); //Same for assault token
 							break;
 						case "Auxiliary Token":
-							cachedPlanet.auxiliaryTokenAllocation.Add (tokenScript.hero); //And for auxiliary token
+							cachedPlanet.auxiliaryTokenAllocation.Add (temp); //And for auxiliary token
 							break;
 						default:
 							break;
@@ -113,12 +119,6 @@ public class TokenManagement : MasterScript
 				GameObject tempToken = NGUITools.AddChild(parent, token); //Instantiate the token
 				EventDelegate.Add (tempToken.GetComponent<UIButton>().onClick, behaviour.ButtonClicked); //Add button clicked event
 
-				if(loadScreen.CheckForExistingInvasion(invasionGUI.system) == true)
-				{
-					tempToken.transform.position = invasionGUI.planetInvasionLabels[i].
-				}
-
-
 				tempToken.transform.position = parent.transform.GetChild(i).transform.position; //Set the position of the token
 				
 				TokenUI tokenUI = tempToken.GetComponent<TokenUI>(); //Get a reference to the token's script
@@ -128,27 +128,17 @@ public class TokenManagement : MasterScript
 				
 				UIButton tokenButton = tempToken.GetComponent<UIButton>(); //Get the button attached to the token
 				
+				AssignTokenButton(tokenButton, tokenType);
+
 				switch (tokenType) //And change the button's sprites based on what kind of token it is
 				{
 				case "Assault":
-					tokenButton.normalSprite = "Primary Weapon Normal";
-					tokenButton.hoverSprite = "Primary Weapon Hover";
-					tokenButton.pressedSprite = "Primary Weapon Pressed";
-					tokenButton.disabledSprite = "Primary Weapon Pressed";
 					invasionGUI.heroInvasionLabels[pos].assaultTokensList.Add (tempToken);
 					break;
 				case "Auxiliary":
-					tokenButton.normalSprite = "Secondary Weapon Normal";
-					tokenButton.hoverSprite = "Secondary Weapon Hover";
-					tokenButton.pressedSprite = "Secondary Weapon Pressed";
-					tokenButton.disabledSprite = "Secondary Weapon Pressed";
 					invasionGUI.heroInvasionLabels[pos].auxiliaryTokensList.Add (tempToken);
 					break;
 				case "Defence":
-					tokenButton.normalSprite = "Defence Normal";
-					tokenButton.hoverSprite = "Defence Hover";
-					tokenButton.pressedSprite = "Defence Pressed";
-					tokenButton.disabledSprite = "Defence Pressed";
 					invasionGUI.heroInvasionLabels[pos].defenceTokensList.Add (tempToken);
 					break;
 				default:
@@ -160,6 +150,33 @@ public class TokenManagement : MasterScript
 			{
 				NGUITools.SetActive(tokenPositionObject, false); //If the hero does not have this token, disable the image and don't do anything
 			}
+		}
+	}
+
+	public void AssignTokenButton(UIButton tokenButton, string tokenType)
+	{
+		switch (tokenType) //And change the button's sprites based on what kind of token it is
+		{
+		case "Assault":
+			tokenButton.normalSprite = "Primary Weapon Normal";
+			tokenButton.hoverSprite = "Primary Weapon Hover";
+			tokenButton.pressedSprite = "Primary Weapon Pressed";
+			tokenButton.disabledSprite = "Primary Weapon Pressed";
+			break;
+		case "Auxiliary":
+			tokenButton.normalSprite = "Secondary Weapon Normal";
+			tokenButton.hoverSprite = "Secondary Weapon Hover";
+			tokenButton.pressedSprite = "Secondary Weapon Pressed";
+			tokenButton.disabledSprite = "Secondary Weapon Pressed";
+			break;
+		case "Defence":
+			tokenButton.normalSprite = "Defence Normal";
+			tokenButton.hoverSprite = "Defence Hover";
+			tokenButton.pressedSprite = "Defence Pressed";
+			tokenButton.disabledSprite = "Defence Pressed";
+			break;
+		default:
+			break;
 		}
 	}
 

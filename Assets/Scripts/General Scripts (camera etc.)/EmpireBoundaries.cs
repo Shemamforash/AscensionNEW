@@ -9,9 +9,16 @@ public class EmpireBoundaries : MasterScript
 	public Transform boundaryContainer;
 	public float[] radius;
 	public Material humansMat, selkiesMat, nereidesMat;
-	
+	private List<VoronoiCellVertices> voronoiVertices = new List<VoronoiCellVertices> ();
+
+	private class VoronoiCellVertices
+	{
+		public List<Vector3> vertices = new List<Vector3>();
+	}
+
 	public void SetArrSize()
 	{
+		CreateVoronoiCells ();
 		boundRings = new GameObject[systemListConstructor.systemList.Count];
 		radius = new float[systemListConstructor.mapSize];
 	}
@@ -24,6 +31,48 @@ public class EmpireBoundaries : MasterScript
 			{
 				boundRings[i].transform.position = systemListConstructor.systemList[i].systemObject.transform.position;
 			}
+		}
+	}
+
+	public void CreateVoronoiCells()
+	{
+		for(int i = 0; i < systemListConstructor.systemList.Count; ++i) //For all systems
+		{
+			bool looped = false;
+
+			VoronoiCellVertices newCell = new VoronoiCellVertices(); //Create new voronoi cell
+
+			for(int j = 0; j < systemListConstructor.systemList[i].permanentConnections.Count; ++j) //For all permanent connections
+			{
+				Vector3 systemA = systemListConstructor.systemList[i].permanentConnections[j].transform.position; //System A equals this system
+
+				int nextSys = j + 1;
+
+				if(j + 1 == systemListConstructor.systemList[i].permanentConnections.Count)
+				{
+					nextSys = 0;
+					looped = true;
+				}
+
+				Vector3 systemB = systemListConstructor.systemList[i].systemObject.transform.position;
+
+				Vector3 systemC = systemListConstructor.systemList[i].permanentConnections[nextSys].transform.position;
+
+				Vector3 lineAB = mapConstructor.PerpendicularLineEquation(systemA, systemB);
+				Vector3 lineBC = mapConstructor.PerpendicularLineEquation(systemB, systemC);
+
+				Vector3 centre = mapConstructor.IntersectionOfTwoLines(lineAB, lineBC);
+
+				newCell.vertices.Add (centre);
+				Instantiate(systemInvasion.invasionQuad, centre, Quaternion.identity);
+
+				if(looped)
+				{
+					break;
+				}
+			}
+
+			voronoiVertices.Add (newCell);
 		}
 	}
 

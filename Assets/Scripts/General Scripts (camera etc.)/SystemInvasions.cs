@@ -8,13 +8,13 @@ public class SystemInvasions : MasterScript
 	public HeroScriptParent hero;
 	public List<SystemInvasionInfo> currentInvasions = new List<SystemInvasionInfo>();
 
-	private float CalculateTotalTokenValue(List<GameObject> tokenList)
+	private float CalculateTotalTokenValue(List<TokenInfo> tokenList)
 	{
 		float total = 0;
 		
 		for(int k = 0; k < tokenList.Count; ++k)
 		{
-			heroScript = tokenList[k].GetComponent<HeroScriptParent>();
+			heroScript = tokenList[k].heroOwner.GetComponent<HeroScriptParent>();
 			
 			total += heroScript.assaultDamage / heroScript.assaultTokens;
 		}
@@ -181,7 +181,13 @@ public class SystemInvasionInfo
 
 public class PlanetInvasionInfo
 {
-	public List<GameObject> assaultTokenAllocation = new List<GameObject>();
-	public List<GameObject> auxiliaryTokenAllocation = new List<GameObject>();
-	public List<GameObject> defenceTokenAllocation = new List<GameObject>();
+	public List<TokenInfo> assaultTokenAllocation = new List<TokenInfo>();
+	public List<TokenInfo> auxiliaryTokenAllocation = new List<TokenInfo>();
+	public List<TokenInfo> defenceTokenAllocation = new List<TokenInfo>();
+}
+
+public class TokenInfo
+{
+	public Vector3 originalPosition, currentPosition;
+	public GameObject heroOwner, originalParent, currentParent;
 }
