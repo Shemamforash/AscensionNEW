@@ -19,7 +19,7 @@ public class LineRenderScript : MasterScript
 
 	public void StartUp()
 	{	
-		connectorLineContainer = GameObject.Find ("LineContainer").transform;
+		connectorLineContainer = GameObject.Find ("Connector Lines Container").transform;
 		systemSIMData = gameObject.GetComponent<SystemSIMData>();
 		thisSystem = RefreshCurrentSystem (gameObject);
 
@@ -43,33 +43,30 @@ public class LineRenderScript : MasterScript
 	{
 		for(int i = 0; i < systemListConstructor.systemList[thisSystem].permanentConnections.Count; ++i)
 		{
-			ConnectorLine newLine = new ConnectorLine ();
-
-			GameObject clone = NGUITools.AddChild(connectorLineContainer.gameObject, line);
-
-			newLine.thisLine = clone;
-			
-			newLine.sprite = newLine.thisLine.transform.Find ("Sprite").GetComponent<UISprite>();
-
-			newLine.widget = newLine.thisLine.GetComponent<UIWidget>();
-
-			connectorLines.Add (newLine);
+			CreateNewLine(i);
 		}
+	}
+
+	public void CreateNewLine(int system)
+	{
+		ConnectorLine newLine = new ConnectorLine ();
+		
+		GameObject clone = (GameObject)Instantiate(line, Vector3.zero, Quaternion.identity); //NGUITools.AddChild(connectorLineContainer.gameObject, line);
+		
+		clone.transform.parent = connectorLineContainer;
+		
+		newLine.thisLine = clone;
+		
+		connectorLines.Add (newLine);
 	}
 
 	private void SetPosition(GameObject target, int i)
 	{
-		midPoint = (gameObject.transform.position + target.transform.position) / 2;
+		midPoint = (gameObject.transform.position + target.transform.position) / 2; //Get midpoint between target and current system
 		
-		midPoint = new Vector3 (midPoint.x, midPoint.y, 0.0f);
-		
-		Vector3 position = systemPopup.mainCamera.WorldToViewportPoint (midPoint);
-		
-		position = systemPopup.uiCamera.ViewportToWorldPoint (position);
-		
-		position = new Vector3(position.x, position.y, -37.0f);
-		
-		connectorLines[i].thisLine.transform.position = position;
+		midPoint = new Vector3 (midPoint.x, midPoint.y, 0.0f); //Create vector from midpoint
+
+		connectorLines[i].thisLine.transform.position = midPoint; //Set position of line to midpoint
 	}
 
 	private void SetRotation(GameObject target, int i)
@@ -103,44 +100,33 @@ public class LineRenderScript : MasterScript
 		SetPosition (target, i);
 		SetRotation (target, i);
 		
-		connectorLines[i].sprite.spriteName = SetRaceLineColour();
+		connectorLines[i].thisLine.gameObject.renderer.material = SetRaceLineColour();
 
-		Vector3 start = systemPopup.mainCamera.WorldToScreenPoint (gameObject.transform.position);
-		Vector3 end = systemPopup.mainCamera.WorldToScreenPoint (target.transform.position);
+		Vector3 start = gameObject.transform.position;
+		Vector3 end = target.transform.position;
 
-		Vector3 left = new Vector3 (gameObject.transform.position.x - empireBoundaries.radius[thisSystem], 0f, 0f);
-		Vector3 right = new Vector3 (gameObject.transform.position.x + empireBoundaries.radius[thisSystem], 0f, 0f);
+		float distance = Vector3.Distance (start, end);
+		distance = distance - 4f;
 
-		left = systemPopup.mainCamera.WorldToScreenPoint (left);
-		right = systemPopup.mainCamera.WorldToScreenPoint (right);
-
-		systemPixelSize = Vector3.Distance (left, right);
-
-		pixelHeight = Vector3.Distance(start, end);
-		
-		pixelWidth = (0.16f * systemPopup.mainCamera.transform.position.z) + 10f;
-		
-		connectorLines[i].widget.width = Convert.ToInt32(pixelWidth);
-	
-		connectorLines[i].widget.height = Convert.ToInt32(pixelHeight - (systemPixelSize / 2));
+		connectorLines [i].thisLine.transform.localScale = new Vector3 (0.14f, distance, 0.0f);
 	}
 
-	public string SetRaceLineColour()
+	public Material SetRaceLineColour()
 	{
 		if(systemListConstructor.systemList[thisSystem].systemOwnedBy == "Humans")
 		{
-			return "PlayerOwnedLineMaterial";
+			return turnInfoScript.humansLineMaterial;
 		}
 		if(systemListConstructor.systemList[thisSystem].systemOwnedBy == "Selkies")
 		{
-			return "EnemyOwnedLineMaterial";
+			return turnInfoScript.selkiesLineMaterial;
 		}
 		if(systemListConstructor.systemList[thisSystem].systemOwnedBy == "Nereides")
 		{
-			return "SelkiesOwnedLine";
+			return turnInfoScript.nereidesLineMaterial;
 		}
 
-		return "Empty Line"; //Should be "Empty Line"
+		return turnInfoScript.unownedLineMaterial;
 	}
 
 	private void ViewNearbySystems()
@@ -164,6 +150,4 @@ public class ConnectorLine
 	public Quaternion rotation;
 	public Vector3 midPoint;
 	public GameObject thisLine;
-	public UISprite sprite;
-	public UIWidget widget;
 }

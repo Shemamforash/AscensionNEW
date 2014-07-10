@@ -114,8 +114,11 @@ public class CollisionDetection : MasterScript
 				systemListConstructor.systemList[sysToJoinA].numberOfConnections = systemListConstructor.systemList[sysToJoinA].permanentConnections.Count;
 				systemListConstructor.systemList[sysToJoinB].permanentConnections.Add (systemListConstructor.systemList[sysToJoinA].systemObject);
 				systemListConstructor.systemList[sysToJoinB].numberOfConnections = systemListConstructor.systemList[sysToJoinB].permanentConnections.Count;
-				CreateNewLine(sysToJoinA);
-				CreateNewLine(sysToJoinB);
+
+				lineRenderScript = systemListConstructor.systemList[sysToJoinA].systemObject.GetComponent<LineRenderScript>();
+				lineRenderScript.CreateNewLine(sysToJoinA);
+				lineRenderScript = systemListConstructor.systemList[sysToJoinB].systemObject.GetComponent<LineRenderScript>();
+				lineRenderScript.CreateNewLine(sysToJoinB);
 			}
 		}
 	}
@@ -249,23 +252,6 @@ public class CollisionDetection : MasterScript
 		return false;
 	}
 
-	private void CreateNewLine(int system)
-	{
-		lineRenderScript = systemListConstructor.systemList[system].systemObject.GetComponent<LineRenderScript>();
-		
-		ConnectorLine newLine = new ConnectorLine ();
-		
-		GameObject clone = NGUITools.AddChild(lineRenderScript.connectorLineContainer.gameObject, lineRenderScript.line);
-		
-		newLine.thisLine = clone;
-		
-		newLine.sprite = newLine.thisLine.transform.Find ("Sprite").GetComponent<UISprite>();
-		
-		newLine.widget = newLine.thisLine.GetComponent<UIWidget>();
-		
-		lineRenderScript.connectorLines.Add (newLine);
-	}
-	
 	public void ReconnectSystems(GameObject systemA, GameObject systemB)
 	{
 		int thisSystem = RefreshCurrentSystem (systemA); //Get this system
@@ -305,8 +291,10 @@ public class CollisionDetection : MasterScript
 				{
 					systemListConstructor.systemList[thisSystem].permanentConnections[i] = systemListConstructor.systemList[newConnection].systemObject; //The connection that was system b is now the new connection
 					systemListConstructor.systemList[newConnection].permanentConnections.Add(systemListConstructor.systemList[thisSystem].systemObject); //The new connection is now connected to this system
-					
-					CreateNewLine(newConnection);
+
+					lineRenderScript = systemListConstructor.systemList[newConnection].systemObject.GetComponent<LineRenderScript>();
+
+					lineRenderScript.CreateNewLine(newConnection);
 					
 					systemListConstructor.systemList[thisSystem].numberOfConnections = systemListConstructor.systemList[thisSystem].permanentConnections.Count;
 					systemListConstructor.systemList[newConnection].numberOfConnections = systemListConstructor.systemList[newConnection].permanentConnections.Count;

@@ -15,6 +15,7 @@ public class TurnInfo : MasterScript
 	public bool playerHasWon, startSteps, isPlayer;
 	public Camera mainCamera;
 	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse, emptyMaterial;
+	public Material nereidesLineMaterial, humansLineMaterial, selkiesLineMaterial, unownedLineMaterial;
 	public string playerRace, homePlanetType, playerHasWonRace, homeSystem;
 	public int systemsInPlay = 0, heroCounter = 0;
 	public List<GameObject> playerOwnedHeroes = new List<GameObject> ();
