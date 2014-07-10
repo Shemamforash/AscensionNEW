@@ -16,7 +16,7 @@ public class MapConstructor : MasterScript
 
 		if(determinant == 0f)
 		{
-			return new Vector3(-1000f, -1000f, -1000f);
+			return Vector3.zero;
 		}
 		
 		float x = (lineB.y * lineA.z - lineA.y * lineB.z) / determinant;
@@ -40,11 +40,18 @@ public class MapConstructor : MasterScript
 	{
 		Vector3 midpoint = (systemA + systemB) / 2;
 		float gradient = (systemB.y - systemA.y) / (systemB.x - systemA.x);
-		float perpGradient = -1/gradient;
-		float yIntersect = midpoint.y - (perpGradient * midpoint.x);
-		Vector3 perpSecondPoint = new Vector3(0, yIntersect, midpoint.z);
-		
-		return ABCLineEquation(midpoint, perpSecondPoint);
+
+		if(gradient == 0f)
+		{
+			return new Vector3(1, 0, midpoint.x);
+		}
+		else
+		{
+			float perpGradient = -1/gradient;
+			float yIntersect = midpoint.y - (perpGradient * midpoint.x);
+			Vector3 perpSecondPoint = new Vector3(0, yIntersect, midpoint.z);
+			return ABCLineEquation(midpoint, perpSecondPoint);
+		}
 	}
 
 	public bool TestForIntersection(Vector3 thisSystem, Vector3 targetSystem, bool includeIntersections)
@@ -68,6 +75,11 @@ public class MapConstructor : MasterScript
 			Vector3 lineB = ABCLineEquation(coordinateList[i].systemA, coordinateList[i].systemB);
 
 			Vector3 intersection = IntersectionOfTwoLines(lineA, lineB);
+
+			if(intersection == Vector3.zero)
+			{
+				return false;
+			}
 
 			if(PointLiesOnLine(new Vector2(thisSystem.x, thisSystem.y), new Vector2(targetSystem.x, targetSystem.y), new Vector2(intersection.x, intersection.y)))
 			{
@@ -134,15 +146,14 @@ public class MapConstructor : MasterScript
 	}
 
 	public bool PointLiesOnLine(Vector2 pointA, Vector2 pointB, Vector2 intersection)
-	{
-		Vector2 lineVector = pointA.normalized - pointB.normalized;
-		Vector2 pointVector = intersection.normalized - pointA.normalized;
-		
-		float dotProduct = Vector2.Dot (pointVector, lineVector);
-		
+	{		
+		float dotProduct = (intersection.x - pointA.x) * (pointB.x - pointA.x) + (intersection.y - pointA.y) * (pointB.y - pointA.y);
+
 		if(dotProduct > 0)
 		{
-			if(pointVector.magnitude < lineVector.magnitude)
+			float squaredDistance = Mathf.Pow((pointB.x - pointA.x), 2f) + Mathf.Pow ((pointB.y - pointA.y), 2f);
+
+			if(dotProduct > squaredDistance)
 			{
 				return true;
 			}
@@ -212,7 +223,7 @@ public class MapConstructor : MasterScript
 		AssignMaximumConnections ();
 	}
 
-	private void SortConnectionsByAngle (int i)
+	private void SortConnectionsByAngle (int i) //Sorts the permanent connections of a system into clockwise order from first added connection
 	{
 		Vector3 zeroVector = systemListConstructor.systemList [i].permanentConnections [0].transform.position;
 
