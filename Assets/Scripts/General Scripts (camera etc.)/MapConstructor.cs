@@ -146,19 +146,24 @@ public class MapConstructor : MasterScript
 	}
 
 	public bool PointLiesOnLine(Vector2 pointA, Vector2 pointB, Vector2 intersection)
-	{		
-		float dotProduct = (intersection.x - pointA.x) * (pointB.x - pointA.x) + (intersection.y - pointA.y) * (pointB.y - pointA.y);
+	{	
+		float crossProduct = (intersection.y - pointA.y) * (pointB.x - pointA.x) - (intersection.x - pointA.x) * (pointB.y - pointA.y);
 
-		if(dotProduct > 0)
+		if(crossProduct == 0f)
 		{
-			float squaredDistance = Mathf.Pow((pointB.x - pointA.x), 2f) + Mathf.Pow ((pointB.y - pointA.y), 2f);
-
-			if(dotProduct > squaredDistance)
+			float dotProduct = (intersection.x - pointA.x) * (pointB.x - pointA.x) + (intersection.y - pointA.y) * (pointB.y - pointA.y);
+			
+			if(dotProduct >= 0) 
 			{
-				return true;
+				float distanceAB = Mathf.Pow((pointB.x - pointA.x), 2f) + Mathf.Pow((pointB.y - pointA.y), 2f);
+				
+				if(dotProduct <= distanceAB)
+				{
+					return true;
+				}
 			}
 		}
-
+			
 		return false;
 	}
 	
