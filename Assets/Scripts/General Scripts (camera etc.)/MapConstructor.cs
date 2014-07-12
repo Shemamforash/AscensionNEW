@@ -10,19 +10,19 @@ public class MapConstructor : MasterScript
 	public bool connected = false;
 	public List<int> allIntersections = new List<int>();
 
-	public Vector3 IntersectionOfTwoLines (Vector3 lineA, Vector3 lineB)
+	public Vector2 IntersectionOfTwoLines (Vector3 lineA, Vector3 lineB)
 	{
 		float determinant = (lineA.x * lineB.y) - (lineB.x * lineA.y);
 
 		if(determinant == 0f)
 		{
-			return Vector3.zero;
+			return Vector2.zero;
 		}
 		
 		float x = (lineB.y * lineA.z - lineA.y * lineB.z) / determinant;
 		float y = (lineA.x * lineB.z - lineB.x * lineA.z) / determinant;
 		
-		Vector3 intersection = new Vector3(x, y, 0f);
+		Vector2 intersection = new Vector3(x, y);
 		
 		return intersection;
 	}
@@ -74,16 +74,16 @@ public class MapConstructor : MasterScript
 
 			Vector3 lineB = ABCLineEquation(coordinateList[i].systemA, coordinateList[i].systemB);
 
-			Vector3 intersection = IntersectionOfTwoLines(lineA, lineB);
+			Vector2 intersection = IntersectionOfTwoLines(lineA, lineB);
 
-			if(intersection == Vector3.zero)
+			if(intersection == Vector2.zero)
 			{
 				return false;
 			}
 
-			if(PointLiesOnLine(new Vector2(thisSystem.x, thisSystem.y), new Vector2(targetSystem.x, targetSystem.y), new Vector2(intersection.x, intersection.y)))
+			if(PointLiesOnLine(thisSystem, targetSystem, intersection))
 			{
-				if(PointLiesOnLine(new Vector2(coordinateList[i].systemA.x, coordinateList[i].systemA.y), new Vector2(coordinateList[i].systemB.x, coordinateList[i].systemB.y), new Vector2(intersection.x, intersection.y)))
+				if(PointLiesOnLine(coordinateList[i].systemA, coordinateList[i].systemB, intersection))
 				{
 					if(includeIntersections == true)
 					{
@@ -145,18 +145,33 @@ public class MapConstructor : MasterScript
 		return true;
 	}
 
-	public bool PointLiesOnLine(Vector2 pointA, Vector2 pointB, Vector2 intersection)
+	public bool PointLiesOnLine(Vector3 pointAVec3, Vector3 pointBVec3, Vector3 intersectionVec3)
 	{	
+		if(intersectionVec3.x <= Mathf.Max(pointAVec3.x, pointBVec3.x) && intersectionVec3.x >= Mathf.Min (pointAVec3.x, pointBVec3.x))
+		{
+			if(intersectionVec3.y <= Mathf.Max(pointAVec3.y, pointBVec3.y) && intersectionVec3.y >= Mathf.Min (pointAVec3.y, pointBVec3.y))
+			{
+				return true;
+			}
+		}
+
+		return false;
+
+		/*
+		Vector2 pointA = new Vector2(pointAVec3.x, pointAVec3.y);
+		Vector2 pointB = new Vector2(pointBVec3.x, pointBVec3.y);
+		Vector2 intersection = new Vector2(intersectionVec3.x, intersectionVec3.y);
+
 		float crossProduct = (intersection.y - pointA.y) * (pointB.x - pointA.x) - (intersection.x - pointA.x) * (pointB.y - pointA.y);
 
-		if(crossProduct == 0f)
+		if(crossProduct <= 0.001f || crossProduct >= -0.001f)
 		{
 			float dotProduct = (intersection.x - pointA.x) * (pointB.x - pointA.x) + (intersection.y - pointA.y) * (pointB.y - pointA.y);
-			
-			if(dotProduct >= 0) 
+
+			if(dotProduct >= 0f) 
 			{
 				float distanceAB = Mathf.Pow((pointB.x - pointA.x), 2f) + Mathf.Pow((pointB.y - pointA.y), 2f);
-				
+
 				if(dotProduct <= distanceAB)
 				{
 					return true;
@@ -164,7 +179,7 @@ public class MapConstructor : MasterScript
 			}
 		}
 			
-		return false;
+		return false;*/
 	}
 	
 	public void DrawMinimumSpanningTree() //Working
