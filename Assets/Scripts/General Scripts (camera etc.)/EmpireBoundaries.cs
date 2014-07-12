@@ -41,8 +41,9 @@ public class EmpireBoundaries : MasterScript
 
 	private class Triangle
 	{
-		public GameObject[] points = new GameObject[3]; //A, B, C points
+		public List<GameObject> points = new List<GameObject>(); //A, B, C points
 		public Vector3[] lines = new Vector3[3]; //AB, BC, CA line equations
+		public bool isInternal = false; //This allows me to ignore any triangles with no external points
 	}
 
 	private float AreaOfTriangle(Vector3 vertexA, Vector3 vertexB, Vector3 vertexC)
@@ -146,66 +147,231 @@ public class EmpireBoundaries : MasterScript
 		return false;
 	}
 
+	private bool IsIllegalIntersection(int external, int point, Vector3 curToExt)
+	{
+		for(int j = 0; j < triangles.Count; ++j) //For every triangle
+		{
+			if(triangles[j].isInternal == true)
+			{
+				continue;
+			}
+
+			for(int k = 0; k < 3; ++k) //For each line in that triangle
+			{
+				Vector3 pointA = Vector3.zero; //Get the points at each end of the line
+				Vector3 pointB = Vector3.zero;
+				
+				if(k == 0)
+				{
+					pointA = triangles[j].points[0].transform.position;
+					pointB = triangles[j].points[1].transform.position;
+				}
+				if(k == 1)
+				{
+					pointA = triangles[j].points[1].transform.position;
+					pointB = triangles[j].points[2].transform.position;
+				}
+				if(k == 2)
+				{
+					pointA = triangles[j].points[2].transform.position;
+					pointB = triangles[j].points[0].transform.position;
+				}
+				
+				Vector2 intersection = mapConstructor.IntersectionOfTwoLines(curToExt, triangles[j].lines[k]); //Get the intersection of the line with the current star to external point line
+
+				if(CheckPointIsCloseToPoint(intersection, new Vector2(externalPoints[external].transform.position.x, externalPoints[external].transform.position.y))) //If the intersection is on the external point
+				{
+					continue; //This is not illegal so keep going
+				}
+
+				if(mapConstructor.PointLiesOnLine(externalPoints[external].transform.position, unvisitedStars[point].transform.position, intersection) == true) //If the point lies elsewhere on the line
+				{
+					if(mapConstructor.PointLiesOnLine(pointA, pointB, intersection) == true)
+					{
+						return true; //This IS an illegal intersection so return that, otherwise keep checking
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
 	private void LinkPointToTris(int curPoint) //Send the current unvisited star as the seed point
 	{
-		List<Vector3> tempExternals = new List<Vector3> ();
-
 		for(int i = 0; i < externalPoints.Count; ++i) //For all the external points
 		{
-			Vector3 lineCurToExternal = mapConstructor.ABCLineEquation(unvisitedStars[curPoint].transform.position, externalPoints[i]); //Create a line between the external point and the unvisited star
+			Vector3 lineCurToExternal = mapConstructor.ABCLineEquation(unvisitedStars[curPoint].transform.position, externalPoints[i].transform.position); //Create a line between the external point and the unvisited star
 			bool illegalLine = false;
 
-			for(int j = 0; j < triangles.Count; ++j) //For every triangle
+			if(IsIllegalIntersection(i, curPoint, lineCurToExternal) == true)
 			{
-				illegalLine = false;
+				continue;
+			}
 
-				for(int k = 0; k < 3; ++k)
+			for(int j = 0; j < triangles.Count; ++j) //For all triangles
+			{
+				if(triangles[j].points.Contains(externalPoints[i])) //If triangle contains the external point currently being tested
 				{
-					Vector3 pointA = Vector3.zero;
-					Vector3 pointB = Vector3.zero;
-					
-					if(k == 0)
-					{
-						pointA = triangles[j].points[0].transform.position;
-						pointB = triangles[j].points[2].transform.position;
-					}
-					if(k == 1)
-					{
-						pointA = triangles[j].points[1].transform.position;
-						pointB = triangles[j].points[0].transform.position;
-					}
-					if(k == 2)
-					{
-						pointA = triangles[j].points[2].transform.position;
-						pointB = triangles[j].points[1].transform.position;
-					}
+					bool validTri = false;
 
-					Vector3 intersection = mapConstructor.IntersectionOfTwoLines(lineCurToExternal, triangles[j].lines[k]);
-
-					if(mapConstructor.PointLiesOnLine(pointA, pointB, intersection) == true 
-					   && mapConstructor.PointLiesOnLine(unvisitedStars[curPoint].transform.position, externalPoints[i], intersection) == true) //If the intersection lies on both line segments 
+					for(int k = 0; k < externalPoints.Count; ++k) //Go through all the other external points
 					{
-						if(CheckPointIsCloseToPoint(intersection, externalPoints[i]) == false) //And the intersection doesn't lie on the external point
+						if(k == i)
 						{
-							illegalLine = true; //It's an illegal line
-							break;
+							continue;
+						}
+
+						if(triangles[j].points.Contains(externalPoints[k])) //To make sure triangle contains another external point - we are not interested in triangle with only 1 external point (a tri cannot be formed)
+						{
+							if(IsIllegalIntersection(k, curPoint, mapConstructor.ABCLineEquation(unvisitedStars[curPoint].transform.position, externalPoints[k].transform.position)) == false)
+							{
+								GameObject pointA = externalPoints[i], pointB = externalPoints[k], pointC = unvisitedStars[curPoint];
+
+								bool triangleExists = false;
+
+								for(int l = 0; l < tempTri.Count; ++l)
+								{
+									if(tempTri[l].points.Contains (pointA) == true && tempTri[l].points.Contains (pointB) == true && tempTri[l].points.Contains (pointC) == true)
+									{
+										triangleExists = true;
+										break;
+									}
+								}
+
+								if(triangleExists == false)
+								{
+									Triangle newTri = new Triangle();
+									newTri.points.Add (pointA);
+									newTri.points.Add (pointB);
+									newTri.points.Add (pointC);
+									newTri.lines[0] = mapConstructor.ABCLineEquation (pointA.transform.position, pointB.transform.position);
+									newTri.lines[1] = mapConstructor.ABCLineEquation (pointB.transform.position, pointC.transform.position);
+									newTri.lines[2] = mapConstructor.ABCLineEquation (pointC.transform.position, pointA.transform.position);
+									tempTri.Add (newTri);
+								}
+							}
 						}
 					}
 				}
-
-				if(illegalLine == true)
-				{
-					break;
-				}
-			}
-
-			if(illegalLine == false)
-			{
-				tempExternals.Add (externalPoints[i]);
 			}
 		}
 	}
 
+	private void CacheTempTris(int curPoint)
+	{
+		for(int i = 0; i < tempTri.Count; ++i)
+		{
+			triangles.Add (tempTri[i]);
+		}
+
+		externalPoints.Add (unvisitedStars [curPoint]);
+		//unvisitedStars.RemoveAt(curPoint);
+		CheckInteriorPoints ();
+		tempTri.Clear ();
+	}
+
+	private void CheckInteriorPoints() //Checks through external point list to see if any points have become internal ones (are within the polygon formed by linking triangles
+	{
+		List<int> pointsToRemove = new List<int> ();
+
+		for(int i = 0; i < externalPoints.Count; ++i)
+		{
+			float tempAngle = 0;
+
+			for(int j = 0; j < triangles.Count; ++j)
+			{
+				for(int k = 0; k < 3; ++k)
+				{
+					if(triangles[j].points[k] == externalPoints[i])
+					{
+						int a = 0, b = 0;
+
+						if(k == 0)
+						{
+							a = 1; b = 2;
+						}
+						if(k == 1)
+						{
+							a = 0; b = 2;
+						}
+						if(k == 2)
+						{
+							a = 0; b = 1;
+						}
+
+						Vector3 line1 = triangles[j].points[k].transform.position - triangles[j].points[a].transform.position;
+						Vector3 line2 = triangles[j].points[k].transform.position - triangles[j].points[b].transform.position;
+						
+						tempAngle += Vector3.Angle (line1, line2);
+					}
+				}
+			}
+
+			if(tempAngle > 359)
+			{
+				pointsToRemove.Add (i);
+			}
+		}
+
+		for(int j = 0; j < triangles.Count; ++j)
+		{
+			bool isInternalTri = true;
+			
+			for(int k = 0; k < 3; ++k)
+			{
+				if(externalPoints.Contains (triangles[j].points[k]))
+				{
+					isInternalTri = false;
+				}
+			}
+			
+			if(isInternalTri == true)
+			{
+				triangles[j].isInternal = true;
+			}
+		}
+		
+		int counter = 0;
+
+		for(int i = 0; i < pointsToRemove.Count; ++i)
+		{
+			externalPoints.RemoveAt(pointsToRemove[i] - counter);
+			++counter;
+		}
+	}
+
+	private void SimpleTriangulation()
+	{
+		CacheNearestStars ();
+
+		Triangle newTri = new Triangle();
+		newTri.points.Add (unvisitedStars [0]);
+		newTri.points.Add (unvisitedStars [1]);
+		newTri.points.Add (unvisitedStars [2]);
+		newTri.lines[0] = mapConstructor.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position);
+		newTri.lines[1] = mapConstructor.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position);
+		newTri.lines[2] = mapConstructor.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position);
+		externalPoints.Add (unvisitedStars [0]);
+		externalPoints.Add (unvisitedStars [1]);
+		externalPoints.Add (unvisitedStars [2]);
+		triangles.Add (newTri);
+
+		unvisitedStars.RemoveRange (0, 3);
+
+
+		for(int i = 0; i < unvisitedStars.Count; ++i)//unvisitedStars.Count; ++i) //For all unchecked points
+		{
+			LinkPointToTris(i);
+			CacheTempTris(i);
+		}
+
+		Debug.Log (unvisitedStars.Count);
+
+		Debug.Log (triangles.Count);
+	}
+
+	/*
 	private void CheckForTriangleCreation(int curExternal, int curPoint)
 	{
 		List<GameObject> newTriPoints = new List<GameObject>();
@@ -221,22 +387,6 @@ public class EmpireBoundaries : MasterScript
 
 			for(int l = 0; l < triangles.Count; ++l) //For all triangles
 			{
-				bool isInternalTri = true; //Say triangle is not internal
-
-				for(int m = 0; m < 3; ++m) //Check through all points in triangle
-				{
-					if(externalPoints.Contains(triangles[l].points[m])) //If external points contains this point
-					{
-						isInternalTri = false; //The triangle is not internal
-						break;
-					}
-				}
-
-				if(isInternalTri == true) //If it is internal (no points are on the edge of the polygon
-				{
-					continue; //Check the next triangle
-				}
-
 				for(int m = 0; m < 3; ++m) //For all lines in those triangles
 				{
 					Vector3 pointA = Vector3.zero;
@@ -320,9 +470,9 @@ public class EmpireBoundaries : MasterScript
 		if(newTriPoints.Count == 2) //If there are exactly 2 points to be added this is a valid triangle so make one
 		{
 			Triangle newTri = new Triangle();
-			newTri.points[0] = unvisitedStars[curPoint];
-			newTri.points[1] = newTriPoints[0];
-			newTri.points[2] = newTriPoints[1];
+			newTri.points.Add (unvisitedStars[curPoint]);
+			newTri.points.Add (newTriPoints[0]);
+			newTri.points.Add (newTriPoints[1]);
 			newTri.lines[0] = mapConstructor.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position);
 			newTri.lines[1] = mapConstructor.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position);
 			newTri.lines[2] = mapConstructor.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position);
@@ -330,111 +480,7 @@ public class EmpireBoundaries : MasterScript
 		}
 		
 		newTriPoints.Clear (); //Clear the new tri points list
-	}
-
-	private void CacheTempTris(int curPoint)
-	{
-		for(int i = 0; i < tempTri.Count; ++i)
-		{
-			triangles.Add (tempTri[i]);
-		}
-
-		externalPoints.Add (unvisitedStars [curPoint]);
-		unvisitedStars.RemoveAt(curPoint);
-		CheckInteriorPoints ();
-		tempTri.Clear ();
-	}
-
-	private void CheckInteriorPoints() //Checks through external point list to see if any points have become internal ones (are within the polygon formed by linking triangles
-	{
-		List<int> pointsToRemove = new List<int> ();
-
-		for(int i = 0; i < externalPoints.Count; ++i)
-		{
-			float tempAngle = 0;
-
-			for(int j = 0; j < triangles.Count; ++j)
-			{
-				for(int k = 0; k < 3; ++k)
-				{
-					if(triangles[j].points[k] == externalPoints[i])
-					{
-						int a = 0, b = 0;
-
-						if(k == 0)
-						{
-							a = 1; b = 2;
-						}
-						if(k == 1)
-						{
-							a = 0; b = 2;
-						}
-						if(k == 2)
-						{
-							a = 0; b = 1;
-						}
-
-						Vector3 line1 = triangles[j].points[k].transform.position - triangles[j].points[a].transform.position;
-						Vector3 line2 = triangles[j].points[k].transform.position - triangles[j].points[b].transform.position;
-						
-						tempAngle += Vector3.Angle (line1, line2);
-					}
-				}
-			}
-
-			if(tempAngle > 359)
-			{
-				pointsToRemove.Add (i);
-			}
-		}
-
-		int counter = 0;
-
-		for(int i = 0; i < pointsToRemove.Count; ++i)
-		{
-			externalPoints.RemoveAt(pointsToRemove[i] - counter);
-			++counter;
-		}
-
-		for(int i = 0; i < externalPoints.Count; ++i)
-		{
-			//Instantiate(systemInvasion.invasionQuad, externalPoints[i].transform.position, Quaternion.identity);
-		}
-	}
-
-	private void SimpleTriangulation()
-	{
-		CacheNearestStars ();
-
-		Triangle newTri = new Triangle();
-		newTri.points[0] = unvisitedStars [0];
-		newTri.points[1] = unvisitedStars [1];
-		newTri.points[2] = unvisitedStars [2];
-		newTri.lines[0] = mapConstructor.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position);
-		newTri.lines[1] = mapConstructor.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position);
-		newTri.lines[2] = mapConstructor.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position);
-		externalPoints.Add (unvisitedStars [0]);
-		externalPoints.Add (unvisitedStars [1]);
-		externalPoints.Add (unvisitedStars [2]);
-		triangles.Add (newTri);
-
-		unvisitedStars.RemoveRange (0, 3);
-
-		Debug.Log (unvisitedStars.Count);
-
-		for(int i = 0; i < 10; ++i)//unvisitedStars.Count; ++i) //For all unchecked points
-		{
-			int exteriorsChecked = 0;
-
-			while(exteriorsChecked < externalPoints.Count)
-			{
-				CheckForTriangleCreation(exteriorsChecked, i);
-				++exteriorsChecked;
-			}
-
-			CacheTempTris(i);
-		}
-	}
+	}*/
 
 	public void CreateVoronoiCells()
 	{
@@ -550,8 +596,15 @@ public class EmpireBoundaries : MasterScript
 		GameObject line = (GameObject)Instantiate(lineRenderScript.line, midPoint, rotation);
 
 		line.renderer.material = mat;
+
+		float width = 0.10f;
+
+		if(mat == turnInfoScript.humansMaterial || mat == turnInfoScript.selkiesMaterial)
+		{
+			width = 0.15f;
+		}
 		
-		line.transform.localScale = new Vector3(0.10f, distance, 0f);
+		line.transform.localScale = new Vector3(width, distance, 0f);
 	}
 
 	public void CalculateRadius(int system)
