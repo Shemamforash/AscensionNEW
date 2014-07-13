@@ -16,6 +16,8 @@ public class EmpireBoundaries : MasterScript
 	private List<GameObject> externalPoints = new List<GameObject> ();
 	private Triangle activeTriangle;
 
+	private int flips = 0;
+
 	private class VoronoiCellVertices
 	{
 		public List<Vector3> vertices = new List<Vector3>();
@@ -42,43 +44,120 @@ public class EmpireBoundaries : MasterScript
 	private class Triangle
 	{
 		public List<GameObject> points = new List<GameObject>(); //A, B, C points
-		public Vector3[] lines = new Vector3[3]; //AB, BC, CA line equations
+		public List<Vector3> lines = new List<Vector3>(); //AB, BC, CA line equations
 		public bool isInternal = false; //This allows me to ignore any triangles with no external points
 	}
 
-	private float AreaOfTriangle(Vector3 vertexA, Vector3 vertexB, Vector3 vertexC)
+	private float AngleOppositeLineInTri(int tri, int line)
 	{
-		float determinant = vertexA.x * (vertexB.y - vertexC.y) + vertexB.x * (vertexC.y - vertexA.y) + vertexC.x * (vertexA.y - vertexB.y); //det = x1(y2-y3) + x2(y3-y1) + x3(y1-y2)
-		return determinant / 2f; //area is half determinant
+		Vector2 lineA = Vector2.zero;
+		Vector2 lineB = Vector2.zero;
+
+		if(line == 0)
+		{
+			lineA = new Vector2(triangles[tri].lines[1].x, triangles[tri].lines[1].y);
+			lineB = new Vector2(triangles[tri].lines[2].x, triangles[tri].lines[2].y);
+		}
+		if(line == 1)
+		{
+			lineA = new Vector2(triangles[tri].lines[0].x, triangles[tri].lines[0].y);
+			lineB = new Vector2(triangles[tri].lines[2].x, triangles[tri].lines[2].y);
+		}
+		if(line == 2)
+		{
+			lineA = new Vector2(triangles[tri].lines[0].x, triangles[tri].lines[0].y);
+			lineB = new Vector2(triangles[tri].lines[1].x, triangles[tri].lines[1].y);
+		}
+
+		return Vector2.Angle (lineA, lineB);
 	}
 
-	private bool IsInTriangle(Vector3 point)
+	private int GetPointNotInLine(int line)
 	{
+		int point = -1;
+
+		if(line == 0)
+		{
+			point = 2;
+		}
+		if(line == 1)
+		{
+			point = 0;
+		}
+		if(line == 2)
+		{
+			point = 1;
+		}
+
+		return point;
+	}
+
+	private void CheckForDupes()
+	{
+		int dupes = 0;
+
 		for(int i = 0; i < triangles.Count; ++i)
 		{
-			float originalArea = AreaOfTriangle(triangles[i].points[0].transform.position, triangles[i].points[1].transform.position, triangles[i].points[2].transform.position); //Get area of triangle
-			float areaA = AreaOfTriangle(triangles[i].points[0].transform.position, triangles[i].points[1].transform.position, point); //Get area of new triangle formed by a and b of original triangle and new point to be tested
-			float areaB = AreaOfTriangle(triangles[i].points[1].transform.position, triangles[i].points[2].transform.position, point); //Get area of new triangle formed by b and c of original triangle and new point to be tested
-			float areaC = AreaOfTriangle(triangles[i].points[2].transform.position, triangles[i].points[0].transform.position, point); //Get area of new triangle formed by c and a of original triangle and new point to be tested
-
-			float u = areaC / originalArea; //Calculate u of barycentric coordinates
-			float v = areaA / originalArea; //Calculate v of barycentric coordinates
-			float w = areaB / originalArea; //Calculate w of barycentric coordinate
-
-			if(0f <= u && u <= 1) //If u is within 0 and 1
+			for(int j = 0; j < triangles.Count; ++j)
 			{
-				if(0f <= v && v <= 1) //If v is within 0 and 1
+				if(i == j)
 				{
-					if(0f <= w && w <= 1) //If w is within 0 and 1
+					continue;
+				}
+
+				int count = 0;
+
+				for(int k = 0; k < 3; ++k)
+				{
+					for(int l = 0; l < 3; ++l)
 					{
-						activeTriangle = triangles[i];
-						return true; //Point lies within triangle so return true
+						if(triangles[i].points[k] == triangles[j].points[l])
+						{
+							++count;
+						}
 					}
+				}
+
+				if(count == 3)
+				{
+					++dupes;
 				}
 			}
 		}
 
-		return false;
+		Debug.Log (dupes);
+	}
+
+	private float AngleBetweenLinesOfTri(Triangle tri, int anglePoint) //Anglepoint is the point at which the angle needs to be found
+	{
+		float lengthAB = Mathf.Sqrt(Mathf.Pow(tri.points[0].transform.position.x - tri.points[1].transform.position.x, 2f) + Mathf.Pow(tri.points[0].transform.position.y - tri.points[1].transform.position.y, 2f));
+		float lengthBC = Mathf.Sqrt(Mathf.Pow(tri.points[1].transform.position.x - tri.points[2].transform.position.x, 2f) + Mathf.Pow(tri.points[1].transform.position.y - tri.points[2].transform.position.y, 2f));
+		float lengthCA = Mathf.Sqrt(Mathf.Pow(tri.points[0].transform.position.x - tri.points[2].transform.position.x, 2f) + Mathf.Pow(tri.points[0].transform.position.y - tri.points[2].transform.position.y, 2f));
+		float angle = 0f;
+
+		if(anglePoint == 0)
+		{
+			angle = CosLawAngle(lengthBC, lengthCA, lengthAB);
+		}
+		if(anglePoint == 1)
+		{
+			angle = CosLawAngle(lengthCA, lengthAB, lengthBC);
+		}
+		if(anglePoint == 2)
+		{
+			angle = CosLawAngle(lengthAB, lengthBC, lengthCA);
+		}
+
+		return angle;
+	}
+
+	private float CosLawAngle(float a, float b, float c)
+	{
+		float numerator = (b * b) + (c * c) - (a * a);
+		float denominator = 2 * b * c;
+		float angleRad = Mathf.Acos (numerator / denominator);
+
+		return angleRad * Mathf.Rad2Deg;
 	}
 
 	private void CacheNearestStars()
@@ -113,25 +192,6 @@ public class EmpireBoundaries : MasterScript
 				break; //So break
 			}
 		}
-	}
-
-	private Triangle FindNextTri(int curExternal)
-	{
-		for(int i = curExternal; i < externalPoints.Count; ++i)
-		{
-			for(int j = 0; j < triangles.Count; ++j)
-			{
-				for(int k = 0; k < 3; ++k)
-				{
-					if(triangles[j].points[k] == externalPoints[i])
-					{
-						return triangles[j];
-					}
-				}
-			}
-		}
-
-		return null;
 	}
 
 	private bool CheckPointIsCloseToPoint(Vector3 pointA, Vector3 pointB)
@@ -245,9 +305,9 @@ public class EmpireBoundaries : MasterScript
 									newTri.points.Add (pointA);
 									newTri.points.Add (pointB);
 									newTri.points.Add (pointC);
-									newTri.lines[0] = mapConstructor.ABCLineEquation (pointA.transform.position, pointB.transform.position);
-									newTri.lines[1] = mapConstructor.ABCLineEquation (pointB.transform.position, pointC.transform.position);
-									newTri.lines[2] = mapConstructor.ABCLineEquation (pointC.transform.position, pointA.transform.position);
+									newTri.lines.Add (mapConstructor.ABCLineEquation (pointA.transform.position, pointB.transform.position));
+									newTri.lines.Add (mapConstructor.ABCLineEquation (pointB.transform.position, pointC.transform.position));
+									newTri.lines.Add (mapConstructor.ABCLineEquation (pointC.transform.position, pointA.transform.position));
 									tempTri.Add (newTri);
 								}
 							}
@@ -266,7 +326,6 @@ public class EmpireBoundaries : MasterScript
 		}
 
 		externalPoints.Add (unvisitedStars [curPoint]);
-		//unvisitedStars.RemoveAt(curPoint);
 		CheckInteriorPoints ();
 		tempTri.Clear ();
 	}
@@ -341,6 +400,119 @@ public class EmpireBoundaries : MasterScript
 		}
 	}
 
+	private bool TriangulationToDelaunay()
+	{
+		List<GameObject> sharedPoints = new List<GameObject>();
+		
+		for(int i = 0; i < triangles.Count; ++i) //For each triangle
+		{
+			for(int j = 0; j < triangles.Count; ++j) //For all other triangles
+			{
+				if(i == j)
+				{
+					continue;
+				}
+				
+				for(int k = 0; k < 3; ++k)
+				{
+					for(int l = 0; l < 3; ++l)
+					{
+						if(triangles[i].points[k] == triangles[j].points[l]) //If the current triangle shares a side with another triangle
+						{
+							sharedPoints.Add (triangles[i].points[k]);
+							break;
+						}
+					}
+					
+					if(sharedPoints.Count == 2)
+					{
+						//break;
+					}
+					if(sharedPoints.Count == 3)
+					{
+						Debug.Log("bananas");
+					}
+				}
+				
+				if(sharedPoints.Count == 2)
+				{
+					if(CheckIsDelaunay(sharedPoints[0], sharedPoints[1], triangles[i], triangles[j]) == false)
+					{
+						return false;
+					}
+				}
+				
+				sharedPoints.Clear ();
+			}
+		}
+		
+		return true;
+	}
+
+	private bool CheckIsDelaunay(GameObject sharedPointA, GameObject sharedPointB, Triangle triOne, Triangle triTwo)
+	{
+		GameObject unsharedPointOne = new GameObject ();
+		GameObject unsharedPointTwo = new GameObject ();
+		float angleAlpha = 0f, angleBeta = 0f;
+		
+		for(int i = 0; i < 3; ++i)
+		{
+			if(triOne.points[i] != sharedPointA && triOne.points[i] != sharedPointB)
+			{
+				unsharedPointOne = triOne.points[i];
+				angleAlpha = AngleBetweenLinesOfTri(triOne, i);
+			}
+			if(triTwo.points[i] != sharedPointA && triTwo.points[i] != sharedPointB)
+			{
+				unsharedPointTwo = triTwo.points[i];
+				angleBeta = AngleBetweenLinesOfTri(triTwo, i);
+			}
+		}
+		
+		Vector3 sharedPointLine = mapConstructor.ABCLineEquation (sharedPointA.transform.position, sharedPointB.transform.position);
+		Vector3 unsharedPointLine = mapConstructor.ABCLineEquation (unsharedPointOne.transform.position, unsharedPointTwo.transform.position);
+		Vector2 intersection = mapConstructor.IntersectionOfTwoLines (sharedPointLine, unsharedPointLine);
+		
+		if(mapConstructor.PointLiesOnLine(sharedPointA.transform.position, sharedPointB.transform.position, intersection) == false)
+		{
+			return true;
+		}
+		
+		if(angleAlpha + angleBeta > 180f)
+		{
+			Debug.Log (triangles.Count + " initial");
+
+			Triangle newTriA = new Triangle ();
+			newTriA.points.Add (unsharedPointOne);
+			newTriA.points.Add (unsharedPointTwo);
+			newTriA.points.Add (sharedPointA);
+			newTriA.lines.Add (mapConstructor.ABCLineEquation (newTriA.points[0].transform.position, newTriA.points[1].transform.position));
+			newTriA.lines.Add (mapConstructor.ABCLineEquation (newTriA.points[1].transform.position, newTriA.points[2].transform.position));
+			newTriA.lines.Add (mapConstructor.ABCLineEquation (newTriA.points[2].transform.position, newTriA.points[0].transform.position));
+			triangles.Add (newTriA);
+			
+			Triangle newTriB = new Triangle ();
+			newTriB.points.Add (unsharedPointOne);
+			newTriB.points.Add (unsharedPointTwo);
+			newTriB.points.Add (sharedPointB);
+			newTriB.lines.Add (mapConstructor.ABCLineEquation (newTriB.points[0].transform.position, newTriB.points[1].transform.position));
+			newTriB.lines.Add (mapConstructor.ABCLineEquation (newTriB.points[1].transform.position, newTriB.points[2].transform.position));
+			newTriB.lines.Add (mapConstructor.ABCLineEquation (newTriB.points[2].transform.position, newTriB.points[0].transform.position));
+			triangles.Add (newTriB);
+			
+			triangles.Remove(triOne);
+			triangles.Remove(triTwo);
+
+			flips++;
+
+			Debug.Log (triangles.Count + " final");
+
+			return false;
+		}
+		
+		return true;
+	}
+
 	private void SimpleTriangulation()
 	{
 		CacheNearestStars ();
@@ -349,9 +521,9 @@ public class EmpireBoundaries : MasterScript
 		newTri.points.Add (unvisitedStars [0]);
 		newTri.points.Add (unvisitedStars [1]);
 		newTri.points.Add (unvisitedStars [2]);
-		newTri.lines[0] = mapConstructor.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position);
-		newTri.lines[1] = mapConstructor.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position);
-		newTri.lines[2] = mapConstructor.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position);
+		newTri.lines.Add (mapConstructor.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position));
+		newTri.lines.Add (mapConstructor.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position));
+		newTri.lines.Add (mapConstructor.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position));
 		externalPoints.Add (unvisitedStars [0]);
 		externalPoints.Add (unvisitedStars [1]);
 		externalPoints.Add (unvisitedStars [2]);
@@ -359,159 +531,45 @@ public class EmpireBoundaries : MasterScript
 
 		unvisitedStars.RemoveRange (0, 3);
 
-
 		for(int i = 0; i < unvisitedStars.Count; ++i)//unvisitedStars.Count; ++i) //For all unchecked points
 		{
 			LinkPointToTris(i);
 			CacheTempTris(i);
 		}
 
-		Debug.Log (unvisitedStars.Count);
+		bool isDelaunay = false;
 
-		Debug.Log (triangles.Count);
+		while(isDelaunay == false)
+		{
+			isDelaunay = TriangulationToDelaunay();
+		}
+
+		CheckForDupes ();
+
+		Debug.Log (triangles.Count + " | " + flips);
 	}
-
-	/*
-	private void CheckForTriangleCreation(int curExternal, int curPoint)
-	{
-		List<GameObject> newTriPoints = new List<GameObject>();
-		Triangle activeTriangle = FindNextTri(curExternal);
-
-		for(int k = 0; k < 3; ++k) //For all vertexes of the active triangle
-		{
-			Debug.Log (curPoint + " | " + unvisitedStars.Count);
-
-			Vector3 lineToVertex = mapConstructor.ABCLineEquation(unvisitedStars[curPoint].transform.position, activeTriangle.points[k].transform.position); //Get the abc line between the vertex and the point
-
-			bool illegalIntersection = false; //Say there is no intersection
-
-			for(int l = 0; l < triangles.Count; ++l) //For all triangles
-			{
-				for(int m = 0; m < 3; ++m) //For all lines in those triangles
-				{
-					Vector3 pointA = Vector3.zero;
-					Vector3 pointB = Vector3.zero;
-
-					if(m == 0)
-					{
-						pointA = triangles[l].points[0].transform.position;
-						pointB = triangles[l].points[2].transform.position;
-					}
-					if(m == 1)
-					{
-						pointA = triangles[l].points[1].transform.position;
-						pointB = triangles[l].points[0].transform.position;
-					}
-					if(m == 2)
-					{
-						pointA = triangles[l].points[2].transform.position;
-						pointB = triangles[l].points[1].transform.position;
-					}
-
-					if(triangles[l] == activeTriangle) //If the triangle to test is the same as the triangle containing the current vertex, check to skip the lines connecting to the current vertex
-					{
-						if(k == m)
-						{
-							continue;
-						}
-						if(k - 1 < 0)
-						{
-							if(2 == m)
-							{
-								continue;
-							}
-						}
-						if(k - 1 >= 0)
-						{
-							if(k - 1 == m)
-							{
-								continue;
-							}
-						}
-					}
-
-					Vector3 intersection = mapConstructor.IntersectionOfTwoLines(lineToVertex, triangles[l].lines[m]); //Intersection between line to testing point and other lines in triangle
-
-					if(intersection == Vector3.zero)
-					{
-						Debug.Log ("Wut");
-					}
-
-					if(CheckPointIsCloseToPoint(activeTriangle.points[k].transform.position, intersection)) //If the intersection lies where the two ends of the line meet this is not illegal
-					{
-						break;
-					}
-
-					if(mapConstructor.PointLiesOnLine(unvisitedStars[curPoint].transform.position, activeTriangle.points[k].transform.position, intersection))
-					{
-						Instantiate(systemInvasion.invasionQuad, intersection, Quaternion.identity);
-
-						illegalIntersection = true;
-						break;
-					}
-				}
-				
-				if(illegalIntersection == true) //If there is an illegal intersection at all
-				{
-					//DrawDebugLine(unvisitedStars[curPoint].transform.position, activeTriangle.points[k].transform.position, turnInfoScript.selkiesMaterial);
-					break; //Stop the algorithm
-				}
-
-				//DrawDebugLine(unvisitedStars[curPoint].transform.position, activeTriangle.points[k].transform.position, turnInfoScript.humansMaterial);
-
-			}
-			
-			if(illegalIntersection == false && newTriPoints.Contains(activeTriangle.points[k]) == false) //If there were no illegal intersections
-			{
-				newTriPoints.Add (activeTriangle.points[k]); //Add the vertex of this triangle to the points to be added to a new triangle
-			}
-		}
-		
-		if(newTriPoints.Count == 2) //If there are exactly 2 points to be added this is a valid triangle so make one
-		{
-			Triangle newTri = new Triangle();
-			newTri.points.Add (unvisitedStars[curPoint]);
-			newTri.points.Add (newTriPoints[0]);
-			newTri.points.Add (newTriPoints[1]);
-			newTri.lines[0] = mapConstructor.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position);
-			newTri.lines[1] = mapConstructor.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position);
-			newTri.lines[2] = mapConstructor.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position);
-			tempTri.Add (newTri);
-		}
-		
-		newTriPoints.Clear (); //Clear the new tri points list
-	}*/
-
+	
 	public void CreateVoronoiCells()
 	{
 		SimpleTriangulation ();
 
 		/*
-		for(int i = 0; i < systemListConstructor.systemList.Count; ++i) //For all systems
+		for(int j = 0; j < systemListConstructor.systemList.Count; ++j)
 		{
-			bool looped = false;
-
-			if(systemListConstructor.systemList[i].permanentConnections.Count >= 2)
-			{
-
 			VoronoiCellVertices newCell = new VoronoiCellVertices(); //Create new voronoi cell
 
-
-				for(int j = 0; j < systemListConstructor.systemList[i].permanentConnections.Count; ++j) //For all permanent connections
+			for(int i = 0; i < triangles.Count; ++i) //For all systems
+			{
+				if(triangles[i].points.Contains(systemListConstructor.systemList[j].systemObject))
 				{
-					Vector3 systemA = systemListConstructor.systemList[i].permanentConnections[j].transform.position; //System A equals this system
+					bool looped = false;
 
-					int nextSys = j + 1;
 
-					if(j + 1 == systemListConstructor.systemList[i].permanentConnections.Count)
-					{
-						nextSys = 0;
-						looped = true;
-					}
+					Vector3 systemA = triangles[i].points[0]; //System A equals this system
 
-					Vector3 systemB = systemListConstructor.systemList[i].systemObject.transform.position;
+					Vector3 systemB = triangles[i].points[1];
 
-					Vector3 systemC = systemListConstructor.systemList[i].permanentConnections[nextSys].transform.position;
+					Vector3 systemC = triangles[i].points[2];
 
 					Vector3 lineAB = mapConstructor.PerpendicularLineEquation(systemA, systemB);
 					Vector3 lineBC = mapConstructor.PerpendicularLineEquation(systemB, systemC);
@@ -526,11 +584,10 @@ public class EmpireBoundaries : MasterScript
 						break;
 					}
 				}
+			}
 
 			voronoiVertices.Add (newCell);
-			}
-		}
-		*/
+		}*/
 
 
 		for(int i = 0; i < triangles.Count; ++i)
