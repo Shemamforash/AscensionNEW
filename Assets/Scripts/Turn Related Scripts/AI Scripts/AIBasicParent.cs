@@ -364,8 +364,6 @@ public class AIBasicParent : TurnInfo
 				++thisPlayer.systemsColonisedThisTurn;
 
 				thisPlayer.wealth -= 20.0f;
-
-				empireBoundaries.ModifyBoundaryCircles ();
 			}
 
 			if(currentPlanet != -1 && currentSystem != -1)

@@ -35,8 +35,6 @@ public class EnemyOne : AIBasicParent
 				break;
 			}
 		}
-
-		empireBoundaries.ModifyBoundaryCircles ();
 	}
 }
 
