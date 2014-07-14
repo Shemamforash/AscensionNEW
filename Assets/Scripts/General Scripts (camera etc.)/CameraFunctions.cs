@@ -20,7 +20,7 @@ public class CameraFunctions : MasterScript
 	private GameObject thisObject;
 	private TechTreeGUI techTreeGUI;
 
-	private Vector3 initPos, finalPos;
+	private Vector3 initPos, finalPos, lastFrameMousePos = Vector3.zero;
 
 	void Start()
 	{
@@ -39,6 +39,7 @@ public class CameraFunctions : MasterScript
 			ZoomCamera();
 			PanCamera();
 			ClickSystem ();
+			ClickAndDrag();
 		}
 		
 		if(Input.GetKeyDown ("escape")) //Used to close all open menus, and to reset doubleclick
@@ -59,6 +60,36 @@ public class CameraFunctions : MasterScript
 		if(techTreeGUI.techTree.activeInHierarchy == true)
 		{
 			techTreeGUI.ShowTechTree();
+		}
+	}
+
+	private void ClickAndDrag()
+	{
+		if(Input.GetMouseButton(0)) //If the mouse is held down
+		{
+			Vector3 curMousePos = Input.mousePosition; //Get the current mouse pos in screen coordinates
+			
+			curMousePos = new Vector3(curMousePos.x, curMousePos.y, cameraMain.transform.position.z); //Set its z position equal to the height of the camera from the game
+			
+			curMousePos = cameraMain.ScreenToWorldPoint(curMousePos); //Get that position in world coordinates
+			
+			if(lastFrameMousePos == Vector3.zero) //If the last frame position was 0
+			{
+				lastFrameMousePos = curMousePos; //Set the last frame position to be this frame's position
+			}
+			
+			if(lastFrameMousePos != curMousePos && lastFrameMousePos != Vector3.zero) //If last frame position isn't 0 or the current position
+			{
+				Vector3 difference = curMousePos - lastFrameMousePos; //Get the difference between the last frame position and the current position
+				
+				cameraMain.transform.position += difference / 2; //Add half of this (for smoothing) to the current camera position
+				
+				lastFrameMousePos = curMousePos; //Update the last frame position
+			}
+		}
+		else //If it isn't
+		{
+			lastFrameMousePos = Vector3.zero; //Reset the last frame value
 		}
 	}
 

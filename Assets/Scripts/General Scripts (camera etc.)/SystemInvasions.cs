@@ -101,7 +101,6 @@ public class SystemInvasions : MasterScript
 
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();
 		systemDefence.underInvasion = false;
-		empireBoundaries.ModifyBoundaryCircles ();
 	}
 	
 	private void OwnSystem(int system)
@@ -136,8 +135,6 @@ public class SystemInvasions : MasterScript
 				systemListConstructor.systemList [system].planetsInSystem[i].improvementsBuilt.Clear ();
 			}
 		}
-
-		empireBoundaries.ModifyBoundaryCircles ();
 	}
 	
 	public void StartSystemInvasion(int system)

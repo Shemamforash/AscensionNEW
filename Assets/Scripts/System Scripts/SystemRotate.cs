@@ -12,7 +12,7 @@ public class SystemRotate : MasterScript
 	public void Start()
 	{
 		radius = Vector3.Distance (gameObject.transform.position, galacticCentre);
-		speed = UnityEngine.Random.Range (0.0009f, 0.0011f);
+		speed = 0.001f;
 
 		if(gameObject.tag == "StarSystem")
 		{
@@ -35,7 +35,10 @@ public class SystemRotate : MasterScript
 			gameObject.transform.Rotate (Vector3.forward, Time.deltaTime * 5f);
 		}
 
-		UpdateRotation ();
+		if(systemListConstructor.loaded == true)
+		{
+			UpdateRotation ();
+		}
 	}
 
 	public void UpdateRotation()

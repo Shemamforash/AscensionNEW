@@ -24,6 +24,7 @@ public class SystemListConstructor : MasterScript
 	private float xPos, yPos, distanceXY;
 	public float systemScale = 0.0f, sysDistMin;
 	public Transform systemContainer;
+	public bool loaded = false;
 
 	private void Start()
 	{
@@ -36,7 +37,7 @@ public class SystemListConstructor : MasterScript
 		CreateObjects ();
 		mapConstructor.DrawMinimumSpanningTree ();
 
-		empireBoundaries.SetArrSize ();
+		voronoiGenerator.CreateVoronoiCells ();
 
 		ambientStars = GameObject.Find ("ScriptsContainer").GetComponent<AmbientStarRandomiser> ();
 		ambientStars.GenerateStars ();
@@ -53,6 +54,7 @@ public class SystemListConstructor : MasterScript
 		systemPopup.LoadOverlays ();
 
 		galaxyGUI.SelectRace(PlayerPrefs.GetString ("Player Race"));
+		loaded = true;
 	}
 
 	public int RefreshCurrentSystemA(GameObject thisSystem)

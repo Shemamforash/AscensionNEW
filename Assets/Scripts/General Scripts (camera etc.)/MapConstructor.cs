@@ -10,56 +10,12 @@ public class MapConstructor : MasterScript
 	public bool connected = false;
 	public List<int> allIntersections = new List<int>();
 
-	public Vector2 IntersectionOfTwoLines (Vector3 lineA, Vector3 lineB)
-	{
-		float determinant = (lineA.x * lineB.y) - (lineB.x * lineA.y);
-
-		if(determinant == 0f)
-		{
-			return Vector2.zero;
-		}
-		
-		float x = (lineB.y * lineA.z - lineA.y * lineB.z) / determinant;
-		float y = (lineA.x * lineB.z - lineB.x * lineA.z) / determinant;
-		
-		Vector2 intersection = new Vector3(x, y);
-		
-		return intersection;
-	}
-
-	public Vector3 ABCLineEquation(Vector3 pointA, Vector3 pointB)
-	{
-		float A = pointB.y - pointA.y;
-		float B = pointA.x - pointB.x;
-		float C = (A * pointA.x) + (B * pointA.y);
-
-		return new Vector3 (A, B, C);
-	}
-
-	public Vector3 PerpendicularLineEquation(Vector3 systemA, Vector3 systemB)
-	{
-		Vector3 midpoint = (systemA + systemB) / 2;
-		float gradient = (systemB.y - systemA.y) / (systemB.x - systemA.x);
-
-		if(gradient == 0f)
-		{
-			return new Vector3(1, 0, midpoint.x);
-		}
-		else
-		{
-			float perpGradient = -1/gradient;
-			float yIntersect = midpoint.y - (perpGradient * midpoint.x);
-			Vector3 perpSecondPoint = new Vector3(0, yIntersect, midpoint.z);
-			return ABCLineEquation(midpoint, perpSecondPoint);
-		}
-	}
-
 	public bool TestForIntersection(Vector3 thisSystem, Vector3 targetSystem, bool includeIntersections)
 	{
 		allIntersections.Clear ();
 		bool intersects = false;
 
-		Vector3 lineA = ABCLineEquation(thisSystem, targetSystem);
+		Vector3 lineA = MathsFunctions.ABCLineEquation(thisSystem, targetSystem);
 
 		for (int i = 0; i < coordinateList.Count; ++i) 
 		{
@@ -72,18 +28,18 @@ public class MapConstructor : MasterScript
 				continue;
 			}
 
-			Vector3 lineB = ABCLineEquation(coordinateList[i].systemA, coordinateList[i].systemB);
+			Vector3 lineB = MathsFunctions.ABCLineEquation(coordinateList[i].systemA, coordinateList[i].systemB);
 
-			Vector2 intersection = IntersectionOfTwoLines(lineA, lineB);
+			Vector2 intersection = MathsFunctions.IntersectionOfTwoLines(lineA, lineB);
 
 			if(intersection == Vector2.zero)
 			{
 				return false;
 			}
 
-			if(PointLiesOnLine(thisSystem, targetSystem, intersection))
+			if(MathsFunctions.PointLiesOnLine(thisSystem, targetSystem, intersection))
 			{
-				if(PointLiesOnLine(coordinateList[i].systemA, coordinateList[i].systemB, intersection))
+				if(MathsFunctions.PointLiesOnLine(coordinateList[i].systemA, coordinateList[i].systemB, intersection))
 				{
 					if(includeIntersections == true)
 					{
@@ -143,43 +99,6 @@ public class MapConstructor : MasterScript
 		}
 
 		return true;
-	}
-
-	public bool PointLiesOnLine(Vector3 pointAVec3, Vector3 pointBVec3, Vector3 intersectionVec3)
-	{	
-		if(intersectionVec3.x <= Mathf.Max(pointAVec3.x, pointBVec3.x) && intersectionVec3.x >= Mathf.Min (pointAVec3.x, pointBVec3.x))
-		{
-			if(intersectionVec3.y <= Mathf.Max(pointAVec3.y, pointBVec3.y) && intersectionVec3.y >= Mathf.Min (pointAVec3.y, pointBVec3.y))
-			{
-				return true;
-			}
-		}
-
-		return false;
-
-		/*
-		Vector2 pointA = new Vector2(pointAVec3.x, pointAVec3.y);
-		Vector2 pointB = new Vector2(pointBVec3.x, pointBVec3.y);
-		Vector2 intersection = new Vector2(intersectionVec3.x, intersectionVec3.y);
-
-		float crossProduct = (intersection.y - pointA.y) * (pointB.x - pointA.x) - (intersection.x - pointA.x) * (pointB.y - pointA.y);
-
-		if(crossProduct <= 0.001f || crossProduct >= -0.001f)
-		{
-			float dotProduct = (intersection.x - pointA.x) * (pointB.x - pointA.x) + (intersection.y - pointA.y) * (pointB.y - pointA.y);
-
-			if(dotProduct >= 0f) 
-			{
-				float distanceAB = Mathf.Pow((pointB.x - pointA.x), 2f) + Mathf.Pow((pointB.y - pointA.y), 2f);
-
-				if(dotProduct <= distanceAB)
-				{
-					return true;
-				}
-			}
-		}
-			
-		return false;*/
 	}
 	
 	public void DrawMinimumSpanningTree() //Working

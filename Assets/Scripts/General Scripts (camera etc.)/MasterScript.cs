@@ -60,7 +60,9 @@ public class MasterScript : MonoBehaviour
 	[HideInInspector]
 	public InvasionGUI invasionGUI;
 	[HideInInspector]
-	public EmpireBoundaries empireBoundaries;
+	public VoronoiGeneratorAndDelaunay voronoiGenerator;
+	[HideInInspector]
+	public Triangulation triangulation;
 	[HideInInspector]
 	public HeroResourceImprovement heroResource;
 
@@ -82,9 +84,10 @@ public class MasterScript : MonoBehaviour
 		systemInvasion = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<SystemInvasions> ();
 		uiObjects = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<UIObjects> ();
 		ambientStarRandomiser = GameObject.FindGameObjectWithTag ("ScriptContainer").GetComponent<AmbientStarRandomiser> ();
-		empireBoundaries = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<EmpireBoundaries> ();
+		voronoiGenerator = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<VoronoiGeneratorAndDelaunay> ();
 		heroResource = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<HeroResourceImprovement> ();
 		systemPopup = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<SystemInfoPopup> ();
+		triangulation = GameObject.FindGameObjectWithTag ("GUIContainer").GetComponent<Triangulation> ();
 	}
 
 	public int RefreshCurrentSystem(GameObject thisSystem) //Returns the systemList enumerator of a system gameobject
