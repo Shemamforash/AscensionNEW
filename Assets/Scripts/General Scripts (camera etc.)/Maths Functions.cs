@@ -41,7 +41,7 @@ public static class MathsFunctions
 		
 		if(yDif == 0 && xDif > 0) //If y equals zero and x is positive then angle is 360 degrees (horizontal forward
 		{
-			angle = 360;
+			angle = 0;
 		}
 		
 		if(xDif < 0f && yDif > 0f) //If x is negative and y is positive the angle is in the top left quadrant
@@ -123,5 +123,20 @@ public static class MathsFunctions
 		}
 		
 		return false;
+	}
+
+	public static float AngleBetweenLineSegments(Vector3 origin, Vector3 pointA, Vector3 pointB)
+	{
+		float angleA = MathsFunctions.RotationOfLine(pointA, origin);
+		float angleB = MathsFunctions.RotationOfLine(pointB, origin);
+		
+		float testAngle = Mathf.Max (angleA, angleB) - Mathf.Min (angleA, angleB);
+		
+		if(testAngle > 180)
+		{
+			testAngle = 360 - testAngle;
+		}
+		
+		return testAngle;
 	}
 }
