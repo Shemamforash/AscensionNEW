@@ -11,7 +11,6 @@ public class SystemRotate : MasterScript
 
 	public void Start()
 	{
-		/*
 		radius = Vector3.Distance (gameObject.transform.position, galacticCentre);
 		speed = 0.001f;
 
@@ -23,12 +22,11 @@ public class SystemRotate : MasterScript
 			rndSpd2 = UnityEngine.Random.Range (8f, 12f);
 			corona3 = gameObject.transform.Find ("Point01").transform.Find ("corona03").gameObject;
 			rndSpd3 = UnityEngine.Random.Range (8f, 12f);
-		}*/
+		}
 	}
 
 	void Update () //FIXED PLS DONT CHANGE THIS FUTURE SAM
 	{
-		/*
 		if(corona1 != null)
 		{
 			corona1.transform.Rotate (Vector3.forward, Time.deltaTime * rndSpd1);
@@ -40,7 +38,7 @@ public class SystemRotate : MasterScript
 		if(systemListConstructor.loaded == true)
 		{
 			UpdateRotation ();
-		}*/
+		}
 	}
 
 	public void UpdateRotation()

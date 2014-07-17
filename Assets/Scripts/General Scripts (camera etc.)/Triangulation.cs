@@ -9,82 +9,6 @@ public class Triangulation : MasterScript
 	private List<Triangle> tempTri = new List<Triangle>();
 	private List<GameObject> unvisitedStars = new List<GameObject> ();
 	private List<GameObject> externalPoints = new List<GameObject> ();
-	private Triangle activeTriangle;
-	private float timer = 0;
-	private int number = 0;
-	private bool loaded = false, triangulated = false;
-
-	void Update()
-	{
-		if(systemListConstructor.loaded == true && loaded == false)
-		{
-			CacheNearestStars ();
-			
-			Triangle newTri = new Triangle();
-			newTri.points.Add (unvisitedStars [0]);
-			newTri.points.Add (unvisitedStars [1]);
-			newTri.points.Add (unvisitedStars [2]);
-			newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position));
-			newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position));
-			newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position));
-			externalPoints.Add (unvisitedStars [0]);
-			externalPoints.Add (unvisitedStars [1]);
-			externalPoints.Add (unvisitedStars [2]);
-			triangles.Add (newTri);
-		
-			voronoiGenerator.DrawDebugLine(unvisitedStars [0].transform.position, unvisitedStars [1].transform.position, turnInfoScript.selkiesMaterial);
-			voronoiGenerator.DrawDebugLine(unvisitedStars [2].transform.position, unvisitedStars [1].transform.position, turnInfoScript.selkiesMaterial);
-			voronoiGenerator.DrawDebugLine(unvisitedStars [0].transform.position, unvisitedStars [2].transform.position, turnInfoScript.selkiesMaterial);
-			
-			unvisitedStars.RemoveRange (0, 3);
-
-			timer = Time.time;
-
-			loaded = true;
-		}
-
-		if(loaded == true)
-		{
-			if(timer + 1.0f < Time.time && number < unvisitedStars.Count)
-			{
-				if(externalPoints.Contains (unvisitedStars[23]) == true)
-				{
-					Debug.Log ("isee");
-				}
-
-				LinkPointToTris(number);
-				CacheTempTris(number);
-				++number;
-
-				if(number == unvisitedStars.Count)
-				{
-					triangulated = true;
-				}
-
-				timer = Time.time;
-			}
-		}
-
-		if(triangulated == true)
-		{
-			if(timer + 1.0f < Time.time)
-			{
-				bool isDelaunay = false;
-
-				while(isDelaunay == false)
-				{
-					isDelaunay = voronoiGenerator.TriangulationToDelaunay();
-				}
-
-				for(int i = 0; i < triangles.Count; ++i)
-				{
-					voronoiGenerator.DrawDebugLine(triangles[i].points[0].transform.position, triangles[i].points [1].transform.position, turnInfoScript.nereidesMaterial);
-					voronoiGenerator.DrawDebugLine(triangles[i].points [2].transform.position, triangles[i].points [1].transform.position, turnInfoScript.nereidesMaterial);
-					voronoiGenerator.DrawDebugLine(triangles[i].points [0].transform.position, triangles[i].points [2].transform.position, turnInfoScript.nereidesMaterial);
-				}
-			}
-		}
-	}
 
 	public void SimpleTriangulation()
 	{
@@ -93,27 +17,30 @@ public class Triangulation : MasterScript
 		Triangle newTri = new Triangle();
 		newTri.points.Add (unvisitedStars [0]);
 		newTri.points.Add (unvisitedStars [1]);
-		newTri.points.Add (unvisitedStars [2]);
-		newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position));
-		newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position));
-		newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position));
-		externalPoints.Add (unvisitedStars [0]);
-		externalPoints.Add (unvisitedStars [1]);
-		externalPoints.Add (unvisitedStars [2]);
-		triangles.Add (newTri);
-
-		Debug.Log (unvisitedStars [0] + " | " + unvisitedStars [1] + " | " + unvisitedStars [2] + " | " + unvisitedStars[3]);
-
-		unvisitedStars.RemoveRange (0, 3);
+		for(int i = 2; i < unvisitedStars.Count; ++i)
+		{
+			if(MathsFunctions.PointsAreColinear(unvisitedStars[0].transform.position, unvisitedStars[1].transform.position, unvisitedStars[i].transform.position) == false)
+			{
+				newTri.points.Add (unvisitedStars[i]);
+				newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[0].transform.position, newTri.points[1].transform.position));
+				newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[1].transform.position, newTri.points[2].transform.position));
+				newTri.lines.Add (MathsFunctions.ABCLineEquation (newTri.points[2].transform.position, newTri.points[0].transform.position));
+				externalPoints.Add (unvisitedStars [0]);
+				externalPoints.Add (unvisitedStars [1]);
+				externalPoints.Add (unvisitedStars [i]);
+				triangles.Add (newTri);
+				unvisitedStars.RemoveAt(i);
+				unvisitedStars.RemoveRange(0, 2);
+				break;
+			}
+		}
 
 		for(int i = 0; i < unvisitedStars.Count; ++i) //For all unchecked points
 		{
 			LinkPointToTris(i);
 			CacheTempTris(i);
 		}
-
-		Debug.Log (triangles.Count);
-	
+			
 		bool isDelaunay = false;
 
 		//while(isDelaunay == false)
@@ -123,27 +50,28 @@ public class Triangulation : MasterScript
 
 		CheckForNonDelaunayTriangles ();
 	}
-
+	
 	private void CacheNearestStars()
 	{
 		for(int i = 0; i < systemListConstructor.systemList.Count; ++i) //Add all systems to a list of unvisited nodes
 		{
 			unvisitedStars.Add (systemListConstructor.systemList[i].systemObject);
 		}
-		
-		for(int i = 0; i < 12; ++i)
+
+		float theta = 0f;
+
+		while(theta <= 360f)
 		{
-			float angle = i * 30f;
-			
-			float xPos = (float)(Mathf.Cos(angle) * (-60f) - Mathf.Sin(angle) * (-50f) + 50f);
-			float yPos = (float)(Mathf.Sin(angle) * (-60f) + Mathf.Cos(angle) * (-50f) + 50f);
-			
+			float xPos = 50f + 60f * Mathf.Cos (theta * Mathf.Deg2Rad);
+			float yPos = 50f + 60f * Mathf.Sin (theta * Mathf.Deg2Rad);
+
 			Vector3 newPos = new Vector3 (xPos, yPos, 0f);
 			
-			GameObject edge = new GameObject();
-			edge.name = i.ToString();
-			edge.transform.position = newPos;
-			unvisitedStars.Add (edge); //This adds bounds to the voronoi diagram (forces it to be a circle);
+			GameObject edgePoint = new GameObject();
+			edgePoint.name = ((int)(theta / 30f)).ToString();
+			edgePoint.transform.position = newPos;
+			unvisitedStars.Add (edgePoint); //This adds bounds to the voronoi diagram (forces it to be a circle);
+			theta += 15f;
 		}
 		
 		Vector3 centre = new Vector3 (50f, 50f, 0f); //Create centre point at middle of map
@@ -198,6 +126,32 @@ public class Triangulation : MasterScript
 				continue;
 			}
 
+			if(lineCurToExternal == lineCurToNextExternal)
+			{
+				continue;
+			}
+
+			bool illegal = false;
+
+			for(int j = 0; j < externalPoints.Count; ++j)
+			{
+				if(j == i || j == nextPoint)
+				{
+					continue;
+				}
+
+				if(MathsFunctions.IsInTriangle(externalPoints[i].transform.position, externalPoints[nextPoint].transform.position, unvisitedStars[curPoint].transform.position, externalPoints[j].transform.position) == true)
+				{
+					illegal = true;
+					break;
+				}
+			}
+
+			if(illegal == true)
+			{
+				continue;
+			}
+
 			for(int j = 0; j < triangles.Count; ++j)
 			{
 				if(triangles[j].isInternal == true)
@@ -219,67 +173,45 @@ public class Triangulation : MasterScript
 					newTri.lines.Add (MathsFunctions.ABCLineEquation (pointB.transform.position, pointC.transform.position));
 					newTri.lines.Add (MathsFunctions.ABCLineEquation (pointC.transform.position, pointA.transform.position));
 					tempTri.Add (newTri);
-
-					voronoiGenerator.DrawDebugLine(pointA.transform.position, pointB.transform.position, turnInfoScript.selkiesMaterial);
-					voronoiGenerator.DrawDebugLine(pointC.transform.position, pointB.transform.position, turnInfoScript.selkiesMaterial);
-					voronoiGenerator.DrawDebugLine(pointA.transform.position, pointC.transform.position, turnInfoScript.selkiesMaterial);
-
 				}				  
 			}
 		}
 	}
 
-	public Vector2 CheckIfSharesSide(Triangle triOne, Triangle triTwo)
+	public List<GameObject> CheckIfSharesSide(Triangle triOne, Triangle triTwo) //Just return the points
 	{
-		List<int> sharedPointsA = new List<int> ();
-		List<int> sharedPointsB = new List<int> ();
+		List<GameObject> pointList = new List<GameObject> ();
+
+		int counter = 0;
 
 		for(int i = 0; i < 3; ++i) //For all points in tri one
 		{
 			for(int j = 0; j < 3; ++j) //For all points in tri two
 			{
-				if(triOne.points[i] == triTwo.points[j]) //If tri one shares a point with tri two
+				if(triOne.points[i].name == triTwo.points[j].name) //If tri one shares a point with tri two
 				{
-					sharedPointsA.Add (i); //Add it to the shared points list
-					sharedPointsB.Add (j);
-					break; //Skip to the next point in tri one
+					pointList.Add(triOne.points[i]);
+					break;
 				}
 			}
 		}
 
-		if(sharedPointsA.Count == 2) //If there are 2 shared point (i.e a line)
+		if(pointList.Count == 2)
 		{
-			int lineA = 0, lineB = 0;
-
-			if(sharedPointsA[0] == 0 && sharedPointsA[1] == 1|| sharedPointsA[0] == 1 && sharedPointsA[1] == 0)
+			for(int i = 0; i < 3; ++i)
 			{
-				lineA = 0;
+				if(triOne.points[i].name != pointList[0].name && triOne.points[i].name != pointList[1].name)
+				{
+					pointList.Add(triOne.points[i]);
+				}
+				if(triTwo.points[i].name != pointList[0].name && triTwo.points[i].name != pointList[1].name)
+				{
+					pointList.Add (triTwo.points[i]);
+				}
 			}
-			if(sharedPointsA[0] == 2 && sharedPointsA[1] == 1 || sharedPointsA[0] == 1 && sharedPointsA[1] == 2)
-			{
-				lineA = 1;
-			}
-			if(sharedPointsA[0] == 0 && sharedPointsA[1] == 2 || sharedPointsA[0] == 2 && sharedPointsA[1] == 0)
-			{
-				lineA = 2;
-			}
-			if(sharedPointsB[0] == 0 && sharedPointsB[1] == 1 || sharedPointsB[0] == 1 && sharedPointsB[1] == 0)
-			{
-				lineB = 0;
-			}
-			if(sharedPointsB[0] == 2 && sharedPointsB[1] == 1 || sharedPointsB[0] == 1 && sharedPointsB[1] == 2)
-			{
-				lineB = 1;
-			}
-			if(sharedPointsB[0] == 0 && sharedPointsB[1] == 2 || sharedPointsB[0] == 2 && sharedPointsB[1] == 0)
-			{
-				lineB = 2;
-			}
-
-			return new Vector2(lineA, lineB);
 		}
-
-		return new Vector2 (-1, -1);
+	
+		return pointList;
 	}
 
 	private void CheckForNonDelaunayTriangles()
@@ -295,53 +227,21 @@ public class Triangulation : MasterScript
 					continue;
 				}
 
-				Vector2 sharedSides = CheckIfSharesSide(triangles[i], triangles[j]);
+				List<GameObject> sharedSides = CheckIfSharesSide(triangles[i], triangles[j]);
 
-				if(sharedSides != new Vector2(-1, -1))
+				if(sharedSides.Count == 4)
 				{
-					GameObject sharedPointA = new GameObject ();
-					GameObject sharedPointB = new GameObject ();
-					GameObject unsharedPointA = new GameObject ();
-					GameObject unsharedPointB = new GameObject ();
+					GameObject sharedPointA = sharedSides[0];
+					GameObject sharedPointB = sharedSides[1];
+					GameObject unsharedPointA = sharedSides[2];
+					GameObject unsharedPointB = sharedSides[3];
 					float angleAlpha = 0f, angleBeta = 0f;
 					
-					if(sharedSides.x == 0f)
-					{
-						sharedPointA = triangles[i].points[0];
-						sharedPointB = triangles[i].points[1];
-						unsharedPointA = triangles[i].points[2];
-					}
-					if(sharedSides.x == 1f)
-					{
-						sharedPointA = triangles[i].points[1];
-						sharedPointB = triangles[i].points[2];
-						unsharedPointA = triangles[i].points[0];
-					}
-					if(sharedSides.x == 2f)
-					{
-						sharedPointA = triangles[i].points[0];
-						sharedPointB = triangles[i].points[2];
-						unsharedPointA = triangles[i].points[1];
-					}
-					
 					angleAlpha = MathsFunctions.AngleBetweenLineSegments (unsharedPointA.transform.position, sharedPointA.transform.position, sharedPointB.transform.position);
-					
-					if(sharedSides.y == 0f)
-					{
-						unsharedPointB = triangulation.triangles[j].points[2];
-					}
-					if(sharedSides.y == 1f)
-					{
-						unsharedPointB = triangulation.triangles[j].points[0];
-					}
-					if(sharedSides.y == 2f)
-					{
-						unsharedPointB = triangulation.triangles[j].points[1];
-					}
-					
+
 					angleBeta = MathsFunctions.AngleBetweenLineSegments (unsharedPointB.transform.position, sharedPointA.transform.position, sharedPointB.transform.position);
 					
-					Vector3 sharedPointLine = triangles[i].lines[(int)sharedSides.x];
+					Vector3 sharedPointLine = MathsFunctions.ABCLineEquation (sharedPointA.transform.position, sharedPointB.transform.position);
 					Vector3 unsharedPointLine = MathsFunctions.ABCLineEquation (unsharedPointA.transform.position, unsharedPointB.transform.position);
 					Vector2 intersection = MathsFunctions.IntersectionOfTwoLines (sharedPointLine, unsharedPointLine);
 					

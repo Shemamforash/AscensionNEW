@@ -63,7 +63,11 @@ public class SystemInfoPopup : MasterScript
 			tempScale = 0f;
 		}
 
-		float scale = ((0.0125f / tempScale) * mainCamera.transform.position.z) + 1.5f; //Orig 1.5f 
+		//float scale = ((0.015f / tempScale) * mainCamera.transform.position.z) + 1.5f; //Orig 1.5f 
+
+		//float scale = mainCamera.transform.position.z * (-1f / 65f);
+
+		float scale = 0.35f;
 
 		overlayObjectList [i].container.transform.localScale = new Vector3 (scale, scale, 0f);
 	}
@@ -90,7 +94,7 @@ public class SystemInfoPopup : MasterScript
 
 	void Update () 
 	{
-		if(mainCamera.transform.position.z > -65f)
+		if(mainCamera.transform.position.z < 0f)//> -65f)
 		{
 			for(int i = 0; i < overlayObjectList.Count; ++i)
 			{
@@ -112,6 +116,7 @@ public class SystemInfoPopup : MasterScript
 			allfade = true;
 		}
 
+		/*
 		else if(mainCamera.transform.position.z <= -65f && allfade == true)
 		{
 			for(int i = 0; i < overlayObjectList.Count; ++i)
@@ -127,7 +132,7 @@ public class SystemInfoPopup : MasterScript
 			}
 
 			allfade = false;
-		}
+		}*/
 	}
 }
 

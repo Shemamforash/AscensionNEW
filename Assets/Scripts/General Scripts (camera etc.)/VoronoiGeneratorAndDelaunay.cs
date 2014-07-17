@@ -15,87 +15,52 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 		public List<float> vertexAngles = new List<float> ();
 	}
 
-	public bool CheckIsDelaunay(int triOne, int triTwo)
+	public bool CheckIsDelaunay(Triangle triOne, Triangle triTwo)
 	{
-		Vector2 sharedSides = triangulation.CheckIfSharesSide(triangulation.triangles[triOne], triangulation.triangles[triTwo]);
-		
-		if(sharedSides != new Vector2(-1f, -1f))
-		{
-			GameObject sharedPointA = new GameObject ();
-			GameObject sharedPointB = new GameObject ();
-			GameObject unsharedPointA = new GameObject ();
-			GameObject unsharedPointB = new GameObject ();
-			float angleAlpha = 0f, angleBeta = 0f;
+		List<GameObject> sharedSides = triangulation.CheckIfSharesSide(triOne, triTwo);
 
-			if(sharedSides.x == 0f)
-			{
-				sharedPointA = triangulation.triangles[triOne].points[0];
-				sharedPointB = triangulation.triangles[triOne].points[1];
-				unsharedPointA = triangulation.triangles[triOne].points[2];
-			}
-			if(sharedSides.x == 1f)
-			{
-				sharedPointA = triangulation.triangles[triOne].points[1];
-				sharedPointB = triangulation.triangles[triOne].points[2];
-				unsharedPointA = triangulation.triangles[triOne].points[0];
-			}
-			if(sharedSides.x == 2f)
-			{
-				sharedPointA = triangulation.triangles[triOne].points[0];
-				sharedPointB = triangulation.triangles[triOne].points[2];
-				unsharedPointA = triangulation.triangles[triOne].points[1];
-			}
+		if(sharedSides.Count == 4)
+		{
+			GameObject sharedPointA = sharedSides[0];
+			GameObject sharedPointB = sharedSides[1];
+			GameObject unsharedPointA = sharedSides[2];
+			GameObject unsharedPointB = sharedSides[3];
+			float angleAlpha = 0f, angleBeta = 0f;
+			int a = 0, b = 0;
 
 			angleAlpha = MathsFunctions.AngleBetweenLineSegments (unsharedPointA.transform.position, sharedPointA.transform.position, sharedPointB.transform.position);
 
-			if(sharedSides.y == 0f)
-			{
-				unsharedPointB = triangulation.triangles[triTwo].points[2];
-			}
-			if(sharedSides.y == 1f)
-			{
-				unsharedPointB = triangulation.triangles[triTwo].points[0];
-			}
-			if(sharedSides.x == 2f)
-			{
-				unsharedPointB = triangulation.triangles[triTwo].points[1];
-			}
-
 			angleBeta = MathsFunctions.AngleBetweenLineSegments (unsharedPointB.transform.position, sharedPointA.transform.position, sharedPointB.transform.position);
 
-			float angleOne = MathsFunctions.AngleBetweenLineSegments (sharedPointA.transform.position, unsharedPointA.transform.position, unsharedPointB.transform.position);
-			float angleTwo = MathsFunctions.AngleBetweenLineSegments (sharedPointB.transform.position, unsharedPointA.transform.position, unsharedPointB.transform.position);
-
-			Vector3 sharedPointLine = triangulation.triangles[triOne].lines[(int)sharedSides.x];
+			Vector3 sharedPointLine = MathsFunctions.ABCLineEquation (sharedPointA.transform.position, sharedPointB.transform.position);
 			Vector3 unsharedPointLine = MathsFunctions.ABCLineEquation (unsharedPointA.transform.position, unsharedPointB.transform.position);
 			Vector2 intersection = MathsFunctions.IntersectionOfTwoLines (sharedPointLine, unsharedPointLine);
 			
 			if(MathsFunctions.PointLiesOnLine(sharedPointA.transform.position, sharedPointB.transform.position, intersection) == false) //Is non-convex
 			{
-				//Instantiate(systemInvasion.invasionQuad, intersection, Quaternion.identity);
-				//DrawDebugLine(unsharedPointA.transform.position, unsharedPointB.transform.position, turnInfoScript.humansMaterial);
 				return true;
 			}
 
-			float potential = angleOne +angleTwo;
-
 			if(angleAlpha + angleBeta > 180f) //DUPLICATES ARE MADE HERE!!!
-			{
-				Debug.Log ("bacon");
+			{				      
+				int triPosOne = triangulation.triangles.IndexOf(triOne);
+				int triPosTwo = triangulation.triangles.IndexOf(triTwo);
 
-				triangulation.triangles[triOne].points[0] = unsharedPointA;
-				triangulation.triangles[triOne].points[1] = unsharedPointB;
-				triangulation.triangles[triOne].points[2] = sharedPointA;
-				triangulation.triangles[triOne].lines[0] = MathsFunctions.ABCLineEquation (triangulation.triangles[triOne].points[0].transform.position, triangulation.triangles[triOne].points[1].transform.position);
-				triangulation.triangles[triOne].lines[1] = MathsFunctions.ABCLineEquation (triangulation.triangles[triOne].points[1].transform.position, triangulation.triangles[triOne].points[2].transform.position);
-				triangulation.triangles[triOne].lines[2] = MathsFunctions.ABCLineEquation (triangulation.triangles[triOne].points[2].transform.position, triangulation.triangles[triOne].points[0].transform.position);
-				
-				triangulation.triangles[triTwo].points[0] = unsharedPointA;
-				triangulation.triangles[triTwo].points[1] = unsharedPointB;
-				triangulation.triangles[triTwo].points[2] = sharedPointB;
-				triangulation.triangles[triTwo].lines[0] = MathsFunctions.ABCLineEquation (triangulation.triangles[triTwo].points[0].transform.position, triangulation.triangles[triTwo].points[1].transform.position);
-				triangulation.triangles[triTwo].lines[1] = MathsFunctions.ABCLineEquation (triangulation.triangles[triTwo].points[1].transform.position, triangulation.triangles[triTwo].points[2].transform.position);
-				triangulation.triangles[triTwo].lines[2] = MathsFunctions.ABCLineEquation (triangulation.triangles[triTwo].points[2].transform.position, triangulation.triangles[triTwo].points[0].transform.position);
+				triOne.points[0] = unsharedPointA;
+				triOne.points[1] = unsharedPointB;
+				triOne.points[2] = sharedPointA;
+				triOne.lines[0] = MathsFunctions.ABCLineEquation (triOne.points[0].transform.position, triOne.points[1].transform.position);
+				triOne.lines[1] = MathsFunctions.ABCLineEquation (triOne.points[1].transform.position, triOne.points[2].transform.position);
+				triOne.lines[2] = MathsFunctions.ABCLineEquation (triOne.points[2].transform.position, triOne.points[0].transform.position);
+				triangulation.triangles[triPosOne] = triOne;
+
+				triTwo.points[0] = unsharedPointA;
+				triTwo.points[1] = unsharedPointB;
+				triTwo.points[2] = sharedPointB;
+				triTwo.lines[0] = MathsFunctions.ABCLineEquation (triTwo.points[0].transform.position, triTwo.points[1].transform.position);
+				triTwo.lines[1] = MathsFunctions.ABCLineEquation (triTwo.points[1].transform.position, triTwo.points[2].transform.position);
+				triTwo.lines[2] = MathsFunctions.ABCLineEquation (triTwo.points[2].transform.position, triTwo.points[0].transform.position);
+				triangulation.triangles[triPosTwo] = triTwo;
 
 				++flips;
 
@@ -106,9 +71,41 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 		return true;
 	}
 
+	public float AngleBetweenLinesOfTri(Triangle tri, int anglePoint) //Anglepoint is the point at which the angle needs to be found (this works)
+	{
+		float lengthAB = Mathf.Sqrt(Mathf.Pow(tri.points[0].transform.position.x - tri.points[1].transform.position.x, 2f) + Mathf.Pow(tri.points[0].transform.position.y - tri.points[1].transform.position.y, 2f));
+		float lengthBC = Mathf.Sqrt(Mathf.Pow(tri.points[1].transform.position.x - tri.points[2].transform.position.x, 2f) + Mathf.Pow(tri.points[1].transform.position.y - tri.points[2].transform.position.y, 2f));
+		float lengthCA = Mathf.Sqrt(Mathf.Pow(tri.points[0].transform.position.x - tri.points[2].transform.position.x, 2f) + Mathf.Pow(tri.points[0].transform.position.y - tri.points[2].transform.position.y, 2f));
+		
+		float angle = 0f;
+		
+		if(anglePoint == 0)
+		{
+			angle = CosLawAngle(lengthBC, lengthCA, lengthAB);
+		}
+		if(anglePoint == 1)
+		{
+			angle = CosLawAngle(lengthCA, lengthAB, lengthBC);
+		}
+		if(anglePoint == 2)
+		{
+			angle = CosLawAngle(lengthAB, lengthBC, lengthCA);
+		}
+		
+		return angle;
+	}
+
+	private float CosLawAngle(float a, float b, float c)
+	{
+		float numerator = (b * b) + (c * c) - (a * a);
+		float denominator = 2 * b * c;
+		float angleRad = Mathf.Acos (numerator / denominator);
+		
+		return angleRad * Mathf.Rad2Deg;
+	}
+
 	public bool TriangulationToDelaunay()
 	{
-		bool isDelaunay = true;
 		flips = 0;
 
 		for(int i = 0; i < triangulation.triangles.Count; ++i)
@@ -120,10 +117,9 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 					continue;
 				}
 		
-				if(CheckIsDelaunay(i, j) == false)
+				if(CheckIsDelaunay(triangulation.triangles[i], triangulation.triangles[j]) == false)
 				{
-					return false;//i = -1; j = 0;
-					break;
+					return false;
 				}
 			}
 		}
@@ -162,8 +158,6 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 					Vector3 lineBC = MathsFunctions.PerpendicularLineEquation(systemB, systemC);
 
 					Vector3 voronoiVertex = MathsFunctions.IntersectionOfTwoLines(lineAB, lineBC);
-
-					//Instantiate (systemInvasion.invasionQuad, voronoiVertex, Quaternion.identity);
 
 					float angle = MathsFunctions.RotationOfLine(voronoiVertex, voronoiCentre);
 
@@ -272,7 +266,7 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 					end = triangulation.triangles[i].points[j + 1].transform.position;
 				}
 
-				DrawDebugLine(start, end, turnInfoScript.selkiesMaterial);
+				GameObject temp = DrawDebugLine(start, end, turnInfoScript.selkiesMaterial);
 				
 				if(looped == true)
 				{
@@ -282,7 +276,7 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 		}
 	}
 
-	public void DrawDebugLine(Vector3 start, Vector3 end, Material mat)
+	public GameObject DrawDebugLine(Vector3 start, Vector3 end, Material mat)
 	{
 		float distance = Vector3.Distance (start, end);
 
@@ -302,13 +296,15 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 
 		line.renderer.material = mat;
 
-		float width = 0.10f;
+		float width = 0.20f;
 
 		if(mat == turnInfoScript.humansMaterial || mat == turnInfoScript.selkiesMaterial)
 		{
-			width = 0.2f;
+			width = 0.1f;
 		}
 		
 		line.transform.localScale = new Vector3(width, distance, 0f);
+
+		return line;
 	}
 }
