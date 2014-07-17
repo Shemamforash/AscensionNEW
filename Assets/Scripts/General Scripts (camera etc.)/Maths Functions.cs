@@ -5,9 +5,9 @@ public static class MathsFunctions
 {
 	public static bool CheckPointIsCloseToPoint(Vector3 pointA, Vector3 pointB)
 	{
-		if(pointA.x - 0.1f <= pointB.x && pointA.x + 0.1f >= pointB.x)
+		if(pointA.x - 0.001f <= pointB.x && pointA.x + 0.001f >= pointB.x)
 		{
-			if(pointA.y - 0.1f <= pointB.y && pointA.y + 0.1f >= pointB.y)
+			if(pointA.y - 0.001f <= pointB.y && pointA.y + 0.001f >= pointB.y)
 			{
 				return true;
 			}
@@ -16,10 +16,55 @@ public static class MathsFunctions
 		return false;
 	}
 
-	public static float RotationOfLine(Vector3 pointA, Vector3 pointB)
+	public static float AreaOfTriangle(Vector3 vertexA, Vector3 vertexB, Vector3 vertexC)
 	{
-		float xDif = pointA.x - pointB.x;
-		float yDif = pointA.y - pointB.y;
+		float determinant = vertexA.x * (vertexB.y - vertexC.y) + vertexB.x * (vertexC.y - vertexA.y) + vertexC.x * (vertexA.y - vertexB.y); //det = x1(y2-y3) + x2(y3-y1) + x3(y1-y2)
+		return determinant / 2f; //area is half determinant
+	}
+
+	public static bool PointsAreColinear(Vector3 pointA, Vector3 pointB, Vector3 pointC)
+	{
+		float distanceAB = Vector3.Distance (pointA, pointB);
+		float distanceBC = Vector3.Distance (pointB, pointC);
+		float distanceCA = Vector3.Distance (pointC, pointA);
+
+		if(distanceCA + 0.01f == distanceAB + distanceBC || distanceCA - 0.01f == distanceAB + distanceBC)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public static bool IsInTriangle(Vector3 vertexOne, Vector3 vertexTwo, Vector3 VertexThree, Vector3 point)
+	{
+		float originalArea = AreaOfTriangle(vertexOne, vertexTwo, VertexThree); //Get area of triangle
+		float areaA = AreaOfTriangle(vertexOne, vertexTwo, point); //Get area of new triangle formed by a and b of original triangle and new point to be tested
+		float areaB = AreaOfTriangle(vertexTwo, VertexThree, point); //Get area of new triangle formed by b and c of original triangle and new point to be tested
+		float areaC = AreaOfTriangle(VertexThree, vertexOne, point); //Get area of new triangle formed by c and a of original triangle and new point to be tested
+		
+		float u = areaC / originalArea; //Calculate u of barycentric coordinates
+		float v = areaA / originalArea; //Calculate v of barycentric coordinates
+		float w = areaB / originalArea; //Calculate w of barycentric coordinate
+		
+		if(0f < u && u < 1) //If u is within 0 and 1
+		{
+			if(0f < v && v < 1) //If v is within 0 and 1
+			{
+				if(0f < w && w < 1) //If w is within 0 and 1
+				{
+					return true; //Point lies within triangle so return true
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	public static float RotationOfLine(Vector3 point, Vector3 origin)
+	{
+		float xDif = point.x - origin.x;
+		float yDif = point.y - origin.y;
 		float angle = Mathf.Atan (yDif / xDif);
 		
 		angle = angle * Mathf.Rad2Deg;
@@ -93,12 +138,12 @@ public static class MathsFunctions
 		Vector3 midpoint = (systemA + systemB) / 2;
 		float gradient = (systemB.y - systemA.y) / (systemB.x - systemA.x);
 		
-		if(systemB.x - systemA.x == 0)
+		if(systemB.x - systemA.x < 0.0001f && systemB.x - systemA.x > -0.0001f)
 		{
 			return new Vector3(0, 1, midpoint.y);
 		}
 		
-		if(systemB.y - systemA.y == 0f)
+		if(systemB.y - systemA.y < 0.0001f && systemB.y - systemA.y > -0.0001f)
 		{
 			return new Vector3(1, 0, midpoint.x);
 		}
@@ -132,7 +177,7 @@ public static class MathsFunctions
 		
 		float testAngle = Mathf.Max (angleA, angleB) - Mathf.Min (angleA, angleB);
 		
-		if(testAngle > 180)
+		if(testAngle > 180f)
 		{
 			testAngle = 360 - testAngle;
 		}

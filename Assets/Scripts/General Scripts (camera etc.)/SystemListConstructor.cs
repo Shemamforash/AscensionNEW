@@ -37,7 +37,7 @@ public class SystemListConstructor : MasterScript
 		CreateObjects ();
 		mapConstructor.DrawMinimumSpanningTree ();
 
-		//voronoiGenerator.CreateVoronoiCells ();
+		voronoiGenerator.CreateVoronoiCells ();
 
 		ambientStars = GameObject.Find ("ScriptsContainer").GetComponent<AmbientStarRandomiser> ();
 		ambientStars.GenerateStars ();

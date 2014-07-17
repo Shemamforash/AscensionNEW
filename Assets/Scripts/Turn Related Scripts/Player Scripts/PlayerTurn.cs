@@ -135,6 +135,6 @@ public class PlayerTurn : TurnInfo
 
 		Vector3 temp = systemListConstructor.systemList [i].systemObject.transform.position;
 
-		systemPopup.mainCamera.transform.position = new Vector3 (50f, 50f, -250f);//new Vector3(temp.x, temp.y, -45f);
+		systemPopup.mainCamera.transform.position = new Vector3(temp.x, temp.y, -45f);
 	}
 }
