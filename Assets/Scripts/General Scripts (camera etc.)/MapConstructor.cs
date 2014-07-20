@@ -27,6 +27,10 @@ public class MapConstructor : MasterScript
 			{
 				continue;
 			}
+			if(coordinateList[i].systemA == thisSystem || coordinateList[i].systemB == thisSystem)
+			{
+				continue;
+			}
 
 			Vector3 lineB = MathsFunctions.ABCLineEquation(coordinateList[i].systemA, coordinateList[i].systemB);
 
@@ -50,9 +54,9 @@ public class MapConstructor : MasterScript
 				}
 			}
 
-			if(intersection.x < 60f && intersection.x > 45f)
+			if(intersection.x < 65f && intersection.x > 50f)
 			{
-				if(intersection.y < 60f && intersection.y > 45f)
+				if(intersection.y < 65f && intersection.y > 50f)
 				{
 					intersects = true;
 				}
@@ -78,21 +82,10 @@ public class MapConstructor : MasterScript
 		{
 			Vector3 directionVector2 = systemListConstructor.systemList[current].permanentConnections[i].transform.position - thisSystem.transform.position;
 
-			float angle = Vector3.Angle(directionVector1, directionVector2);
-
-			if(angle <= 30.0f)
-			{
-				return false;
-			}
-		}
-
-		for(int i = 0; i < systemListConstructor.systemList[target].permanentConnections.Count; ++i)
-		{
-			Vector3 directionVector2 = systemListConstructor.systemList[target].permanentConnections[i].transform.position - targetSystem.transform.position;
+			float angleA = MathsFunctions.AngleBetweenLineSegments(thisSystem.transform.position, targetSystem.transform.position, systemListConstructor.systemList[current].permanentConnections[i].transform.position);
+			float angleB = MathsFunctions.AngleBetweenLineSegments(targetSystem.transform.position, thisSystem.transform.position, systemListConstructor.systemList[current].permanentConnections[i].transform.position);
 			
-			float angle = Vector3.Angle(directionVector1, directionVector2);
-			
-			if(angle <= 30.0f)
+			if(angleA <= 20.0f || angleB <= 20.0f)
 			{
 				return false;
 			}
@@ -170,23 +163,12 @@ public class MapConstructor : MasterScript
 		{
 			bool swapsMade = false;
 
-			for(int k = 2; k < j; ++k)
+			for(int k = 1; k < j; ++k)
 			{
-				float angleA = Vector3.Angle(systemListConstructor.systemList[i].permanentConnections[k].transform.position, zeroVector);
+				float angleK = MathsFunctions.RotationOfLine(systemListConstructor.systemList[i].permanentConnections[k].transform.position, zeroVector);
+				float angleKMinusOne = MathsFunctions.RotationOfLine(systemListConstructor.systemList[i].permanentConnections[k - 1].transform.position, zeroVector);
 
-				if(Vector3.Cross(systemListConstructor.systemList[i].permanentConnections[k].transform.position, zeroVector).y < 0)
-				{
-					angleA = -angleA;
-				}
-
-				float angleB = Vector3.Angle(systemListConstructor.systemList[i].permanentConnections[k - 1].transform.position, zeroVector);
-
-				if(Vector3.Cross(systemListConstructor.systemList[i].permanentConnections[k - 1].transform.position, zeroVector).y < 0)
-				{
-					angleB = -angleB;
-				}
-
-				if(angleB > angleA)
+				if(angleK < angleKMinusOne)
 				{
 					GameObject temp = systemListConstructor.systemList[i].permanentConnections[k];
 					systemListConstructor.systemList[i].permanentConnections[k] = systemListConstructor.systemList[i].permanentConnections[k - 1];
@@ -242,29 +224,33 @@ public class MapConstructor : MasterScript
 	
 	private int WeightedConnectionFinder(int randomInt)
 	{
-		if(randomInt < 20)
+		if(randomInt < 10)
 		{
 			return 1;
 		}
-		if(randomInt >= 20 && randomInt < 30)
+		if(randomInt >= 10 && randomInt < 20)
 		{
 			return 2;
 		}
-		if(randomInt >= 40 && randomInt < 60)
+		if(randomInt >= 20 && randomInt < 40)
 		{
 			return 3;
 		}
-		if(randomInt >= 60 && randomInt < 80)
+		if(randomInt >= 40 && randomInt < 60)
 		{
 			return 4;
 		}
-		if(randomInt >= 80 && randomInt < 90)
+		if(randomInt >= 60 && randomInt < 80)
 		{
 			return 5;
 		}
-		if(randomInt >= 90)
+		if(randomInt >= 80 && randomInt < 90)
 		{
 			return 6;
+		}
+		if(randomInt >= 90)
+		{
+			return 7;
 		}
 		
 		return 0;
@@ -382,10 +368,14 @@ public class MapConstructor : MasterScript
 					continue;
 				}
 
-				if(TestForIntersection(systemListConstructor.systemList[j].systemObject.transform.position, systemListConstructor.systemList[targetSystem].systemObject.transform.position, false) == false)
+				Debug.Log ("bacon");
+
+				if(TestForAngle(systemListConstructor.systemList[j].systemObject, systemListConstructor.systemList[targetSystem].systemObject))
 				{
-					if(TestForAngle(systemListConstructor.systemList[j].systemObject, systemListConstructor.systemList[targetSystem].systemObject) == true)
-					{
+					if(TestForIntersection(systemListConstructor.systemList[j].systemObject.transform.position, systemListConstructor.systemList[targetSystem].systemObject.transform.position, false) == false)
+					{		
+						Debug.Log ("bacon3");
+						
 						AddPermanentSystem(j, targetSystem);
 					}
 				}

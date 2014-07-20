@@ -110,18 +110,20 @@ public class SystemInvasions : MasterScript
 		switch(hero.heroOwnedBy)
 		{
 		case "Humans":
-			//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.humansMaterial;
+			voronoiGenerator.voronoiCells[system].renderer.material = turnInfoScript.humansMaterial;
 			break;
 		case "Selkies":
-			//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.selkiesMaterial;
+			voronoiGenerator.voronoiCells[system].renderer.material = turnInfoScript.selkiesMaterial;
 			break;
 		case "Nereides":
-			//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.nereidesMaterial;
+			voronoiGenerator.voronoiCells[system].renderer.material = turnInfoScript.nereidesMaterial;
 			break;
 		default:
-			//systemListConstructor.systemList [system].systemObject.renderer.material = turnInfoScript.emptyMaterial;
+			voronoiGenerator.voronoiCells[system].renderer.material = turnInfoScript.emptyMaterial;
 			break;
 		}
+
+		voronoiGenerator.voronoiCells[system].renderer.material.shader = Shader.Find("Transparent/Diffuse");
 
 		improvementsBasic = systemListConstructor.systemList [system].systemObject.GetComponent<ImprovementsBasic> ();
 		systemDefence = systemListConstructor.systemList [system].systemObject.GetComponent<SystemDefence> ();

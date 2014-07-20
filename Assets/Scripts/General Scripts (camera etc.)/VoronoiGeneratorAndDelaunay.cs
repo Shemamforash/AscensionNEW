@@ -8,6 +8,7 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 	public Material humansMat, selkiesMat, nereidesMat;
 	private List<VoronoiCellVertices> voronoiVertices = new List<VoronoiCellVertices> ();
 	private int flips = 0;
+	public List<GameObject> voronoiCells = new List<GameObject>();
 
 	private class VoronoiCellVertices
 	{
@@ -205,74 +206,81 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 		{
 			bool looped = false;
 
+
+			GameObject newCell = new GameObject("Voronoi Cell");
+			newCell.AddComponent("MeshRenderer");
+			newCell.AddComponent("MeshFilter");
+			newCell.AddComponent("MeshCollider");
+
+			MeshFilter newMesh = (MeshFilter)newCell.GetComponent("MeshFilter");
+
+			List<Vector3> vertices = new List<Vector3>();
+
 			for(int j = 0; j < voronoiVertices[i].vertices.Count; ++j)
 			{
-				Vector3 start = voronoiVertices[i].vertices[j];
+				int nextVertex = j + 1;
 
-				Vector3 end = Vector3.zero;
-
-				if(start == end)
+				if(nextVertex == voronoiVertices[i].vertices.Count)
 				{
-					continue;
+					nextVertex = 0;
 				}
 
-				if(j + 1 == voronoiVertices[i].vertices.Count)
+				int prevVertex = j - 1;
+
+				if(prevVertex == -1)
 				{
-					end = voronoiVertices[i].vertices[0];
-					looped = true;
-				}
-				else
-				{
-					end = voronoiVertices[i].vertices[j + 1];
+					prevVertex = voronoiVertices[i].vertices.Count - 1;
 				}
 
-				if(start == end)
-				{
-					continue;
-				}
+				Vector3 lineA = voronoiVertices[i].vertices[prevVertex] - voronoiVertices[i].vertices[j]; //Line from vertex to next vertex
+				Vector3 lineB = voronoiVertices[i].vertices[nextVertex] - voronoiVertices[i].vertices[j]; //Line from vertex to previous vertex
 
-				//DrawDebugLine(start, end, turnInfoScript.nereidesMaterial);
+				Vector3 bisector = (lineA.normalized + lineB.normalized) / 2f; //Bisector line
+				float cIntersect = voronoiVertices[i].vertices[j].y - (bisector.y / bisector.x) * voronoiVertices[i].vertices[j].x; //Cintersect = y - mx
+				Vector3 bisectorIntersect = new Vector3(0f, cIntersect, 0f);
 
-				if(looped == true)
-				{
-					break;
-				}
+				float vertAngle = MathsFunctions.AngleBetweenLineSegments(voronoiVertices[i].vertices[j], voronoiVertices[i].vertices[prevVertex], voronoiVertices[i].vertices[nextVertex]) / 2f;
+
+				float hypotenuseLength = 0.25f / Mathf.Sin(vertAngle * Mathf.Deg2Rad);
+
+				Vector3 dir = bisectorIntersect - voronoiVertices[i].vertices[j]; //Intersect
+				dir = bisector.normalized;
+				vertices.Add (voronoiVertices[i].vertices[j] + (dir * hypotenuseLength));
 			}
-		}
 
+			newMesh.mesh.vertices = vertices.ToArray();
 
-		for(int i = 0; i < triangulation.triangles.Count; ++i)
-		{
-			bool looped = false;
-			
-			for(int j = 0; j < 3; ++j)
+			List<int> tris = new List<int>();
+
+			for(int j = 2; j < voronoiVertices[i].vertices.Count; ++j)
 			{
-				Vector3 start = triangulation.triangles[i].points[j].transform.position;
-				
-				Vector3 end = Vector3.zero;
-				
-				if(start == end)
-				{
-					continue;
-				}
-				
-				if(j + 1 >= 3)
-				{
-					end = triangulation.triangles[i].points[0].transform.position;
-					looped = true;
-				}
-				else
-				{
-					end = triangulation.triangles[i].points[j + 1].transform.position;
-				}
-
-				GameObject temp = DrawDebugLine(start, end, turnInfoScript.selkiesMaterial);
-				
-				if(looped == true)
-				{
-					break;
-				}
+				tris.Add (0);
+				tris.Add (j);
+				tris.Add (j-1);
 			}
+
+			List<Vector2> uvs =new List<Vector2>();
+
+			for(int j = 0; j < newMesh.mesh.vertices.Length; ++j) 
+			{
+				Vector2 uvCoordinate = new Vector2(newMesh.mesh.vertices[j].x, newMesh.mesh.vertices[j].z);
+				uvs.Add(uvCoordinate);
+			}
+
+			newMesh.mesh.triangles = tris.ToArray();
+			newMesh.mesh.uv = uvs.ToArray();
+
+			newMesh.mesh.RecalculateNormals();
+			newMesh.mesh.RecalculateBounds();
+			newMesh.mesh.Optimize();
+
+			newCell.renderer.material = turnInfoScript.emptyMaterial;
+			newCell.renderer.material.shader = Shader.Find("Transparent/Diffuse");
+			Color newColour = newCell.renderer.material.color;
+			newColour = new Color(newColour.r, newColour.g, newColour.b, 0f);
+			newCell.renderer.material.color = newColour;
+
+			voronoiCells.Add (newCell);
 		}
 	}
 

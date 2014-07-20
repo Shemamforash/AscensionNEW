@@ -11,6 +11,7 @@ public class SystemInfoPopup : MasterScript
 	private List<OverlayObject> overlayObjectList = new List<OverlayObject> ();
 	public Camera mainCamera, uiCamera;
 	private bool allfade;
+	private float timer = 0f, cameraZPrev = 1000f;
 
 	public void LoadOverlays () 
 	{
@@ -44,6 +45,8 @@ public class SystemInfoPopup : MasterScript
 
 			overlayObjectList.Add(tempObj);
 		}
+
+		cameraZPrev = mainCamera.transform.position.z;
 	}
 
 	private void UpdatePosition(int i)
@@ -92,9 +95,39 @@ public class SystemInfoPopup : MasterScript
 		overlayObjectList[i].planets.fillAmount = (1f/systemListConstructor.systemList[i].systemSize) * colonisedPlanets;
 	}
 
+	private void UpdateTerritories()
+	{
+		for(int i = 0; i < voronoiGenerator.voronoiCells.Count; ++i) //For all cells
+		{
+			Color tempColor = voronoiGenerator.voronoiCells[i].renderer.material.color; //Cache the colour
+
+			float distanceBasedA = (mainCamera.transform.position.z + 100f) / -80;
+
+			if(distanceBasedA < 0f)
+			{
+				distanceBasedA = 0f;
+			}
+			if(distanceBasedA > 0.75f)
+			{
+				distanceBasedA = 0.75f;
+			}
+
+			tempColor.a = distanceBasedA; //Change the colour
+
+			voronoiGenerator.voronoiCells[i].renderer.material.color = tempColor; //Set the new colour
+		}
+	}
+	
 	void Update () 
 	{
-		if(mainCamera.transform.position.z < 0f)//> -65f)
+		//if(mainCamera.transform.position.z < -65f && cameraZPrev >= -65 || mainCamera.transform.position.z >= -65f && cameraZPrev < -65f)
+		//{
+			UpdateTerritories ();
+		//}
+
+		cameraZPrev = mainCamera.transform.position.z;
+		
+		if(mainCamera.transform.position.z > -65f)
 		{
 			for(int i = 0; i < overlayObjectList.Count; ++i)
 			{
@@ -116,7 +149,7 @@ public class SystemInfoPopup : MasterScript
 			allfade = true;
 		}
 
-		/*
+
 		else if(mainCamera.transform.position.z <= -65f && allfade == true)
 		{
 			for(int i = 0; i < overlayObjectList.Count; ++i)
@@ -132,7 +165,7 @@ public class SystemInfoPopup : MasterScript
 			}
 
 			allfade = false;
-		}*/
+		}
 	}
 }
 

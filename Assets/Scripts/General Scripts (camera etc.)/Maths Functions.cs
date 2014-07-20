@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public static class MathsFunctions
 {
@@ -28,7 +29,28 @@ public static class MathsFunctions
 		float distanceBC = Vector3.Distance (pointB, pointC);
 		float distanceCA = Vector3.Distance (pointC, pointA);
 
-		if(distanceCA + 0.01f == distanceAB + distanceBC || distanceCA - 0.01f == distanceAB + distanceBC)
+		float maxDist = Mathf.Max (distanceAB, distanceBC, distanceCA);
+		float minDistA = 0f, minDistB = 0f;
+
+		if(maxDist == distanceAB)
+		{
+			minDistA = distanceBC;
+			minDistB = distanceCA;
+		}
+
+		if(maxDist == distanceBC)
+		{
+			minDistA = distanceAB;
+			minDistB = distanceCA;
+		}
+
+		if(maxDist == distanceCA)
+		{
+			minDistA = distanceBC;
+			minDistB = distanceAB;
+		}
+
+		if(maxDist + 0.01f >= minDistA + minDistB && maxDist - 0.01f <= minDistA + minDistB)
 		{
 			return true;
 		}
@@ -47,11 +69,11 @@ public static class MathsFunctions
 		float v = areaA / originalArea; //Calculate v of barycentric coordinates
 		float w = areaB / originalArea; //Calculate w of barycentric coordinate
 		
-		if(0f < u && u < 1) //If u is within 0 and 1
+		if(0f <= u && u <= 1) //If u is within 0 and 1
 		{
-			if(0f < v && v < 1) //If v is within 0 and 1
+			if(0f <= v && v <= 1) //If v is within 0 and 1
 			{
-				if(0f < w && w < 1) //If w is within 0 and 1
+				if(0f <= w && w <= 1) //If w is within 0 and 1
 				{
 					return true; //Point lies within triangle so return true
 				}
@@ -63,45 +85,45 @@ public static class MathsFunctions
 
 	public static float RotationOfLine(Vector3 point, Vector3 origin)
 	{
-		float xDif = point.x - origin.x;
-		float yDif = point.y - origin.y;
+		float xDif = (float)Math.Round(point.x - origin.x, 3);
+		float yDif = (float)Math.Round(point.y - origin.y, 3);
 		float angle = Mathf.Atan (yDif / xDif);
 		
 		angle = angle * Mathf.Rad2Deg;
 		
-		if(xDif == 0 && yDif > 0) //If x equals zero and y is positive the angle is 90 degrees (vertical up)
+		if(xDif == 0f && yDif > 0f) //If x equals zero and y is positive the angle is 90 degrees (vertical up)
 		{
 			angle = 90f;
 		}
 		
-		if(xDif == 0 && yDif < 0) //If x equals zero and y is negative the angle is 270 degrees (vertical down)
+		if(xDif == 0f && yDif < 0f) //If x equals zero and y is negative the angle is 270 degrees (vertical down)
 		{
 			angle = 270f;
 		}
 		
-		if(yDif == 0 && xDif < 0) //If y equals zero and x is negative the angle is 180 degrees (horizontal back)
+		if(yDif == 0f && xDif < 0f) //If y equals zero and x is negative the angle is 180 degrees (horizontal back)
 		{
-			angle = 180;
+			angle = 180f;
 		}
 		
-		if(yDif == 0 && xDif > 0) //If y equals zero and x is positive then angle is 360 degrees (horizontal forward
+		if(yDif == 0f && xDif > 0f) //If y equals zero and x is positive then angle is 360 degrees (horizontal forward
 		{
-			angle = 0;
+			angle = 0f;
 		}
 		
 		if(xDif < 0f && yDif > 0f) //If x is negative and y is positive the angle is in the top left quadrant
 		{
-			angle = 180 + angle;
+			angle = 180f + angle;
 		}
 		
-		if(xDif < 0 && yDif < 0f) //If x is negative and y is negative the angle is in the bottom left quadrant
+		if(xDif < 0f && yDif < 0f) //If x is negative and y is negative the angle is in the bottom left quadrant
 		{
-			angle = 180 + angle;
+			angle = 180f + angle;
 		}
 		
 		if(xDif > 0f && yDif < 0f) //If x is positive and y is negative the angle is in the bottom right quadrant
 		{
-			angle = 360 + angle;
+			angle = 360f + angle;
 		}
 		
 		return angle;
@@ -118,7 +140,7 @@ public static class MathsFunctions
 
 	public static Vector2 IntersectionOfTwoLines (Vector3 lineA, Vector3 lineB)
 	{
-		float determinant = (lineA.x * lineB.y) - (lineB.x * lineA.y);
+		float determinant = (float)Math.Round((lineA.x * lineB.y) - (lineB.x * lineA.y), 3);
 		
 		if(determinant == 0f)
 		{
@@ -159,9 +181,9 @@ public static class MathsFunctions
 
 	public static bool PointLiesOnLine(Vector3 pointAVec3, Vector3 pointBVec3, Vector3 intersectionVec3)
 	{	
-		if(intersectionVec3.x -0.01f <= Mathf.Max(pointAVec3.x, pointBVec3.x) && intersectionVec3.x + 0.01f >= Mathf.Min (pointAVec3.x, pointBVec3.x))
+		if(intersectionVec3.x - 0.001f <= Mathf.Max(pointAVec3.x, pointBVec3.x) && intersectionVec3.x + 0.001f >= Mathf.Min (pointAVec3.x, pointBVec3.x))
 		{
-			if(intersectionVec3.y - 0.01f <= Mathf.Max(pointAVec3.y, pointBVec3.y) && intersectionVec3.y + 0.01f >= Mathf.Min (pointAVec3.y, pointBVec3.y))
+			if(intersectionVec3.y - 0.001f <= Mathf.Max(pointAVec3.y, pointBVec3.y) && intersectionVec3.y + 0.001f >= Mathf.Min (pointAVec3.y, pointBVec3.y))
 			{
 				return true;
 			}
@@ -179,7 +201,7 @@ public static class MathsFunctions
 		
 		if(testAngle > 180f)
 		{
-			testAngle = 360 - testAngle;
+			testAngle = 360f - testAngle;
 		}
 		
 		return testAngle;
