@@ -357,7 +357,8 @@ public class AIBasicParent : TurnInfo
 				
 				systemListConstructor.systemList[currentSystem].systemOwnedBy = thisPlayer.playerRace;
 				
-				//systemListConstructor.systemList[currentSystem].systemObject.renderer.material = thisPlayer.materialInUse;
+				voronoiGenerator.voronoiCells[currentSystem].renderer.material = thisPlayer.materialInUse;
+				voronoiGenerator.voronoiCells[currentSystem].renderer.material.shader = Shader.Find("Transparent/Diffuse");
 
 				++systemsInPlay;
 
