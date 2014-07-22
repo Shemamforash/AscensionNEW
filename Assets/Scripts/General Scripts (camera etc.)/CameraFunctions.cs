@@ -73,19 +73,14 @@ public class CameraFunctions : MasterScript
 			
 			curMousePos = cameraMain.ScreenToWorldPoint(curMousePos); //Get that position in world coordinates
 			
-			if(lastFrameMousePos == Vector3.zero) //If the last frame position was 0
-			{
-				lastFrameMousePos = curMousePos; //Set the last frame position to be this frame's position
-			}
-			
 			if(lastFrameMousePos != curMousePos && lastFrameMousePos != Vector3.zero) //If last frame position isn't 0 or the current position
 			{
 				Vector3 difference = curMousePos - lastFrameMousePos; //Get the difference between the last frame position and the current position
 				
 				cameraMain.transform.position += difference / 2; //Add half of this (for smoothing) to the current camera position
-				
-				lastFrameMousePos = curMousePos; //Update the last frame position
 			}
+
+			lastFrameMousePos = curMousePos; //Set the last frame position to be this frame's position
 		}
 		else //If it isn't
 		{

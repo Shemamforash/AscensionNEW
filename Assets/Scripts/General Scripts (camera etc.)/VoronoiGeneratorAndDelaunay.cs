@@ -9,6 +9,7 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 	private List<VoronoiCellVertices> voronoiVertices = new List<VoronoiCellVertices> ();
 	private int flips = 0;
 	public List<GameObject> voronoiCells = new List<GameObject>();
+	public GameObject voronoiCellContainer;
 
 	private class VoronoiCellVertices
 	{
@@ -200,18 +201,24 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 					break; //So break
 				}
 			}
+
+			for(int j = 1; j < voronoiVertices[i].vertices.Count; ++j)
+			{
+				if(voronoiVertices[i].vertices[j] == voronoiVertices[i].vertices[j - 1])
+				{
+					voronoiVertices[i].vertices.RemoveAt(j);
+					--j;
+				}
+			}
 		}
 
 		for(int i = 0; i < voronoiVertices.Count; ++i)
 		{
-			bool looped = false;
-
-
 			GameObject newCell = new GameObject("Voronoi Cell");
 			newCell.AddComponent("MeshRenderer");
 			newCell.AddComponent("MeshFilter");
 			newCell.AddComponent("MeshCollider");
-
+		
 			MeshFilter newMesh = (MeshFilter)newCell.GetComponent("MeshFilter");
 
 			List<Vector3> vertices = new List<Vector3>();
@@ -248,6 +255,14 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 				vertices.Add (voronoiVertices[i].vertices[j] + (dir * hypotenuseLength));
 			}
 
+			for(int j = 0; j < vertices.Count; ++j)
+			{
+				float x = vertices[j].x - systemListConstructor.systemList[i].systemObject.transform.position.x;
+				float y = vertices[j].y - systemListConstructor.systemList[i].systemObject.transform.position.y;
+				Vector3 newPos = new Vector3(x, y, 0f);
+				vertices[j] = newPos;
+			}
+
 			newMesh.mesh.vertices = vertices.ToArray();
 
 			List<int> tris = new List<int>();
@@ -279,6 +294,11 @@ public class VoronoiGeneratorAndDelaunay : MasterScript
 			Color newColour = newCell.renderer.material.color;
 			newColour = new Color(newColour.r, newColour.g, newColour.b, 0f);
 			newCell.renderer.material.color = newColour;
+			newCell.AddComponent<SystemRotate>();
+			newCell.name = "Voronoi Cell" + i.ToString();
+			newCell.tag = "VoronoiCell";
+			newCell.transform.position = new Vector3(systemListConstructor.systemList[i].systemObject.transform.position.x, systemListConstructor.systemList[i].systemObject.transform.position.y, 0f);
+			newCell.transform.parent = voronoiCellContainer.transform;
 
 			voronoiCells.Add (newCell);
 		}

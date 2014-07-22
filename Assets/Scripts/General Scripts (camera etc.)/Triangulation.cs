@@ -293,8 +293,8 @@ public class Triangulation : MasterScript
 			
 			for(int k = 1; k < j; ++k) //While k is less than j (anything above current j value is sorted)
 			{
-				float angleK = MathsFunctions.RotationOfLine(new Vector3(45f,45f,0), externalPoints[k].transform.position);
-				float angleKMinus1 = MathsFunctions.RotationOfLine(new Vector3(45f,45f,0), externalPoints[k - 1].transform.position);
+				float angleK = MathsFunctions.RotationOfLine(new Vector3(50f, 50f, 0f), externalPoints[k].transform.position);
+				float angleKMinus1 = MathsFunctions.RotationOfLine(new Vector3(50f, 50f, 0f), externalPoints[k - 1].transform.position);
 
 				if(angleK < angleKMinus1) //Sort smallest to largest
 				{

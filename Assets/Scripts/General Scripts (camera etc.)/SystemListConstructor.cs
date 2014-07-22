@@ -73,7 +73,7 @@ public class SystemListConstructor : MasterScript
 	private void SelectSystemsForMap()
 	{
 		int randomInt = -1;
-		mapConstructor.distanceMax = (mapSize - 260) / -8f;
+		mapConstructor.distanceMax = (mapSize - 260) / -4f;
 
 		systemScale = (mapSize - 300.0f) / -320.0f;
 

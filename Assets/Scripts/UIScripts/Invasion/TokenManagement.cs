@@ -78,6 +78,8 @@ public class TokenManagement : MasterScript
 		if(invasionLoc == -1) //If this invasion is not already cached
 		{
 			systemInvasion.currentInvasions.Add (cachedInvasion); //Cache it
+			systemDefence = systemListConstructor.systemList[system].systemObject.GetComponent<SystemDefence>();
+			systemDefence.underInvasion = true;
 		}
 		else //If it is
 		{

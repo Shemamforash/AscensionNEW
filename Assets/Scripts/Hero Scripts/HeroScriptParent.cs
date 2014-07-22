@@ -96,13 +96,21 @@ public class HeroScriptParent : MasterScript
 				{
 					systemInvasion.ContinueInvasion(system);
 				}
+				if(currentHealth < 0f)
+				{
+					currentHealth = 0f;
+				}
+				if(currentHealth > maxHealth)
+				{
+					currentHealth = maxHealth;
+				}
 			}
 
 			if(isInvading == false && currentHealth != maxHealth)
 			{
 				currentHealth += maxHealth * 0.02f;
 
-				if(currentHealth >= maxHealth)
+				if(currentHealth > maxHealth)
 				{
 					currentHealth = maxHealth;
 				}
