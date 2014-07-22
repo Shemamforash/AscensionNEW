@@ -19,8 +19,8 @@ public class QuadraticBezierCurve : MasterScript
 	{
 		double angle = -rotate.speed * Mathf.Deg2Rad;
 		
-		float xPos = (float)(Math.Cos(angle) * (pathToFollow[currentVertex].x - 45f) - Math.Sin(angle) * (pathToFollow[currentVertex].y - 45f) + 45f);
-		float yPos = (float)(Math.Sin(angle) * (pathToFollow[currentVertex].x - 45f) + Math.Cos(angle) * (pathToFollow[currentVertex].y - 45f) + 45f);
+		float xPos = (float)(Math.Cos(angle) * (pathToFollow[currentVertex].x - 50f) - Math.Sin(angle) * (pathToFollow[currentVertex].y - 50f) + 50f);
+		float yPos = (float)(Math.Sin(angle) * (pathToFollow[currentVertex].x - 50f) + Math.Cos(angle) * (pathToFollow[currentVertex].y - 50f) + 50f);
 		
 		pathToFollow[currentVertex] = new Vector3 (xPos, yPos, 0f);
 	}

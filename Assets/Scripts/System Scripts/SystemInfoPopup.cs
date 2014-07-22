@@ -100,30 +100,32 @@ public class SystemInfoPopup : MasterScript
 		for(int i = 0; i < voronoiGenerator.voronoiCells.Count; ++i) //For all cells
 		{
 			Color tempColor = voronoiGenerator.voronoiCells[i].renderer.material.color; //Cache the colour
+			
+			float distanceBasedA = 0f;
 
-			float distanceBasedA = (mainCamera.transform.position.z + 100f) / -80;
+			if(systemListConstructor.systemList[i].systemOwnedBy != null)
+			{
+				distanceBasedA = (mainCamera.transform.position.z + 100f) / -80f;
 
-			if(distanceBasedA < 0f)
-			{
-				distanceBasedA = 0f;
-			}
-			if(distanceBasedA > 0.75f)
-			{
-				distanceBasedA = 0.75f;
+				if(distanceBasedA < 0f)
+				{
+					distanceBasedA = 0f;
+				}
+				if(distanceBasedA > 0.75f)
+				{
+					distanceBasedA = 0.75f;
+				}
 			}
 
 			tempColor.a = distanceBasedA; //Change the colour
-
+			
 			voronoiGenerator.voronoiCells[i].renderer.material.color = tempColor; //Set the new colour
 		}
 	}
 	
 	void Update () 
 	{
-		//if(mainCamera.transform.position.z < -65f && cameraZPrev >= -65 || mainCamera.transform.position.z >= -65f && cameraZPrev < -65f)
-		//{
-			UpdateTerritories ();
-		//}
+		UpdateTerritories ();
 
 		cameraZPrev = mainCamera.transform.position.z;
 		

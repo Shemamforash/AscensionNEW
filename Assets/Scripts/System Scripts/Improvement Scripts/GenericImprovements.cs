@@ -153,27 +153,16 @@ public class GenericImprovements : MasterScript
 	{
 		if(checkValue == false)
 		{
-			improvements.resourceYieldBonus += 3f;
+			improvements.resourceYieldBonus += 0.5f;
 			improvements.listOfImprovements[2].improvementMessage = ("+50% Yield on Secondary Resources");
 		}
 	}
 
-	private void T1I1()
+	private void T1I1() //Injection
 	{
-		int j = improvements.CheckDiplomaticStateOfAllPlayers(thisPlayer, "Peace");
-		
-		if(j != 0)
-		{
-			systemSIMData = systemListConstructor.systemList[improvements.system].systemObject.GetComponent<SystemSIMData>();
-		}
-
-		improvements.tempKnwlUnitBonus = (turnInfoScript.turn / 20 * Mathf.Pow (2.0f, j));
-		improvements.tempCount = (turnInfoScript.turn * Mathf.Pow (2.0f, j));
-
 		if(checkValue == false)
 		{
-			systemSIMData.knowledgeUnitBonus += improvements.tempKnwlUnitBonus;
-			improvements.listOfImprovements[3].improvementMessage = ("+" + improvements.tempCount + " Knowledge from Peace");
+			improvements.listOfImprovements[3].improvementMessage = ("Resource Bonus on Secondary Resource Generation");
 		}
 	}
 
@@ -187,7 +176,7 @@ public class GenericImprovements : MasterScript
 		if(checkValue == false)
 		{
 			improvements.powerPercentBonus += improvements.tempPowBonus;
-			improvements.listOfImprovements[4].improvementMessage = ("+" + improvements.tempCount * 5f + "% Power from other Systems with this Improvement");
+			improvements.listOfImprovements[4].improvementMessage = ("+" + improvements.tempCount * 0.5f + "% Power from other Systems with this Improvement");
 		}
 	}
 
@@ -202,31 +191,33 @@ public class GenericImprovements : MasterScript
 
 		if(checkValue == false)
 		{
-			improvements.listOfImprovements[5].improvementMessage = ("+" + improvements.tempCount + "10% * Planet Quality Max Population on Planets");
+			improvements.listOfImprovements[5].improvementMessage = ("+10% * Planet Quality Max Population on Planets");
 		}
 	}
 
-	private void T2I1()
+	private void T2I1() //Inertia
 	{
-		for(int j = 0; j <  systemListConstructor.systemList[improvements.system].systemSize; ++j)
+		improvements.tempCount = 0f;
+
+		for(int i = 0; i <  systemListConstructor.systemList[improvements.system].systemSize; ++i)
 		{
-			if(systemListConstructor.systemList[improvements.system].planetsInSystem[j].planetColonised == false)
+			for(int j = 0; j < systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Count; ++j)
 			{
-				improvements.tempKnwlBonus += 0.25f;
-				improvements.tempCount += 0.25f;
+				if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt[j] == "")
+				{
+					improvements.tempKnwlBonus += 0.05f;
+					improvements.tempCount += 0.05f;
+				}
 			}
 		}
 
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * improvements.tempKnwlBonus;
-
 		if(checkValue == false)
 		{
-			improvements.knowledgePercentBonus += improvements.tempKnwlBonus;
 			improvements.listOfImprovements[6].improvementMessage = ("+" + improvements.tempCount * 100f + "% Knowledge from uncolonised planets");
 		}
 	}
 
-	private void T2I2()
+	private void T2I2() //Nostalgia
 	{
 		bool allPlanetsColonised  = true;
 		

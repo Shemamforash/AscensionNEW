@@ -368,14 +368,10 @@ public class MapConstructor : MasterScript
 					continue;
 				}
 
-				Debug.Log ("bacon");
-
 				if(TestForAngle(systemListConstructor.systemList[j].systemObject, systemListConstructor.systemList[targetSystem].systemObject))
 				{
 					if(TestForIntersection(systemListConstructor.systemList[j].systemObject.transform.position, systemListConstructor.systemList[targetSystem].systemObject.transform.position, false) == false)
 					{		
-						Debug.Log ("bacon3");
-						
 						AddPermanentSystem(j, targetSystem);
 					}
 				}

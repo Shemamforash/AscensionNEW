@@ -7,16 +7,33 @@ public class SystemInvasions : MasterScript
 	public GameObject invasionQuad;
 	public HeroScriptParent hero;
 	public List<SystemInvasionInfo> currentInvasions = new List<SystemInvasionInfo>();
+	private TokenManagement management;
 
-	private float CalculateTotalTokenValue(List<TokenInfo> tokenList)
+	void Start()
+	{
+		management = invasionGUI.tokenContainer.GetComponent<TokenManagement> ();
+	}
+
+	private float CalculateTotalTokenValue(List<TokenInfo> tokenList, string damageType)
 	{
 		float total = 0;
 		
 		for(int k = 0; k < tokenList.Count; ++k)
 		{
 			heroScript = tokenList[k].heroOwner.GetComponent<HeroScriptParent>();
+
+			float damageTotal = 0;
+
+			if(damageType == "Assault")
+			{
+				damageTotal = heroScript.assaultDamage;
+			}
+			if(damageType == "Auxiliary")
+			{
+				damageTotal = heroScript.auxiliaryDamage;
+			}
 			
-			total += heroScript.assaultDamage / heroScript.assaultTokens;
+			total += damageTotal / heroScript.assaultTokens;
 		}
 
 		return total;
@@ -29,12 +46,17 @@ public class SystemInvasions : MasterScript
 			systemDefence = currentInvasions[i].system.GetComponent<SystemDefence>();
 			int system = RefreshCurrentSystem(currentInvasions[i].system);
 
+			if(invasionGUI.invasionScreen.activeInHierarchy == true && invasionGUI.system == system)
+			{
+				management.CacheInvasionInfo();
+			}
+
 			for(int j = 0; j < systemListConstructor.systemList[system].systemSize; ++j)
 			{
-				float assaultDamage = CalculateTotalTokenValue(currentInvasions[i].tokenAllocation[j].assaultTokenAllocation);
-				float auxiliaryDamage = CalculateTotalTokenValue(currentInvasions[i].tokenAllocation[j].auxiliaryTokenAllocation) - systemListConstructor.systemList[system].planetsInSystem[j].planetCurrentDefence / 10f;
+				float assaultDamage = CalculateTotalTokenValue(currentInvasions[i].tokenAllocation[j].assaultTokenAllocation, "Assault");
+				float auxiliaryDamage = CalculateTotalTokenValue(currentInvasions[i].tokenAllocation[j].auxiliaryTokenAllocation, "Auxiliary") - systemListConstructor.systemList[system].planetsInSystem[j].planetCurrentDefence / 10f;
 
-				systemDefence.TakeDamage(assaultDamage, auxiliaryDamage, j);
+				systemDefence.TakeDamage(assaultDamage/2, auxiliaryDamage/2, j);
 
 				if(systemListConstructor.systemList [system].planetsInSystem [j].planetPopulation <= 0)
 				{
