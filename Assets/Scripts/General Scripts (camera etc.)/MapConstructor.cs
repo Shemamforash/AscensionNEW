@@ -85,7 +85,7 @@ public class MapConstructor : MasterScript
 			float angleA = MathsFunctions.AngleBetweenLineSegments(thisSystem.transform.position, targetSystem.transform.position, systemListConstructor.systemList[current].permanentConnections[i].transform.position);
 			float angleB = MathsFunctions.AngleBetweenLineSegments(targetSystem.transform.position, thisSystem.transform.position, systemListConstructor.systemList[current].permanentConnections[i].transform.position);
 			
-			if(angleA <= 20.0f || angleB <= 20.0f)
+			if(angleA <= 10.0f || angleB <= 10.0f)
 			{
 				return false;
 			}
@@ -266,7 +266,7 @@ public class MapConstructor : MasterScript
 			{
 				randomInt = WeightedConnectionFinder(Random.Range (49, 99));
 			}
-			
+
 			if(systemListConstructor.systemList[i].numberOfConnections < randomInt) //If number of connections is lower than number
 			{
 				systemListConstructor.systemList[i].numberOfConnections = randomInt; //Increase number of connections

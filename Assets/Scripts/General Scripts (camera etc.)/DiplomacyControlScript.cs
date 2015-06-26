@@ -131,13 +131,13 @@ public class DiplomacyControlScript : MasterScript
 		relationsList [i].stealthModifier = tempValue + 0.75f;
 	}
 
-	private void CalculatePopulationModifier(int i) //Population eq: y = 0.3742log(x + 1) + 0.5
+	private void CalculateGrowthModifier(int i) //Population eq: y = 0.3742log(x + 1) + 0.5
 	{
 		tempValue = (float)Math.Log (relationsList [i].stateCounter + 1);
 
 		tempValue = (tempValue * 0.3742f) + 0.5f;
 
-		relationsList [i].populationModifier = tempValue;
+		relationsList [i].growthModifier = tempValue;
 	}
 
 	public void DiplomaticStateEffects() //This function calls all other diplomatic functions for each relation
@@ -148,7 +148,7 @@ public class DiplomacyControlScript : MasterScript
 			CalculateOffDefModifier(i);
 			CalculateResourceModifier(i);
 			CalculateStealthModifier(i);
-			CalculatePopulationModifier(i);
+			CalculateGrowthModifier(i);
 			relationsList[i].diplomaticState = UpdateDiplomaticPosition(i);
 			PeaceTreaty(i);
 		}
@@ -204,6 +204,6 @@ public class DiplomaticPosition
 	public TurnInfo playerOne, playerTwo;
 	public string diplomaticState;
 	public int stateCounter;
-	public float timeAtPeace, timeAtColdWar, timeAtWar, peaceTreatyTimer, offDefModifier, resourceModifier, stealthModifier, populationModifier;
+	public float timeAtPeace, timeAtColdWar, timeAtWar, peaceTreatyTimer, offDefModifier, resourceModifier, stealthModifier, growthModifier;
 	public bool ceaseFireActive, firstContact, adjacencyBonus, autoFight, tradeAllowed, peaceTreatyAllowed;
 }

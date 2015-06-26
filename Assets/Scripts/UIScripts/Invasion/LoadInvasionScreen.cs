@@ -34,8 +34,13 @@ public class LoadInvasionScreen : MasterScript
 			tokenScript.hero = tokenList[i].heroOwner;
 			tokenScript.originalParent = tokenList[i].originalParent;
 			tokenScript.originalPosition = tokenList[i].originalPosition;
+			tokenScript.name = tokenList[i].name;
+
+			Debug.Log (newToken.transform.position + " | " + tokenScript.originalPosition);
 
 			management.AssignTokenButton(newToken.GetComponent<UIButton>(), type);
+
+			management.allTokens.Add(newToken);
 		}
 	}
 

@@ -152,10 +152,13 @@ public class HeroMovement : MasterScript
 				nodeToPick = i; //Set this node to be the next to join the closed list
 			}
 		}
-		
-		closedList.Add (openList [nodeToPick]); //Add node to closed list
-		finalPath.Add (openList [nodeToPick].system); //You can also add it to the final path as the closed list does not change
-		openList.RemoveAt (nodeToPick); //Remove it from the open list- we will not be backtracking to already assigned nodes
+
+		if(nodeToPick != -1)
+		{
+			closedList.Add (openList [nodeToPick]); //Add node to closed list
+			finalPath.Add (openList [nodeToPick].system); //You can also add it to the final path as the closed list does not change
+			openList.RemoveAt (nodeToPick); //Remove it from the open list- we will not be backtracking to already assigned nodes
+		}
 	}
 
 	public void RefreshHeroLocation()

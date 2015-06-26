@@ -5,42 +5,78 @@ public class NereidesImprovements : MasterScript
 {
 	private ImprovementsBasic improvements;
 	private bool checkValue;
-	private TurnInfo thisPlayer;
+	private TurnInfo player;
 	
-	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
+	public void TechSwitch(int tech, int planet, ImprovementsBasic tempImprov, TurnInfo thisPlayer, bool check)
 	{
 		improvements = tempImprov;
 
 		systemSIMData = systemListConstructor.systemList [improvements.system].systemObject.GetComponent<SystemSIMData> ();
 
 		checkValue = check;
-		thisPlayer = player;
+		player = thisPlayer;
 		
 		switch (tech)
 		{
-		case 20:
+		case 32:
 			TN1I1();
 			break;
-		case 21:
+		case 33:
 			TN1I2();
 			break;
-		case 22:
-			TN2I1();
+		case 34:
+			TN1I3();
 			break;
-		case 23:
+		case 35:
+			TN1I4();
+			break;
+		case 36:
+			TN1I5(planet);
+			break;
+		case 37:
+			TN2I1(planet);
+			break;
+		case 38:
 			TN2I2();
 			break;
-		case 24:
+		case 39:
+			TN2I3();
+			break;
+		case 40:
+			TN2I4(planet);
+			break;
+		case 41:
+			TN2I5();
+			break;
+		case 42:
 			TN3I1();
 			break;
-		case 25:
-			TN3I2();
+		case 43:
+			TN3I2(planet);
 			break;
-		case 26:
+		case 44:
+			TN3I3();
+			break;
+		case 45:
+			TN3I4(planet);
+			break;
+		case 46:
+			TN3I5();
+			break;
+		case 47:
 			TN4I1();
 			break;
-		case 27:
-			TN4I2();
+		case 48:
+			TN4I2(planet);
+			break;
+		case 49:
+			TN4I3(planet);
+			break;
+		case 50:
+			TN4I4();
+			break;
+		case 51:
+			TN4I5();
 			break;
 		default:
 			break;
@@ -49,130 +85,56 @@ public class NereidesImprovements : MasterScript
 
 	private void TN1I1()
 	{
-		improvements.tempImprovementCostReduction = racialTraitScript.nereidesStacks;
+		improvements.improvementCostReduction = racialTraitScript.nereidesStacks;
 
 		if(checkValue == false)
 		{
 			improvements.improvementCostModifier += (int)improvements.tempImprovementCostReduction;
-			improvements.listOfImprovements[20].improvementMessage = ("-" + racialTraitScript.nereidesStacks + " Power Cost for Improvements");
+			improvements.listOfImprovements[32].improvementMessage = ("-" + racialTraitScript.nereidesStacks + " Power Cost for Improvements");
 		}
 	}
 
 	private void TN1I2()
 	{
-		improvements.tempKnwlBonus = 0.1f * (float)racialTraitScript.nereidesStacks;
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * improvements.tempKnwlBonus;
+		//TODO
+	}
+
+	private void TN1I3()
+	{
+		//TODO
+	}
+
+	private void TN1I4()
+	{
+		improvements.tempCount = 0.001 * racialTraitScript.nereidesStacks;
+		improvements.knowledgePercentBonus += improvements.tempCount;
 
 		if(checkValue == false)
 		{
-			improvements.knowledgePercentBonus += improvements.tempKnwlBonus;
-			improvements.listOfImprovements[21].improvementMessage = ("+" + improvements.tempCount + "% Knowledge from Elation");
+			improvements.listOfImprovements[35].improvementMessage = ("+" + improvements.tempCount * 100 + "% Knowledge from Stacks of Elation");
 		}
 	}
 
-	private void TN2I1()
+	private void TN1I5()
 	{
-		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
-		{
-			string tempString = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetType;
-			
-			if(tempString == "Boreal" || tempString == "Tundra" || tempString == "Desolate")
-			{
-				improvements.tempCount += 1f;
-			}
-		}
-		
-		if(improvements.IsBuiltOnPlanetType(improvements.system, 22, "Boreal") == true)
-		{
-			improvements.tempCount = improvements.tempCount * 2f;
-		}
-
-		improvements.planetToBuildOn.Add ("Boreal");
-		improvements.planetToBuildOn.Add ("Tundra");
-		improvements.planetToBuildOn.Add ("Desolate");
-
-		improvements.tempWealth = improvements.tempCount;
-
-		if(checkValue == false)
-		{
-			thisPlayer.wealth += (int)improvements.tempWealth;
-			improvements.listOfImprovements[22].improvementMessage = ("+" + improvements.tempCount + " Wealth from Cold Planets");
-		}
+		//TODO
 	}
 
-	private void TN2I2() //TODO this needs a value
+	private void TN2I1(int planet)
 	{
-		for(int i = 0; i < systemListConstructor.systemList[improvements.system].systemSize; ++i)
+		int wealthBonus = 1;
+
+		if(improvements.IsBuiltOnPlanetType(improvements.system, 37, "Boreal") || improvements.IsBuiltOnPlanetType(improvements.system, 37, "Tundra") ||
+		   improvements.IsBuiltOnPlanetType(improvements.system, 37, "Desolate"))
 		{
-			string tempString = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetType;
-			
-			if(tempString == "Boreal" && checkValue == false)
-			{
-				++improvements.tempImprovementSlots;
-				
-				if(checkValue == false)
-				{
-					++systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementSlots;
-					systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Add (null);
-				}
-			}
-			
-			if(tempString == "Tundra" && checkValue == false)
-			{
-				++improvements.tempImprovementSlots;
-				
-				if(checkValue == false)
-				{
-					++systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementSlots;
-					systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Add (null);
-				}
-			}
+			wealthBonus = 2;
 		}
 
-		improvements.planetToBuildOn.Add ("Boreal");
-		improvements.planetToBuildOn.Add ("Tundra");
+		improvements.upkeepWealth -= wealthBonus;
 
 		if(checkValue == false)
 		{
-			improvements.listOfImprovements[23].improvementMessage = ("+1 Improvement Slot on Tundra and Boreal Planets");
-		}
-	}
-
-	private void TN3I1()
-	{
-		for(int i = 0; i < systemListConstructor.systemList[improvements.system].planetsInSystem.Count; ++i)
-		{
-			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetCategory == "Hot")
-			{
-				improvements.tempKnwlUnitBonus = -systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetKnowledge;
-				improvements.tempPowUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPower * 0.5f;
-			}
-		}
-
-		if(checkValue == false)
-		{
-			improvements.listOfImprovements[24].improvementMessage = ("+50% Power and 0% Knowledge on Hot Planets");
-		}
-	}
-
-	private void TN3I2()
-	{
-		improvements.tempKnwlBonus += 1.0f;
-		improvements.tempCount = 100f;
-		
-		if(improvements.IsBuiltOnPlanetType(improvements.system, 25, "Boreal") == true)
-		{
-			improvements.tempKnwlBonus += 0.5f;
-			improvements.tempCount += 50f;
-		}
-
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * improvements.tempKnwlBonus;
-		improvements.planetToBuildOn.Add ("Boreal");
-
-		if(checkValue == false)
-		{
-			improvements.knowledgeBonusModifier += improvements.tempKnwlBonus;
-			improvements.listOfImprovements[25].improvementMessage = ("+" + improvements.tempCount + "% Effect from Knowledge Improvements");
+			improvements.listOfImprovements[37].improvementMessage = ("+" + wealthBonus + " Wealth on Planets");
 		}
 	}
 
@@ -195,7 +157,7 @@ public class NereidesImprovements : MasterScript
 
 		if(checkValue == false)
 		{
-			improvements.populationModifier += improvements.tempPopulationBonus;
+			improvements.growthModifier += improvements.tempPopulationBonus;
 			improvements.listOfImprovements[26].improvementMessage = ("+" + improvements.tempCount * racialTraitScript.nereidesStacks + "Population from Elation");
 		}
 	}

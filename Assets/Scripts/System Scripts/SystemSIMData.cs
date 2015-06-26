@@ -18,10 +18,10 @@ public class SystemSIMData : MasterScript
 	public GameObject protectedBy = null;
 
 	public float totalSystemKnowledge, totalSystemPower, totalSystemSIM, totalSystemAmber, totalSystemWealth;
-	public float flResourceModifier, flPopulationModifier, flOffDefModifier;
+	public float flResourceModifier, flgrowthModifier, flOffDefModifier;
 	public float secRecPowerMod, secRecKnowledgeMod, secRecPopulationMod;
 	public float planetKnowledgeModifier, planetPowerModifier;
-	public float systemKnowledgeModifier, systemPowerModifier, systemPopulationModifier;
+	public float systemKnowledgeModifier, systemPowerModifier, systemgrowthModifier;
 	private TurnInfo thisPlayer;
 
 	void Start()
@@ -93,7 +93,7 @@ public class SystemSIMData : MasterScript
 				{
 					int rnd = UnityEngine.Random.Range (0, 100);
 					
-					if(rnd < 4 + improvementsBasic.resourceYieldBonus)
+					if(rnd < 4 * improvementsBasic.resourceYieldBonus)
 					{
 						switch(systemListConstructor.systemList[thisSystem].planetsInSystem[j].rareResourceType)
 						{
@@ -141,7 +141,7 @@ public class SystemSIMData : MasterScript
 	{
 		systemKnowledgeModifier =  improvementsBasic.knowledgePercentBonus * EmbargoPenalty() * PromoteBonus() * improvementsBasic.amberPenalty * flResourceModifier;
 		systemPowerModifier =  improvementsBasic.powerPercentBonus * racialTraitScript.NereidesPowerModifer (thisPlayer) * EmbargoPenalty () * PromoteBonus () * improvementsBasic.amberPenalty * flResourceModifier;
-		systemPopulationModifier = racialTraitScript.HumanTrait (thisPlayer, improvementsBasic) * improvementsBasic.amberPenalty * flPopulationModifier * improvementsBasic.populationModifier;
+		systemgrowthModifier = racialTraitScript.HumanTrait (thisPlayer, improvementsBasic) * improvementsBasic.amberPenalty * flgrowthModifier * improvementsBasic.growthModifier;
 	}
 
 	public float CheckPlanetValues(int planet, string resource)
@@ -225,7 +225,7 @@ public class SystemSIMData : MasterScript
 						continue;
 					}
 
-					populationToAdd = systemPopulationModifier * secRecPopulationMod; //Growth is the standard growth rate for the planets in the system multiplied by secondary resource modifiers
+					populationToAdd = systemgrowthModifier * secRecPopulationMod; //Growth is the standard growth rate for the planets in the system multiplied by secondary resource modifiers
 
 					if(systemListConstructor.systemList[thisSystem].planetsInSystem[j].planetPopulation < 0) //If population is less than 0, the planet must be reset
 					{
@@ -243,7 +243,7 @@ public class SystemSIMData : MasterScript
 	private void CheckFrontLineBonus()
 	{
 		flResourceModifier = 1f;
-		flPopulationModifier = 1f;
+		flgrowthModifier = 1f;
 		flOffDefModifier = 1f;
 
 		int noSystems = 0;
@@ -257,7 +257,7 @@ public class SystemSIMData : MasterScript
 				DiplomaticPosition temp = diplomacyScript.ReturnDiplomaticRelation(systemListConstructor.systemList[thisSystem].systemOwnedBy, systemListConstructor.systemList[neighbour].systemOwnedBy);
 
 				flResourceModifier += temp.resourceModifier;
-				flPopulationModifier += temp.populationModifier;
+				flgrowthModifier += temp.growthModifier;
 				flOffDefModifier += temp.offDefModifier;
 				++noSystems;
 			}
@@ -266,7 +266,7 @@ public class SystemSIMData : MasterScript
 		if(noSystems != 0)
 		{
 			flResourceModifier = flResourceModifier / noSystems;
-			flPopulationModifier = flPopulationModifier / noSystems;
+			flgrowthModifier = flgrowthModifier / noSystems;
 			flOffDefModifier = flOffDefModifier / noSystems;
 		}
 	}

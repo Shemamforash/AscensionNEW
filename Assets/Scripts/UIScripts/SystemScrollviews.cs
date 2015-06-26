@@ -326,15 +326,17 @@ public class SystemScrollviews : MasterScript
 
 			temp = temp + Math.Round((improvementsBasic.powerPercentBonus - 1) * 100, 1) + "% Power from Improvements";
 		}
-		if(improvementsBasic.populationModifier != 1f)
+
+		if(improvementsBasic.growthModifier != 1f)
 		{
 			if(temp != "")
 			{
 				temp = temp + "\n+";
 			}
 
-			temp = temp + Math.Round((improvementsBasic.populationModifier - 1) * 100, 1) + "% Growth from Improvements";
+			temp = temp + Math.Round((improvementsBasic.growthModifier - 1) * 100, 1) + "% Growth from Improvements";
 		}
+
 		if(improvementsBasic.maxPopulationBonus != 0f)
 		{
 			if(temp != "")

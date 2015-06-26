@@ -16,7 +16,7 @@ public class TurnInfo : MasterScript
 	public Camera mainCamera;
 	public Material nereidesMaterial, humansMaterial, selkiesMaterial, materialInUse, emptyMaterial;
 	public Material nereidesLineMaterial, humansLineMaterial, selkiesLineMaterial, unownedLineMaterial;
-	public string playerRace, homePlanetType, playerHasWonRace, homeSystem;
+	public string playerRace, homePlanetType, homePlanetCategory, playerHasWonRace, homeSystem;
 	public int systemsInPlay = 0, heroCounter = 0;
 	public List<GameObject> playerOwnedHeroes = new List<GameObject> ();
 	public List<EnemyOne> allPlayers = new List<EnemyOne>();
@@ -83,6 +83,7 @@ public class TurnInfo : MasterScript
 			raceWealth = 0.6f;
 			homeSystem = "Midgard";
 			homePlanetType = "Ocean";
+			homePlanetCategory = "Terran";
 			materialInUse = turnInfoScript.humansMaterial;
 		}
 		if(playerRace == "Selkies")
@@ -92,6 +93,7 @@ public class TurnInfo : MasterScript
 			raceWealth = 0.5f;
 			homeSystem = "Samael";
 			homePlanetType = "Prairie";
+			homePlanetCategory = "Hot";
 			materialInUse = turnInfoScript.selkiesMaterial;
 		}
 		if(playerRace == "Nereides")
@@ -101,6 +103,7 @@ public class TurnInfo : MasterScript
 			raceWealth = 10.4f;
 			homeSystem = "Nephthys";
 			homePlanetType = "Boreal";
+			homePlanetCategory = "Cold";
 			materialInUse = turnInfoScript.nereidesMaterial;
 		}
 	}

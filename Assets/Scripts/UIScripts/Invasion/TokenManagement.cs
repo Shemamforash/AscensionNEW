@@ -6,6 +6,7 @@ public class TokenManagement : MasterScript
 {
 	private TokenBehaviour behaviour;
 	public GameObject token;
+	public List<GameObject> allTokens = new List<GameObject>();
 
 	void Start()
 	{
@@ -33,45 +34,36 @@ public class TokenManagement : MasterScript
 		for(int i = 0; i < systemListConstructor.systemList[system].systemSize; ++i) //For all planets in the system
 		{
 			PlanetInvasionInfo cachedPlanet = new PlanetInvasionInfo(); //Create object for planet
-			
-			foreach(Transform child in behaviour.tokenContainers[i]) //For all the containers within each planet
+
+			for(int j = 0; j < allTokens.Count; ++j)//else //It must be a token
 			{
-				foreach(Transform subChild in child) //For all children within the container
+				TokenUI tokenScript = allTokens[j].GetComponent<TokenUI>(); //So get a reference to it's script
+
+				TokenInfo temp = new TokenInfo();
+
+				temp.originalPosition = tokenScript.originalPosition;
+				temp.currentPosition = allTokens[j].transform.position;
+				temp.heroOwner = tokenScript.hero;
+				temp.originalParent = tokenScript.originalParent;
+				temp.currentParent = allTokens[j].transform.parent.gameObject;
+				temp.name = tokenScript.name;
+
+				switch(temp.name) //Switch based on name of container
 				{
-					if(subChild.name == "Label") //If the name of the child is not label
-					{
-						continue;
-					}
-					else //It must be a token
-					{
-						TokenUI tokenScript = subChild.GetComponent<TokenUI>(); //So get a reference to it's script
-
-						TokenInfo temp = new TokenInfo();
-
-						temp.originalPosition = tokenScript.originalPosition;
-						temp.currentPosition = subChild.transform.position;
-						temp.heroOwner = tokenScript.hero;
-						temp.originalParent = tokenScript.originalParent;
-						temp.currentParent = subChild.parent.gameObject;
-
-						switch(child.name) //Switch based on name of container
-						{
-						case "Defence Token":
-							cachedPlanet.defenceTokenAllocation.Add (temp); //If it's a defence token cache the token's hero into the planet list
-							break;
-						case "Assault Token":
-							cachedPlanet.assaultTokenAllocation.Add (temp); //Same for assault token
-							break;
-						case "Auxiliary Token":
-							cachedPlanet.auxiliaryTokenAllocation.Add (temp); //And for auxiliary token
-							break;
-						default:
-							break;
-						}
-					}
+				case "Defence Token":
+					cachedPlanet.defenceTokenAllocation.Add (temp); //If it's a defence token cache the token's hero into the planet list
+					break;
+				case "Assault Token":
+					cachedPlanet.assaultTokenAllocation.Add (temp); //Same for assault token
+					break;
+				case "Auxiliary Token":
+					cachedPlanet.auxiliaryTokenAllocation.Add (temp); //And for auxiliary token
+					break;
+				default:
+					break;
 				}
 			}
-			
+
 			cachedInvasion.tokenAllocation.Add (cachedPlanet);
 		}
 		
@@ -80,10 +72,12 @@ public class TokenManagement : MasterScript
 			systemInvasion.currentInvasions.Add (cachedInvasion); //Cache it
 			systemDefence = systemListConstructor.systemList[system].systemObject.GetComponent<SystemDefence>();
 			systemDefence.underInvasion = true;
+			allTokens.Clear ();
 		}
 		else //If it is
 		{
 			systemInvasion.currentInvasions[invasionLoc] = cachedInvasion; //Replace it with the updated one
+			allTokens.Clear ();
 		}
 	}
 
@@ -135,17 +129,22 @@ public class TokenManagement : MasterScript
 				switch (tokenType) //And change the button's sprites based on what kind of token it is
 				{
 				case "Assault":
+					tokenUI.name = "Assault Token";
 					invasionGUI.heroInvasionLabels[pos].assaultTokensList.Add (tempToken);
 					break;
 				case "Auxiliary":
+					tokenUI.name = "Auxiliary Token";
 					invasionGUI.heroInvasionLabels[pos].auxiliaryTokensList.Add (tempToken);
 					break;
 				case "Defence":
+					tokenUI.name = "Defence Token";
 					invasionGUI.heroInvasionLabels[pos].defenceTokensList.Add (tempToken);
 					break;
 				default:
 					break;
 				}
+
+				allTokens.Add (tempToken);
 			}
 			
 			else

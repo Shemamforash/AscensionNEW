@@ -461,7 +461,8 @@ public class SystemListConstructor : MasterScript
 					improvement.cost = float.Parse(reader.GetAttribute("D"));
 					improvement.wealthUpkeep = float.Parse (reader.GetAttribute("E"));
 					improvement.powerUpkeep = float.Parse (reader.GetAttribute("F"));
-					improvement.details = reader.GetAttribute("G") + "\n" + reader.GetAttribute("H");
+					improvement.influence = reader.GetAttribute("G");
+					improvement.details = reader.GetAttribute("H") + "\n" + reader.GetAttribute("I");
 					
 					basicImprovementsList.Add (improvement);
 				}
@@ -473,7 +474,6 @@ public class SystemListConstructor : MasterScript
 public class PlanetInfo
 {
 	public string planetType, planetCategory;
-	public bool colonised;
 	public float knowledge, power;
 	public int improvementSlots, wealthCost;
 }
@@ -489,6 +489,7 @@ public class StarSystem
 	public List<Planet> planetsInSystem = new List<Planet> ();
 	public List<Node> tempConnections = new List<Node>();
 	public List<GameObject> permanentConnections = new List<GameObject>();
+	public float sysKnowledgeModifier, sysPowerModifier, sysGrowthModifier, sysMaxPopulationModifier, sysResourceModifier, sysAmberPenalty, sysAmberModifier;
 }
 
 public class Planet
@@ -498,11 +499,12 @@ public class Planet
 	public float planetKnowledge, planetPower, planetPopulation, planetCurrentDefence, planetMaxDefence, defenceRegeneration, planetOffence, virusTimer, chillTimer, poisonTimer, chillLength, maxPopulation, expansionPenaltyTimer;
 	public bool planetColonised, underEnemyControl, virusActive, chillActive, poisonActive;
 	public int planetImprovementLevel, improvementSlots, wealthValue;
+	public float knowledgeModifier, powerModifier, growthModifier, maxPopulationModifier, resourceModifier, amberPenalty, amberModifier;
 }
 
 public class BasicImprovement
 {
-	public string name, category, details;
+	public string name, category, details, influence;
 	public float cost, wealthUpkeep, powerUpkeep;
 	public int level;
 }

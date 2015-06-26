@@ -17,7 +17,7 @@ public class GenericImprovements : MasterScript
 		selkiesImprovements = GameObject.Find ("ScriptsContainer").GetComponent<SelkiesImprovements> ();
 	}
 
-	public void TechSwitch(int tech, ImprovementsBasic tempImprov, TurnInfo player, bool check)
+	public void TechSwitch(int tech, int planet, ImprovementsBasic tempImprov, TurnInfo player, bool check)
 	{
 		improvements = tempImprov;
 
@@ -27,24 +27,6 @@ public class GenericImprovements : MasterScript
 		thisPlayer = player;
 
 		improvements.planetToBuildOn.Clear ();
-
-		improvements.tempKnwlUnitBonus = 0f;  
-		improvements.tempPowUnitBonus = 0f; 
-
-		improvements.tempKnwlBonus = 0f; //To Unit
-		improvements.tempPowBonus = 0f; //To Unit
-		improvements.tempPopulationBonus = 0f; //To Unit
-		improvements.tempAmberPenalty = 0f; //To Unit
-		improvements.tempPopulationUnitBonus = 0f; //To Unit
-
-		improvements.tempBonusAmbition = 0f; 
-		improvements.tempAmberProductionBonus = 0f; 
-		improvements.tempAmberPointBonus = 0f;
-		improvements.tempImprovementSlots = 0f;
-		improvements.tempWealth = 0f; 
-		
-		improvements.tempResearchCostReduction = 0f;  
-		improvements.tempImprovementCostReduction = 0f; 
 		
 		improvements.tempCount = 0f;		
 		
@@ -66,13 +48,13 @@ public class GenericImprovements : MasterScript
 			T1I2();
 			break;
 		case 5:
-			T1I3();
+			T1I3(planet);
 			break;
 		case 6:
-			T2I1();
+			T2I1(planet);
 			break;
 		case 7:
-			T2I2();
+			T2I2(planet);
 			break;
 		case 8:
 			T2I3();
@@ -106,45 +88,37 @@ public class GenericImprovements : MasterScript
 
 	private void T0I1() //Amplification
 	{
-		for(int i = 0; i < improvements.listOfImprovements.Count; ++i)
+		for(int i = 0; i < improvements.listOfImprovements.Count; ++i) //For all improvements
 		{
-			if(improvements.listOfImprovements[i].hasBeenBuilt == true)
+			if(improvements.listOfImprovements[i].hasBeenBuilt == true) //If it has been built
 			{
-				improvements.tempKnwlBonus += 0.025f;
-				improvements.tempPowBonus += 0.025f;
+				improvements.knowledgePercentBonus += 0.025f; //Increase counter by 2.5%
+				improvements.powerPercentBonus += 0.025f;
 				improvements.tempCount += 0.025f;
 			}
 		}
 
-		improvements.tempKnwlUnitBonus = systemSIMData.totalSystemKnowledge * improvements.tempKnwlBonus;
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
-
 		if(checkValue == false)
 		{
-			improvements.knowledgePercentBonus += improvements.tempKnwlBonus;
-			improvements.powerPercentBonus += improvements.tempPowBonus;
 			improvements.listOfImprovements[0].improvementMessage = ("+" + improvements.tempCount * 100f + "% Production from Improvements");
 		}
 	}
 
 	private void T0I2() //Fertile Link
 	{
-		for(int i = 0; i < systemListConstructor.systemList[improvements.system].permanentConnections.Count; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].permanentConnections.Count; ++i) //For all connections
 		{
 			int k = RefreshCurrentSystem(systemListConstructor.systemList[improvements.system].permanentConnections[i]);
 			
-			if(systemListConstructor.systemList[k].systemOwnedBy == thisPlayer.playerRace)
+			if(systemListConstructor.systemList[k].systemOwnedBy == thisPlayer.playerRace) //If connected system is allied
 			{
-				improvements.tempPowBonus += 0.075f;
+				improvements.powerPercentBonus += 0.075f; //Increase counter by 7.5%
 				improvements.tempCount += 0.075f;
 			}
 		}
 
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
-
 		if(checkValue == false)
 		{
-			improvements.powerPercentBonus += improvements.tempPowBonus;
 			improvements.listOfImprovements[1].improvementMessage = ("+" + improvements.tempCount * 100f + "% Power from nearby systems");
 		}
 	}
@@ -170,24 +144,19 @@ public class GenericImprovements : MasterScript
 	{
 		int tempCount = CheckNumberOfPlanetsWithImprovement(4, thisPlayer, improvements);
 		
-		improvements.tempPowBonus = (tempCount * 0.005f);
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
+		improvements.powerPercentBonus += (tempCount * 0.005f);
 
 		if(checkValue == false)
 		{
-			improvements.powerPercentBonus += improvements.tempPowBonus;
 			improvements.listOfImprovements[4].improvementMessage = ("+" + improvements.tempCount * 0.5f + "% Power from other Systems with this Improvement");
 		}
 	}
 
-	private void T1I3() //Isolation
+	private void T1I3(int planet) //Isolation
 	{
-		for(int i = 0; i < systemListConstructor.systemList[improvements.system].planetsInSystem.Count; ++i)
-		{
-			float basePop = (systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetImprovementLevel + 1) * 25f;
+		float temp = (systemListConstructor.systemList[improvements.system].planetsInSystem[planet].planetImprovementLevel + 1) * 10f;
 
-			systemListConstructor.systemList[improvements.system].planetsInSystem[i].maxPopulation = basePop + systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetImprovementLevel * 10f;
-		}
+		improvements.maxPopulationBonus += temp;
 
 		if(checkValue == false)
 		{
@@ -195,123 +164,71 @@ public class GenericImprovements : MasterScript
 		}
 	}
 
-	private void T2I1() //Inertia
+	private void T2I1(int planet) //Inertia
 	{
 		improvements.tempCount = 0f;
 
-		for(int i = 0; i <  systemListConstructor.systemList[improvements.system].systemSize; ++i)
+		for(int i = 0; i < systemListConstructor.systemList[improvements.system].planetsInSystem[planet].improvementsBuilt.Count; ++i)
 		{
-			for(int j = 0; j < systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt.Count; ++j)
+			if(systemListConstructor.systemList[improvements.system].planetsInSystem[planet].improvementsBuilt[i] == "")
 			{
-				if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].improvementsBuilt[j] == "")
-				{
-					improvements.tempKnwlBonus += 0.05f;
-					improvements.tempCount += 0.05f;
-				}
+				improvements.knowledgePercentBonus += 0.05f;
 			}
 		}
 
 		if(checkValue == false)
 		{
-			improvements.listOfImprovements[6].improvementMessage = ("+" + improvements.tempCount * 100f + "% Knowledge from uncolonised planets");
+			improvements.listOfImprovements[6].improvementMessage = ("+5% Knowledge per unused improvement slot on planets");
 		}
 	}
 
-	private void T2I2() //Nostalgia
+	private void T2I2(int planet) //Nostalgia
 	{
 		bool allPlanetsColonised  = true;
-		
-		for(int j = 0; j <  systemListConstructor.systemList[improvements.system].systemSize; ++j)
+
+		if(systemListConstructor.systemList[improvements.system].planetsInSystem[planet].planetType == thisPlayer.homePlanetType)
 		{
-			if(systemListConstructor.systemList[improvements.system].planetsInSystem[j].planetColonised == false)
-			{
-				allPlanetsColonised = false;
-			}
+			improvements.powerPercentBonus += 1f;
+			improvements.knowledgePercentBonus += 1f;
 		}
-		
-		if(allPlanetsColonised == true)
-		{
-			improvements.tempPowUnitBonus += 0.2f;
-			improvements.tempCount += 0.2f;
-		}
-		
-		improvements.tempPowBonus += 0.1f;
-		improvements.tempCount += 0.1f;
-		improvements.tempPowUnitBonus = systemSIMData.totalSystemPower * improvements.tempPowBonus;
 
 		if(checkValue == false)
 		{
-			improvements.powerPercentBonus += improvements.tempPowBonus;
-			improvements.listOfImprovements[7].improvementMessage = ("+" + improvements.tempCount * 100f + "% Power on System");
+			improvements.listOfImprovements[7].improvementMessage = ("+100% Power and Knowledge on home type planets");
 		}
 	}
 
 	private void T2I3()
 	{
-		for(int i = 0; i < systemListConstructor.systemList[improvements.system].planetsInSystem.Count; ++i)
-		{
-			string cat = null;
-
-			switch(thisPlayer.playerRace)
-			{
-			case "Selkies":
-				cat = "Hot";
-				break;
-			case "Humans":
-				cat = "Terran";
-				break;
-			case "Nereides":
-				cat = "Cold";
-				break;
-			default:
-				break;
-			}
-
-			if(systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetCategory == cat)
-			{
-				improvements.tempKnwlUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetKnowledge;
-				improvements.tempPowUnitBonus = systemListConstructor.systemList[improvements.system].planetsInSystem[i].planetPower;
-			}
-		}
-
-		if(checkValue == false)
-		{
-			improvements.listOfImprovements[8].improvementMessage = ("2x SI production on Home-Type Planets");
-		}
+		//TODO
 	}
 
 	private void T3I1()
 	{
-		float tempCountB = 0.0f;
+		improvements.tempCount = 0.0025 * (systemSIMData.totalSystemKnowledge + systemSIMData.totalSystemPower);
 		
-		improvements.tempKnwlUnitBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemKnowledge;
-		improvements.tempCount = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemKnowledge;
-		
-		improvements.tempPowUnitBonus += (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemPower;
-		tempCountB = (0.025f * turnInfoScript.turn) * systemSIMData.totalSystemPower;
+		improvements.knowledgePercentBonus += improvements.tempCount;
+		improvements.upkeepModifier += improvements.tempCount;
 
 		if(checkValue == false)
 		{
-			systemSIMData.knowledgeUnitBonus += improvements.tempKnwlUnitBonus;
-			systemSIMData.powerUnitBonus -= improvements.tempPowUnitBonus;
-			improvements.listOfImprovements[9].improvementMessage = ("+" + improvements.tempCount + " Knowledge, -" + tempCountB + " Power On System");
+			improvements.listOfImprovements[9].improvementMessage = ("+" + (improvements.tempCount * 100) + "% Knowledge from KP output On System");
 		}
 	}
 
 	private void T3I2()
 	{
-		//TODO
+		improvements.upkeepModifier -= 0.5f;
+
+		if(checkValue == false)
+		{
+			improvements.listOfImprovements[10].improvementMessage = "-50% Upkeep on Improvements";
+		}
 	}
 
 	private void T3I3()
 	{
-		improvements.tempResearchCostReduction = CheckNumberOfPlanetsWithImprovement(11, thisPlayer, improvements);
-
-		if(checkValue == false)
-		{
-			improvements.researchCost += (int)improvements.tempResearchCostReduction;
-			improvements.listOfImprovements[11].improvementMessage = ("-" + improvements.tempCount + " Research cost from other Systems with this Improvement");
-		}
+		//TODO
 	}
 
 	private int CheckNumberOfPlanetsWithImprovement(int improvementNo, TurnInfo thisPlayer, ImprovementsBasic improvements)

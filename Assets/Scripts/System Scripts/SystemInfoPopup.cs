@@ -103,8 +103,8 @@ public class SystemInfoPopup : MasterScript
 			
 			float distanceBasedA = 0f;
 
-			if(systemListConstructor.systemList[i].systemOwnedBy != null)
-			{
+			//if(systemListConstructor.systemList[i].systemOwnedBy != null)
+			//{
 				distanceBasedA = (mainCamera.transform.position.z + 100f) / -80f;
 
 				if(distanceBasedA < 0f)
@@ -115,7 +115,7 @@ public class SystemInfoPopup : MasterScript
 				{
 					distanceBasedA = 0.75f;
 				}
-			}
+			//}
 
 			tempColor.a = distanceBasedA; //Change the colour
 			

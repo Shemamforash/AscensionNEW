@@ -211,4 +211,5 @@ public class TokenInfo
 {
 	public Vector3 originalPosition, currentPosition;
 	public GameObject heroOwner, originalParent, currentParent;
+	public string name;
 }
